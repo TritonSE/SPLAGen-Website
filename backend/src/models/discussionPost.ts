@@ -23,6 +23,9 @@ const discussionPostSchema = new Schema(
     },
     channel: {
       type: String,
+      required: true,
+      default: "everyone",
+      // TODO: Add enum for channel values when valid options are defined
     },
   },
   { timestamps: true },
