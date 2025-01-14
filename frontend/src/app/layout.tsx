@@ -1,6 +1,9 @@
 import { Geist, Geist_Mono } from "next/font/google";
 
+import SideNavbar from "./components/Shared/SideNavbar";
+
 import type { Metadata } from "next";
+
 import "./globals.css";
 
 const geistSans = Geist({
@@ -25,7 +28,17 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>{children}</body>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <div className="layout-container">
+          <SideNavbar/>
+
+          <section className="main-content">
+            {/* Insert Top Bar Here */}
+          </section>
+
+          <main>{children}</main>
+        </div>
+        </body>
     </html>
   );
 }
