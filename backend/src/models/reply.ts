@@ -12,6 +12,10 @@ const replySchema = new Schema(
       ref: "DiscussionPost",
       required: true,
     },
+    message: {
+      type: String,
+      required: true,
+    },
   },
   { timestamps: true },
 );

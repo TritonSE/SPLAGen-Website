@@ -13,6 +13,17 @@ const discussionPostSchema = new Schema(
         ref: "Reply",
       },
     ],
+    title: {
+      type: String,
+      required: true,
+    },
+    message: {
+      type: String,
+      required: true,
+    },
+    channel: {
+      type: String,
+    },
   },
   { timestamps: true },
 );
