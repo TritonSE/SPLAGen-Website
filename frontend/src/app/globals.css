@@ -36,4 +36,20 @@ body {
   color: var(--color-text1);
   background: var(--color-background);
   font-family: 'DM-sans', Arial, Helvetica, sans-serif;
+  min-width: 800px;
+}
+
+.layout-container {
+  display: flex;
+  height: 100vh;
+  overflow-x: hidden;
+  min-width: 800px;
+}
+
+.main-content {
+  flex-grow: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  word-wrap: break-word;
+  padding: 40px;
 }
