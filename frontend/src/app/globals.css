@@ -1,6 +1,6 @@
 @font-face {
-  font-family: 'DM-sans';
-  src: url('../../public/fonts/DMSans-VariableFont_opsz\,wght.ttf') format('truetype'); 
+  font-family: "DM-sans";
+  src: url("../../public/fonts/DMSans-VariableFont_opsz\,wght.ttf") format("truetype");
   font-weight: 100 900;
   font-style: normal;
 }
@@ -10,18 +10,18 @@
 @tailwind utilities;
 
 :root {
-  --color-primary1:#3b3b62;
-  --color-primary2:#5189ae;
-  --color-primary3:#4368a4;
+  --color-primary1: #3b3b62;
+  --color-primary2: #5189ae;
+  --color-primary3: #4368a4;
 
   --color-secondary1: #eff3f7;
   --color-secondary2: #53b0d1;
 
-  --color-background:#eff3f7;
-  --color-surface:#ffffff;
+  --color-background: #eff3f7;
+  --color-surface: #ffffff;
   --color-grey0: #f3f3f3;
-  --color-success:#3bb966;
-  --color-error:#b93b3b;
+  --color-success: #3bb966;
+  --color-error: #b93b3b;
   --color-text1: #333435;
 }
 
@@ -35,7 +35,7 @@
 body {
   color: var(--color-text1);
   background: var(--color-background);
-  font-family: 'DM-sans', Arial, Helvetica, sans-serif;
+  font-family: "DM-sans", Arial, Helvetica, sans-serif;
   min-width: 800px;
 }
 
@@ -43,7 +43,7 @@ body {
   display: flex;
   height: 100vh;
   overflow-x: hidden;
-  min-width: 800px;
+  min-width: 500px;
 }
 
 .main-content {

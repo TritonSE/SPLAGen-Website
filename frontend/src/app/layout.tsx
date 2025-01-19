@@ -1,8 +1,6 @@
-
 import SideNavbar from "./components/SideNavbar";
 
 import "./globals.css";
-
 
 export default function RootLayout({
   children,
@@ -13,8 +11,8 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <div className="layout-container">
-          <SideNavbar/>
-          
+          <SideNavbar />
+
           <section className="main-content">
             {/* Insert Top Bar Here */}
             <main>{children}</main>
