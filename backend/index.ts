@@ -1,6 +1,7 @@
 import dotenv from "dotenv";
 import express, { Express, NextFunction, Request, Response } from "express";
 import { isHttpError } from "http-errors";
+import userRoutes from './routes/user'
 
 import discussionRoutes from "./src/routes/discussion";
 import replyRoutes from "./src/routes/reply";
@@ -13,11 +14,7 @@ const port = process.env.PORT ?? 3001;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-app.use(express.json());
-
 app.use("/api/user", userRoutes);
-
 app.get("/", (req: Request, res: Response) => {
   res.send("Express + TypeScript Server");
 });
