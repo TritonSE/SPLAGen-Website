@@ -1,7 +1,7 @@
 import Image from "next/image";
 
 import LanguageSwitcher from "./components/languageSwitcher";
-import External from "./components/text";
+import External from "./components/translationDemo";
 
 export default function Home() {
   return (
