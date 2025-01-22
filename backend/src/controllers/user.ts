@@ -5,10 +5,10 @@ import UserModel, { DisplayUser, UserRole } from "../models/user";
 import { validationResult } from "express-validator";
 import validationErrorParser from "../util/validationErrorParser";
 import createHttpError from "http-errors";
-import {
-  sendOwnPasswordChangedNotificationEmail,
-  sendPasswordChangedEmailToAdmin,
-} from "../services/emails";
+// import {
+//   sendOwnPasswordChangedNotificationEmail,
+//   sendPasswordChangedEmailToAdmin,
+// } from "../services/emails";
 
 /**
  * Retrieves data about the current user (their MongoDB ID, Firebase UID, and role).
@@ -90,58 +90,58 @@ export const createUser: RequestHandler = async (req: SPLAGENRequest, res, next)
 /**
  * Changes a user's password, finding the user by their UID
  */
-export const changeUserPassword: RequestHandler = async (req, res, next) => {
-  try {
-    const errors = validationResult(req);
+// export const changeUserPassword: RequestHandler = async (req, res, next) => {
+//   try {
+//     const errors = validationResult(req);
 
-    validationErrorParser(errors);
+//     validationErrorParser(errors);
 
-    const { password } = req.body;
-    const { uid } = req.params;
+//     const { password } = req.body;
+//     const { uid } = req.params;
 
-    const updatedUser = await firebaseAuth.updateUser(uid, {
-      password,
-    });
+//     const updatedUser = await firebaseAuth.updateUser(uid, {
+//       password,
+//     });
 
-    await sendPasswordChangedEmailToAdmin(updatedUser.email!);
+//     await sendPasswordChangedEmailToAdmin(updatedUser.email!);
 
-    res.status(200).json(updatedUser);
-  } catch (error) {
-    next(error);
-  }
-};
+//     res.status(200).json(updatedUser);
+//   } catch (error) {
+//     next(error);
+//   }
+// };
 
 /**
  * Sends an email to notify the user that their password has been reset.
  */
-export const notifyResetPassword: RequestHandler = async (req: SPLAGENRequest, res, next) => {
-  try {
-    const { userUid } = req;
-    const firebaseUser = await firebaseAuth.getUser(userUid!);
-    await sendOwnPasswordChangedNotificationEmail(firebaseUser.email!);
-    await sendPasswordChangedEmailToAdmin(firebaseUser.email!);
+// export const notifyResetPassword: RequestHandler = async (req: SPLAGENRequest, res, next) => {
+//   try {
+//     const { userUid } = req;
+//     const firebaseUser = await firebaseAuth.getUser(userUid!);
+//     await sendOwnPasswordChangedNotificationEmail(firebaseUser.email!);
+//     await sendPasswordChangedEmailToAdmin(firebaseUser.email!);
 
-    res.status(204).send();
-  } catch (error) {
-    next(error);
-  }
-};
+//     res.status(204).send();
+//   } catch (error) {
+//     next(error);
+//   }
+// };
 
 /**
  * Deletes a user from the Firebase and MongoDB databases
  */
-export const deleteUser: RequestHandler = async (req, res, next) => {
-  try {
-    const { uid } = req.params;
+// export const deleteUser: RequestHandler = async (req: SPLAGENRequest, res, next) => {
+//   try {
+//     const { uid } = req.params;
 
-    await firebaseAuth.deleteUser(uid);
+//     await firebaseAuth.deleteUser(uid);
 
-    const deletedUser = await UserModel.deleteOne({ uid });
-    if (deletedUser === null) {
-      throw createHttpError(404, "User not found at uid " + uid);
-    }
-    return res.status(204).send();
-  } catch (error) {
-    next(error);
-  }
-};
+//     const deletedUser = await UserModel.deleteOne({ uid });
+//     if (deletedUser === null) {
+//       throw createHttpError(404, "User not found at uid " + uid);
+//     }
+//     return res.status(204).send();
+//   } catch (error) {
+//     next(error);
+//   }
+// };

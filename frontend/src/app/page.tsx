@@ -1,4 +1,5 @@
 import Image from "next/image";
+import LoginPage from "./pages/LogInPage";
 import SignUpPage from "./pages/SignUpPage";
 
 export default function Home() {
@@ -80,6 +81,7 @@ export default function Home() {
     //     </a>
     //   </footer>
     // </div>
-    <SignUpPage></SignUpPage>
+    // <SignUpPage></SignUpPage>
+    <LoginPage></LoginPage>
   );
 }

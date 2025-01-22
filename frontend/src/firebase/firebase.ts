@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import env from "@/util/validateEnv";
 
 /**
@@ -17,4 +17,14 @@ export const initFirebase = () => {
   const auth = getAuth(app);
 
   return { app, auth };
+};
+
+export const loginUser = async (email: string, password: string) => {
+  const auth = getAuth();
+  try {
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    return userCredential.user;
+  } catch (error) {
+    throw new Error("Can't Login User");
+  }
 };

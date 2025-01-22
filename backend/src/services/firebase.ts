@@ -8,7 +8,7 @@
 import * as firebase from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
 import { InternalError } from "../errors/internal";
-import env from "../util/vaildateEnv";
+import env from "../util/validateEnv";
 
 /**
  * Initializes Firebase Auth using the SERVICE_ACCOUNT_KEY environment variable
