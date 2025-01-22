@@ -15,7 +15,6 @@ void i18n
       es: { translation: es },
       pt: { translation: pt },
     },
-    lng: "en",
     fallbackLng: "en",
     interpolation: {
       escapeValue: false,
