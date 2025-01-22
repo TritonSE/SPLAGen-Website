@@ -16,17 +16,13 @@
   "license": "ISC",
   "dependencies": {
     "dotenv": "^16.4.7",
-<<<<<<< HEAD
     "envalid": "^8.0.0",
     "express": "^4.21.2",
     "express-validator": "^7.2.1",
     "firebase": "^11.1.0",
-    "firebase-admin": "^13.0.2"
-=======
-    "express": "^4.21.2",
+    "firebase-admin": "^13.0.2",
     "mongodb": "^5.7.0",
     "mongoose": "^7.4.0"
->>>>>>> 320cbaa292b7f4450ac97ec1bcc7d9da514be266
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",

@@ -9,6 +9,8 @@ import { json, str } from "envalid/dist/validators";
 /**
  * NextJS only allows the frontend to access environment variables if they start with
  * "NEXT_PUBLIC", so we have to manually acccess attributes of process.env here.
+ * process.env.NEXT_PUBLIC_BACKEND_URL
+ * NEXT_PUBLIC_FIREBASE_SETTINGS: process.env.NEXT_PUBLIC_FIREBASE_SETTINGS
  */
 export default cleanEnv(
   {
