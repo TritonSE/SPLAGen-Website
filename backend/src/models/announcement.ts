@@ -6,11 +6,13 @@ const announcementSchema = new Schema(
     message: {
       title: { type: String, required: true },
       channel: { type: String, required: true, default: "everyone" },
-      // text as html
+      // text as markdown?
       text: { type: String, required: true },
     },
-    // How to handle file attachments?
+    //Files should be urls?
+    files: [{ type: String }],
     commentsAllowed: { type: Boolean, required: true },
+    comments: [{ type: Schema.Types.ObjectId }],
   },
   { timestamps: true },
 );

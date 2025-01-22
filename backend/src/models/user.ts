@@ -2,17 +2,18 @@ import { InferSchemaType, Schema, model } from "mongoose";
 
 const userSchema = new Schema(
   {
-    // Should I add an separate firebaseId field or should we directly link with _id?
-    _id: { type: String, required: true },
+    firebaseId: { type: String, required: true },
 
     account: {
-      type: { type: String, enum: ["Admin", "Counselor"], required: true },
+      type: { type: String, enum: ["superadmin", "admin", "counselor", "student"], required: true },
       inDirectory: { type: Boolean, required: true },
       profilePicture: { type: String, default: "" },
-
-      // Is membership required for counselors?
-      // Should this be an enum, and if so, what are the possible values?
-      membership: { type: String, required: true },
+      // can they have multiple memberships?
+      membership: {
+        type: String,
+        enum: ["student", "geneticCounselor", "healthcareProvider", "associate"],
+        required: true,
+      },
     },
 
     personal: {
@@ -23,12 +24,14 @@ const userSchema = new Schema(
 
     professional: {
       title: { type: String },
-      prefLanguages: [{ type: String, enum: ["English", "Spanish"] }],
+      prefLanguages: [{ type: String, enum: ["english", "spanish", "portuguese", "other"] }],
+      otherPrefLanguages: { type: String },
       country: { type: String },
     },
 
     education: {
-      degree: { type: String },
+      degree: { type: String, enum: ["masters", "diploma", "fellowship", "other"] },
+      otherDegree: { type: String, default: "" },
       institution: { type: String },
     },
 
@@ -41,9 +44,32 @@ const userSchema = new Schema(
     display: {
       workEmail: { type: String },
       workPhone: { type: String },
-      // How to get services enum values?
-      services: [{ type: String }],
-      languages: [{ type: String, enum: ["English", "Spanish", "Portuguese", "Other"] }],
+
+      // I feel like this should not be hard-coded? Like we should have a single list elsewhere
+      services: [
+        {
+          type: String,
+          enum: [
+            "pediatrics",
+            "cardiovascular",
+            "neurogenetics",
+            "rareDiseases",
+            "cancer",
+            "biochemical",
+            "prenatal",
+            "adult",
+            "psychiatric",
+            "reproductive",
+            "ophthalmic",
+            "research",
+            "pharmacogenomics",
+            "metabolic",
+            "other",
+          ],
+        },
+      ],
+
+      languages: [{ type: String, enum: ["english", "spanish", "portuguese", "other"] }],
       license: [{ type: String }],
 
       options: {
@@ -51,8 +77,14 @@ const userSchema = new Schema(
         openToRequests: { type: Boolean, default: false },
         remote: { type: Boolean, default: false },
       },
+
+      comments: {
+        noLicense: { type: String },
+        additional: { type: String },
+      },
     },
   },
+
   { timestamps: true },
 );
 
