@@ -3,16 +3,26 @@
 import React, { useState } from "react";
 import "./EditBasicInfoModal.css";
 
-const EditBasicInfoModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
+// Add onSubmit prop
+const EditBasicInfoModal = ({
+  isOpen,
+  onClose,
+  onSubmit,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  onSubmit: (data: { firstName: string; lastName: string; email: string; phone: string }) => void;
+}) => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
 
+  // Modify handleSave to use onSubmit from parent
   const handleSave = () => {
-    // Handle saving logic
-    console.log("Saved:", { firstName, lastName, email, phone });
-    onClose();
+    const data = { firstName, lastName, email, phone };
+    onSubmit(data); // Call onSubmit with the form data
+    onClose(); // Close the modal after submitting
   };
 
   return isOpen ? (
