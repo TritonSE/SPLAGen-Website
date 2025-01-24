@@ -23,7 +23,7 @@ const NavCard = ({ iconLight, iconDark, message, navigateTo }: CardProps) => {
     <Link href={navigateTo} className={`${style.card} ${isActive ? style.activePage : ""}`}>
       <Image
         src={isActive ? `/icons/${iconLight}` : `/icons/${iconDark}`}
-        alt=""
+        alt={`Navigate to ${navigateTo}`}
         width={24}
         height={24}
       />

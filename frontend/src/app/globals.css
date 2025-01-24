@@ -10,8 +10,8 @@
 @tailwind utilities;
 
 :root {
-  --color-primary1: #3b3b62;
-  --color-primary2: #5189ae;
+  --color-primary1: #5189ae;
+  --color-primary2: #3b3b62;
   --color-primary3: #4368a4;
 
   --color-secondary1: #eff3f7;
@@ -36,14 +36,14 @@ body {
   color: var(--color-text1);
   background: var(--color-background);
   font-family: "DM-sans", Arial, Helvetica, sans-serif;
-  min-width: 800px;
+  height: 100%;
 }
 
 .layout-container {
   display: flex;
   height: 100vh;
   overflow-x: hidden;
-  min-width: 500px;
+  min-width: 30rem;
 }
 
 .main-content {
