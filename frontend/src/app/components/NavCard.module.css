@@ -2,16 +2,14 @@
   display: flex;
   gap: 10px;
   padding: 10px;
-  transition: border 0.1s ease-in-out;
   border-radius: 10px;
-  border: 2px solid transparent; /* Default transparent border */
 }
 
 .card:hover {
-  border: 2px solid var(--color-primary2); /* Solid border on hover */
+  background-color: var(--color-purplegrey);
 }
 
 .activePage {
-  background-color: var(--color-primary1);
-  color: var(--color-background);
+  background-color: white;
+  color: var(--color-primary2);
 }

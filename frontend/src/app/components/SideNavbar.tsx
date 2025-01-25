@@ -1,5 +1,6 @@
 "use client";
 import Image from "next/image";
+import Link from "next/link";
 import { useState } from "react";
 
 import logo from "../../../public/images/Logo_SPLAGen1.png";
@@ -105,14 +106,14 @@ const SideNavbar: React.FC = () => {
 
   return (
     <section className={styles.SideNavbar}>
-      <div className={styles.decoration}>
+      <Link href="/" className={styles.decoration}>
         <Image src={logo} alt="SPLAGen logo" aria-hidden="true" id={styles.logo} />
         <strong>SPLAGen</strong>
-      </div>
+      </Link>
 
       {/* Navigation cards */}
       <div className={styles.cards}>
-        <span className="text-gray-500" id={styles.overview}>
+        <span className="text-white-500" id={styles.overview}>
           OVERVIEW
         </span>
         {renderNavItems()}
@@ -172,7 +173,7 @@ const SideNavbar: React.FC = () => {
           alert("Are you sure you want to log out?");
         }}
       >
-        <Image src="/icons/logout_dark.svg" alt="Logout" width={24} height={24} />
+        <Image src="/icons/logout_light.svg" alt="Logout" width={24} height={24} />
         Log out
       </button>
     </section>

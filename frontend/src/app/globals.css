@@ -17,19 +17,13 @@
   --color-secondary1: #eff3f7;
   --color-secondary2: #53b0d1;
 
+  --color-purplegrey: #bcbccf;
   --color-background: #eff3f7;
   --color-surface: #ffffff;
   --color-grey0: #f3f3f3;
   --color-success: #3bb966;
   --color-error: #b93b3b;
   --color-text1: #333435;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 body {
