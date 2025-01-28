@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "./DirectoryInfoModal.css";
 
-interface DirectoryInfoModalProps {
+type DirectoryInfoModalProps = {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (data: {
@@ -16,7 +16,7 @@ interface DirectoryInfoModalProps {
     state: string;
     postcode: string;
   }) => void;
-}
+};
 
 const DirectoryInfoModal: React.FC<DirectoryInfoModalProps> = ({ isOpen, onClose, onSubmit }) => {
   const [degree, setDegree] = useState<string>("");

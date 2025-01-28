@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import "./CreatePostModal.css";
 
-interface CreatePostModalProps {
+type CreatePostModalProps = {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (data: { title: string; message: string }) => void;
-}
+};
 
 const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onSubmit }) => {
   const [title, setTitle] = useState<string>("");
