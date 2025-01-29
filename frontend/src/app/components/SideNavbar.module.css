@@ -11,16 +11,12 @@
   overflow: hidden;
 }
 
-.cards {
-  gap: 20px;
-}
-
 .decoration {
   display: flex;
   align-items: center;
   margin-bottom: clamp(10px, 5vh, 80px);
   font-size: 26px;
-  gap: clamp();
+  gap: 12px;
 }
 
 @media (max-height: 300px) {
