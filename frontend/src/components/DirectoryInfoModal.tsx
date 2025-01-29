@@ -1,5 +1,19 @@
 import React, { useState } from "react";
+import { z } from "zod";
 import "./DirectoryInfoModal.css";
+
+const directoryInfoSchema = z.object({
+  degree: z.string().min(3, "Degree must be at least 3 characters"),
+  institution: z.string().min(3, "Institution must be at least 3 characters"),
+  clinic: z.string().optional(),
+  website: z.string().url("Invalid website URL").optional(),
+  country: z.string().nonempty("Country is required"),
+  addressLine: z.string().optional(),
+  apartment: z.string().optional(),
+  city: z.string().optional(),
+  state: z.string().optional(),
+  postcode: z.string().min(5, "Postcode must be at least 5 characters"),
+});
 
 interface DirectoryInfoModalProps {
   isOpen: boolean;
@@ -29,6 +43,7 @@ const DirectoryInfoModal: React.FC<DirectoryInfoModalProps> = ({ isOpen, onClose
   const [city, setCity] = useState<string>("");
   const [state, setState] = useState<string>("");
   const [postcode, setPostcode] = useState<string>("");
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   if (!isOpen) return null;
 
@@ -38,6 +53,35 @@ const DirectoryInfoModal: React.FC<DirectoryInfoModalProps> = ({ isOpen, onClose
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    const result = directoryInfoSchema.safeParse({
+      degree,
+      institution,
+      clinic,
+      website,
+      country,
+      addressLine,
+      apartment,
+      city,
+      state,
+      postcode,
+    });
+
+    if (!result.success) {
+      // Extract error messages from validation result
+      const fieldErrors: Record<string, string> = {};
+      for (const [key, value] of Object.entries(result.error.format())) {
+        if (value && "_errors" in value) {
+          fieldErrors[key] = value._errors[0];
+        }
+      }
+      setErrors(fieldErrors);
+      return;
+    }
+
+    // Clear errors on successful validation
+    setErrors({});
+
     onSubmit({
       degree,
       institution,
@@ -84,6 +128,7 @@ const DirectoryInfoModal: React.FC<DirectoryInfoModalProps> = ({ isOpen, onClose
               placeholder="e.g. Master's Degree in Genetic Counceling"
               required
             />
+            {errors.degree && <p className="error-message">{errors.degree}</p>}
           </div>
           <div className="form-group">
             <label htmlFor="institution-title">Insitution of Education</label>
@@ -97,6 +142,7 @@ const DirectoryInfoModal: React.FC<DirectoryInfoModalProps> = ({ isOpen, onClose
               placeholder="e.g. University of California, San Diego"
               required
             />
+            {errors.institution && <p className="error-message">{errors.institution}</p>}
           </div>
           <div className="form-group">
             <label htmlFor="website-title">Clinic Website Link</label>
@@ -110,6 +156,7 @@ const DirectoryInfoModal: React.FC<DirectoryInfoModalProps> = ({ isOpen, onClose
               placeholder="Phone"
               required
             />
+            {errors.website && <p className="error-message">{errors.website}</p>}
           </div>
           <label htmlFor="address-title">Address of clinic</label>
           <div className="form-group">
@@ -135,6 +182,7 @@ const DirectoryInfoModal: React.FC<DirectoryInfoModalProps> = ({ isOpen, onClose
               <option value="China">China</option>
               <option value="South Korea">South Korea</option>
             </select>
+            {errors.country && <p className="error-message">{errors.country}</p>}
           </div>
           <div className="form-group">
             <input
@@ -192,6 +240,7 @@ const DirectoryInfoModal: React.FC<DirectoryInfoModalProps> = ({ isOpen, onClose
                 placeholder="Postcode"
                 required
               />
+              {errors.postcode && <p className="error-message">{errors.postcode}</p>}
             </div>
           </div>
           <div className="modal-actions">
