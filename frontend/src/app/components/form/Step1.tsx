@@ -1,6 +1,5 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-misused-promises */
+
 import { useStateMachine } from "little-state-machine";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
@@ -18,8 +17,8 @@ const Step1 = () => {
   const navigate = useNavigate();
 
   const onSubmit = (data: FormData) => {
-    actions.updateAction(data);  // TypeScript now knows that updateAction is a valid function
-    navigate("/result"); // Move to next step
+    actions.updateAction(data);
+    void navigate("/result");
   };
 
   return (
@@ -30,7 +29,7 @@ const Step1 = () => {
       <label>Country</label>
       <input {...register("country")} defaultValue={state.data.country} />
 
-      <button type="submit">Next</button>
+      <div><button type="submit">Next</button></div>
     </form>
   );
 };
