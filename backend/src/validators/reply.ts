@@ -2,6 +2,14 @@ import { Request, Response, NextFunction } from 'express';
 
 import { body, param, validationResult } from 'express-validator';
 
+function validateRequest(req: Request, res: Response, next: NextFunction) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    res.status(400).json({ errors: errors.array() });
+  }
+  next();
+}
+
 export const createReply = [
   body('content').isString().notEmpty().trim().withMessage('Content is required'),
   body('discussionId').isInt().withMessage('Valid discussion ID is required'),
@@ -24,10 +32,3 @@ export const deleteReply = [
   validateRequest,
 ];
 
-function validateRequest(req: Request, res: Response, next: NextFunction) {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-  next();
-}

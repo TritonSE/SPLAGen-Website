@@ -1,6 +1,14 @@
 import { Request, Response, NextFunction } from 'express';
 import { body, param, query, validationResult } from 'express-validator';
 
+function validateRequest(req: Request, res: Response, next: NextFunction) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    res.status(400).json({ errors: errors.array() });
+  }
+  next();
+}
+
 export const createDiscussion = [
   body('title').isString().notEmpty().trim().withMessage('Title is required'),
   body('content').isString().notEmpty().trim().withMessage('Content is required'),
@@ -39,10 +47,3 @@ export const getDiscussion = [
   validateRequest,
 ];
 
-function validateRequest(req: Request, res: Response, next: NextFunction) {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-  next();
-}
