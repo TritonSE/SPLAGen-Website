@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 
 // Temporary storage until database is set up
-interface User {
+type User = {
   id: number;
   name: string;
   email: string;

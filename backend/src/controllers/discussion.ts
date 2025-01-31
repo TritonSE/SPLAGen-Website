@@ -1,14 +1,14 @@
 import { Request, Response } from 'express';
 
 // Temporary storage for discussion posts
-interface Discussion {
+type Discussion = {
   id: number;
   title: string;
   content: string;
   replies: DiscussionReply[];
 }
 
-interface DiscussionReply {
+type DiscussionReply = {
   id: number;
   content: string;
 }

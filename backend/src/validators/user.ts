@@ -4,7 +4,8 @@ import { body, param, validationResult, Result, ValidationError } from 'express-
 function validateRequest(req: Request, res: Response, next: NextFunction): void {
   const errors: Result<ValidationError> = validationResult(req);
   if (!errors.isEmpty()) {
-    res.status(400).json({ errors: errors.array() });
+    const errorList: ValidationError[] = errors.array();
+    res.status(400).json({ errors: errorList });
     return;
   }
   next();
@@ -17,12 +18,12 @@ export const createUser = [
 ];
 
 export const deleteUser = [
-  param('id').isInt().withMessage('Valid user ID is required'),
+  param('id').toInt().isInt().withMessage('Valid user ID is required'),
   validateRequest
 ];
 
 export const getUser = [
-  param('id').isInt().withMessage('Valid user ID is required'),
+  param('id').toInt().isInt().withMessage('Valid user ID is required'),
   validateRequest
 ];
 

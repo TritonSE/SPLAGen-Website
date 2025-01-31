@@ -4,7 +4,8 @@ import { body, param, query, validationResult, Result, ValidationError } from 'e
 function validateRequest(req: Request, res: Response, next: NextFunction): void {
   const errors: Result<ValidationError> = validationResult(req);
   if (!errors.isEmpty()) {
-    res.status(400).json({ errors: errors.array() });
+    const errorList: ValidationError[] = errors.array();
+    res.status(400).json({ errors: errorList });
     return;
   }
   next();
@@ -17,14 +18,14 @@ export const createDiscussion = [
 ];
 
 export const editDiscussion = [
-  param('id').isInt().withMessage('Valid discussion ID is required'),
+  param('id').toInt().isInt().withMessage('Valid discussion ID is required'),
   body('title').optional().isString().trim().withMessage('Title must be a string'),
   body('content').optional().isString().trim().withMessage('Content must be a string'),
   validateRequest,
 ];
 
 export const deleteDiscussion = [
-  param('id').isInt().withMessage('Valid discussion ID is required'),
+  param('id').toInt().isInt().withMessage('Valid discussion ID is required'),
   validateRequest,
 ];
 
@@ -39,13 +40,13 @@ export const deleteMultipleDiscussions = [
 ];
 
 export const getMultipleDiscussions = [
-  query('page').optional().isInt({ min: 1 }).withMessage('Page must be a positive integer'),
-  query('limit').optional().isInt({ min: 1 }).withMessage('Limit must be a positive integer'),
+  query('page').optional().toInt().isInt({ min: 1 }).withMessage('Page must be a positive integer'),
+  query('limit').optional().toInt().isInt({ min: 1 }).withMessage('Limit must be a positive integer'),
   validateRequest,
 ];
 
 export const getDiscussion = [
-  param('id').isInt().withMessage('Valid discussion ID is required'),
+  param('id').toInt().isInt().withMessage('Valid discussion ID is required'),
   validateRequest,
 ];
 
