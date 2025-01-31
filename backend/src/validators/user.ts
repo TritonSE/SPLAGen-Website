@@ -1,10 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
-import { body, param, validationResult } from 'express-validator';
+import { body, param, validationResult, Result, ValidationError } from 'express-validator';
 
-function validateRequest(req: Request, res: Response, next: NextFunction) {
-  const errors = validationResult(req);
+function validateRequest(req: Request, res: Response, next: NextFunction): void {
+  const errors: Result<ValidationError> = validationResult(req);
   if (!errors.isEmpty()) {
     res.status(400).json({ errors: errors.array() });
+    return;
   }
   next();
 }

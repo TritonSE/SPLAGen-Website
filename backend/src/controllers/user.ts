@@ -1,23 +1,42 @@
 import { Request, Response } from 'express';
 
 // Temporary storage until database is set up
-const users: any[] = [];
+interface User {
+  id: number;
+  name: string;
+  email: string;
+}
 
-export const createUser = async (req: Request, res: Response) => {
+const users: User[] = [];
+
+export const createUser = (req: Request, res: Response) => {
   try {
-    const userData = req.body;
-    users.push({ id: users.length + 1, ...userData });
-    res.status(201).json({ message: 'User created successfully', user: userData });
+    const { name, email } = req.body as { name: string, email: string};
+    if (!name || !email) {
+      res.status(400).json({ error: 'Name and email are required' });
+      return;
+    }
+    const newUser: User = {
+      id: users.length + 1,
+      name,
+      email,
+    };
+    users.push(newUser);
+    res.status(201).json({ message: 'User created successfully', user: newUser });
   } catch (error) {
     console.error('Error creating user:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 };
 
-export const deleteUser = async (req: Request, res: Response) => {
+export const deleteUser = (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
-    const index = users.findIndex(user => user.id === parseInt(id));
+    const id  = parseInt(req.params.id, 10);
+    if (isNaN(id)) {
+      res.status(400).json({ error: 'Valid user ID is required' });
+      return;
+    }
+    const index = users.findIndex(user => user.id === id);
     if (index === -1) {
       res.status(404).json({ error: 'User not found' });
       return;
@@ -30,7 +49,7 @@ export const deleteUser = async (req: Request, res: Response) => {
   }
 };
 
-export const getAllUsers = async (_req: Request, res: Response) => {
+export const getAllUsers = (_req: Request, res: Response) => {
   try {
     res.status(200).json({ users });
   } catch (error) {
@@ -39,10 +58,14 @@ export const getAllUsers = async (_req: Request, res: Response) => {
   }
 };
 
-export const getUser = async (req: Request, res: Response) => {
+export const getUser = (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
-    const user = users.find(u => u.id === parseInt(id));
+    const id = parseInt(req.params.id, 10);
+    if (isNaN(id)) {
+      res.status(400).json({ error: 'Valid user ID is required' });
+      return;
+    }
+    const user = users.find(u => u.id === id);
     if (!user) {
       res.status(404).json({ error: 'User not found' });
       return;
