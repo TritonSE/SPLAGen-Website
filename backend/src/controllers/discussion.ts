@@ -105,7 +105,7 @@ export const deleteMultipleDiscussions = (req: Request, res: Response) => {
     const finalLength = discussions.length;
 
     res.status(200).json({
-      message: `${initialLength - finalLength} discussion(s) deleted successfully`,
+      message: `${(initialLength - finalLength).toString()} discussion(s) deleted successfully`,
       remainingDiscussions: discussions,
     });
   } catch (error) {
