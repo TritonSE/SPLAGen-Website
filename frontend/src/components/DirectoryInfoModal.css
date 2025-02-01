@@ -33,19 +33,19 @@
 }
 
 h2 {
-  text-align: center;
-  margin-bottom: 20px;
+  @apply text-mainHeading;
+  text-align: left;
+  margin-bottom: 8px;
   font-size: 1.25rem;
 }
 
 .form-group {
-  margin-bottom: 15px;
+  margin-bottom: 10px;
 }
 
 label {
   display: block;
-  font-weight: bold;
-  margin-bottom: 5px;
+  margin-bottom: 3px;
   color: #333;
 }
 
@@ -61,6 +61,7 @@ select {
 
 input::placeholder,
 select {
+  @apply text-disabled;
   font-style: italic;
 }
 
@@ -69,17 +70,15 @@ select {
 }
 
 .save-button {
-  background-color: #007bff;
+  @apply bg-mainHeading text-mainHeading;
   color: white;
-  padding: 10px 20px;
+  padding: 6px 10px;
   font-size: 1rem;
   border: none;
   border-radius: 4px;
   cursor: pointer;
-}
-
-.save-button:hover {
-  background-color: #0056b3;
+  width: 100%;
+  margin-top: 15px;
 }
 
 .city-state-postcode {
