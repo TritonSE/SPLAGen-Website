@@ -1,31 +1,26 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 // src/components/form/Step1.tsx
 "use client";
 
-import { useStateMachine } from "little-state-machine";
 import { useForm } from "react-hook-form";
 import { State } from "../../state/stateTypes";
-import updateAction from "../../state/updateAction";
 
 type Step1Props = {
   onNext: (data: State["data"]) => void;
 }
 
-const Step1 = ({ onNext }: Step1Props) => {
+const Step2 = ({ onNext }: Step1Props) => {
   const { register, handleSubmit } = useForm<State["data"]>();
-  const { actions } = useStateMachine({actions: { updateAction }});
 
   const onSubmit = (data: State["data"]) => {
-    actions.updateAction(data);
     onNext(data);
   };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <div className="space-y-2">
-        <label className="block">Professional Title</label>
+        <label className="block">goofy</label>
         <input 
           {...register("professionalTitle")} 
           className="w-full p-2 border rounded"
@@ -33,7 +28,7 @@ const Step1 = ({ onNext }: Step1Props) => {
       </div>
 
       <div className="space-y-2">
-        <label className="block">Country</label>
+        <label className="block">gooba</label>
         <input 
           {...register("country")} 
           className="w-full p-2 border rounded"
@@ -52,4 +47,4 @@ const Step1 = ({ onNext }: Step1Props) => {
   );
 };
 
-export default Step1;
+export default Step2;
