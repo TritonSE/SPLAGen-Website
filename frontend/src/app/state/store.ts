@@ -1,10 +1,15 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 import { createStore } from "little-state-machine";
 
-createStore({
+import { State } from "./stateTypes";
+
+const initialState: State = {
   data: {
     professionalTitle: "",
     country: "",
   },
-});
+};
+
+createStore(initialState);
 
 export {};

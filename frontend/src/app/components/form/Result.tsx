@@ -1,14 +1,20 @@
+"use client";
+
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+
 import { useStateMachine } from "little-state-machine";
-import { useNavigate } from "react-router-dom";
+import { useRouter } from "next/navigation";
 
 import updateAction from "../../state/updateAction";
 
 const Result = () => {
   const { state } = useStateMachine({ actions: { updateAction } });
-  const navigate = useNavigate();
+  const router = useRouter();
 
   const goBack = () => {
-    void navigate("/");
+    router.push("/");
   };
 
   return (
