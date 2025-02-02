@@ -1,8 +1,10 @@
-/* eslint-disable @typescript-eslint/no-misused-promises */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+"use client";
 
 import { useStateMachine } from "little-state-machine";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
 
 import updateAction from "../../state/updateAction";
 
@@ -13,21 +15,22 @@ type FormData = {
 
 const Step1 = () => {
   const { register, handleSubmit } = useForm<FormData>();
-  const { actions, state } = useStateMachine({actions: { updateAction }});
-  const navigate = useNavigate();
+  const { actions } = useStateMachine({ actions: { updateAction }});
+  const router = useRouter();
 
   const onSubmit = (data: FormData) => {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     actions.updateAction(data);
-    void navigate("/result");
+    router.push("/components/form/result");
   };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <label>Professional Title</label>
-      <input {...register("professionalTitle")} defaultValue={state.data.professionalTitle} />
+      <input {...register("professionalTitle")} defaultValue={""} />
 
       <label>Country</label>
-      <input {...register("country")} defaultValue={state.data.country} />
+      <input {...register("country")} defaultValue={""} />
 
       <div><button type="submit">Next</button></div>
     </form>
