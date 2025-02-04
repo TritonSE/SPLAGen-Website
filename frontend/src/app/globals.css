@@ -20,10 +20,18 @@
   --color-purplegrey: #bcbccf;
   --color-background: #eff3f7;
   --color-surface: #ffffff;
-  --color-grey0: #f3f3f3;
+
   --color-success: #3bb966;
   --color-error: #b93b3b;
   --color-text1: #333435;
+
+  --color-grey0: #f3f3f3;
+  --color-grey1: #ebebeb;
+  --color-grey2: #d8d8d8;
+  --color-grey3: #b4b4b4;
+  --color-grey4: #909090;
+  --color-grey5: #6c6c6c;
+  --color-grey6: #484848;
 }
 
 body {
@@ -38,12 +46,37 @@ body {
   height: 100vh;
   overflow-x: hidden;
   min-width: 30rem;
+  background-color: white;
 }
 
-.main-content {
+.viewPort {
   flex-grow: 1;
   overflow-y: auto;
   overflow-x: hidden;
   word-wrap: break-word;
-  padding: 40px;
+  background-color: var(--color-primary2);
+}
+
+main {
+  margin: 40px;
+  padding: 8px;
+  background-color: white;
+  border-radius: 8px;
+}
+
+form {
+  gap: 20px;
+}
+form input {
+  background-color: white;
+  outline: solid 1px var(--color-grey2);
+  padding: 6px 12px;
+  border-radius: 4px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+form input:focus {
+  outline: solid 1px var(--color-primary2);
+  box-shadow: 0 0 5px var(--color-primary2);
 }

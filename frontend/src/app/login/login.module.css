@@ -1,0 +1,7 @@
+.loginForm {
+  width: clamp(300px, 90%, 520px);
+  height: clamp(350px, auto, 427px);
+  display: flex;
+  flex-direction: column;
+  margin: auto;
+}
