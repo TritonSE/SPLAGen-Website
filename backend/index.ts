@@ -1,8 +1,9 @@
 import dotenv from "dotenv";
 import express, { Express, Request, Response } from "express";
-import userRoutes from './src/routes/user';
-import discussionRoutes from './src/routes/discussion';
-import replyRoutes from './src/routes/reply';
+
+import discussionRoutes from "./src/routes/discussion";
+import replyRoutes from "./src/routes/reply";
+import userRoutes from "./src/routes/user";
 
 dotenv.config();
 
@@ -16,10 +17,9 @@ app.get("/", (req: Request, res: Response) => {
   res.send("Express + TypeScript Server");
 });
 
-app.use('/api/users', userRoutes);
-app.use('/api/discussions', discussionRoutes);
-app.use('/api/replies', replyRoutes);
-
+app.use("/api/users", userRoutes);
+app.use("/api/discussions", discussionRoutes);
+app.use("/api/replies", replyRoutes);
 
 app.listen(port, () => {
   // eslint-disable-next-line @typescript-eslint/restrict-template-expressions

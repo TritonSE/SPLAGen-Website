@@ -1,6 +1,7 @@
-import express from 'express';
-import * as UserController from '../controllers/user';
-import * as UserValidator from '../validators/user';
+import express from "express";
+
+import * as UserController from "../controllers/user";
+import * as UserValidator from "../validators/user";
 
 const router = express.Router();
 
@@ -12,9 +13,9 @@ const router = express.Router();
  * GET /api/users/:id - Get specific user from directory
  */
 
-router.post('/', UserValidator.createUser, UserController.createUser);
-router.delete('/:id', UserValidator.deleteUser, UserController.deleteUser);
-router.get('/', UserController.getAllUsers);
-router.get('/:id', UserValidator.getUser, UserController.getUser);
+router.post("/", UserValidator.createUser, UserController.createUser);
+router.delete("/:id", UserValidator.deleteUser, UserController.deleteUser);
+router.get("/", UserController.getAllUsers);
+router.get("/:id", UserValidator.getUser, UserController.getUser);
 
 export default router;
