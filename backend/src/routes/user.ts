@@ -5,7 +5,7 @@ import * as UserController from "../controllers/user";
 const router = express.Router();
 
 router.get("/personal-information", UserController.getPersonalInformation);
-router.post("/personal-information", UserController.editPersonalInformation); //change to post
+router.post("/personal-information", UserController.editPersonalInformation); 
 
 router.get("/professional-information", UserController.getProfessionalInformation);
 router.post("/professional-information", UserController.editProfessionalInformation);
