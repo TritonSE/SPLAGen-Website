@@ -15,30 +15,26 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@eslint/config-array": "^0.19.2",
-    "@eslint/object-schema": "^2.1.6",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
-    "glob": "^11.0.1",
-    "mongodb": "^6.13.0",
-    "mongoose": "^8.10.0",
-    "rimraf": "^6.0.1"
+    "mongodb": "^5.7.0",
+    "mongoose": "^7.4.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
     "@eslint/js": "^9.17.0",
     "@types/express": "^5.0.0",
-    "@types/node": "^22.13.1",
-    "@typescript-eslint/eslint-plugin": "^8.23.0",
-    "@typescript-eslint/parser": "^8.23.0",
-    "eslint": "^9.19.0",
-    "eslint-config-prettier": "^10.0.1",
+    "@types/node": "^22.10.5",
+    "@typescript-eslint/eslint-plugin": "^8.19.0",
+    "@typescript-eslint/parser": "^8.19.0",
+    "eslint": "^8.57.1",
+    "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-import": "^2.31.0",
     "globals": "^15.14.0",
     "husky": "^9.1.7",
     "nodemon": "^3.1.9",
     "prettier": "^3.4.2",
     "ts-node": "^10.9.2",
-    "typescript": "^5.7.3"
+    "typescript": "^5.7.2"
   }
 }
