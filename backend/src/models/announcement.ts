@@ -12,7 +12,7 @@ const announcementSchema = new Schema(
     //Files should be urls?
     files: [{ type: String }],
     commentsAllowed: { type: Boolean, required: true },
-    comments: [{ type: Schema.Types.ObjectId }],
+    comments: [{ type: Schema.Types.ObjectId, ref: "AnnouncementComment" }],
   },
   { timestamps: true },
 );

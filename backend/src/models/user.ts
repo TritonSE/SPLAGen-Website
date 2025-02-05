@@ -20,6 +20,7 @@ const userSchema = new Schema(
       firstName: { type: String, required: true },
       lastName: { type: String, required: true },
       email: { type: String, required: true },
+      phone: { type: String },
     },
 
     professional: {
@@ -30,15 +31,22 @@ const userSchema = new Schema(
     },
 
     education: {
-      degree: { type: String, enum: ["masters", "diploma", "fellowship", "other"] },
+      degree: { type: String, enum: ["masters", "diploma", "fellowship", "md", "phd", "other"] },
+      program: { type: String },
       otherDegree: { type: String, default: "" },
       institution: { type: String },
+      email: { type: String },
+      gradDate: { type: String },
     },
 
     clinic: {
       name: { type: String },
       url: { type: String },
-      address: { type: String },
+      location: {
+        country: { type: String },
+        address: { type: String },
+        suite: { type: String },
+      },
     },
 
     display: {
