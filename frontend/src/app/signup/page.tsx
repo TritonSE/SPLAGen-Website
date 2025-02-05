@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 
-interface FormData {
+type FormData = {
   firstName: string;
   lastName: string;
   email: string;
@@ -42,7 +42,11 @@ const SignUpPage = () => {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gray-100">
       <div className="w-full max-w-md bg-white p-6 rounded-2xl shadow-md">
-        <h1 className="text-2xl font-bold text-left mb-2 text-mainHeading">Get started</h1>
+        {/* Updated text color to #3B3B62 according to Figma*/}
+        {/* <h1 className="text-2xl font-bold text-left mb-2 text-mainHeading">Get started</h1> */}
+        <h1 className="text-2xl font-bold text-left mb-2" style={{ color: "#3B3B62" }}>
+          Get started
+        </h1>
         <p className="text-left text-gray-600 mb-6">Welcome to SPAGen</p>
         <form onSubmit={handleSubmit}>
           <div className="mb-4 flex space-x-4">
@@ -79,7 +83,7 @@ const SignUpPage = () => {
           <div className="mb-4">
             <label className="block text-sm font-medium mb-1 text-black">Enter your email</label>
             <input
-              type="text"
+              type="email"
               value={formData.email}
               onChange={(e) => {
                 handleInputChange("email", e.target.value);
@@ -93,7 +97,7 @@ const SignUpPage = () => {
           <div className="mb-4">
             <label className="block text-sm font-medium mb-1 text-black">Create a Password</label>
             <input
-              type="text"
+              type="password"
               value={formData.password}
               onChange={(e) => {
                 handleInputChange("password", e.target.value);
@@ -107,8 +111,16 @@ const SignUpPage = () => {
             <button
               type="submit"
               disabled={!isFormValid}
-              className={`w-30 p-2 rounded-lg font-bold text-white mt-4 ${
-                isFormValid ? "bg-blue-500 hover:bg-blue-600" : "bg-gray-300 cursor-not-allowed"
+              /* Updated color for the buttons to be the purple button present
+              in throughout the app with the same hover effect color
+              as shown in Figma*/
+              // className={`w-30 p-2 rounded-lg font-bold text-white mt-4 ${
+              //   isFormValid ? "bg-blue-500 hover:bg-blue-600" : "bg-gray-300 cursor-not-allowed"
+              // }`}
+              className={`w-30 p-2 rounded-lg font-bold text-white mt-4 transition-colors ${
+                isFormValid 
+                  ? "bg-[#3B3B62] hover:bg-[#BCBCCF] active:bg-[#3B3B62]" 
+                  : "bg-[#D8D8D8] cursor-not-allowed"
               }`}
             >
               Continue
