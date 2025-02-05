@@ -3,6 +3,7 @@ import express, { Express, Request, Response, NextFunction } from "express";
 import { isHttpError } from "http-errors";
 
 import userRoutes from "./src/routes/user";
+import announcementRoutes from "./src/routes/announcement"
 
 dotenv.config();
 
@@ -12,6 +13,7 @@ const port = process.env.PORT ?? 3000;
 app.use(express.json());
 
 app.use("/api/user", userRoutes);
+app.use("/api/announcement", announcementRoutes);
 
 app.get("/", (req: Request, res: Response) => {
   res.send("Express + TypeScript Server");
