@@ -7,7 +7,7 @@ type FormData = {
   lastName: string;
   email: string;
   password: string;
-}
+};
 
 const SignUpPage = () => {
   const [formData, setFormData] = useState<FormData>({
@@ -118,8 +118,8 @@ const SignUpPage = () => {
               //   isFormValid ? "bg-blue-500 hover:bg-blue-600" : "bg-gray-300 cursor-not-allowed"
               // }`}
               className={`w-30 p-2 rounded-lg font-bold text-white mt-4 transition-colors ${
-                isFormValid 
-                  ? "bg-[#3B3B62] hover:bg-[#BCBCCF] active:bg-[#3B3B62]" 
+                isFormValid
+                  ? "bg-[#3B3B62] hover:bg-[#BCBCCF] active:bg-[#3B3B62]"
                   : "bg-[#D8D8D8] cursor-not-allowed"
               }`}
             >
