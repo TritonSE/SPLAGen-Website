@@ -1,5 +1,5 @@
 import dotenv from "dotenv";
-import express, { Express, Request, Response, NextFunction } from "express";
+import express, { Express, NextFunction, Request, Response } from "express";
 import { isHttpError } from "http-errors";
 
 import userRoutes from "./src/routes/user";
@@ -10,15 +10,14 @@ dotenv.config();
 const app: Express = express();
 const port = process.env.PORT ?? 3000;
 
-app.use(express.json());
-
-app.use("/api/user", userRoutes);
-app.use("/api/announcement", announcementRoutes);
-
 app.get("/", (req: Request, res: Response) => {
   res.send("Express + TypeScript Server");
 });
 
+app.use('/api/user', userRoutes)
+app.use('/api/announcement', announcementRoutes)
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
 app.use((error: unknown, req: Request, res: Response, next: NextFunction) => {
   // 500 is the "internal server error" error code, this will be our fallback
   let statusCode = 500;
