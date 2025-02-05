@@ -1,3 +1,4 @@
+import { CountrySelector } from "./components"; // Import CountrySelector
 import LanguageSwitcher from "./components/languageSwitcher";
 import External from "./components/translationDemo";
 
@@ -9,6 +10,8 @@ export default function Home() {
         <LanguageSwitcher />
         {/* External is my text component */}
         <External></External>
+        {/* Added the CountrySelector component */}
+        <CountrySelector />
       </main>
     </div>
   );
