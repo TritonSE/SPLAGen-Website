@@ -2,13 +2,16 @@ import dotenv from "dotenv";
 import express, { Express, NextFunction, Request, Response } from "express";
 import { isHttpError } from "http-errors";
 
+import announcementRoutes from "./src/routes/announcement";
 import userRoutes from "./src/routes/user";
-import announcementRoutes from "./src/routes/announcement"
+
 
 dotenv.config();
 
 const app: Express = express();
 const port = process.env.PORT ?? 3000;
+
+app.use(express.json());
 
 app.get("/", (req: Request, res: Response) => {
   res.send("Express + TypeScript Server");
