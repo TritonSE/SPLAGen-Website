@@ -77,7 +77,6 @@ export const getUser = (req: Request, res: Response) => {
   }
 };
 
-
 export const getPersonalInformation: RequestHandler = async (req, res, next) => {
   try {
     res.status(200).send("Get personal information route works!");
