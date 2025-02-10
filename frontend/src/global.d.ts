@@ -8,5 +8,5 @@ declare module "little-state-machine" {
       country: string;
       field1: string;
     };
-  };
+  }
 }

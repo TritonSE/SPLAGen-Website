@@ -1,5 +1,5 @@
 import LanguageSwitcher from "./components/languageSwitcher";
-import FormWrapper from "./components/onboardingForm/formWrapper"
+import FormWrapper from "./components/onboardingForm/formWrapper";
 import External from "./components/translationDemo";
 
 export default function Home() {

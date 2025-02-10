@@ -6,7 +6,6 @@ import { useForm } from "react-hook-form";
 import { State } from "../../state/stateTypes";
 import updateAction from "../../state/updateAction";
 
-
 type Step1Props = {
   onNext: (data: State["data"]) => void;
 };
@@ -24,21 +23,21 @@ const Step1 = ({ onNext }: Step1Props) => {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        void handleSubmit(onSubmit)();
+      }}
+      className="space-y-4"
+    >
       <div className="space-y-2">
         <label className="block">Professional Title</label>
-        <input
-          {...register("professionalTitle")}
-          className="w-full p-2 border rounded"
-        />
+        <input {...register("professionalTitle")} className="w-full p-2 border rounded" />
       </div>
 
       <div className="space-y-2">
         <label className="block">Country</label>
-        <input
-          {...register("country")}
-          className="w-full p-2 border rounded"
-        />
+        <input {...register("country")} className="w-full p-2 border rounded" />
       </div>
 
       <div className="flex justify-end">

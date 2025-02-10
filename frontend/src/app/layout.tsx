@@ -12,14 +12,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-          <div className="layout-container">
-            <SideNavbar />
+        <div className="layout-container">
+          <SideNavbar />
 
-            <section className="main-content">
-              {/* Insert Top Bar Here */}
-              <main>{children}</main>
-            </section>
-          </div>
+          <section className="main-content">
+            {/* Insert Top Bar Here */}
+            <main>{children}</main>
+          </section>
+        </div>
       </body>
     </html>
   );
