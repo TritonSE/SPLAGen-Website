@@ -2,8 +2,8 @@
 
 import React, { useState } from "react";
 
-//import CreatePostModal from "@/components/DirectoryInfoModal";
-import DirectoryInfoModal from "./components/DirectoryInfoModal";
+import DirectoryInfoModal from "../components/DirectoryInfoModal";
+//import CreatePostModal from "../components/CreatePostModal";
 
 const Page: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);

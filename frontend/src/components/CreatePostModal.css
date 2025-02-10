@@ -73,7 +73,6 @@
   border-radius: 4px;
   cursor: pointer;
   font-size: 16px; /* Set size for buttons */
-  color: #333; /* Set color for buttons */
 }
 
 /* Button hover effect */
@@ -90,5 +89,12 @@ button[type="submit"] {
 
 /* Submit button hover effect */
 button[type="submit"]:hover {
-  background-color: #0056b3;
+  @apply bg-mainHeading;
+}
+
+button[type="button"] {
+  border: 1px solid gray;
+  border-radius: 4px;
+  padding: 8px 12px;
+  cursor: pointer;
 }

@@ -25,11 +25,13 @@
   border: none;
   font-size: 1.5rem;
   font-weight: bold;
-  color: #333;
+  color: black;
   cursor: pointer;
   position: absolute;
   top: 15px;
   right: 20px;
+  z-index: 1000;
+  visibility: visible;
 }
 
 h2 {
@@ -61,8 +63,17 @@ select {
 
 input::placeholder,
 select {
-  @apply text-disabled;
-  font-style: italic;
+  width: 100%;
+  padding: 10px;
+  font-size: 1rem;
+}
+
+option:checked {
+  color: black;
+}
+
+option {
+  color: inherit;
 }
 
 .modal-actions {
