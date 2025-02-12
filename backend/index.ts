@@ -3,13 +3,19 @@ import express, { Express, NextFunction, Request, Response } from "express";
 import { isHttpError } from "http-errors";
 
 import announcementRoutes from "./src/routes/announcement";
+import discussionRoutes from "./src/routes/discussion";
+import replyRoutes from "./src/routes/reply";
+
 import userRoutes from "./src/routes/user";
 
 
 dotenv.config();
 
 const app: Express = express();
-const port = process.env.PORT ?? 3000;
+const port = process.env.PORT ?? 3001;
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.use(express.json());
 
@@ -17,8 +23,10 @@ app.get("/", (req: Request, res: Response) => {
   res.send("Express + TypeScript Server");
 });
 
-app.use('/api/user', userRoutes)
 app.use('/api/announcement', announcementRoutes)
+app.use("/api/users", userRoutes);
+app.use("/api/discussions", discussionRoutes);
+app.use("/api/replies", replyRoutes);
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
 app.use((error: unknown, req: Request, res: Response, next: NextFunction) => {
