@@ -5,9 +5,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
 
 import ExitButton from "../../public/Icons/ExitButton.svg";
-
 import "./EditBasicInfoModal.css";
-
 import { fetchRequest } from "../api/requests";
 
 const ExitButtonSrc: string = ExitButton as unknown as string;
