@@ -8,6 +8,8 @@ import ExitButton from "../../public/Icons/ExitButton.svg";
 
 import "./EditBasicInfoModal.css";
 
+import { fetchRequest } from "../api/requests";
+
 const ExitButtonSrc: string = ExitButton as unknown as string;
 
 type FormData = {
@@ -24,7 +26,7 @@ const schema = z.object({
   phone: z
     .string()
     .min(1, "Phone Number is required")
-    .refine((val) => val.length >= 10, {
+    .refine((val) => val.length >= 5 && val.length <= 15, {
       message: "Invalid phone number format",
     }),
 });
@@ -47,13 +49,7 @@ export const EditBasicInfoModal = ({
   //not sure how to send data to backend
   const onSubmit: SubmitHandler<FormData> = async (data) => {
     try {
-      const response = await fetch("/your-api-endpoint", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
+      const response = await fetchRequest("POST", "/your-api-endpoint", data, {});
 
       if (response.ok) {
         onClose();
