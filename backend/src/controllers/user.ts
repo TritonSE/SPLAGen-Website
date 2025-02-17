@@ -1,4 +1,6 @@
 import { Request, RequestHandler, Response } from "express";
+import mongoose from "mongoose";
+import User from '../models/user'
 
 // Temporary storage until database is set up
 type User = {
@@ -55,6 +57,15 @@ export const getAllUsers = (_req: Request, res: Response) => {
   } catch (error) {
     console.error("Error getting users:", error);
     res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+export const getAllCounselors: RequestHandler = async (_req, res, next) => {
+  try {
+    const counselors = await User.find({ "account.type": "counselor" });
+    res.status(200).json({ counselors });
+  } catch (error) {
+    next(error);
   }
 };
 
@@ -128,7 +139,7 @@ export const editDirectoryPersonalInformation: RequestHandler = async (req, res,
 
 export const getDirectoryDisplayInfo: RequestHandler = async (req, res, next) => {
   try {
-    res.status(200).send("Get directory display information route works!");
+    res.status(200).send("get directory display information route works!");
   } catch (error) {
     next(error);
   }
