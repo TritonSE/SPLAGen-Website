@@ -1,4 +1,6 @@
 import { RequestHandler } from "express";
+import mongoose from "mongoose";
+import User from '../models/user'
 
 export const getPersonalInformation: RequestHandler = async (req, res, next) => {
   try {
@@ -50,7 +52,8 @@ export const editDirectoryPersonalInformation: RequestHandler = async (req, res,
 
 export const getDirectoryDisplayInfo: RequestHandler = async (req, res, next) => {
   try {
-    res.status(200).send("Get directory display information route works!");
+    const users = await User.find();
+    res.json(users);
   } catch (error) {
     next(error);
   }

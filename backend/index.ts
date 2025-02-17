@@ -9,6 +9,8 @@ dotenv.config();
 const app: Express = express();
 const port = process.env.PORT ?? 3000;
 
+console.log(process.env.MONGO_URI)
+
 app.use(express.json());
 
 app.use("/api/user", userRoutes);
