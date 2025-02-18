@@ -60,12 +60,12 @@ export const EditBasicInfoModal = ({
   return isOpen ? (
     <div className="modal-overlay">
       <div className="modal-container">
-        <div className="modal-header">
-          <h2> Edit Basic Info</h2>
-        </div>
         <button className="close-button" onClick={onClose}>
           <Image src={ExitButtonSrc} alt="Exit" />
         </button>
+        <div className="modal-header">
+          <h2> Edit Basic Info</h2>
+        </div>
         <form
           onSubmit={(e) => {
             e.preventDefault();
