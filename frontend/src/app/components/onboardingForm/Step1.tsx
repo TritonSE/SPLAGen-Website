@@ -23,7 +23,7 @@ const Step1 = ({ onNext }: Step1Props) => {
       actions.updateAction(data);
       onNext(data);
     },
-    [actions, onNext]
+    [actions, onNext],
   );
 
   const handleFormSubmit = (e: React.FormEvent) => {

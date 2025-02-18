@@ -2,7 +2,7 @@
 import { useCallback } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 
-import { onboardingState} from "../../../state/stateTypes";
+import { onboardingState } from "../../../state/stateTypes";
 
 type Step3AProps = {
   onNext: (data: onboardingState["data"]) => void;
@@ -16,7 +16,7 @@ const Step3A = ({ onNext, onBack }: Step3AProps) => {
     (data) => {
       onNext(data);
     },
-    [onNext]
+    [onNext],
   );
 
   const handleFormSubmit = (e: React.FormEvent) => {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useStateMachine } from "little-state-machine";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
 import { onboardingState } from "../../../state/stateTypes";
 import updateOnboardingForm from "../../../state/updateAction";
@@ -27,18 +27,18 @@ const FormWrapper = () => {
     }
   };
 
-  const handleBack = () => {
+  const handleBack = useCallback(() => {
     setStep((prev) => Math.max(1, prev - 1));
-  };
+  }, [setStep]);
 
-  const handleReset = () => {
+  const handleReset = useCallback(() => {
     actions.updateOnboardingForm({
       professionalTitle: "",
       country: "",
       field1: "",
     });
     setStep(1);
-  };
+  }, [actions]);
 
   return (
     <div className="max-w-md mx-auto p-6 bg-white shadow-md rounded">
