@@ -20,7 +20,7 @@ const Step2 = ({ onNext, onBack }: Step2Props) => {
       actions.updateAction(updatedData);
       onNext(updatedData);
     },
-    [state.onboardingForm, actions.updateAction, onNext]
+    [state.onboardingForm, actions.updateAction, onNext],
   );
 
   return (
