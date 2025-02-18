@@ -1,5 +1,4 @@
 import LanguageSwitcher from "./components/languageSwitcher";
-import FormWrapper from "./components/onboardingForm/formWrapper";
 import External from "./components/translationDemo";
 
 export default function Home() {
@@ -8,7 +7,6 @@ export default function Home() {
       <main className="flex flex-col gap-8 row-start-2 items-center">
         <LanguageSwitcher />
         <External />
-        <FormWrapper />
       </main>
     </div>
   );

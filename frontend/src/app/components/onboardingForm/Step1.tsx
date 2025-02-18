@@ -1,35 +1,38 @@
 "use client";
 
 import { useStateMachine } from "little-state-machine";
+import { useCallback } from "react";
 import { useForm } from "react-hook-form";
 
-import { State } from "../../state/stateTypes";
-import updateAction from "../../state/updateAction";
+import { onboardingState } from "../../../state/stateTypes";
+import updateAction from "../../../state/updateAction";
 
 type Step1Props = {
-  onNext: (data: State["data"]) => void;
+  onNext: (data: onboardingState["data"]) => void;
 };
 
 const Step1 = ({ onNext }: Step1Props) => {
   const { state, actions } = useStateMachine({ actions: { updateAction } });
 
-  const { register, handleSubmit } = useForm<State["data"]>({
-    defaultValues: state.data,
+  const { register, handleSubmit } = useForm<onboardingState["data"]>({
+    defaultValues: state.onboardingForm,
   });
 
-  const onSubmit = (data: State["data"]) => {
-    actions.updateAction(data);
-    onNext(data);
+  const onSubmit = useCallback(
+    (data: onboardingState["data"]) => {
+      actions.updateAction(data);
+      onNext(data);
+    },
+    [actions, onNext]
+  );
+
+  const handleFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    void handleSubmit(onSubmit)();
   };
 
   return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        void handleSubmit(onSubmit)();
-      }}
-      className="space-y-4"
-    >
+    <form onSubmit={handleFormSubmit} className="space-y-4">
       <div className="space-y-2">
         <label className="block">Professional Title</label>
         <input {...register("professionalTitle")} className="w-full p-2 border rounded" />
