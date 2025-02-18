@@ -1,5 +1,4 @@
 import LanguageSwitcher from "./components/languageSwitcher";
-import FormWrapper from "./components/onboardingForm/formWrapper";
 import External from "./components/translationDemo";
 
 import { BrowserRouter, Route, Routes } from "react-router-dom";
@@ -14,7 +13,6 @@ export default function Home() {
       <main className="flex flex-col gap-8 row-start-2 items-center">
         <LanguageSwitcher />
         <External />
-        <FormWrapper />
       </main>
     </div>
   );

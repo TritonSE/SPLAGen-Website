@@ -1,23 +1,27 @@
 "use client";
 
 import { useStateMachine } from "little-state-machine";
+import { useCallback } from "react";
 
-import { State } from "../../state/stateTypes";
-import updateAction from "../../state/updateAction";
+import { onboardingState } from "../../../state/stateTypes";
+import updateAction from "../../../state/updateAction";
 
 type Step2Props = {
-  onNext: (data: State["data"]) => void;
+  onNext: (data: onboardingState["data"]) => void;
   onBack: () => void;
 };
 
 const Step2 = ({ onNext, onBack }: Step2Props) => {
   const { state, actions } = useStateMachine({ actions: { updateAction } });
 
-  const handleSelection = (answer: "yes" | "no") => {
-    const updatedData = { ...state.data, field1: answer };
-    actions.updateAction(updatedData);
-    onNext(updatedData);
-  };
+  const handleSelection = useCallback(
+    (answer: "yes" | "no") => {
+      const updatedData = { ...state.onboardingForm, field1: answer };
+      actions.updateAction(updatedData);
+      onNext(updatedData);
+    },
+    [state.onboardingForm, actions.updateAction, onNext]
+  );
 
   return (
     <div className="space-y-4">

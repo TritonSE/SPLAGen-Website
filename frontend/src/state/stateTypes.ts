@@ -1,4 +1,4 @@
-export type State = {
+export type onboardingState = {
   data: {
     professionalTitle: string;
     country: string;

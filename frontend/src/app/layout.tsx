@@ -1,5 +1,3 @@
-"use client";
-
 import SideNavbar from "./components/SideNavbar";
 
 import "./globals.css";
