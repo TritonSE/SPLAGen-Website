@@ -1,28 +1,31 @@
 "use client";
+import { useCallback } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 
-import { State } from "../../state/stateTypes";
+import { onboardingState} from "../../../state/stateTypes";
 
 type Step3AProps = {
-  onNext: (data: State["data"]) => void;
+  onNext: (data: onboardingState["data"]) => void;
   onBack: () => void;
 };
 
 const Step3A = ({ onNext, onBack }: Step3AProps) => {
-  const { handleSubmit } = useForm<State["data"]>();
+  const { handleSubmit } = useForm<onboardingState["data"]>();
 
-  const onSubmit: SubmitHandler<State["data"]> = (data) => {
-    onNext(data);
+  const onSubmit: SubmitHandler<onboardingState["data"]> = useCallback(
+    (data) => {
+      onNext(data);
+    },
+    [onNext]
+  );
+
+  const handleFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    void handleSubmit(onSubmit)();
   };
 
   return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        void handleSubmit(onSubmit)();
-      }}
-      className="space-y-4"
-    >
+    <form onSubmit={handleFormSubmit} className="space-y-4">
       <h2>Step 3A - You chose YES</h2>
 
       <div className="flex justify-between">

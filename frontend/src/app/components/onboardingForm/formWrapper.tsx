@@ -3,21 +3,17 @@
 import { useStateMachine } from "little-state-machine";
 import { useState } from "react";
 
-import { State } from "../../state/stateTypes";
-import updateAction from "../../state/updateAction";
+import { onboardingState } from "../../../state/stateTypes";
+import updateOnboardingForm from "../../../state/updateAction";
 
-import Result from "./Result";
-import Step1 from "./Step1";
-import Step2 from "./Step2";
-import Step3A from "./Step3A";
-import Step3B from "./Step3B";
+import { Result, Step1, Step2, Step3A, Step3B } from ".";
 
 const FormWrapper = () => {
   const [step, setStep] = useState(1);
-  const { actions } = useStateMachine({ actions: { updateAction } });
+  const { actions } = useStateMachine({ actions: { updateOnboardingForm } });
 
-  const handleNext = (data: State["data"]) => {
-    actions.updateAction(data);
+  const handleNext = (data: onboardingState["data"]) => {
+    actions.updateOnboardingForm(data);
     if (step === 2) {
       if (data.field1 === "yes") {
         setStep(3); // Go to Step3A
@@ -32,11 +28,11 @@ const FormWrapper = () => {
   };
 
   const handleBack = () => {
-    setStep((prev) => Math.max(1, prev - 1)); // back out of conditional check
+    setStep((prev) => Math.max(1, prev - 1));
   };
 
   const handleReset = () => {
-    actions.updateAction({
+    actions.updateOnboardingForm({
       professionalTitle: "",
       country: "",
       field1: "",

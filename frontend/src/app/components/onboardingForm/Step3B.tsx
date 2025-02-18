@@ -1,15 +1,15 @@
 "use client";
 import { useForm } from "react-hook-form";
 
-import { State } from "../../state/stateTypes";
+import { onboardingState } from "../../../state/stateTypes";
 
 type Step3BProps = {
-  onNext: (data: State["data"]) => void;
+  onNext: (data: onboardingState["data"]) => void;
   onBack: () => void;
 };
 
 const Step3B = ({ onNext, onBack }: Step3BProps) => {
-  const { handleSubmit } = useForm<State["data"]>();
+  const { handleSubmit } = useForm<onboardingState["data"]>();
 
   return (
     <form
