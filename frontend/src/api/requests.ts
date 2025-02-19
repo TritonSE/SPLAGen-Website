@@ -1,6 +1,6 @@
 type Method = "GET" | "POST" | "PUT";
 
-export async function fetchRequest(
+export async function editBasicInfoRequest(
   method: Method,
   url: string,
   body: unknown,
