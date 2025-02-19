@@ -1,7 +1,64 @@
-.loginForm {
+.loginPageContainer {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  justify-content: center;
+  align-items: center;
+}
+
+.loginPageDiv {
   width: clamp(300px, 90%, 520px);
   height: clamp(350px, auto, 427px);
   display: flex;
   flex-direction: column;
-  margin: auto;
+  gap: clamp(20px, 10vh, 80px);
+}
+
+.loginPageDiv h1 {
+  color: var(--color-primary2);
+  font-size: 2rem;
+}
+
+.loginPageDiv h2 {
+  font-size: 2rem;
+}
+
+.loginPageDiv a {
+  color: var(--color-primary2);
+}
+
+/* Form styling: leverage these stylings and put into global.css once every form is complete. */
+/* We'll keep them isolated to this component to not interfere with other stylings. */
+
+.loginPageContainer form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.loginPageContainer form label {
+  all: unset;
+}
+
+.loginPageContainer form input {
+  background-color: white;
+  outline: solid 1px var(--color-grey2);
+  padding: 6px 12px;
+  border-radius: 4px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.loginPageContainer form input:hover {
+  box-shadow: 0 0 5px var(--color-primary1);
+}
+
+.loginPageContainer form input:focus {
+  outline: solid 1px var(--color-primary2);
+  box-shadow: 0 0 5px var(--color-primary2);
+}
+
+.rememberMe {
+  background-color: red;
+  outline: 4px solid black;
 }

@@ -62,21 +62,31 @@ main {
   padding: 8px;
   background-color: white;
   border-radius: 8px;
+  height: 90%;
 }
 
-form {
-  gap: 20px;
-}
-form input {
-  background-color: white;
-  outline: solid 1px var(--color-grey2);
-  padding: 6px 12px;
-  border-radius: 4px;
+.longButton {
   width: 100%;
-  box-sizing: border-box;
+  padding: 6px;
+  color: white;
+  background-color: var(--color-primary2);
+  border-radius: 4px;
 }
 
-form input:focus {
-  outline: solid 1px var(--color-primary2);
-  box-shadow: 0 0 5px var(--color-primary2);
+.longButton:hover {
+  color: white;
+  background-color: var(--color-primary3);
+}
+
+.brah {
+  background-color: red;
+}
+
+.disabledButton {
+  background-color: var(--color-grey5);
+}
+
+.disabledButton:hover {
+  cursor: not-allowed;
+  background-color: var(--color-grey5);
 }
