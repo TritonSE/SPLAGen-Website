@@ -6,7 +6,13 @@ import { z } from "zod";
 
 import ExitButton from "../../public/Icons/ExitButton.svg";
 import "./EditBasicInfoModal.css";
-import { fetchRequest } from "../api/requests";
+import { editBasicInfoRequest } from "../api/requests";
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+
+if (!API_BASE_URL) {
+  throw new Error("API_BASE_URL is not defined in the environment variables.");
+}
 
 const ExitButtonSrc: string = ExitButton as unknown as string;
 
@@ -44,11 +50,14 @@ export const EditBasicInfoModal = ({
     resolver: zodResolver(schema),
   });
 
-  //not sure how to send data to backend
   const onSubmit: SubmitHandler<FormData> = async (data) => {
     try {
-      const response = await fetchRequest("POST", "/your-api-endpoint", data, {});
-
+      const response = await editBasicInfoRequest(
+        "POST",
+        `${API_BASE_URL}/users/personal-information`,
+        data,
+        {},
+      );
       if (response.ok) {
         onClose();
       }
