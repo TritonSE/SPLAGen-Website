@@ -1,6 +1,7 @@
 import dotenv from "dotenv";
 import express, { Express, Request, Response } from "express";
 
+import directoryRoutes from "./src/routes/directory";
 import discussionRoutes from "./src/routes/discussion";
 import replyRoutes from "./src/routes/reply";
 import userRoutes from "./src/routes/user";
@@ -20,6 +21,7 @@ app.get("/", (req: Request, res: Response) => {
 app.use("/api/users", userRoutes);
 app.use("/api/discussions", discussionRoutes);
 app.use("/api/replies", replyRoutes);
+app.use("/api/directory", directoryRoutes);
 
 app.listen(port, () => {
   // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
