@@ -24,6 +24,8 @@
   --color-success: #3bb966;
   --color-error: #b93b3b;
   --color-text1: #333435;
+
+  --nav-width: clamp(160px, 20vw, 250px);
 }
 
 body {
