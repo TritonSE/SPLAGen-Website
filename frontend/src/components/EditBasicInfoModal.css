@@ -102,7 +102,7 @@ h2 {
 }
 
 .inputField .error {
-  color: red;
+  color: #b93b3b;
   font-size: 0.75rem;
   margin-top: 0.25rem;
   min-height: 1rem;
