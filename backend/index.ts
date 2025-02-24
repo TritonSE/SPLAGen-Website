@@ -3,6 +3,7 @@ import express, { Express, NextFunction, Request, Response } from "express";
 import { isHttpError } from "http-errors";
 
 import announcementRoutes from "./src/routes/announcement";
+import directoryRoutes from "./src/routes/directory";
 import discussionRoutes from "./src/routes/discussion";
 import replyRoutes from "./src/routes/reply";
 
@@ -27,6 +28,7 @@ app.use('/api/announcement', announcementRoutes)
 app.use("/api/users", userRoutes);
 app.use("/api/discussions", discussionRoutes);
 app.use("/api/replies", replyRoutes);
+app.use("/api/directory", directoryRoutes);
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
 app.use((error: unknown, req: Request, res: Response, next: NextFunction) => {
