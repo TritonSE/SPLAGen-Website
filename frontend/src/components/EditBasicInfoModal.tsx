@@ -1,6 +1,8 @@
+"use client";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
-import React from "react";
+import React, { useCallback } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -50,21 +52,24 @@ export const EditBasicInfoModal = ({
     resolver: zodResolver(schema),
   });
 
-  const onSubmit: SubmitHandler<FormData> = async (data) => {
-    try {
-      const response = await editBasicInfoRequest(
-        "POST",
-        `${API_BASE_URL}/users/personal-information`,
-        data,
-        {},
-      );
-      if (response.ok) {
-        onClose();
+  const onSubmit = useCallback<SubmitHandler<FormData>>(
+    async (data) => {
+      try {
+        const response = await editBasicInfoRequest(
+          "POST",
+          `/users/personal-information`,
+          data,
+          {},
+        );
+        if (response.ok) {
+          onClose();
+        }
+      } catch (error) {
+        console.error("Request failed:", error);
       }
-    } catch (error) {
-      console.error("Request failed:", error);
-    }
-  };
+    },
+    [onClose],
+  );
 
   return isOpen ? (
     <div className="modal-overlay">
@@ -85,33 +90,41 @@ export const EditBasicInfoModal = ({
           <div className="inputField">
             <label>First Name*</label>
             <input {...register("firstName")} placeholder="First Name" />
-            {errors.firstName?.message && typeof errors.firstName.message === "string" && (
-              <p className="error">{errors.firstName.message}</p>
-            )}
+            <p className="error">
+              {errors.firstName?.message && typeof errors.firstName.message === "string"
+                ? errors.firstName.message
+                : "\u00A0"}
+            </p>
           </div>
 
           <div className="inputField">
             <label>Last Name*</label>
             <input {...register("lastName")} placeholder="Last Name" />
-            {errors.lastName?.message && typeof errors.lastName.message === "string" && (
-              <p className="error">{errors.lastName.message}</p>
-            )}
+            <p className="error">
+              {errors.lastName?.message && typeof errors.lastName.message === "string"
+                ? errors.lastName.message
+                : "\u00A0"}
+            </p>
           </div>
 
           <div className="inputField">
             <label>Email*</label>
             <input type="email" {...register("email")} placeholder="Email" />
-            {errors.email?.message && typeof errors.email.message === "string" && (
-              <p className="error">{errors.email.message}</p>
-            )}
+            <p className="error">
+              {errors.email?.message && typeof errors.email.message === "string"
+                ? errors.email.message
+                : "\u00A0"}
+            </p>
           </div>
 
           <div className="inputField">
             <label>Phone*</label>
             <input type="tel" {...register("phone")} placeholder="Phone" />
-            {errors.phone?.message && typeof errors.phone.message === "string" && (
-              <p className="error">{errors.phone.message}</p>
-            )}
+            <p className="error">
+              {errors.phone?.message && typeof errors.phone.message === "string"
+                ? errors.phone.message
+                : "\u00A0"}
+            </p>
           </div>
 
           <div className="modal-footer">
