@@ -2,6 +2,7 @@ import dotenv from "dotenv";
 import express, { Express, Request, Response } from "express";
 
 import directoryRoutes from "./src/routes/directory";
+import announcementRoutes from "./src/routes/announcement";
 import discussionRoutes from "./src/routes/discussion";
 import replyRoutes from "./src/routes/reply";
 import userRoutes from "./src/routes/user";
