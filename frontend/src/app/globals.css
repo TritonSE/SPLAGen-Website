@@ -51,7 +51,7 @@ body {
 
 .viewPort {
   flex-grow: 1;
-  overflow-y: auto;
+  overflow-y: hidden;
   overflow-x: hidden;
   word-wrap: break-word;
   background-color: var(--color-primary2);
@@ -63,6 +63,7 @@ main {
   background-color: white;
   border-radius: 8px;
   height: 90%;
+  overflow-y: hidden;
 }
 
 .longButton {
@@ -75,7 +76,7 @@ main {
 
 .longButton:hover {
   color: white;
-  background-color: var(--color-primary3);
+  background-color: var(--color-purplegrey);
 }
 
 .brah {

@@ -81,23 +81,26 @@ const Login: React.FC = () => {
   return (
     <div className={styles.loginPageContainer}>
       <div className={styles.loginPageDiv}>
-        <div>
+        <div className={styles.decorationText}>
           <h1>
-            {" "}
-            <strong> Log in </strong>{" "}
+            <strong> Log in </strong>
           </h1>
-          <h2> Welcome back!</h2>
+          <h3 className={styles.welcomeback}> Welcome back!</h3>
         </div>
 
         {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
         <form onSubmit={handleSubmit(onSubmit)}>
-          <label htmlFor="email">Email</label>
-          <input {...register("email")} id="email" type="text" placeholder="Email" />
-          {errors.email && <div className="text-red-500">{errors.email.message}</div>}
+          <div className={styles.inputFieldContainer}>
+            <label htmlFor="email">Email</label>
+            <input {...register("email")} id="email" type="text" placeholder="Email" />
+            {errors.email && <div className="text-red-500">{errors.email.message}</div>}
+          </div>
 
-          <label htmlFor="password">Password</label>
-          <input {...register("password")} id="password" type="password" placeholder="Password" />
-          {errors.password && <div className="text-red-500">{errors.password.message}</div>}
+          <div className={styles.inputFieldContainer}>
+            <label htmlFor="password">Password</label>
+            <input {...register("password")} id="password" type="password" placeholder="Password" />
+            {errors.password && <div className="text-red-500">{errors.password.message}</div>}
+          </div>
 
           <Checkmark checked={rememberMe} onChange={handleRememberMeChange} label="Remember me" />
 
@@ -112,13 +115,15 @@ const Login: React.FC = () => {
 
           {errors.root && <div className="text-red-500">{errors.root.message}</div>}
 
-          <Link href="/login/forgot_login"> I forgot my username or password </Link>
-          <span>
-            {" "}
-            Don&apos;t have an account?{" "}
-            <Link href="/login/forgot_login"> Create a new account. </Link>{" "}
-          </span>
-          <Link href="/login/forgot_login"> I&apos;m an admin. </Link>
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <Link href="/login/forgot_login"> I forgot my username or password </Link>
+            <span>
+              {" "}
+              Don&apos;t have an account?{" "}
+              <Link href="/login/forgot_login"> Create a new account. </Link>{" "}
+            </span>
+            <Link href="/login/forgot_login"> I&apos;m an admin. </Link>
+          </div>
         </form>
       </div>
     </div>
