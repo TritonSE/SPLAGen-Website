@@ -3,29 +3,31 @@
 import { useStateMachine } from "little-state-machine";
 import { useCallback, useState } from "react";
 
-import { onboardingState } from "../../../state/stateTypes";
-import updateOnboardingForm from "../../../state/updateAction";
+import { onboardingState } from "../../state/stateTypes";
+import updateOnboardingForm from "../../state/updateOnboardingForm";
 
 import { Result, Step1, Step2, Step3A, Step3B } from ".";
 
-const FormWrapper = () => {
+export const OnboardingFormWrapper = () => {
   const [step, setStep] = useState(1);
   const { actions } = useStateMachine({ actions: { updateOnboardingForm } });
 
-  const handleNext = (data: onboardingState["data"]) => {
-    actions.updateOnboardingForm(data);
-    if (step === 2) {
-      if (data.field1 === "yes") {
-        setStep(3); // Go to Step3A
-      } else {
-        setStep(4); // Go to Step3B
-      }
-    } else if (step === 3) {
-      setStep(step + 2);
-    } else {
-      setStep(step + 1);
-    }
-  };
+  const handleNext = useCallback(
+    (data: onboardingState["data"]) => {
+      actions.updateOnboardingForm(data);
+
+      setStep((prevStep) => {
+        if (prevStep === 2) {
+          return data.field1 === "yes" ? 3 : 4;
+        } else if (prevStep === 3) {
+          return prevStep + 2;
+        } else {
+          return prevStep + 1;
+        }
+      });
+    },
+    [actions.updateOnboardingForm],
+  );
 
   const handleBack = useCallback(() => {
     setStep((prev) => Math.max(1, prev - 1));
@@ -64,5 +66,3 @@ const FormWrapper = () => {
     </div>
   );
 };
-
-export default FormWrapper;

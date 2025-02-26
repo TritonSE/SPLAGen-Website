@@ -1,6 +1,6 @@
 "use client";
 
-import i18n from "../../i18n";
+import i18n from "../i18n";
 
 import styles from "./languageSwitcher.module.css";
 

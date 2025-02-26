@@ -4,15 +4,15 @@ import { useStateMachine } from "little-state-machine";
 import { useCallback } from "react";
 import { useForm } from "react-hook-form";
 
-import { onboardingState } from "../../../state/stateTypes";
-import updateAction from "../../../state/updateAction";
+import { onboardingState } from "../../state/stateTypes";
+import updateOnboardingForm from "../../state/updateOnboardingForm";
 
 type Step1Props = {
   onNext: (data: onboardingState["data"]) => void;
 };
 
-const Step1 = ({ onNext }: Step1Props) => {
-  const { state, actions } = useStateMachine({ actions: { updateAction } });
+export const Step1 = ({ onNext }: Step1Props) => {
+  const { state, actions } = useStateMachine({ actions: { updateOnboardingForm } });
 
   const { register, handleSubmit } = useForm<onboardingState["data"]>({
     defaultValues: state.onboardingForm,
@@ -20,16 +20,19 @@ const Step1 = ({ onNext }: Step1Props) => {
 
   const onSubmit = useCallback(
     (data: onboardingState["data"]) => {
-      actions.updateAction(data);
+      actions.updateOnboardingForm(data);
       onNext(data);
     },
-    [actions, onNext],
+    [actions.updateOnboardingForm, onNext],
   );
 
-  const handleFormSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    void handleSubmit(onSubmit)();
-  };
+  const handleFormSubmit = useCallback(
+    (e: React.FormEvent) => {
+      e.preventDefault();
+      void handleSubmit(onSubmit)();
+    },
+    [handleSubmit, onSubmit],
+  );
 
   return (
     <form onSubmit={handleFormSubmit} className="space-y-4">
@@ -51,5 +54,3 @@ const Step1 = ({ onNext }: Step1Props) => {
     </form>
   );
 };
-
-export default Step1;

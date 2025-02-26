@@ -1,5 +1,5 @@
-import LanguageSwitcher from "./components/languageSwitcher";
-import External from "./components/translationDemo";
+import LanguageSwitcher from "../components/languageSwitcher";
+import External from "../components/translationDemo";
 
 export default function Home() {
   return (

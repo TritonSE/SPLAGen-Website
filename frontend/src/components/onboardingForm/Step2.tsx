@@ -3,24 +3,24 @@
 import { useStateMachine } from "little-state-machine";
 import { useCallback } from "react";
 
-import { onboardingState } from "../../../state/stateTypes";
-import updateAction from "../../../state/updateAction";
+import { onboardingState } from "../../state/stateTypes";
+import updateOnboardingForm from "../../state/updateOnboardingForm";
 
 type Step2Props = {
   onNext: (data: onboardingState["data"]) => void;
   onBack: () => void;
 };
 
-const Step2 = ({ onNext, onBack }: Step2Props) => {
-  const { state, actions } = useStateMachine({ actions: { updateAction } });
+export const Step2 = ({ onNext, onBack }: Step2Props) => {
+  const { state, actions } = useStateMachine({ actions: { updateOnboardingForm } });
 
   const handleSelection = useCallback(
     (answer: "yes" | "no") => {
       const updatedData = { ...state.onboardingForm, field1: answer };
-      actions.updateAction(updatedData);
+      actions.updateOnboardingForm(updatedData);
       onNext(updatedData);
     },
-    [state.onboardingForm, actions.updateAction, onNext],
+    [state.onboardingForm, actions.updateOnboardingForm, onNext],
   );
 
   return (
@@ -58,5 +58,3 @@ const Step2 = ({ onNext, onBack }: Step2Props) => {
     </div>
   );
 };
-
-export default Step2;
