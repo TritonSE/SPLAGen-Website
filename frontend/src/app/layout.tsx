@@ -1,4 +1,5 @@
 "use client";
+import { UserContextProvider } from "../contexts/userContext";
 
 import { usePathname } from "next/navigation";
 
@@ -16,13 +17,16 @@ export default function RootLayout({
 
   return (
     <html lang="en">
+        //TODO fix up and check ordering
       <body className={isSignUpPage ? "bg-primary" : ""}>
+      <UserContextProvider>
         <div className="layout-container">
           <SideNavbar />
           <section className="viewPort">
             <main>{children}</main>
           </section>
         </div>
+      </UserContextProvider>
       </body>
     </html>
   );
