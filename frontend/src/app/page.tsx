@@ -1,4 +1,5 @@
-import { ManageCounselor } from "./components";
+import { ManageCounselor } from "../components";
+
 import LanguageSwitcher from "./components/languageSwitcher";
 import External from "./components/translationDemo";
 
