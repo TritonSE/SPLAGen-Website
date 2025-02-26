@@ -20,7 +20,7 @@ const directoryInfoSchema = z.object({
 
 type DirectoryInfoFormData = z.infer<typeof directoryInfoSchema>;
 
-interface DirectoryInfoModalProps {
+type DirectoryInfoModalProps = {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (data: DirectoryInfoFormData) => void;
