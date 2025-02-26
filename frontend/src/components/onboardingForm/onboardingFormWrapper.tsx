@@ -26,7 +26,7 @@ export const OnboardingFormWrapper = () => {
         }
       });
     },
-    [actions.updateOnboardingForm],
+    [actions.updateOnboardingForm, setStep],
   );
 
   const handleBack = useCallback(() => {
@@ -40,7 +40,7 @@ export const OnboardingFormWrapper = () => {
       field1: "",
     });
     setStep(1);
-  }, [actions]);
+  }, [actions.updateOnboardingForm, setStep]);
 
   return (
     <div className="max-w-md mx-auto p-6 bg-white shadow-md rounded">
