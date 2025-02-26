@@ -46,7 +46,13 @@ export const CountrySelector: React.FC<CountrySelectorProps> = ({
 
   return (
     <div style={{ width: "100%" }}>
-      <Select options={options} value={value} onChange={changeHandler} placeholder={placeholder} />
+      <Select
+        instanceId="country-selector"
+        options={options}
+        value={value}
+        onChange={changeHandler}
+        placeholder={placeholder}
+      />
     </div>
   );
 };
