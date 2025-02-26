@@ -2,13 +2,13 @@
 
 import { useStateMachine } from "little-state-machine";
 
-import updateOnboardingForm from "../../../state/updateAction";
+import updateOnboardingForm from "../../state/updateOnboardingForm";
 
 type ResultProps = {
   onReset: () => void;
 };
 
-const Result = ({ onReset }: ResultProps) => {
+export const Result = ({ onReset }: ResultProps) => {
   const { state } = useStateMachine({ actions: { updateOnboardingForm } });
 
   return (
@@ -27,5 +27,3 @@ const Result = ({ onReset }: ResultProps) => {
     </div>
   );
 };
-
-export default Result;

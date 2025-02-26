@@ -1,5 +1,5 @@
-import LanguageSwitcher from "./components/languageSwitcher";
-import External from "./components/translationDemo";
+import LanguageSwitcher from "../components/languageSwitcher";
+import External from "../components/translationDemo";
 
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
