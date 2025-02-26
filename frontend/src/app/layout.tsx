@@ -1,3 +1,5 @@
+import { UserContextProvider } from "../contexts/userContext";
+
 import SideNavbar from "./components/SideNavbar";
 
 import "./globals.css";
@@ -9,16 +11,18 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>
-        <div className="layout-container">
-          <SideNavbar />
+      <UserContextProvider>
+        <body>
+          <div className="layout-container">
+            <SideNavbar />
 
-          <section className="main-content">
-            {/* Insert Top Bar Here */}
-            <main>{children}</main>
-          </section>
-        </div>
-      </body>
+            <section className="main-content">
+              {/* Insert Top Bar Here */}
+              <main>{children}</main>
+            </section>
+          </div>
+        </body>
+      </UserContextProvider>
     </html>
   );
 }

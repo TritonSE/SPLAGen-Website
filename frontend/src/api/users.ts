@@ -1,11 +1,7 @@
-import { User as FirebaseUser } from "firebase/auth";
-
-import { APIResult, get, handleAPIError } from "@/api/requests";
-
-interface Language {}
+import { APIResult, handleAPIError } from "./requests";
 
 // Need to define user type based on user model
-export interface User {
+export type User = {
   _id: string;
   firebaseId: string;
   account: {
@@ -59,29 +55,68 @@ export interface User {
       additional?: string;
     };
   };
-}
-
-export const createAuthHeader = (firebaseToken: string) => ({
-  Authorization: `Bearer ${firebaseToken}`,
-});
+};
 
 export const getWhoAmI = async (firebaseToken: string): Promise<APIResult<User>> => {
   try {
     // Need to replace with api to get user
-    const response = await get("/api/user/whoami", createAuthHeader(firebaseToken));
-    const json = (await response.json()) as User;
-    return { success: true, data: json };
+    const fakeUser: User = {
+      _id: "id",
+      firebaseId: firebaseToken,
+      account: {
+        type: "account_type",
+        inDirectory: true,
+        profilePicture: "pfp_url",
+        membership: "membership",
+      },
+      personal: {
+        firstName: "firstname",
+        lastName: "lastname",
+        email: "email",
+        phone: "phone",
+      },
+      professional: {
+        title: "title",
+        prefLanguages: ["english"],
+        otherPrefLanguages: "otherlanguages",
+        country: "country",
+      },
+      education: {
+        degree: "degree",
+        program: "program",
+        otherDegree: "otherdegree",
+        institution: "institution",
+        email: "eduemail",
+        gradDate: "graddate",
+      },
+      clinic: {
+        name: "clinic_name",
+        url: "clinic_url",
+        location: {
+          country: "clinic_country",
+          address: "clinic_address",
+          suite: "clinic_suite",
+        },
+      },
+      display: {
+        workEmail: "work_email",
+        workPhone: "work_phone",
+        services: ["services"],
+        languages: ["languages"],
+        license: ["license"],
+        options: {
+          openToAppointments: true,
+          openToRequests: true,
+          remote: true,
+        },
+        comments: {
+          noLicense: "",
+          additional: "",
+        },
+      },
+    };
+    return { success: true, data: fakeUser };
   } catch (error) {
     return handleAPIError(error);
   }
 };
-
-export const getAllUsers = async(): Promise<APIResult<User[]>> {
-    try {
-        const response = await get(`/api/users`);
-        const json = (await response.json()) as User[];
-        return { success: true, data: json };
-    } catch (error) {
-        return handleAPIError(error);
-    }
-}
