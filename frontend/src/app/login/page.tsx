@@ -79,13 +79,20 @@ const Login: React.FC = () => {
   }, []);
 
   // Handler for 'remember me' checkbox changes
-
   const handleRememberMeChange = useCallback(
     (checked: boolean) => {
       setRememberMe(checked);
       setValue("rememberMe", checked);
     },
     [setValue],
+  );
+
+  const handleFormSubmit = useCallback(
+    (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      void handleSubmit(onSubmit)();
+    },
+    [handleSubmit, onSubmit]
   );
 
   return (
@@ -98,8 +105,7 @@ const Login: React.FC = () => {
           <h3 className={styles.welcomeback}> Welcome back!</h3>
         </div>
 
-        {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
-        <form onSubmit={handleSubmit(onSubmit)} autoComplete="on">
+        <form onSubmit={handleFormSubmit} autoComplete="on">
           <div className={styles.inputFieldContainer}>
             <label htmlFor="email">Email</label>
             <input {...register("email")} id="email" type="text" placeholder="Email" />
