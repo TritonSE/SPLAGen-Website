@@ -23,9 +23,7 @@ export const CountrySelector: React.FC<CountrySelectorProps> = ({
   // Ensure safe data fetching
   const options = useMemo(() => {
     try {
-      const countryListInstance = countryList() as { getData: () => CountryOption[] };
-      const data = countryListInstance.getData();
-
+      const data = (countryList() as { getData: () => CountryOption[] }).getData();
       return data.map((country) => ({
         value: country.value,
         label: country.label,
