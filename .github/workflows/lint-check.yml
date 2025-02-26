@@ -22,8 +22,6 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - uses: actions/setup-node@v3
-      with:
-        node-version: '20.x'
     - working-directory: frontend # Change this to the name of your frontend directory
       run: |
         npm ci
