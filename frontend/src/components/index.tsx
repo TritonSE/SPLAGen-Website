@@ -1,3 +1,5 @@
+export { CountrySelector } from "./CountrySelector";
+
 export { Checkmark } from "./CheckMark";
 
 export { LanguageSwitcher } from "./languageSwitcher";
