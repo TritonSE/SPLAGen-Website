@@ -65,29 +65,32 @@ main {
   height: 90%;
   overflow-y: hidden;
 }
-
 .longButton {
   width: 100%;
   padding: 6px;
   color: white;
   background-color: var(--color-primary2);
-  border-radius: 4px;
+  border-radius: 10px;
+  transition:
+    background-color 0.3s ease-in-out,
+    box-shadow 0.3s ease-in-out;
 }
 
 .longButton:hover {
   color: white;
   background-color: var(--color-purplegrey);
-}
-
-.brah {
-  background-color: red;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .disabledButton {
   background-color: var(--color-grey5);
+  transition:
+    background-color 0.3s ease-in-out,
+    box-shadow 0.3s ease-in-out;
 }
 
 .disabledButton:hover {
   cursor: not-allowed;
   background-color: var(--color-grey5);
+  box-shadow: none;
 }

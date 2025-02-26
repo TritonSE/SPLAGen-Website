@@ -13,7 +13,7 @@
   height: clamp(350px, auto, 427px);
   display: flex;
   flex-direction: column;
-  gap: clamp(20px, 10vh, 50px);
+  gap: clamp(20px, 4vh, 50px);
 }
 
 .loginPageDiv h1 {
@@ -21,8 +21,8 @@
   font-size: 2rem;
 }
 
-.loginPageDiv h2 {
-  font-size: 2rem;
+.loginPageDiv h3 {
+  font-size: 1.7rem;
 }
 
 .loginPageDiv a {
@@ -51,6 +51,9 @@
   border-radius: 4px;
   width: 100%;
   box-sizing: border-box;
+  transition:
+    box-shadow 0.1s ease-in-out,
+    outline 0.3s ease-in-out;
 }
 
 .loginPageContainer form input:hover {
@@ -62,12 +65,16 @@
   box-shadow: 0 0 5px var(--color-primary2);
 }
 
-.welcomeback {
-  font-size: 1.7rem;
+@media (max-height: 700px) {
+  .decorationText h1 {
+    font-size: 1.3rem;
+  }
+  .decorationText h3 {
+    font-size: 1rem;
+  }
 }
 
-@media (max-height: 600px) {
-  .decorationText {
-    display: none;
-  }
+.formError {
+  height: 16px;
+  color: var(--color-error);
 }

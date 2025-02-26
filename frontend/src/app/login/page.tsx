@@ -1,11 +1,11 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
 
-import Checkmark from "../components/CheckMark";
+import { Checkmark } from "../../components";
 
 import styles from "./login.module.css";
 
@@ -35,21 +35,25 @@ const Login: React.FC = () => {
       password: "",
       rememberMe: false,
     },
-    resolver: zodResolver(schema), // Use Zod for form validation
+    resolver: zodResolver(schema),
     mode: "onChange",
   });
 
-  // Effect to check for remembered email on component mount
+  // Effect to check for remembered email on component mount aka refresh
   useEffect(() => {
     const rememberedEmail = localStorage.getItem("rememberedEmail");
+    const rememberedRememberMe = localStorage.getItem("rememberMe") === "true"; // remembers whether checkmark was on.
     if (rememberedEmail) {
       setValue("email", rememberedEmail);
+    }
+    if (rememberedRememberMe) {
       setRememberMe(true);
+      setValue("rememberMe", true);
     }
   }, [setValue]);
 
   // Form submission handler
-  const onSubmit: SubmitHandler<FormFields> = async (data) => {
+  const onSubmit: SubmitHandler<FormFields> = useCallback(async (data) => {
     try {
       await new Promise((resolve) => {
         setTimeout(resolve, 1000);
@@ -59,8 +63,10 @@ const Login: React.FC = () => {
       // Note how only email is saved...not the password.
       if (data.rememberMe) {
         localStorage.setItem("rememberedEmail", data.email);
+        localStorage.setItem("rememberMe", "true");
       } else {
         localStorage.removeItem("rememberedEmail");
+        localStorage.setItem("rememberMe", "false");
       }
 
       console.log(data);
@@ -70,13 +76,17 @@ const Login: React.FC = () => {
         message: "We couldn't find an account with that email and password.",
       });
     }
-  };
+  }, []);
 
-  // Handler for remember me checkbox changes
-  const handleRememberMeChange = (checked: boolean) => {
-    setRememberMe(checked);
-    setValue("rememberMe", checked);
-  };
+  // Handler for 'remember me' checkbox changes
+
+  const handleRememberMeChange = useCallback(
+    (checked: boolean) => {
+      setRememberMe(checked);
+      setValue("rememberMe", checked);
+    },
+    [setValue],
+  );
 
   return (
     <div className={styles.loginPageContainer}>
@@ -89,17 +99,20 @@ const Login: React.FC = () => {
         </div>
 
         {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={handleSubmit(onSubmit)} autoComplete="on">
           <div className={styles.inputFieldContainer}>
             <label htmlFor="email">Email</label>
             <input {...register("email")} id="email" type="text" placeholder="Email" />
-            {errors.email && <div className="text-red-500">{errors.email.message}</div>}
+            {/* {errors.email && <div className="text-red-500">{errors.email.message}</div>} */}
           </div>
 
           <div className={styles.inputFieldContainer}>
             <label htmlFor="password">Password</label>
             <input {...register("password")} id="password" type="password" placeholder="Password" />
-            {errors.password && <div className="text-red-500">{errors.password.message}</div>}
+          </div>
+          <div className={styles.formError}>
+            {" "}
+            {errors.email || errors.password ? "Login credentials invalid" : ""}{" "}
           </div>
 
           <Checkmark checked={rememberMe} onChange={handleRememberMeChange} label="Remember me" />
@@ -116,13 +129,12 @@ const Login: React.FC = () => {
           {errors.root && <div className="text-red-500">{errors.root.message}</div>}
 
           <div style={{ display: "flex", flexDirection: "column" }}>
-            <Link href="/login/forgot_login"> I forgot my username or password </Link>
+            <Link href="/forgotLogin"> I forgot my username or password </Link>
             <span>
-              {" "}
-              Don&apos;t have an account?{" "}
-              <Link href="/login/forgot_login"> Create a new account. </Link>{" "}
+              <span style={{ color: "black" }}> Don&apos;t have an account? </span>
+              <Link href="/forgotLogin"> Create a new account </Link>
             </span>
-            <Link href="/login/forgot_login"> I&apos;m an admin. </Link>
+            <Link href="/forgotLogin"> I&apos;m an admin </Link>
           </div>
         </form>
       </div>
