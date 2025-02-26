@@ -2,14 +2,14 @@
 import { useCallback } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 
-import { onboardingState } from "../../../state/stateTypes";
+import { onboardingState } from "../../state/stateTypes";
 
 type Step3AProps = {
   onNext: (data: onboardingState["data"]) => void;
   onBack: () => void;
 };
 
-const Step3A = ({ onNext, onBack }: Step3AProps) => {
+export const Step3A = ({ onNext, onBack }: Step3AProps) => {
   const { handleSubmit } = useForm<onboardingState["data"]>();
 
   const onSubmit: SubmitHandler<onboardingState["data"]> = useCallback(
@@ -19,10 +19,13 @@ const Step3A = ({ onNext, onBack }: Step3AProps) => {
     [onNext],
   );
 
-  const handleFormSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    void handleSubmit(onSubmit)();
-  };
+  const handleFormSubmit = useCallback(
+    (e: React.FormEvent) => {
+      e.preventDefault();
+      void handleSubmit(onSubmit)();
+    },
+    [handleSubmit, onSubmit],
+  );
 
   return (
     <form onSubmit={handleFormSubmit} className="space-y-4">
@@ -39,5 +42,3 @@ const Step3A = ({ onNext, onBack }: Step3AProps) => {
     </form>
   );
 };
-
-export default Step3A;
