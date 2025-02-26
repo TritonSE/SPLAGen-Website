@@ -18,7 +18,7 @@ export const OnboardingFormWrapper = () => {
 
       setStep((prevStep) => {
         if (prevStep === 2) {
-          return data.field1 === "yes" ? 3 : 4;
+          return prevStep + 2;
         } else if (prevStep === 3) {
           return prevStep + 2;
         } else {
@@ -37,7 +37,7 @@ export const OnboardingFormWrapper = () => {
     actions.updateOnboardingForm({
       professionalTitle: "",
       country: "",
-      field1: "",
+      languages: [],
     });
     setStep(1);
   }, [actions.updateOnboardingForm, setStep]);

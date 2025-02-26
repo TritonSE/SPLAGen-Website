@@ -6,6 +6,8 @@ import { useCallback } from "react";
 import { onboardingState } from "../../state/stateTypes";
 import updateOnboardingForm from "../../state/updateOnboardingForm";
 
+import styles from "./Step2.module.css";
+
 type Step2Props = {
   onNext: (data: onboardingState["data"]) => void;
   onBack: () => void;
@@ -16,7 +18,7 @@ export const Step2 = ({ onNext, onBack }: Step2Props) => {
 
   const handleSelection = useCallback(
     (answer: "yes" | "no") => {
-      const updatedData = { ...state.onboardingForm, field1: answer };
+      const updatedData = { ...state.onboardingForm, field1: answer }; // field1 not defined currently
       actions.updateOnboardingForm(updatedData);
       onNext(updatedData);
     },
@@ -24,14 +26,24 @@ export const Step2 = ({ onNext, onBack }: Step2Props) => {
   );
 
   return (
-    <div className="space-y-4">
-      <h2>Step 2 - Select Yes or No</h2>
-      <div className="space-y-2">
-        <label className="block">Do you want to proceed?</label>
-        <div className="flex gap-4">
+    <div className={styles.container}>
+      <form className={styles.form}>
+        <div>
+          <h2 className={styles.title}>Membership Questionnaire</h2>
+        </div>
+
+        <div>
+          <p className={styles.subtitle}>
+            Did you complete your genetic counseling training in an accredited masters program in
+            the United States or a formal genetic counseling program in Latin America (either the
+            Cuban or Brazilian genetic counseling masters programs)?
+          </p>
+        </div>
+
+        <div className={styles.buttonGroup}>
           <button
             type="button"
-            className="px-4 py-2 rounded"
+            className={styles.optionButton}
             onClick={() => {
               handleSelection("yes");
             }}
@@ -40,7 +52,7 @@ export const Step2 = ({ onNext, onBack }: Step2Props) => {
           </button>
           <button
             type="button"
-            className="px-4 py-2 rounded"
+            className={styles.optionButton}
             onClick={() => {
               handleSelection("no");
             }}
@@ -48,13 +60,13 @@ export const Step2 = ({ onNext, onBack }: Step2Props) => {
             No
           </button>
         </div>
-      </div>
 
-      <div className="flex justify-between">
-        <button type="button" onClick={onBack} className="px-4 py-2 bg-gray-500 text-white rounded">
-          Back
-        </button>
-      </div>
+        <div className={styles.navigation}>
+          <button type="button" onClick={onBack} className={styles.backButton}>
+            Back
+          </button>
+        </div>
+      </form>
     </div>
   );
 };

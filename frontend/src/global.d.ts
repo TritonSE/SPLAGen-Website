@@ -6,7 +6,7 @@ declare module "little-state-machine" {
     onboardingForm: {
       professionalTitle: string;
       country: string;
-      field1: string;
+      languages: string[];
     };
     directoryForm: {
       field: string;

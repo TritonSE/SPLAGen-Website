@@ -4,7 +4,7 @@ const initialState: GlobalState = {
   onboardingForm: {
     professionalTitle: "",
     country: "",
-    field1: "",
+    languages: [],
   },
   directoryForm: {
     field: "",

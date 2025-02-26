@@ -1,11 +1,13 @@
 "use client";
 
 import { useStateMachine } from "little-state-machine";
-import { useCallback } from "react";
-import { useForm } from "react-hook-form";
+import { useCallback, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 
 import { onboardingState } from "../../state/stateTypes";
 import updateOnboardingForm from "../../state/updateOnboardingForm";
+
+import styles from "./Step1.module.css";
 
 type Step1Props = {
   onNext: (data: onboardingState["data"]) => void;
@@ -14,7 +16,11 @@ type Step1Props = {
 export const Step1 = ({ onNext }: Step1Props) => {
   const { state, actions } = useStateMachine({ actions: { updateOnboardingForm } });
 
-  const { register, handleSubmit } = useForm<onboardingState["data"]>({
+  const [healthcareExpanded, setHealthcareExpanded] = useState(false);
+
+  const [associateExpanded, setAssociateExpanded] = useState(false);
+
+  const { register, handleSubmit, control } = useForm<onboardingState["data"]>({
     defaultValues: state.onboardingForm,
   });
 
@@ -34,23 +40,148 @@ export const Step1 = ({ onNext }: Step1Props) => {
     [handleSubmit, onSubmit],
   );
 
+  const languageOptions = [
+    { value: "ES", label: "Spanish" },
+    { value: "EN", label: "English" },
+    { value: "PT", label: "Portuguese" },
+    { value: "OTH", label: "Other" },
+  ];
+
   return (
-    <form onSubmit={handleFormSubmit} className="space-y-4">
-      <div className="space-y-2">
-        <label className="block">Professional Title</label>
-        <input {...register("professionalTitle")} className="w-full p-2 border rounded" />
-      </div>
+    <div className={styles.container}>
+      <form onSubmit={handleFormSubmit} className={styles.form}>
+        <div>
+          <h2 className={styles.title}>{"Let's start with the basics"}</h2>
+          <p className={styles.subtitle}>Help us get to know you</p>
+        </div>
 
-      <div className="space-y-2">
-        <label className="block">Country</label>
-        <input {...register("country")} className="w-full p-2 border rounded" />
-      </div>
+        <div>
+          <label className={styles.label}>Professional Title</label>
+          <input
+            {...register("professionalTitle")}
+            className={styles.input}
+            placeholder="e.g., Genetic Counselor"
+          />
+        </div>
 
-      <div className="flex justify-end">
-        <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded">
-          Next
-        </button>
-      </div>
-    </form>
+        <div>
+          <label className={styles.label}>Country</label>
+          <select {...register("country")} className={styles.input} defaultValue="">
+            <option value="" disabled>
+              Select country
+            </option>
+            <option value="AR">Argentina</option>
+            <option value="BO">Bolivia</option>
+            <option value="BR">Brazil</option>
+            <option value="CL">Chile</option>
+            <option value="CO">Colombia</option>
+            <option value="CR">Costa Rica</option>
+            <option value="CU">Cuba</option>
+            <option value="DO">Dominican Republic</option>
+            <option value="EC">Ecuador</option>
+            <option value="SV">El Salvador</option>
+            <option value="GT">Guatemala</option>
+            <option value="HN">Honduras</option>
+            <option value="MX">Mexico</option>
+            <option value="NI">Nicaragua</option>
+            <option value="PA">Panama</option>
+            <option value="PY">Paraguay</option>
+            <option value="PE">Peru</option>
+            <option value="PR">Puerto Rico</option>
+            <option value="UY">Uruguay</option>
+            <option value="VE">Venezuela</option>
+          </select>
+        </div>
+
+        <div>
+          <label className={styles.label}>Preferred Language(s)</label>
+          <Controller
+            name="languages"
+            control={control}
+            defaultValue={[]}
+            render={({ field: { onChange, value = [] } }) => (
+              <div className={styles.languageGrid}>
+                {languageOptions.map((option) => (
+                  <div key={option.value} className={styles.checkboxItem}>
+                    <input
+                      type="checkbox"
+                      id={option.value}
+                      checked={value.includes(option.value)}
+                      onChange={(e) => {
+                        const isChecked = e.target.checked;
+                        if (isChecked) {
+                          onChange([...value, option.value]);
+                        } else {
+                          onChange(value.filter((v: string) => v !== option.value));
+                        }
+                      }}
+                    />
+                    <label htmlFor={option.value}>{option.label}</label>
+                  </div>
+                ))}
+              </div>
+            )}
+          />
+        </div>
+
+        <div className={styles.membershipSection}>
+          <h3 className={styles.sectionTitle}>Membership</h3>
+          <p className={styles.sectionText}>
+            The next section of the questionnaire will place you in a membership category. First,
+            review the different types below.
+          </p>
+
+          {/* Healthcare Provider Expandable */}
+          <div className={styles.expandableSection}>
+            <div
+              className={styles.expandableHeader}
+              onClick={() => {
+                setHealthcareExpanded(!healthcareExpanded);
+              }}
+            >
+              <span className={styles.expandIcon}>{healthcareExpanded ? "−" : "+"}</span>
+              <h4 className={styles.expandableTitle}>Healthcare Provider Membership</h4>
+            </div>
+
+            {healthcareExpanded && (
+              <div className={styles.expandableContent}>
+                <p>
+                  Lorem ipsum odor amet, consectetuer adipiscing elit. Netus habitant adipiscing
+                  curabitur phasellus non. Molestie condimentum dictum integer conubia; nisi
+                  lobortis. Hac hendrerit purus dapibus ullamcorper; litora urna.
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Associate Membership Expandable */}
+          <div className={styles.expandableSection}>
+            <div
+              className={styles.expandableHeader}
+              onClick={() => {
+                setAssociateExpanded(!associateExpanded);
+              }}
+            >
+              <span className={styles.expandIcon}>{associateExpanded ? "−" : "+"}</span>
+              <h4 className={styles.expandableTitle}>Associate Membership</h4>
+            </div>
+
+            {associateExpanded && (
+              <div className={styles.expandableContent}>
+                <p>
+                  Lorem ipsum odor amet, consectetuer adipiscing elit. Netus habitant adipiscing
+                  curabitur phasellus non. Molestie condimentum dictum integer conubia; nisi
+                  lobortis. Hac hendrerit purus dapibus ullamcorper; litora urna.
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div>
+          <button type="submit">Next</button>
+        </div>
+      </form>
+    </div>
   );
 };
