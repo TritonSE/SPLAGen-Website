@@ -1,4 +1,4 @@
-import SideNavbar from "./components/SideNavbar";
+import SideNavbar from "../components/SideNavbar";
 
 import "./globals.css";
 
