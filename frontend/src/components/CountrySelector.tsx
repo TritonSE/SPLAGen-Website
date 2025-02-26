@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useMemo } from "react";
 import Select, { SingleValue } from "react-select";
 import countryList from "react-select-country-list";
 
@@ -9,9 +9,17 @@ type CountryOption = {
   label: string;
 };
 
-export const CountrySelector: React.FC = () => {
-  const [value, setValue] = useState<CountryOption | null>(null);
+type CountrySelectorProps = {
+  value: CountryOption | null;
+  onChange: (selectedOption: SingleValue<CountryOption>) => void;
+  placeholder?: string;
+};
 
+export const CountrySelector: React.FC<CountrySelectorProps> = ({
+  value,
+  onChange,
+  placeholder = "Select a country...",
+}) => {
   // Ensure safe data fetching
   const options = useMemo(() => {
     try {
@@ -29,19 +37,16 @@ export const CountrySelector: React.FC = () => {
     }
   }, []);
 
-  const changeHandler = (selectedOption: SingleValue<CountryOption>) => {
-    setValue(selectedOption ?? null);
-  };
+  const changeHandler = useCallback(
+    (selectedOption: SingleValue<CountryOption>) => {
+      onChange(selectedOption ?? null);
+    },
+    [onChange],
+  );
 
   return (
-    <div>
-      <Select
-        options={options}
-        value={value}
-        onChange={changeHandler}
-        placeholder="Select a country..."
-      />
-      {value && <p>Selected country: {value.label}</p>}
+    <div style={{ width: "100%" }}>
+      <Select options={options} value={value} onChange={changeHandler} placeholder={placeholder} />
     </div>
   );
 };
