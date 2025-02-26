@@ -92,7 +92,7 @@ const Login: React.FC = () => {
       e.preventDefault();
       void handleSubmit(onSubmit)();
     },
-    [handleSubmit, onSubmit]
+    [handleSubmit, onSubmit],
   );
 
   return (
