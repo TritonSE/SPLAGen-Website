@@ -26,6 +26,7 @@ type FormData = {
 };
 
 //Source: https://gist.github.com/jacurtis/ccb9ad32664d3b894c12
+//eslint-disable-next-line
 const phoneRegex = /\+?([\d|\(][\h|\(\d{3}\)|\.|\-|\d]{4,}\d)/;
 
 const schema = z.object({
