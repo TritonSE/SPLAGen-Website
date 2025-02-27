@@ -15,7 +15,7 @@
   ],
   // You might not need this.
   "parserOptions": {
-    "project": true
+    "project": "./tsconfig.json"
   },
   "rules": {
     // Add all of these:
