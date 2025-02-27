@@ -37,7 +37,7 @@ const schema = z.object({
     .string()
     .min(7, "Phone number must be at least 7 characters")
     .max(15, "Phone number must be at most 15 characters")
-    .regex(phoneRegex, "Invalid phone number format")
+    .regex(phoneRegex, "Invalid phone number format"),
 });
 
 // Function to normalize phone numbers before sending them
