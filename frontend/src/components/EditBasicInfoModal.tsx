@@ -25,17 +25,24 @@ type FormData = {
   phone: string;
 };
 
+//Source: https://gist.github.com/jacurtis/ccb9ad32664d3b894c12
+const phoneRegex = /\+?([\d|\(][\h|\(\d{3}\)|\.|\-|\d]{4,}\d)/;
+
 const schema = z.object({
   firstName: z.string().min(1, "First Name is required"),
   lastName: z.string().min(1, "Last Name is required"),
   email: z.string().min(1, "Email is required").email("Invalid email format"),
   phone: z
     .string()
-    .min(1, "Phone Number is required")
-    .refine((val) => val.length >= 5 && val.length <= 15, {
-      message: "Invalid phone number format",
-    }),
+    .min(7, "Phone number must be at least 7 characters")
+    .max(15, "Phone number must be at most 15 characters")
+    .regex(phoneRegex, "Invalid phone number format")
 });
+
+// Function to normalize phone numbers before sending them
+const normalizePhoneNumber = (phone: string) => {
+  return phone.replace(/[-.\s()]/g, ""); // Remove spaces, dashes, dots, and parentheses
+};
 
 export const EditBasicInfoModal = ({
   isOpen,
@@ -54,11 +61,16 @@ export const EditBasicInfoModal = ({
 
   const onSubmit = useCallback<SubmitHandler<FormData>>(
     async (data) => {
+      const formattedData = {
+        ...data,
+        phone: normalizePhoneNumber(data.phone),
+      };
+
       try {
         const response = await editBasicInfoRequest(
           "POST",
           `/users/personal-information`,
-          data,
+          formattedData,
           {},
         );
         if (response.ok) {
