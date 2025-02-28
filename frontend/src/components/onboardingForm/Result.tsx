@@ -23,7 +23,9 @@ export const Result = ({ onReset }: ResultProps) => {
       <p>
         <strong>Field1:</strong> {state.onboardingForm.field1}
       </p>
-      <button type="button" onClick={onReset}>Back</button>
+      <button type="button" onClick={onReset}>
+        Back
+      </button>
     </div>
   );
 };
