@@ -1,6 +1,6 @@
 .SideNavbar {
   display: flex;
-  width: clamp(185px, 26vw, 296px);
+  width: clamp(160px, 20vw, 250px);
   background-color: var(--color-primary2);
   padding: clamp(4px, 1vw, 40px);
   color: white;
@@ -9,6 +9,7 @@
   height: 100vh;
   flex-direction: column;
   overflow: hidden;
+  z-index: 1100;
 }
 
 .decoration {
