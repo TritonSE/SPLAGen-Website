@@ -5,7 +5,7 @@ import { useState } from "react";
 
 import logo from "../../public/images/Logo_SPLAGen1.png";
 
-import NavCard from "./NavCard";
+import { NavCard } from "./NavCard";
 import cardStyle from "./NavCard.module.css";
 import styles from "./SideNavbar.module.css";
 // Props for each navigation card on sidebar
@@ -76,7 +76,7 @@ const counselorItems: CardProps[] = [
   NewsletterProps,
 ];
 
-const SideNavbar: React.FC = () => {
+export const SideNavbar: React.FC = () => {
   const [navState, setNavState] = useState<
     "Counselor" | "Admin" | "Onboarding" | "Directory" | "blank"
   >("blank");
@@ -179,4 +179,3 @@ const SideNavbar: React.FC = () => {
     </section>
   );
 };
-export default SideNavbar;
