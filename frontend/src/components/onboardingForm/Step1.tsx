@@ -131,6 +131,8 @@ export const Step1 = ({ onNext }: Step1Props) => {
             review the different types below.
           </p>
 
+          <h4>Healthcare Provider</h4>
+
           {/* Healthcare Provider Expandable */}
           <div className={styles.expandableSection}>
             <div
@@ -139,7 +141,7 @@ export const Step1 = ({ onNext }: Step1Props) => {
                 setHealthcareExpanded(!healthcareExpanded);
               }}
             >
-              <span className={styles.expandIcon}>{healthcareExpanded ? "−" : "+"}</span>
+              <span className={styles.expandIcon}>{healthcareExpanded ? "-" : "+"}</span>
               <h4 className={styles.expandableTitle}>Healthcare Provider Membership</h4>
             </div>
 
@@ -153,6 +155,8 @@ export const Step1 = ({ onNext }: Step1Props) => {
               </div>
             )}
           </div>
+
+          <h4>Associate Member</h4>
 
           {/* Associate Membership Expandable */}
           <div className={styles.expandableSection}>

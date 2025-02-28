@@ -21,7 +21,7 @@ export const Result = ({ onReset }: ResultProps) => {
         <strong>Country:</strong> {state.onboardingForm.country}
       </p>
       <p>
-        <strong>Field1:</strong> {JSON.stringify(state.onboardingForm.languages)}
+        <strong>Languages:</strong> {JSON.stringify(state.onboardingForm.languages)}
       </p>
       <button onClick={onReset}>Back</button>
     </div>
