@@ -17,7 +17,6 @@ export const createDiscussion = async (req: Request, res: Response, next: NextFu
 export const editDiscussion = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;
-    console.log(req.params)
     const { title, message, channel } = req.body;
     const discussion = await discussionPost.findByIdAndUpdate(id, { title, message, channel }, { new: true });
     
