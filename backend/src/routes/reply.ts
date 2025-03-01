@@ -8,14 +8,14 @@ const router = express.Router();
 /**
  * Reply Routes
  * POST /api/replies - Create a reply post
- * GET /api/replies/:discussionId - Get reply posts for a discussion
+ * GET /api/replies/:postId - Get reply posts for a discussion
  * PUT /api/replies/:id - Edit a reply post
  * DELETE /api/replies/:id - Delete a reply post
  */
 
 router.post("/", requireSignedIn, ReplyValidator.createReply, ReplyController.createReply);
 router.get(
-  "/:discussionId",
+  "/:postId",
   requireSignedIn,
   ReplyValidator.getReplies,
   ReplyController.getReplies,
