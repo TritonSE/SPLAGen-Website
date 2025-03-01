@@ -51,19 +51,10 @@ export const deleteUser = (req: Request, res: Response) => {
   }
 };
 
-export const getAllUsers = (_req: Request, res: Response) => {
+export const getAllUsers: RequestHandler = async (req, res, next) => {
   try {
+    const users = await User.find();
     res.status(200).json({ users });
-  } catch (error) {
-    console.error("Error getting users:", error);
-    res.status(500).json({ error: "Internal server error" });
-  }
-};
-
-export const getAllCounselors: RequestHandler = async (_req, res, next) => {
-  try {
-    const counselors = await User.find({ "account.type": "counselor" });
-    res.status(200).json({ counselors });
   } catch (error) {
     next(error);
   }
