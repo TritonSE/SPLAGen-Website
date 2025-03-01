@@ -1,0 +1,9 @@
+.checkmarkContainer {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.checkmarkLabel {
+  margin-left: 8px;
+}

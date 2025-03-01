@@ -20,7 +20,7 @@ router.get("/counselor/", UserController.getAllCounselors);
 router.get("/:id", UserValidator.getUser, UserController.getUser);
 
 router.get("/personal-information", UserController.getPersonalInformation);
-router.post("/personal-information", UserController.editPersonalInformation); 
+router.post("/personal-information", UserController.editPersonalInformation);
 
 router.get("/professional-information", UserController.getProfessionalInformation);
 router.post("/professional-information", UserController.editProfessionalInformation);
