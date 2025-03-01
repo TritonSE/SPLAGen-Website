@@ -5,9 +5,9 @@ import { useCallback, useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { Checkmark } from "../../components";
-
 import styles from "./login.module.css";
+
+import { Checkmark } from "@/components";
 
 // Define the schema for form validation using Zod
 const schema = z.object({

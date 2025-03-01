@@ -1,8 +1,8 @@
 "use client";
 
-import i18n from "../i18n";
-
 import styles from "./languageSwitcher.module.css";
+
+import i18n from "@/i18n";
 
 export const LanguageSwitcher = () => {
   const changeLanguage = async (lng: string) => {
