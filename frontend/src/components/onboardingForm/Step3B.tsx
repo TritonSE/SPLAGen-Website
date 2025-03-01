@@ -1,8 +1,7 @@
 "use client";
 import { useCallback } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
-
-import { onboardingState } from "../../state/stateTypes";
+import { onboardingState } from "src/state/stateTypes";
 
 type Step3BProps = {
   onNext: (data: onboardingState["data"]) => void;
