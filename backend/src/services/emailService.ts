@@ -1,4 +1,3 @@
-// src/services/sendEmail.ts
 import { config } from "dotenv";
 import nodemailer from "nodemailer";
 config();
@@ -14,8 +13,8 @@ const transporter = nodemailer.createTransport({
 const sendApprovalEmail = async (to: string, name: string) => {
   const mailOptions = {
     from: process.env.EMAIL_USER,
-    to: process.env.EMAIL_NOTIFICATIONS_RECIPIENT,
-    subject: "Your Directory Approval",
+    to,
+    subject: "SPLAGen: Your Directory Approval",
     html: `<p>Dear ${name},</p><p>Your directory entry has been approved!</p><p>Thank you for your submission.</p>`,
   };
 
@@ -30,8 +29,8 @@ const sendApprovalEmail = async (to: string, name: string) => {
 const sendDenialEmail = async (to: string, name: string, reason: string) => {
   const mailOptions = {
     from: process.env.EMAIL_USER,
-    to: process.env.EMAIL_NOTIFICATIONS_RECIPIENT,
-    subject: "Your Directory Denial",
+    to,
+    subject: "SPLAGen: Your Directory Denial",
     html: `<p>Dear ${name},</p><p>Your directory entry has been denied for the following reason: ${reason}</p><p>If you have any questions, feel free to reach out.</p>`,
   };
 

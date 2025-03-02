@@ -1,16 +1,14 @@
-// src/controllers/directoryController.ts
 import { Request, Response } from "express";
 
+import UserModel from "../models/user";
 import { sendApprovalEmail, sendDenialEmail } from "../services/emailService";
 
 type ApproveDirectoryRequestBody = {
-  email: string;
-  name: string;
+  firebaseId: string;
 };
 
 type DenyDirectoryRequestBody = {
-  email: string;
-  name: string;
+  firebaseId: string;
   reason: string;
 };
 
@@ -19,15 +17,27 @@ export const approveDirectoryEntry = async (
   res: Response,
 ) => {
   try {
-    const { email, name } = req.body;
+    const { firebaseId } = req.body;
 
-    if (!email || !name) {
-      res.status(400).json({ error: "Email and name are required" });
+    if (!firebaseId) {
+      res.status(400).json({ error: "ID is required" });
       return;
     }
 
     // Send the approval email
-    await sendApprovalEmail(email, name);
+
+    const user = await UserModel.findOne({ firebaseId });
+
+    if (!user || !user.personal) {
+      res.status(404).json({ error: "User not found" });
+      return;
+    }
+
+    await user.save();
+
+    const { firstName, email } = user.personal;
+
+    await sendApprovalEmail(email, firstName);
 
     res.status(200).json({ message: "Directory entry approved and email sent" });
   } catch (error) {
@@ -41,15 +51,27 @@ export const denyDirectoryEntry = async (
   res: Response,
 ) => {
   try {
-    const { email, name, reason } = req.body;
+    const { firebaseId, reason } = req.body;
 
-    if (!email || !name || !reason) {
+    if (!firebaseId || !reason) {
       res.status(400).json({ error: "Email, name, and reason are required" });
       return;
     }
 
     // Send the denial email
-    await sendDenialEmail(email, name, reason);
+
+    const user = await UserModel.findOne({ firebaseId });
+
+    if (!user || !user.personal) {
+      res.status(404).json({ error: "User not found" });
+      return;
+    }
+
+    await user.save();
+
+    const { firstName, email } = user.personal;
+
+    await sendDenialEmail(email, firstName, reason);
 
     res.status(200).json({ message: "Directory entry denied and email sent" });
   } catch (error) {
