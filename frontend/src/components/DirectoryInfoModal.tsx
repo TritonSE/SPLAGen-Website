@@ -1,11 +1,10 @@
-import { useCallback } from "react";
-import { zodResolver } from "@hookform/resolvers/zod";
-import React from "react";
+import React, { useCallback } from "react"; // React should be first
 import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod"; // Move before local imports
 import { z } from "zod";
 import "./DirectoryInfoModal.css";
 
-// Your schema and types
+// Define validation schema using Zod
 const directoryInfoSchema = z.object({
   degree: z.string().min(3, "Degree must be at least 3 characters"),
   institution: z.string().min(3, "Institution must be at least 3 characters"),
@@ -27,7 +26,7 @@ type DirectoryInfoFormData = z.infer<typeof directoryInfoSchema>;
 type DirectoryInfoModalProps = {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (data: DirectoryInfoFormData) => void;
+  onSubmit: (data: DirectoryInfoFormData) => Promise<void>; // Ensuring async handling
 };
 
 const DirectoryInfoModal: React.FC<DirectoryInfoModalProps> = ({ isOpen, onClose, onSubmit }) => {
@@ -40,17 +39,19 @@ const DirectoryInfoModal: React.FC<DirectoryInfoModalProps> = ({ isOpen, onClose
     resolver: zodResolver(directoryInfoSchema),
   });
 
-  // Use useCallback outside the conditional block to avoid rules of hooks violations
   const handleFormSubmit = useCallback(
-    (e: React.FormEvent<HTMLFormElement>): void => {
+    (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault(); // Prevent default form behavior
 
-      // Use handleSubmit to pass the data to onSubmit and reset form
-      void handleSubmit((data) => {
-        onSubmit(data); // Call the onSubmit prop
-        reset(); // Reset the form
-        onClose(); // Close the modal
-      })(e); // Pass the event to handleSubmit
+      void handleSubmit(async (data) => {
+        try {
+          await onSubmit(data); // Ensure async handling
+          reset();
+          onClose();
+        } catch (error) {
+          console.error("Error submitting form:", error);
+        }
+      })();
     },
     [onSubmit, reset, onClose, handleSubmit],
   );
@@ -73,8 +74,9 @@ const DirectoryInfoModal: React.FC<DirectoryInfoModalProps> = ({ isOpen, onClose
               placeholder="e.g. Master's Degree"
               required
             />
-            <p className="error-message">{errors.degree ? errors.degree.message : " "}</p>
+            <p className="error-message">{errors.degree?.message ?? ""}</p>
           </div>
+
           <div className="form-group">
             <label htmlFor="institution">Institution</label>
             <input
@@ -83,13 +85,15 @@ const DirectoryInfoModal: React.FC<DirectoryInfoModalProps> = ({ isOpen, onClose
               placeholder="e.g. UC San Diego"
               required
             />
-            <p className="error-message">{errors.institution ? errors.institution.message : " "}</p>
+            <p className="error-message">{errors.institution?.message ?? ""}</p>
           </div>
+
           <div className="form-group">
             <label htmlFor="website">Clinic Website Link</label>
-            <input id="website" {...register("website")} placeholder="Phone" />
-            <p className="error-message">{errors.website ? errors.website.message : " "}</p>
+            <input id="website" {...register("website")} placeholder="Website URL" />
+            <p className="error-message">{errors.website?.message ?? ""}</p>
           </div>
+
           <label htmlFor="country">Country</label>
           <div className="form-group">
             <select id="country" {...register("country")}>
@@ -116,14 +120,17 @@ const DirectoryInfoModal: React.FC<DirectoryInfoModalProps> = ({ isOpen, onClose
                 </option>
               ))}
             </select>
-            <p className="error-message">{errors.country ? errors.country.message : " "}</p>
+            <p className="error-message">{errors.country?.message ?? ""}</p>
           </div>
+
           <div className="form-group">
             <input id="addressLine" {...register("addressLine")} placeholder="Address Line" />
           </div>
+
           <div className="form-group">
             <input id="apartment" {...register("apartment")} placeholder="Apartment, suite, etc." />
           </div>
+
           <div className="city-state-postcode">
             <div className="form-group">
               <input id="city" {...register("city")} placeholder="City" />
@@ -133,9 +140,10 @@ const DirectoryInfoModal: React.FC<DirectoryInfoModalProps> = ({ isOpen, onClose
             </div>
             <div className="form-group">
               <input id="postcode" {...register("postcode")} placeholder="Postcode" required />
-              <p className="error-message">{errors.postcode ? errors.postcode.message : " "}</p>
+              <p className="error-message">{errors.postcode?.message ?? ""}</p>
             </div>
           </div>
+
           <div className="modal-actions">
             <button type="submit" className="save-button">
               Save
