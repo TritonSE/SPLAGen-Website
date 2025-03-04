@@ -45,7 +45,7 @@
 /* Input and textarea styling */
 .form-group input,
 .form-group textarea {
-  @apply text-disabled;
+  @apply text-black;
   width: 100%;
   padding: 10px;
   border: 1px solid #ccc;
@@ -97,4 +97,11 @@ button[type="button"] {
   border-radius: 4px;
   padding: 8px 12px;
   cursor: pointer;
+}
+
+.error-message {
+  color: red;
+  font-size: 14px;
+  min-height: 18px;
+  margin-top: 4px;
 }

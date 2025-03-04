@@ -1,3 +1,4 @@
+/* Modal Overlay */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -11,15 +12,22 @@
   z-index: 1000;
 }
 
+/* Modal Container */
 .modal-container {
   background-color: #fff;
-  padding: 20px;
+  padding: 4vh 6vw;
   border-radius: 8px;
-  max-width: 500px;
+  max-width: 90vw;
+  max-height: 70vh;
   width: 100%;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  position: relative; /* Add position relative here */
 }
 
+/* Close Button */
 .close-button {
   background: none;
   border: none;
@@ -27,47 +35,54 @@
   font-weight: bold;
   color: black;
   cursor: pointer;
-  position: absolute;
-  top: 15px;
-  right: 20px;
+  position: absolute; /* Absolute positioning */
+  top: 1vh;
+  right: 2vw;
   z-index: 1000;
   visibility: visible;
 }
 
+/* Modal Heading */
 h2 {
   @apply text-mainHeading;
   text-align: left;
-  margin-bottom: 8px;
-  font-size: 1.25rem;
+  margin-bottom: 2vh;
+  font-size: 2rem;
+  color: black;
 }
 
+/* Form Group Styling */
 .form-group {
-  margin-bottom: 10px;
+  margin-bottom: 3vh;
 }
 
+/* Label Styling */
 label {
   display: block;
-  margin-bottom: 3px;
+  margin-bottom: 1vh;
   color: #333;
+  font-size: 1.1rem;
 }
 
+/* Input and Select Fields */
 input,
 select {
   width: 100%;
-  padding: 10px;
+  padding: 1.5vh;
   font-size: 1rem;
-  border: 1px solid #ccc;
+  border: 1px solid #b4b4b4;
   border-radius: 4px;
   box-sizing: border-box;
 }
 
+/* Placeholder Styling */
 input::placeholder,
-select {
-  width: 100%;
-  padding: 10px;
+select::placeholder {
   font-size: 1rem;
+  color: #ccc;
 }
 
+/* Option Styling */
 option:checked {
   color: black;
 }
@@ -76,10 +91,13 @@ option {
   color: inherit;
 }
 
+/* Modal Actions Container */
 .modal-actions {
   text-align: right;
+  margin-top: 2vh;
 }
 
+/* Save Button */
 .save-button {
   @apply bg-mainHeading text-mainHeading;
   color: white;
@@ -89,16 +107,27 @@ option {
   border-radius: 4px;
   cursor: pointer;
   width: 100%;
-  margin-top: 15px;
+  margin-top: 15px; /* Adjust this value for top margin */
+  margin-bottom: 20px; /* Add bottom margin */
+  margin-left: 10px; /* Add left margin */
+  margin-right: 10px; /* Add right margin */
 }
 
+/* City, State, Postcode Form Group */
 .city-state-postcode {
   display: flex;
   justify-content: space-between;
-  gap: 10px;
+  gap: 2vw;
 }
 
 .city-state-postcode .form-group {
   flex: 1;
   margin-bottom: 0;
+}
+
+.error-message {
+  color: red;
+  font-size: 14px;
+  min-height: 18px;
+  margin-top: 4px;
 }

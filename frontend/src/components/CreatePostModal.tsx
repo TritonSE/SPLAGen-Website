@@ -1,7 +1,5 @@
-/* eslint-disable @typescript-eslint/no-misused-promises */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
 import { zodResolver } from "@hookform/resolvers/zod";
-import React from "react";
+import React, { useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import "./CreatePostModal.css";
@@ -37,20 +35,44 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onSu
     resolver: zodResolver(postSchema),
   });
 
-  if (!isOpen) return null;
+  const handleFormSubmit = useCallback(
+    async (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      await handleSubmit((data) => {
+        onSubmit(data);
+        reset();
+        onClose();
+      })();
+    },
+    [onSubmit, reset, onClose, handleSubmit],
+  );
 
-  const submitForm = (data: PostFormData) => {
-    onSubmit(data);
-    reset(); // Reset form after submission
-    onClose();
-  };
+  if (!isOpen) return null;
 
   return (
     <div className="modal-overlay">
       <div className="modal-container">
         <h2>Create New Post</h2>
-        <form onSubmit={handleSubmit(submitForm)}>
+        <form onSubmit={handleFormSubmit}>
           <div className="form-group">
+            <label htmlFor="post-title">Post Title</label>
+            <input
+              id="post-title"
+              type="text"
+              {...register("title")}
+              placeholder="Post title name"
+            />
+            <p className="error-message">{errors.title?.message ?? "\u00A0"}</p>{" "}
+            {/* Keeps space reserved */}
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="post-message">Message</label>
+            <textarea id="post-message" {...register("message")} placeholder="Message" />
+            <p className="error-message">{errors.message?.message ?? "\u00A0"}</p>{" "}
+            {/* Keeps space reserved */}
+          </div>
+          {/* <div className="form-group">
             <label htmlFor="post-title">Post Title</label>
             <input
               id="post-title"
@@ -64,7 +86,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onSu
             <label htmlFor="post-message">Message</label>
             <textarea id="post-message" {...register("message")} placeholder="Message" />
             {errors.message && <p className="error-message">{errors.message.message}</p>}
-          </div>
+          </div> */}
           <div className="modal-actions">
             <button type="button" onClick={onClose}>
               Cancel
