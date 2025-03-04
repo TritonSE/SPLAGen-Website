@@ -3,7 +3,7 @@ import { GlobalState, createStore } from "little-state-machine";
 const initialState: GlobalState = {
   onboardingForm: {
     professionalTitle: "",
-    country: "",
+    country: {value:"", label:""},
     languages: [],
   },
   directoryForm: {

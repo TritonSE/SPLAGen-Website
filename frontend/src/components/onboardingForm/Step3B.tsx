@@ -1,39 +1,32 @@
 "use client";
-import { useCallback } from "react";
-import { SubmitHandler, useForm } from "react-hook-form";
 
-import { onboardingState } from "@/state/stateTypes";
+import React from "react";
 
-type Step3BProps = {
-  onNext: (data: onboardingState["data"]) => void;
+type Step3AProps = {
+  onNext: () => void;
   onBack: () => void;
 };
 
-export const Step3B = ({ onNext, onBack }: Step3BProps) => {
-  const { handleSubmit } = useForm<onboardingState["data"]>();
+export const Step3B: React.FC<Step3AProps> = ({ onNext, onBack }) => {
 
-  const onSubmit: SubmitHandler<onboardingState["data"]> = useCallback(
-    (data) => {
-      onNext(data);
-    },
-    [onNext],
-  );
-
-  const handleFormSubmit = useCallback(
-    (e: React.FormEvent) => {
-      e.preventDefault();
-      void handleSubmit(onSubmit)();
-    },
-    [handleSubmit, onSubmit], // Dependencies
-  );
+  const handleContinue = () => {
+    onNext();
+  };
 
   return (
-    <form onSubmit={handleFormSubmit} className="space-y-4">
-      <h2>Step 3B - You chose NO</h2>
-      <button type="button" onClick={onBack} className="mr-2">
-        Back
-      </button>
-      <button type="submit">Submit</button>
-    </form>
+    <div className="space-y-4">
+      <h2>Welcome to SPLAGen!</h2>
+
+      <p>{"You are being added to SPLAGEN's full membership as a Student."}</p>
+
+      <div className="flex justify-between">
+        <button type="button" onClick={onBack} className="px-4 py-2 bg-gray-500 text-white rounded">
+          Back
+        </button>
+        <button type="button" onClick={handleContinue} className="px-4 py-2 bg-blue-500 text-white rounded">
+          Continue
+        </button>
+      </div>
+    </div>
   );
 };

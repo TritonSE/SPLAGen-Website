@@ -1,0 +1,46 @@
+.expandableSection {
+    border-radius: 4px;
+    border: 1px solid var(--Neutral-Gray2, #d9d9d9);
+    background: var(--Neutral-White, #fff);
+    margin-bottom: 12px;
+    overflow: hidden;
+  }
+  
+  .expandableHeader {
+    display: flex;
+    padding: 8px 8px 8px 16px;
+    align-items: center;
+    gap: 8px;
+    align-self: stretch;
+    cursor: pointer;
+    background-color: transparent;
+  }
+  
+  .expandIcon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 24px;
+    height: 24px;
+    font-size: 18px;
+    font-weight: bold;
+  }
+  
+  .expandableTitle {
+    font-size: 18px;
+    font-weight: 500;
+    margin: 0;
+  }
+  
+  .expandableContent {
+    padding: 16px;
+    background-color: white;
+  }
+  
+  .expandableContent p {
+    margin-bottom: 12px;
+  }
+  
+  .expandableContent p:last-child {
+    margin-bottom: 0;
+  }

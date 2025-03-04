@@ -1,44 +1,50 @@
 "use client";
-import { useCallback } from "react";
-import { SubmitHandler, useForm } from "react-hook-form";
+
+import { useStateMachine } from "little-state-machine";
+import React from "react";
 
 import { onboardingState } from "@/state/stateTypes";
 
 type Step3AProps = {
-  onNext: (data: onboardingState["data"]) => void;
+  onNext: () => void;
   onBack: () => void;
 };
 
-export const Step3A = ({ onNext, onBack }: Step3AProps) => {
-  const { handleSubmit } = useForm<onboardingState["data"]>();
+export const Step3A: React.FC<Step3AProps> = ({ onNext, onBack }) => {
+  const { state } = useStateMachine<onboardingState>();
+  const membershipType = state.onboardingForm.field4; // Assuming field4 stores membership type
 
-  const onSubmit: SubmitHandler<onboardingState["data"]> = useCallback(
-    (data) => {
-      onNext(data);
-    },
-    [onNext],
-  );
+  let membershipText = "";
 
-  const handleFormSubmit = useCallback(
-    (e: React.FormEvent) => {
-      e.preventDefault();
-      void handleSubmit(onSubmit)();
-    },
-    [handleSubmit, onSubmit],
-  );
+  switch (membershipType) {
+    case "Student":
+      membershipText = "a Student";
+      break;
+    case "Associate Member":
+      membershipText = "an Associate Member";
+      break;
+    default:
+        membershipText = "a Healthcare Professional";
+  }
+
+  const handleContinue = () => {
+    onNext();
+  };
 
   return (
-    <form onSubmit={handleFormSubmit} className="space-y-4">
-      <h2>Step 3A - You chose YES</h2>
+    <div className="space-y-4">
+      <h2>Welcome to SPLAGen!</h2>
+
+      <p>You are being added to SPLAGEN&apos;s full membership as {membershipText}.</p>
 
       <div className="flex justify-between">
         <button type="button" onClick={onBack} className="px-4 py-2 bg-gray-500 text-white rounded">
           Back
         </button>
-        <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded">
-          Submit
+        <button type="button" onClick={handleContinue} className="px-4 py-2 bg-blue-500 text-white rounded">
+          Continue
         </button>
       </div>
-    </form>
+    </div>
   );
 };

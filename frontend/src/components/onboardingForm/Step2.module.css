@@ -1,5 +1,6 @@
 .container {
   width: 522px;
+  max-height: 80vh; /* Limit height to 80% of viewport height */
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -7,6 +8,13 @@
   background: var(--color-surface);
   padding: 20px;
   margin: -40px;
+  overflow-y: auto; /* Enable vertical scrolling */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;
+}
+
+.container::-webkit-scrollbar {
+  display: none; /* Chrome, Safari */
 }
 
 .form {
@@ -44,16 +52,9 @@
 }
 
 .optionButton {
-  padding: 12px 24px;
-  border-radius: 5px;
-  background-color: var(--color-primary2);
-  color: white;
-  border: none;
-  font-family: "DM-sans", sans-serif;
-  font-size: 18px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .optionButton:hover {
@@ -81,3 +82,47 @@
 .backButton:hover {
   background-color: #5a6268;
 }
+
+.expandableSection:empty {
+  display: none;
+}
+
+.expandableHeader {
+  display: flex;
+  padding: 8px 8px 8px 16px;
+  align-items: center;
+  gap: 8px;
+  align-self: stretch;
+  cursor: pointer;
+  background-color: transparent;
+}
+
+.expandIcon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 24px;
+  height: 24px;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.expandableTitle {
+  font-size: 18px;
+  font-weight: 500;
+  margin: 0;
+}
+
+.expandableContent {
+  padding: 16px;
+  background-color: white;
+}
+
+.expandableContent p {
+  margin-bottom: 12px;
+}
+
+.expandableContent p:last-child {
+  margin-bottom: 0;
+}
+

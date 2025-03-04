@@ -18,7 +18,7 @@ export const Result = ({ onReset }: ResultProps) => {
         <strong>Professional Title:</strong> {state.onboardingForm.professionalTitle}
       </p>
       <p>
-        <strong>Country:</strong> {state.onboardingForm.country}
+        <strong>Country:</strong> {state.onboardingForm.country.value}
       </p>
       <p>
         <strong>Languages:</strong> {JSON.stringify(state.onboardingForm.languages)}

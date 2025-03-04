@@ -4,6 +4,7 @@ import { useStateMachine } from "little-state-machine";
 import { useCallback, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 
+import { Checkmark, CountrySelector, type CountryOption } from "@/components";
 import { onboardingState } from "@/state/stateTypes";
 import updateOnboardingForm from "@/state/updateOnboardingForm";
 import styles from "./Step1.module.css";
@@ -14,6 +15,8 @@ type Step1Props = {
 
 export const Step1 = ({ onNext }: Step1Props) => {
   const { state, actions } = useStateMachine({ actions: { updateOnboardingForm } });
+
+  const [selectedCountry, setSelectedCountry] = useState<CountryOption | null>(null);
 
   const [healthcareExpanded, setHealthcareExpanded] = useState(false);
 
@@ -65,31 +68,20 @@ export const Step1 = ({ onNext }: Step1Props) => {
 
         <div>
           <label className={styles.label}>Country</label>
-          <select {...register("country")} className={styles.input} defaultValue="">
-            <option value="" disabled>
-              Select country
-            </option>
-            <option value="AR">Argentina</option>
-            <option value="BO">Bolivia</option>
-            <option value="BR">Brazil</option>
-            <option value="CL">Chile</option>
-            <option value="CO">Colombia</option>
-            <option value="CR">Costa Rica</option>
-            <option value="CU">Cuba</option>
-            <option value="DO">Dominican Republic</option>
-            <option value="EC">Ecuador</option>
-            <option value="SV">El Salvador</option>
-            <option value="GT">Guatemala</option>
-            <option value="HN">Honduras</option>
-            <option value="MX">Mexico</option>
-            <option value="NI">Nicaragua</option>
-            <option value="PA">Panama</option>
-            <option value="PY">Paraguay</option>
-            <option value="PE">Peru</option>
-            <option value="PR">Puerto Rico</option>
-            <option value="UY">Uruguay</option>
-            <option value="VE">Venezuela</option>
-          </select>
+          <Controller
+            name="country"
+            control={control}
+            defaultValue={state.onboardingForm?.country || ""}
+            render={({ field }) => (
+              <CountrySelector
+                value={selectedCountry || state.onboardingForm?.country}
+                onChange={(option) => {
+                  setSelectedCountry(option);
+                  field.onChange(option);
+                }}
+              />
+            )}
+          />
         </div>
 
         <div>
@@ -100,24 +92,24 @@ export const Step1 = ({ onNext }: Step1Props) => {
             defaultValue={[]}
             render={({ field: { onChange, value = [] } }) => (
               <div className={styles.languageGrid}>
-                {languageOptions.map((option) => (
-                  <div key={option.value} className={styles.checkboxItem}>
-                    <input
-                      type="checkbox"
-                      id={option.value}
-                      checked={value.includes(option.value)}
-                      onChange={(e) => {
-                        const isChecked = e.target.checked;
-                        if (isChecked) {
-                          onChange([...value, option.value]);
-                        } else {
-                          onChange(value.filter((v: string) => v !== option.value));
-                        }
-                      }}
-                    />
-                    <label htmlFor={option.value}>{option.label}</label>
-                  </div>
-                ))}
+                {languageOptions.map((option) => {
+                  const isChecked = value.includes(option.value);
+                  return (
+                    <div key={option.value} className={styles.checkboxItem}>
+                      <Checkmark
+                        checked={isChecked}
+                        onChange={() => {
+                          if (isChecked) {
+                            onChange(value.filter((v: string) => v !== option.value));
+                          } else {
+                            onChange([...value, option.value]);
+                          }
+                        }}
+                        label={option.label}
+                      />
+                    </div>
+                  );
+                })}
               </div>
             )}
           />
@@ -147,9 +139,7 @@ export const Step1 = ({ onNext }: Step1Props) => {
             {healthcareExpanded && (
               <div className={styles.expandableContent}>
                 <p>
-                  Lorem ipsum odor amet, consectetuer adipiscing elit. Netus habitant adipiscing
-                  curabitur phasellus non. Molestie condimentum dictum integer conubia; nisi
-                  lobortis. Hac hendrerit purus dapibus ullamcorper; litora urna.
+                Full membership should be extended to any individual who has an MD, master's or doctorate degree in a related field, such as nursing, social work or public health, and has had formal training in genetic counseling with at least 1 year of formal clinical training in genetics or has obtained a certificate in genetic counseling training and has at least 3 years of clinical experience in a role where their primary responsibility is genetic counseling. Full members can attend all meetings of members, vote, serve as officers, committee chairs and on the Board of Directors.
                 </p>
               </div>
             )}
@@ -172,9 +162,7 @@ export const Step1 = ({ onNext }: Step1Props) => {
             {associateExpanded && (
               <div className={styles.expandableContent}>
                 <p>
-                  Lorem ipsum odor amet, consectetuer adipiscing elit. Netus habitant adipiscing
-                  curabitur phasellus non. Molestie condimentum dictum integer conubia; nisi
-                  lobortis. Hac hendrerit purus dapibus ullamcorper; litora urna.
+                Associate membership will be granted to all applicants interested in supporting the mission of Splagen and who are not eligible for full or student membership. Interested individuals can submit an application and, upon approval by officials, associated membership can be granted or denied. Associate members have all the privileges of full members, but are not eligible for a position on the Board of Directors and can only vote, hold positions as committee chairs and leadership positions related to their specialty and professional background.
                 </p>
               </div>
             )}
