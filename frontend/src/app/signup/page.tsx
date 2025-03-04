@@ -30,17 +30,22 @@ const SignUpPage = () => {
     mode: "onChange",
   });
 
+  const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    void handleSubmit(onSubmit)(); // Prevent promise from returning
+  };
+
   const onSubmit = (data: FormData) => {
     console.log("Signed Up!", data);
     alert("Signed Up!");
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-primary">
-      <div className="w-full max-w-md bg-white p-6 rounded-2xl shadow-md">
+    <div className="flex flex-col items-center justify-center flex-grow p-4 bg-primary">
+      <div className="w-full bg-white p-6 rounded-2xl shadow-md">
         <h1 className="text-2xl font-bold text-left mb-2 text-primary">Get started</h1>
         <p className="text-left text-gray-600 mb-6">Welcome to SPAGen</p>
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={handleFormSubmit}>
           <div className="mb-4 flex space-x-4">
             {/* First Name Input */}
             <div className="w-1/2">

@@ -14,6 +14,7 @@
 //   );
 // }
 import React from "react";
+
 import Signup from "./signup/page";
 
 const Page = () => {
