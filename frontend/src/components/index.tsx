@@ -7,3 +7,5 @@ export { SideNavbar } from "./SideNavbar";
 export { External } from "./translationDemo";
 export { CreatePostModal } from "./CreatePostModal";
 export { DirectoryInfoModal } from "./DirectoryInfoModal";
+
+export { VerticalStepper } from "./VerticalStepper";

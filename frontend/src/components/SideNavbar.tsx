@@ -6,6 +6,7 @@ import { useState } from "react";
 import { NavCard } from "./NavCard";
 import cardStyle from "./NavCard.module.css";
 import styles from "./SideNavbar.module.css";
+import { VerticalStepper } from "./VerticalStepper";
 
 import logo from "@/../public/images/Logo_SPLAGen1.png";
 // Props for each navigation card on sidebar
@@ -76,6 +77,8 @@ const counselorItems: CardProps[] = [
   NewsletterProps,
 ];
 
+const stepLabels = ["Step One", "Step Two", "Step Three", "Step Four"];
+
 export const SideNavbar: React.FC = () => {
   const [navState, setNavState] = useState<
     "Counselor" | "Admin" | "Onboarding" | "Directory" | "blank"
@@ -94,7 +97,11 @@ export const SideNavbar: React.FC = () => {
       case "Admin":
         return adminItems.map((item, index) => <NavCard key={index} {...item} />);
       case "Onboarding":
-        return <div>onboarding</div>;
+        return (
+          <>
+            <VerticalStepper steps={stepLabels} activeStep={3} />
+          </>
+        );
       case "Directory":
         return <div>directory</div>;
       case "blank":
@@ -113,7 +120,10 @@ export const SideNavbar: React.FC = () => {
 
       {/* Navigation cards */}
       <div className={styles.cards}>
-        <span className="text-white-500" id={styles.overview}>
+        <span
+          className={styles.overview}
+          style={{ display: navState === "Onboarding" ? "none" : "block" }}
+        >
           OVERVIEW
         </span>
         {renderNavItems()}
