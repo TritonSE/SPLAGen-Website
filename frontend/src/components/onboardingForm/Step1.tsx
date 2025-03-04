@@ -4,9 +4,8 @@ import { useStateMachine } from "little-state-machine";
 import { useCallback, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 
-import { onboardingState } from "../../state/stateTypes";
-import updateOnboardingForm from "../../state/updateOnboardingForm";
-
+import { onboardingState } from "@/state/stateTypes";
+import updateOnboardingForm from "@/state/updateOnboardingForm";
 import styles from "./Step1.module.css";
 
 type Step1Props = {

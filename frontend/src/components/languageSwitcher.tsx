@@ -4,7 +4,7 @@ import i18n from "../i18n";
 
 import styles from "./languageSwitcher.module.css";
 
-const LanguageSwitcher = () => {
+export const LanguageSwitcher = () => {
   const changeLanguage = async (lng: string) => {
     try {
       await i18n.changeLanguage(lng);
@@ -27,5 +27,3 @@ const LanguageSwitcher = () => {
     </div>
   );
 };
-
-export default LanguageSwitcher;

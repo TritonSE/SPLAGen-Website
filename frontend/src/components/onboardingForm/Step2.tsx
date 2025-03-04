@@ -3,9 +3,8 @@
 import { useStateMachine } from "little-state-machine";
 import { useCallback } from "react";
 
-import { onboardingState } from "../../state/stateTypes";
-import updateOnboardingForm from "../../state/updateOnboardingForm";
-
+import { onboardingState } from "@/state/stateTypes";
+import updateOnboardingForm from "@/state/updateOnboardingForm";
 import styles from "./Step2.module.css";
 
 type Step2Props = {
