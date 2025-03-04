@@ -9,12 +9,16 @@ const dummyData = [
     name: "John Doe",
     email: "johndoe@example.com",
     phone: "(123) 456-7890",
-    title: "Adult Genetics",
+    title: "Medical Geneticist",
     membership: "Student Member",
     education: "Bachelors",
-    location: { city: "San Diego", university: "University of San Diego", country: "Venezuela" },
+    location: {
+      address: "79664 Eisenlohrstrasse 6, Wehr, Baden-Württemberg",
+      hospital: "UC San Diego Health",
+      country: "Germany",
+    },
     languages: ["English", "Spanish"],
-    services: ["Pediatric Genetics", "Genetic Counseling"],
+    services: ["Pediatric Genetics", "Cancer Genetics"],
     joined: "01/12/2025",
   },
   {
@@ -22,10 +26,14 @@ const dummyData = [
     name: "Jane Smith",
     email: "janesmith@example.com",
     phone: "(987) 654-3210",
-    title: "Prenatal Genetics",
+    title: "Medical Geneticist",
     membership: "Health Professional",
     education: "Bachelors",
-    location: { city: "Los Angeles", university: "UCLA", country: "United States" },
+    location: {
+      address: "9500 Gilman Dr, La Jolla, CA 92093",
+      hospital: "UC San Diego Health",
+      country: "United States",
+    },
     languages: ["English"],
     services: ["Cancer Genetics"],
     joined: "02/15/2024",
@@ -35,12 +43,16 @@ const dummyData = [
     name: "Michael Johnson",
     email: "michaelj@example.com",
     phone: "(456) 789-0123",
-    title: "Cancer Genetics",
+    title: "Medical Geneticist",
     membership: "Associate Member",
     education: "PHD",
-    location: { city: "New York", university: "Columbia University", country: "United States" },
+    location: {
+      address: "405 Hilgard Ave, Los Angeles, CA 90095",
+      hospital: "UCLA Medical Center",
+      country: "United States",
+    },
     languages: ["English", "French"],
-    services: ["Rare Disease Diagnosis", "Prenatal Genetics"],
+    services: ["Rare Diseases", "Prenatal Genetics"],
     joined: "03/20/2023",
   },
   {
@@ -48,26 +60,31 @@ const dummyData = [
     name: "Emily Davis",
     email: "emilyd@example.com",
     phone: "(321) 654-9870",
-    title: "Biochemical Genetics",
+    title: "Medical Geneticist",
     membership: "Health Professional",
     education: "Masters",
-    location: { city: "Chicago", university: "University of Mexico", country: "Venezuela" },
+    location: {
+      address: "405 Hilgard Ave, Los Angeles, CA 90095",
+      hospital: "UCLA Medical Center",
+      country: "United States",
+    },
     languages: ["English", "German"],
-    services: ["Neurogenetics", "Genomic Medicine"],
+    services: ["Neurogenetics", "Cardiovascular Genetics"],
     joined: "04/10/2022",
   },
 ];
 
 export const ManageCounselor = () => {
+  // Initialize state with lowercase keys
   const [searchTerm, setSearchTerm] = useState("");
   const [filters, setFilters] = useState({
     title: [],
     membership: [],
     education: [],
     location: [],
+    services: [],
   });
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [sortOrder, setSortOrder] = useState("asc");
 
   const toggleFilter = () => {
     setIsFilterOpen(!isFilterOpen);
@@ -76,20 +93,24 @@ export const ManageCounselor = () => {
     setIsFilterOpen(false);
   };
   const resetFilters = () => {
-    setFilters({ title: [], membership: [], education: [], location: [] });
+    setFilters({
+      title: [],
+      membership: [],
+      education: [],
+      location: [],
+      services: [],
+    });
   };
 
   const handleFilterChange = (category, value) => {
     setFilters((prev) => ({
       ...prev,
-      [category]: prev[category].includes(value)
-        ? prev[category].filter((v) => v !== value)
-        : [...prev[category], value],
+      [category]: Array.isArray(prev[category])
+        ? prev[category].includes(value)
+          ? prev[category].filter((v) => v !== value)
+          : [...prev[category], value]
+        : [value],
     }));
-  };
-
-  const handleSortToggle = () => {
-    setSortOrder((prevOrder) => (prevOrder === "asc" ? "desc" : "asc")); // Toggle between 'asc' and 'desc'
   };
 
   const filteredData = dummyData.filter(
@@ -98,25 +119,21 @@ export const ManageCounselor = () => {
       (filters.title.length === 0 || filters.title.includes(counselor.title)) &&
       (filters.membership.length === 0 || filters.membership.includes(counselor.membership)) &&
       (filters.education.length === 0 || filters.education.includes(counselor.education)) &&
-      (filters.location.length === 0 || filters.location.includes(counselor.location.country)),
+      (filters.location.length === 0 || filters.location.includes(counselor.location.country)) &&
+      (filters.services.length === 0 ||
+        counselor.services.some((service) => filters.services.includes(service))),
   );
-
-  const sortedData = [...filteredData].sort((a, b) => {
-    if (sortOrder === "asc") {
-      return a.name.localeCompare(b.name); // Ascending order
-    } else {
-      return b.name.localeCompare(a.name); // Descending order
-    }
-  });
 
   const downloadCSV = () => {
     const csvContent =
       "data:text/csv;charset=utf-8," +
       "Name,Title,Membership,Education,Location,Languages,Services,Joined\n" +
-      sortedData
+      filteredData
         .map(
           (counselor) =>
-            `${counselor.name},${counselor.title},${counselor.membership},${counselor.education},${counselor.location.country},${counselor.languages.join(",")},${counselor.services.join(",")},${counselor.joined}`,
+            `${counselor.name},${counselor.title},${counselor.membership},${counselor.education},${counselor.location.country},${counselor.languages.join(
+              ",",
+            )},${counselor.services.join(",")},${counselor.joined}`,
         )
         .join("\n");
 
@@ -124,16 +141,16 @@ export const ManageCounselor = () => {
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
     link.setAttribute("download", "counselors.csv");
-    document.body.appendChild(link); // Required for Firefox
+    document.body.appendChild(link);
     link.click();
-    document.body.removeChild(link); // Clean up after download
+    document.body.removeChild(link);
   };
 
   return (
     <div className="manage-counselor-container">
       <div className="header">
-        <h1 className="title">Manage Counselors</h1>
-        <div className="profile-picture">[Profile Picture]</div>
+        <h1 className="title">Manage Members</h1>
+        <div className="profile-picture">Picture</div>
       </div>
       <div className="controls">
         <div className="search-container">
@@ -148,30 +165,51 @@ export const ManageCounselor = () => {
             }}
           />
         </div>
-        <button className="filter-button" onClick={toggleFilter}>
+        <button
+          className={`action-button ${isFilterOpen ? "selected" : ""}`}
+          onClick={toggleFilter}
+        >
           Filter By
+          <img src="/icons/filter.svg" alt="Filter" className="button-icon" />
         </button>
-        <button className="sort-button" onClick={handleSortToggle}>
-          Sort By
-        </button>
-        <button className="download-button" onClick={downloadCSV}>
+        <button className="action-button" onClick={downloadCSV}>
           Download
+          <img src="/icons/download.svg" alt="Download" className="button-icon" />
         </button>
+      </div>
+      <div className="button-container">
+        <button className="chooseView-button">All Counselors</button>
+        <button className="chooseView-button">Directory</button>
       </div>
 
       {/* Sidebar Filter */}
       <div className={`filter-sidebar ${isFilterOpen ? "open" : ""}`}>
         <div className="filter-header">
           <h3>Filter By</h3>
-          <button className="close-button" onClick={toggleFilter}>
-            X
+          <button onClick={toggleFilter}>
+            <img src="/icons/close.svg" className="close-button" />
           </button>
         </div>
         {Object.entries({
-          Title: ["Adult Genetics", "Prenatal Genetics", "Biochemical Genetics", "Cancer Genetics"],
-          Membership: ["Student Member", "Health Professional", "Associate Member"],
-          Education: ["PhD", "Masters", "Bachelors"],
-          Location: ["United States", "Venezuela"],
+          Title: ["Medical Geneticist"],
+          Membership: [
+            "Student Member",
+            "Health Professional",
+            "Associate Member",
+            "Genetic Counselor",
+          ],
+          Education: ["PHD", "Masters", "Bachelors"],
+          Location: ["United States", "Venezuela", "Germany", "Brazil", "Spain", "Chile"],
+          Services: [
+            "Cancer Genetics",
+            "Biochemical Genetics",
+            "Prenatal Genetics",
+            "Pediatric Genetics",
+            "Cardiovascular Genetics",
+            "Rare Diseases",
+            "Nuerogenetics",
+            "Adult Genetics",
+          ],
         }).map(([category, options]) => (
           <div key={category} className="filter-category">
             <h4>{category}</h4>
@@ -179,7 +217,8 @@ export const ManageCounselor = () => {
               <label key={option}>
                 <input
                   type="checkbox"
-                  checked={filters[category.toLowerCase()]?.includes(option)}
+                  // Use the lowercased category key consistently (e.g. "title", "services", etc.)
+                  checked={filters[category.toLowerCase()]?.includes(option) || false}
                   onChange={() => {
                     handleFilterChange(category.toLowerCase(), option);
                   }}
@@ -195,40 +234,66 @@ export const ManageCounselor = () => {
         </div>
       </div>
 
-      <table className="counselor-table">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Title</th>
-            <th>Membership</th>
-            <th>Education</th>
-            <th>Location</th>
-            <th>Language</th>
-            <th>Service</th>
-            <th>Joined</th>
-          </tr>
-        </thead>
-        <tbody>
-          {sortedData.map((counselor) => (
-            <tr key={counselor.id}>
-              <td>
-                {counselor.name}
-                <br />
-                <small>{counselor.email}</small>
-                <br />
-                <small>{counselor.phone}</small>
-              </td>
-              <td>{counselor.title}</td>
-              <td>{counselor.membership}</td>
-              <td>{counselor.education}</td>
-              <td>{counselor.location.country}</td>
-              <td>{counselor.languages.join(", ")}</td>
-              <td>{counselor.services.join(", ")}</td>
-              <td>{counselor.joined}</td>
+      <div className="table-wrapper">
+        <table className="counselor-table">
+          <thead>
+            <tr>
+              <th>NAME</th>
+              <th>TITLE</th>
+              <th>MEMBERSHIP</th>
+              <th>EDUCATION</th>
+              <th>LOCATION</th>
+              <th>LANGUAGE</th>
+              <th>SERVICE</th>
+              <th>JOINED</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {filteredData.map((counselor) => (
+              <tr key={counselor.id}>
+                <td>
+                  {counselor.name}
+                  <br />
+                  <div>{counselor.email}</div>
+                  <div>{counselor.phone}</div>
+                </td>
+                <td>{counselor.title}</td>
+                <td>{counselor.membership}</td>
+                <td>{counselor.education}</td>
+                <td>
+                  x
+                  <div>
+                    <div>
+                      <img src="/icons/location.svg" alt="Location" className="location-icon" />
+                      {counselor.location.address}
+                    </div>
+                    <div>
+                      <img src="/icons/hospital.svg" alt="Hospital" className="location-icon" />
+                      {counselor.location.hospital}
+                    </div>
+                    <div>
+                      <img src="/icons/country.svg" alt="Country" className="location-icon" />
+                      {counselor.location.country}
+                    </div>
+                  </div>
+                </td>
+                <td>{counselor.languages.join(" ")}</td>
+                <td>
+                  {counselor.services.map((service, index) => (
+                    <span
+                      key={index}
+                      className={`service-tag ${service.toLowerCase().replace(/ /g, "-")}`}
+                    >
+                      {service}
+                    </span>
+                  ))}
+                </td>
+                <td>{counselor.joined}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };
