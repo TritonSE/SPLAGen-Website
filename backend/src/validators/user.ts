@@ -11,11 +11,6 @@ function validateRequest(req: Request, res: Response, next: NextFunction): void 
   next();
 }
 
-// export const createUser = [
-//   body("name").isString().notEmpty().trim().withMessage("Name is required"),
-//   body("email").isEmail().normalizeEmail().withMessage("Valid email is required"),
-//   validateRequest,
-// ];
 export const createUser = [
   body("firebaseId").isString().notEmpty().withMessage("Firebase ID is required"),
   body("account").notEmpty().withMessage("Account information is required"),
@@ -31,19 +26,12 @@ export const createUser = [
   validateRequest,
 ];
 
-// export const deleteUser = [
-//   param("id").toInt().isInt().withMessage("Valid user ID is required"),
-//   validateRequest,
-// ];
+
 export const deleteUser = [
   param("firebaseId").isString().notEmpty().withMessage("Valid Firebase ID is required"),
   validateRequest,
 ];
 
-// export const getUser = [
-//   param("id").toInt().isInt().withMessage("Valid user ID is required"),
-//   validateRequest,
-// ];
 export const getUser = [
   param("firebaseId").isString().notEmpty().withMessage("Valid Firebase ID is required"),
   validateRequest,
