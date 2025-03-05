@@ -14,17 +14,11 @@
 
 /* Modal Container */
 .modal-container {
-  background-color: #fff;
-  padding: 4vh 6vw;
+  background: white;
+  padding: 20px;
   border-radius: 8px;
-  max-width: 90vw;
-  max-height: 70vh;
-  width: 100%;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  position: relative; /* Add position relative here */
+  width: 400px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 /* Close Button */
@@ -35,7 +29,7 @@
   font-weight: bold;
   color: black;
   cursor: pointer;
-  position: absolute; /* Absolute positioning */
+  position: absolute;
   top: 1vh;
   right: 2vw;
   z-index: 1000;
@@ -46,14 +40,14 @@
 h2 {
   @apply text-mainHeading;
   text-align: left;
-  margin-bottom: 2vh;
+  margin-bottom: 1.1vh;
   font-size: 2rem;
   color: black;
 }
 
 /* Form Group Styling */
 .form-group {
-  margin-bottom: 3vh;
+  margin-bottom: 1vh;
 }
 
 /* Label Styling */
@@ -62,16 +56,17 @@ label {
   margin-bottom: 1vh;
   color: #333;
   font-size: 1.1rem;
+  margin-top: 1vh;
 }
 
 /* Input and Select Fields */
 input,
 select {
   width: 100%;
-  padding: 1.5vh;
+  padding: 0.5vh;
   font-size: 1rem;
   border: 1px solid #b4b4b4;
-  border-radius: 4px;
+  border-radius: 3px;
   box-sizing: border-box;
 }
 
@@ -93,8 +88,8 @@ option {
 
 /* Modal Actions Container */
 .modal-actions {
-  text-align: right;
-  margin-top: 2vh;
+  text-align: middle;
+  margin-top: 1vh;
 }
 
 /* Save Button */
@@ -107,17 +102,15 @@ option {
   border-radius: 4px;
   cursor: pointer;
   width: 100%;
-  margin-top: 15px; /* Adjust this value for top margin */
-  margin-bottom: 20px; /* Add bottom margin */
-  margin-left: 10px; /* Add left margin */
-  margin-right: 10px; /* Add right margin */
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 
 /* City, State, Postcode Form Group */
 .city-state-postcode {
   display: flex;
   justify-content: space-between;
-  gap: 2vw;
+  gap: 1vw;
 }
 
 .city-state-postcode .form-group {
@@ -129,5 +122,5 @@ option {
   color: red;
   font-size: 14px;
   min-height: 18px;
-  margin-top: 4px;
+  margin-top: 2px;
 }

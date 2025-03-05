@@ -22,7 +22,7 @@ type PostFormData = z.infer<typeof postSchema>;
 type CreatePostModalProps = {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (data: PostFormData) => void;
+  onSubmit: (data: PostFormData) => Promise<void>; // Ensuring async handling
 };
 
 const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onSubmit }) => {
@@ -36,15 +36,15 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onSu
   });
 
   const handleFormSubmit = useCallback(
-    async (e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
-      await handleSubmit((data) => {
-        onSubmit(data);
+    (e: React.FormEvent<HTMLFormElement>): void => {
+      e.preventDefault(); // Prevent default form behavior
+      void handleSubmit(async (data) => {
+        await onSubmit(data); // Await async operation
         reset();
         onClose();
       })();
     },
-    [onSubmit, reset, onClose, handleSubmit],
+    [onSubmit, reset, onClose, handleSubmit]
   );
 
   if (!isOpen) return null;
@@ -62,31 +62,15 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onSu
               {...register("title")}
               placeholder="Post title name"
             />
-            <p className="error-message">{errors.title?.message ?? "\u00A0"}</p>{" "}
-            {/* Keeps space reserved */}
+            <p className="error-message">{errors.title?.message ?? ""}</p>
           </div>
 
           <div className="form-group">
             <label htmlFor="post-message">Message</label>
             <textarea id="post-message" {...register("message")} placeholder="Message" />
-            <p className="error-message">{errors.message?.message ?? "\u00A0"}</p>{" "}
-            {/* Keeps space reserved */}
+            <p className="error-message">{errors.message?.message ?? ""}</p>
           </div>
-          {/* <div className="form-group">
-            <label htmlFor="post-title">Post Title</label>
-            <input
-              id="post-title"
-              type="text"
-              {...register("title")}
-              placeholder="Post title name"
-            />
-            {errors.title && <p className="error-message">{errors.title.message}</p>}
-          </div>
-          <div className="form-group">
-            <label htmlFor="post-message">Message</label>
-            <textarea id="post-message" {...register("message")} placeholder="Message" />
-            {errors.message && <p className="error-message">{errors.message.message}</p>}
-          </div> */}
+
           <div className="modal-actions">
             <button type="button" onClick={onClose}>
               Cancel
