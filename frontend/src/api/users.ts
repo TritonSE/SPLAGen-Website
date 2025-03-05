@@ -57,6 +57,8 @@ export type User = {
   };
 };
 
+// getWhoAmI with sample data
+// Replace with actual code once database is in use
 export const getWhoAmI = async (firebaseToken: string): Promise<APIResult<User>> => {
   try {
     // Need to replace with api to get user
