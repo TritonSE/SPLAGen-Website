@@ -43,6 +43,7 @@ export const UserContextProvider = ({ children }: { children: ReactNode }) => {
     setLoadingUser(true);
     setUser(null);
 
+    // Delete this after firebase is set up and uncomment the other chunk
     getWhoAmI("temp_firebase_token") // Make the API call
       .then((res) => {
         if (res.success) {

@@ -28,11 +28,6 @@ export default function Dashboard() {
       <main className="flex flex-col gap-8 row-start-2 items-center">
         {/* Added the LanguageSwitcher component */}
         <LanguageSwitcher />
-        {user && (
-          <p>
-            {user.personal.firstName} {user.display.workEmail}
-          </p>
-        )}
         {/* External is my text component */}
         <External></External>
       </main>
