@@ -42,46 +42,47 @@ export const UserContextProvider = ({ children }: { children: ReactNode }) => {
     // }
     setLoadingUser(true);
     setUser(null);
-    if (firebaseUser === null) {
-      setLoadingUser(false);
-    } else {
-      getWhoAmI("temp_firebase_token") // Make the API call
-        .then((res) => {
-          if (res.success) {
-            setUser(res.data); // Set user if API call is successful
-          } else {
-            setUser(null); // Set user to null if the API call fails
-          }
-          setLoadingUser(false); // Set loading state to false when done
-        })
-        .catch((error: unknown) => {
-          console.error("Error fetching user:", error);
-          setUser(null); // Set user to null in case of error
-          setLoadingUser(false); // Stop loading in case of error
-        });
 
-      //   firebaseUser.getIdToken().then((token) =>
-      //     getWhoAmI("temp_firebase_token") // Make the API call
-      //       .then((res) => {
-      //         if (res.success) {
-      //           setUser(res.data); // Set user if API call is successful
-      //         } else {
-      //           setUser(null); // Set user to null if the API call fails
-      //         }
-      //         setLoadingUser(false); // Set loading state to false when done
-      //       })
-      //       .catch((error: unknown) => {
-      //         console.error("Error fetching user:", error);
-      //         setUser(null); // Set user to null in case of error
-      //         setLoadingUser(false); // Stop loading in case of error
-      //       }),
-      //   );
-    }
+    getWhoAmI("temp_firebase_token") // Make the API call
+      .then((res) => {
+        if (res.success) {
+          setUser(res.data); // Set user if API call is successful
+        } else {
+          setUser(null); // Set user to null if the API call fails
+        }
+        setLoadingUser(false); // Set loading state to false when done
+      })
+      .catch((error: unknown) => {
+        console.error("Error fetching user:", error);
+        setUser(null); // Set user to null in case of error
+        setLoadingUser(false); // Stop loading in case of error
+      });
+
+    // if (firebaseUser === null) {
+    //   setLoadingUser(false);
+    // } else {
+    //   firebaseUser.getIdToken().then((token) =>
+    //     getWhoAmI("temp_firebase_token") // Make the API call
+    //       .then((res) => {
+    //         if (res.success) {
+    //           setUser(res.data); // Set user if API call is successful
+    //         } else {
+    //           setUser(null); // Set user to null if the API call fails
+    //         }
+    //         setLoadingUser(false); // Set loading state to false when done
+    //       })
+    //       .catch((error: unknown) => {
+    //         console.error("Error fetching user:", error);
+    //         setUser(null); // Set user to null in case of error
+    //         setLoadingUser(false); // Stop loading in case of error
+    //       }),
+    //   );
+    // }
   };
 
   useEffect(() => {
     reloadUser();
-  });
+  }, []);
 
   return (
     <UserContext.Provider
