@@ -1,25 +1,43 @@
 import { NextFunction, Request, Response } from "express";
+import { validationResult } from "express-validator";
+import admin from "firebase-admin";
+import UserModel from "../models/user";
+import DirectoryModel from "../models/directory";
+import { firebaseAdminAuth } from "../util/firebase";
+import { CreateUserRequestBody,
+  EditUserPersonalInformationRequestBody,
+  EditUserProfessionalInformationRequestBody,
+  EditDirectoryPersonalInformationRequestBody,
+  EditDirectoryDisplayInformationRequestBody
+} from "./types/userTypes";
+import { deleteUserFromFirebase, deleteUserFromMongoDB } from "../util/user";
 
-import User from "../models/user";
-import {AuthenticatedRequest} from "../types/AuthenticatedRequest";
 
-// RequestHandler is a codebreaking change and is removed
-
-export const createUser = async (req: Request, res: Response, next: NextFunction) => {
+export const createUser = async (
+  req: Request<Record<string, never>, Record<string, never>, CreateUserRequestBody>,
+  res: Response,
+  next: NextFunction
+) => {
   try {
+
     const {
-      firebaseId,
       account,
       personal,
       professional,
       education,
       clinic,
       display,
+      password
     } = req.body;
 
+    //Create user in firestore
+    const userRecord = await firebaseAdminAuth.createUser({
+      email: personal.email,
+      password: password,
+    } as admin.auth.CreateRequest);
 
-    const newUser = new User({
-      firebaseId,
+    const newUser = await UserModel.create({
+      firebaseId: userRecord.uid,
       account,
       personal,
       professional,
@@ -27,25 +45,25 @@ export const createUser = async (req: Request, res: Response, next: NextFunction
       clinic,
       display,
     });
-    await newUser.save();
 
-    res.status(201).json({ message: "User created successfully", user: newUser });
+    res.status(201).json(newUser);
+
   } catch (error) {
     console.error("Error creating user:", error);
     next(error);
   }
+
+  return;
 };
 
 export const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
 
     const { firebaseId } = req.params;
-    const deletedUser = await User.findOneAndDelete({ firebaseId });
 
-    if (!deletedUser) {
-      res.status(404).json({ error: "User not found" });
-      return;
-    }
+    // delete user from Firebase and MongoDB
+    await deleteUserFromFirebase(firebaseId);
+    await deleteUserFromMongoDB(firebaseId);
 
     res.status(200).json({ message: "User deleted successfully" });
   } catch (error) {
@@ -56,7 +74,7 @@ export const deleteUser = async (req: Request, res: Response, next: NextFunction
 
 export const getAllUsers = async (_req: Request, res: Response, next: NextFunction) => {
   try {
-    const users = await User.find({});
+    const users = await UserModel.find({}).exec();
     res.status(200).json({ users });
   } catch (error) {
     console.error("Error getting users:", error);
@@ -67,7 +85,7 @@ export const getAllUsers = async (_req: Request, res: Response, next: NextFuncti
 export const getUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { firebaseId } = req.params;
-    const user = await User.findOne({ firebaseId });
+    const user = await UserModel.findOne({ firebaseId });
 
     if (!user) {
       res.status(404).json({ error: "User not found" });
@@ -82,10 +100,11 @@ export const getUser = async (req: Request, res: Response, next: NextFunction) =
 };
 
 
-export const getPersonalInformation = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+export const getPersonalInformation = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const user = await User.findOne({ firebaseId: req.user?.firebaseId }).select("personal");
-    
+    const { firebaseId } = req.params;
+    const user = await UserModel.findOne({ firebaseId });
+
     if (!user) {
       res.status(404).json({ error: "User not found" });
       return;
@@ -93,28 +112,38 @@ export const getPersonalInformation = async (req: AuthenticatedRequest, res: Res
 
     res.status(200).json(user.personal);
   } catch (error) {
-    console.error("Error fetching personal information:", error);
+    console.error("Error fetching user personal information:", error);
     next(error);
   }
 };
 
-export const editPersonalInformation = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+export const editPersonalInformation = async (
+  req: Request<Record<string, never>, Record<string, never>, EditUserPersonalInformationRequestBody>,
+  res: Response,
+  next: NextFunction
+) => {
   try {
-    const { firstName, lastName, email, phone } = req.body;
+    const { uid, newFirstName, newLastName, newEmail, newPhone } = req.body;
 
-    const updatedUser = await User.findOneAndUpdate(
-      { firebaseId: req.user?.firebaseId },
+    const user = await UserModel.findById(uid);
+    
+    if (!user) {
+      res.status(404).json({ error: "User not found" });
+      return;
+    }
+    
+    const updatedUser = await UserModel.findByIdAndUpdate(uid,
       {
-        "personal.firstName": firstName,
-        "personal.lastName": lastName,
-        "personal.email": email,
-        "personal.phone": phone,
+        "personal.firstName": newFirstName,
+        "personal.lastName": newLastName,
+        "personal.email": newEmail,
+        "personal.phone": newPhone,
       },
       { new: true, runValidators: true }
     );
 
     if (!updatedUser) {
-      res.status(404).json({ error: "User not found" });
+      res.status(404).json({ error: "Updated User not found" });
       return;
     }
 
@@ -125,10 +154,11 @@ export const editPersonalInformation = async (req: AuthenticatedRequest, res: Re
   }
 };
 
-export const getProfessionalInformation = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+export const getProfessionalInformation = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const user = await User.findOne({ firebaseId: req.user?.firebaseId }).select("professional");
-    
+    const { firebaseId } = req.params;
+    const user = await UserModel.findOne({ firebaseId });
+
     if (!user) {
       res.status(404).json({ error: "User not found" });
       return;
@@ -136,28 +166,41 @@ export const getProfessionalInformation = async (req: AuthenticatedRequest, res:
 
     res.status(200).json(user.professional);
   } catch (error) {
-    console.error("Error fetching professional information:", error);
+    console.error("Error fetching user professional information:", error);
     next(error);
   }
 };
 
-export const editProfessionalInformation = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-  try {
-    const { title, prefLanguages, otherPrefLanguages, country } = req.body;
+export const editProfessionalInformation = async (
+  req:  Request<Record<string, never>, Record<string, never>, EditUserProfessionalInformationRequestBody>,
+  res: Response,
+  next: NextFunction) => {
+    try {
+      const { uid,
+              newTitle,
+              newPrefLanguages,
+              newOtherPrefLanguages,
+              newCountry } = req.body;
 
-    const updatedUser = await User.findOneAndUpdate(
-      { firebaseId: req.user?.firebaseId },
+    const user = await UserModel.findById(uid);
+
+    if (!user) {
+      res.status(404).json({ error: "User not found" });
+      return;
+    }
+    
+    const updatedUser = await UserModel.findByIdAndUpdate(uid,
       {
-        "professional.title": title,
-        "professional.prefLanguages": prefLanguages,
-        "professional.otherPrefLanguages": otherPrefLanguages,
-        "professional.country": country,
+        "professional.title": newTitle,
+        "professional.prefLanguages": newPrefLanguages,
+        "professional.otherPrefLanguages": newOtherPrefLanguages,
+        "professional.newCountry": newCountry,
       },
       { new: true, runValidators: true }
     );
 
     if (!updatedUser) {
-      res.status(404).json({ error: "User not found" });
+      res.status(404).json({ error: "Updated User not found" });
       return;
     }
 
@@ -168,48 +211,73 @@ export const editProfessionalInformation = async (req: AuthenticatedRequest, res
   }
 };
 
-export const getDirectoryPersonalInformation = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+
+export const getDirectoryPersonalInformation = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const user = await User.findOne({ firebaseId: req.user?.firebaseId }).select("personal");
-    
+    const { firebaseId } = req.params;
+    const user = await UserModel.findOne({ firebaseId });
+
     if (!user) {
       res.status(404).json({ error: "User not found" });
       return;
     }
 
-    res.status(200).json(user.personal);
+    //Directory Personal Information contained in (subset of) education + clinic
+    res.status(200).json({...user.education, ...user.clinic});
   } catch (error) {
-    console.error("Error fetching directory personal information:", error);
+    console.error("Error fetching user professional information:", error);
     next(error);
   }
 };
 
-export const editDirectoryPersonalInformation = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+export const editDirectoryPersonalInformation = async (
+  req: Request<Record<string, never>, Record<string, never>, EditDirectoryPersonalInformationRequestBody>,
+  res: Response,
+  next: NextFunction
+) => {
   try {
-    const { firstName, lastName, email, phone } = req.body;
+    const { uid,
+            newDegree,
+            newEducationInstitution,
+            newClinicName,
+            newClinicWebsiteUrl,
+            newClinicAddress} = req.body;
+    
+    const user = await UserModel.findById(uid);
 
-    const updatedUser = await User.findOneAndUpdate(
-      { firebaseId: req.user?.firebaseId },
-      { "personal.firstName": firstName, "personal.lastName": lastName, "personal.email": email, "personal.phone": phone },
+    if (!user) {
+      res.status(404).json({ error: "User not found" });
+      return;
+    }
+    
+    const updatedUser = await UserModel.findByIdAndUpdate(uid,
+      {
+        "education.degree": newDegree,
+        "education.institution": newEducationInstitution,
+        "clinic.name": newClinicName,
+        "clinic.location.address": newClinicAddress,
+        "clinic.url": newClinicWebsiteUrl
+      },
       { new: true, runValidators: true }
     );
 
     if (!updatedUser) {
-      res.status(404).json({ error: "User not found" });
+      res.status(404).json({ error: "Updated User not found" });
       return;
     }
 
-    res.status(200).json({ message: "Directory personal information updated", personal: updatedUser.personal });
+    res.status(200).json({ message: "Directory information updated", personal: {...user.education, ...user.clinic} });
   } catch (error) {
     console.error("Error updating directory personal information:", error);
     next(error);
   }
 };
 
-export const getDirectoryDisplayInfo = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+export const getDirectoryDisplayInfo = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const user = await User.findOne({ firebaseId: req.user?.firebaseId }).select("display");
-    
+    const { firebaseId } = req.params;
+    const user = await UserModel.findOne({ firebaseId });
+
     if (!user) {
       res.status(404).json({ error: "User not found" });
       return;
@@ -222,32 +290,49 @@ export const getDirectoryDisplayInfo = async (req: AuthenticatedRequest, res: Re
   }
 };
 
-export const editDirectoryDisplayInfo = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+export const editDirectoryDisplayInfo = async (
+  req: Request<Record<string, never>, Record<string, never>, EditDirectoryDisplayInformationRequestBody>,
+  res: Response,
+  next: NextFunction
+) => {
   try {
-    const { workEmail, workPhone, services, languages, license, options, comments } = req.body;
-
-    const updatedUser = await User.findOneAndUpdate(
-      { firebaseId: req.user?.firebaseId },
-      {
-        "display.workEmail": workEmail,
-        "display.workPhone": workPhone,
-        "display.services": services,
-        "display.languages": languages,
-        "display.license": license,
-        "display.options": options,
-        "display.comments": comments,
-      },
-      { new: true, runValidators: true }
-    );
+    const { uid,
+            newWorkEmail,
+            newWorkPhone,
+            newServices,
+            newLanguages,
+            newLicense,
+            newRemoteOption,
+            newRequestOption} = req.body;
     
-    if (!updatedUser) {
+    const user = await UserModel.findById(uid);
+
+    if (!user) {
       res.status(404).json({ error: "User not found" });
       return;
     }
+    
+    const updatedUser = await UserModel.findByIdAndUpdate(uid,
+      {
+        "display.workEmail": newWorkEmail,
+        "display.workPhone": newWorkPhone,
+        "display.services": newServices,
+        "display.languages": newLanguages,
+        "display.license": newLicense,
+        "display.options.remote": newRemoteOption,
+        "display.options.openToRequests": newRequestOption
+      },
+      { new: true, runValidators: true }
+    );
 
-    res.status(200).json({ message: "Directory display information updated", display: updatedUser.display });
+    if (!updatedUser) {
+      res.status(404).json({ error: "Updated User not found" });
+      return;
+    }
+
+    res.status(200).json({ message: "Directory information updated", personal: {...user.education, ...user.clinic} });
   } catch (error) {
-    console.error("Error updating directory display information:", error);
+    console.error("Error updating directory personal information:", error);
     next(error);
   }
 };
