@@ -32,7 +32,7 @@ const SignUpPage = () => {
 
   const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    void handleSubmit(onSubmit)(); // Prevent promise from returning
+    void handleSubmit(onSubmit)();
   };
 
   const onSubmit = (data: FormData) => {
@@ -41,12 +41,47 @@ const SignUpPage = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center flex-grow p-4 bg-primary">
-      <div className="w-full bg-white p-6 rounded-2xl shadow-md">
-        <h1 className="text-2xl font-bold text-left mb-2 text-primary">Get started</h1>
-        <p className="text-left text-gray-600 mb-6">Welcome to SPAGen</p>
-        <form onSubmit={handleFormSubmit}>
-          <div className="mb-4 flex space-x-4">
+    <div
+      style={{
+        justifyContent: "center",
+        alignItems: "center",
+        display: "flex",
+        width: "1110px",
+        height: "942px",
+        padding: "65px 278px",
+        flexShrink: 0,
+        backgroundColor: "white",
+        borderRadius: "10px",
+        border: "10px solid #3B3B62;",
+      }}
+    >
+      <div
+        style={{
+          marginTop: "125px",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "flex-start",
+          alignSelf: "stretch",
+          width: "521px",
+          padding: "65px",
+          borderRadius: "10px",
+          backgroundColor: "white",
+        }}
+      >
+        <h1
+          className="text-2xl font-bold text-left text-primary mb-2"
+          style={{ width: "323px", height: "42px" }}
+        >
+          Get started
+        </h1>
+        <p
+          className="text-left text-gray-600 mb-2"
+          style={{ marginTop: "-20px", width: "323px", height: "27px" }}
+        >
+          Welcome to SPAGen
+        </p>
+        <form onSubmit={handleFormSubmit} className="w-full">
+          <div className="mb-4 flex space-x-4 w-full">
             {/* First Name Input */}
             <div className="w-1/2">
               <label className="block text-sm font-medium mb-1 text-black">First Name</label>
@@ -75,7 +110,7 @@ const SignUpPage = () => {
           </div>
 
           {/* Email Input */}
-          <div className="mb-4">
+          <div className="mb-4 w-full">
             <label className="block text-sm font-medium mb-1 text-black">Enter your email</label>
             <input
               type="email"
@@ -87,7 +122,7 @@ const SignUpPage = () => {
           </div>
 
           {/* Create a Password */}
-          <div className="mb-4">
+          <div className="mb-4 w-full">
             <label className="block text-sm font-medium mb-1 text-black">Create a Password</label>
             <input
               type="password"
@@ -100,7 +135,7 @@ const SignUpPage = () => {
             )}
           </div>
 
-          <div className="flex justify-end">
+          <div className="flex justify-end w-full">
             <button
               type="submit"
               disabled={!isValid}
