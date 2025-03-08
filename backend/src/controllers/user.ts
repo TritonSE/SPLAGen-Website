@@ -1,4 +1,5 @@
 import { Request, RequestHandler, Response } from "express";
+import User from '../models/user'
 
 // Temporary storage until database is set up
 type User = {
@@ -49,12 +50,12 @@ export const deleteUser = (req: Request, res: Response) => {
   }
 };
 
-export const getAllUsers = (_req: Request, res: Response) => {
+export const getAllUsers: RequestHandler = async (req, res, next) => {
   try {
-    res.status(200).json({ users });
+    const allUsers = await User.find();
+    res.status(200).json({ allUsers });
   } catch (error) {
-    console.error("Error getting users:", error);
-    res.status(500).json({ error: "Internal server error" });
+    next(error);
   }
 };
 
@@ -127,7 +128,7 @@ export const editDirectoryPersonalInformation: RequestHandler = async (req, res,
 
 export const getDirectoryDisplayInfo: RequestHandler = async (req, res, next) => {
   try {
-    res.status(200).send("Get directory display information route works!");
+    res.status(200).send("get directory display information route works!");
   } catch (error) {
     next(error);
   }
