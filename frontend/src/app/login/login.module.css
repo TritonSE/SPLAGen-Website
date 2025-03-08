@@ -35,7 +35,7 @@
 .loginPageContainer form {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 1rem;
 }
 
 .inputFieldContainer {
@@ -76,5 +76,6 @@
 
 .formError {
   height: 16px;
+  font-size: 15px;
   color: var(--color-error);
 }

@@ -5,14 +5,14 @@ import { useCallback, useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { Checkmark } from "../../components";
-
 import styles from "./login.module.css";
+
+import { Checkmark } from "@/components";
 
 // Define the schema for form validation using Zod
 const schema = z.object({
   email: z.string().email(),
-  password: z.string().min(8),
+  password: z.string(),
   rememberMe: z.boolean().optional(),
 });
 
@@ -50,7 +50,7 @@ const Login: React.FC = () => {
       setRememberMe(true);
       setValue("rememberMe", true);
     }
-  }, [setValue]);
+  }, [setValue, setRememberMe]);
 
   // Form submission handler
   const onSubmit: SubmitHandler<FormFields> = useCallback(async (data) => {
@@ -68,24 +68,29 @@ const Login: React.FC = () => {
         localStorage.removeItem("rememberedEmail");
         localStorage.setItem("rememberMe", "false");
       }
-
-      console.log(data);
     } catch (error) {
       console.error(error);
       setError("root", {
-        message: "We couldn't find an account with that email and password.",
+        message: "We couldn't find an account with the given email and password.",
       });
     }
   }, []);
 
   // Handler for 'remember me' checkbox changes
-
   const handleRememberMeChange = useCallback(
     (checked: boolean) => {
       setRememberMe(checked);
       setValue("rememberMe", checked);
     },
     [setValue],
+  );
+
+  const handleFormSubmit = useCallback(
+    (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      void handleSubmit(onSubmit)();
+    },
+    [handleSubmit, onSubmit],
   );
 
   return (
@@ -98,21 +103,31 @@ const Login: React.FC = () => {
           <h3 className={styles.welcomeback}> Welcome back!</h3>
         </div>
 
-        {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
-        <form onSubmit={handleSubmit(onSubmit)} autoComplete="on">
+        <form onSubmit={handleFormSubmit} autoComplete="on">
           <div className={styles.inputFieldContainer}>
             <label htmlFor="email">Email</label>
-            <input {...register("email")} id="email" type="text" placeholder="Email" />
-            {/* {errors.email && <div className="text-red-500">{errors.email.message}</div>} */}
+            <input
+              {...register("email")}
+              id="email"
+              type="text"
+              placeholder="Email"
+              autoComplete="on"
+            />
           </div>
 
           <div className={styles.inputFieldContainer}>
             <label htmlFor="password">Password</label>
-            <input {...register("password")} id="password" type="password" placeholder="Password" />
-          </div>
-          <div className={styles.formError}>
-            {" "}
-            {errors.email || errors.password ? "Login credentials invalid" : ""}{" "}
+            <div>
+              <input
+                {...register("password")}
+                id="password"
+                type="password"
+                placeholder="Password"
+              />
+              <div className={styles.formError}>
+                {errors.email || errors.password ? "Login credentials invalid" : ""}
+              </div>
+            </div>
           </div>
 
           <Checkmark checked={rememberMe} onChange={handleRememberMeChange} label="Remember me" />

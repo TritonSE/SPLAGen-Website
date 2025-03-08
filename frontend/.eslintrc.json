@@ -13,6 +13,7 @@
     "next/core-web-vitals",
     "next/typescript"
   ],
+  "plugins": ["no-relative-import-paths"],
   // You might not need this.
   "parserOptions": {
     "project": true
@@ -22,7 +23,7 @@
 
     // Uncomment this if you have verbatimModuleSyntax enabled and importing
     // .ts files with a .js extension gives lint errors.
-    // "import/no-unresolved": "off",
+    "import/no-unresolved": "off",
 
     // Uncomment these if you really need to.
     // "@typescript-eslint/ban-ts-comment": "off",
@@ -76,6 +77,7 @@
 
     // Disabled because of too many false positives.
     "@typescript-eslint/no-unnecessary-condition": "off",
-    "react-hooks/exhaustive-deps": "off"
+    "react-hooks/exhaustive-deps": "off",
+    "no-relative-import-paths/no-relative-import-paths": ["warn", { "allowSameFolder": true }]
   }
 }
