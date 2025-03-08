@@ -1,0 +1,77 @@
+.stepContainer {
+  display: flex;
+  align-items: start;
+}
+
+.iconContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stepIcon {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-weight: bold;
+  background-color: white;
+  color: var(--color-primary2);
+}
+
+.done {
+  background-color: white;
+  color: var(--color-primary2);
+}
+
+.doneText {
+  color: white;
+}
+
+.current {
+  background-color: white;
+  box-shadow: 0px 0px 8px white;
+}
+
+.currentText {
+  color: white;
+}
+
+.pending {
+  background-color: white;
+  border: 2px solid var(--color-grey3);
+}
+
+.pendingText {
+  color: var(--color-grey3);
+}
+
+.stepLine {
+  width: 2px;
+  background-color: var(--color-grey3);
+  flex-grow: 1;
+  height: clamp(5px, 5vh, 50px);
+  margin: 8px;
+}
+
+.stepText {
+  margin-top: 3px;
+  margin-left: 10px;
+  font-weight: 500;
+}
+
+@media (max-width: 550px) {
+  .doneText {
+    display: none;
+  }
+
+  .currentText {
+    display: none;
+  }
+
+  .stepText {
+    display: none;
+  }
+}

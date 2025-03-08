@@ -5,3 +5,5 @@ export { LanguageSwitcher } from "./languageSwitcher";
 export { NavCard } from "./NavCard";
 export { SideNavbar } from "./SideNavbar";
 export { External } from "./translationDemo";
+
+export { VerticalStepper } from "./VerticalStepper";
