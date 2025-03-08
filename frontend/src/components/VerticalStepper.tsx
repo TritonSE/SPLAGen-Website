@@ -8,7 +8,7 @@ type VerticalStepperProps = {
 
 export const VerticalStepper: React.FC<VerticalStepperProps> = ({ steps, activeStep }) => {
   // Ensure activeStep is within bounds
-  const validActiveStep = Math.max(0, Math.min(activeStep, steps.length - 1));
+  const validActiveStep = activeStep;
 
   return (
     <div className={styles.stepperContainer}>

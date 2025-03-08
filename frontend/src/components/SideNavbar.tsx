@@ -11,6 +11,7 @@ import { VerticalStepper } from "./VerticalStepper";
 import logo from "@/../public/images/Logo_SPLAGen1.png";
 // Props for each navigation card on sidebar
 
+// Props for each navigation card on sidebar
 type CardProps = {
   iconDark: string;
   iconLight: string;
@@ -54,13 +55,6 @@ const AdminsProps: CardProps = {
   message: "Admins",
 };
 
-const NewsletterProps: CardProps = {
-  iconDark: "newsletter_dark.svg",
-  iconLight: "newsletter_light.svg",
-  navigateTo: "/newsletter",
-  message: "Newsletter",
-};
-
 // Navigation items
 const adminItems: CardProps[] = [
   DashboardProps,
@@ -70,14 +64,10 @@ const adminItems: CardProps[] = [
   AdminsProps,
 ];
 
-const counselorItems: CardProps[] = [
-  DashboardProps,
-  DiscussionProps,
-  AnnouncementsProps,
-  NewsletterProps,
-];
+const counselorItems: CardProps[] = [DashboardProps, DiscussionProps, AnnouncementsProps];
 
-const stepLabels = ["Step One", "Step Two", "Step Three", "Step Four"];
+// const stepLabels = ["Step One", "Step Two", "Step Three", "Step Four"];
+const stepLabels = ["Account Setup", "Personal Information", "Membership", "Directory"];
 
 export const SideNavbar: React.FC = () => {
   const [navState, setNavState] = useState<
@@ -98,9 +88,7 @@ export const SideNavbar: React.FC = () => {
         return adminItems.map((item, index) => <NavCard key={index} {...item} />);
       case "Onboarding":
         return (
-          <>
-            <VerticalStepper steps={stepLabels} activeStep={3} />
-          </>
+          <VerticalStepper steps={stepLabels} activeStep={1} /> // Set Active Step here
         );
       case "Directory":
         return <div>directory</div>;

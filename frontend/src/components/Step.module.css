@@ -10,8 +10,8 @@
 }
 
 .stepIcon {
-  width: 2rem;
-  height: 2rem;
+  width: 30px;
+  height: 30px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -32,7 +32,7 @@
 
 .current {
   background-color: white;
-  outline: 2px solid var(--color-primary2);
+  box-shadow: 0px 0px 8px white;
 }
 
 .currentText {
@@ -41,7 +41,7 @@
 
 .pending {
   background-color: white;
-  outline: 2px solid var(--color-grey3);
+  border: 2px solid var(--color-grey3);
 }
 
 .pendingText {
@@ -52,13 +52,26 @@
   width: 2px;
   background-color: var(--color-grey3);
   flex-grow: 1;
-  max-height: 4rem;
-  height: 3rem;
-  margin: 0.25rem 0;
+  height: clamp(5px, 5vh, 50px);
+  margin: 8px;
 }
 
 .stepText {
-  margin-left: 1rem;
-  font-size: 1.125rem;
+  margin-top: 3px;
+  margin-left: 10px;
   font-weight: 500;
+}
+
+@media (max-width: 550px) {
+  .doneText {
+    display: none;
+  }
+
+  .currentText {
+    display: none;
+  }
+
+  .stepText {
+    display: none;
+  }
 }
