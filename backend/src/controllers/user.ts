@@ -52,8 +52,8 @@ export const deleteUser = (req: Request, res: Response) => {
 
 export const getAllUsers: RequestHandler = async (req, res, next) => {
   try {
-    const users = await User.find();
-    res.status(200).json({ users });
+    const allUsers = await User.find();
+    res.status(200).json({ allUsers });
   } catch (error) {
     next(error);
   }
