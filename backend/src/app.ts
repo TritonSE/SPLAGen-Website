@@ -38,7 +38,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/discussions", discussionRoutes);
 app.use("/api/replies", replyRoutes);
 
-
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.get("/", (req: Request, res: Response) => {
   res.send("Express + TypeScript Server");
 });
@@ -63,6 +63,7 @@ app.use((error: unknown, req: Request, res: Response, next: NextFunction) => {
 });
 
 // Start the server
+//eslint-disable-next-line @typescript-eslint/restrict-template-expressions
 app.listen(port, () => {
   console.log(`[server]: Server is running at http://localhost:${port}`);
 });

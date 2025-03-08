@@ -1,5 +1,4 @@
 import { Request, RequestHandler, Response } from "express";
-import mongoose from "mongoose";
 import User from '../models/user'
 
 // Temporary storage until database is set up
