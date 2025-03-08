@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
-import mongoose from "mongoose";
 import express, { Express, NextFunction, Request, Response } from "express";
 import { isHttpError } from "http-errors";
+import mongoose from "mongoose";
 
 import announcementRoutes from "../src/routes/announcement";
 import discussionRoutes from "../src/routes/discussion";
@@ -44,6 +44,7 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 // Error handling middleware
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use((error: unknown, req: Request, res: Response, next: NextFunction) => {
   // 500 is the "internal server error" error code, this will be our fallback
   let statusCode = 500;
