@@ -18,9 +18,9 @@ export default function RootLayout({
     <html lang="en">
       <body className={isSignUpPage ? "bg-primary" : ""}>
         <div className="layout-container">
-          {!isSignUpPage && <SideNavbar />}
+          <SideNavbar />
           <section className="main-content">
-            <main>{children}</main>
+            <main className="h-full">{children}</main>
           </section>
         </div>
       </body>
