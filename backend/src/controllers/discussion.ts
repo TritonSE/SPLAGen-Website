@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from "express";
+import { AuthenticatedRequest } from "./auth";
 import { Types } from "mongoose";
 
 import discussionPost from "../models/discussionPost";
@@ -22,12 +23,20 @@ type DeleteMultipleDiscussionsRequestBody = {
 
 // Create a discussion post
 export const createDiscussion = async (
-  req: Request<unknown, unknown, DiscussionRequestBody>,
+  req: AuthenticatedRequest & Request<unknown, unknown, DiscussionRequestBody>,
   res: Response,
   next: NextFunction,
 ) => {
   try {
     const { userId, title, message, channel } = req.body;
+    if (!userUid) {
+      res.status(403).json({ error: "User not signed in" });
+      return
+    }
+    if (!title || !content) {
+      res.status(400).json({ error: "Title and content are required" });
+      return;
+    }
     const newDiscussion = new discussionPost({ userId, title, message, channel, replies: [] });
     await newDiscussion.save();
     res.status(201).json({ message: "Discussion created successfully", discussion: newDiscussion });
@@ -38,7 +47,7 @@ export const createDiscussion = async (
 
 // Edit a discussion post
 export const editDiscussion = async (
-  req: Request<{ id: string }, unknown, EditDiscussionRequestBody>,
+  req:  AuthenticatedRequest & Request<{ id: string }, unknown, EditDiscussionRequestBody>,
   res: Response,
   next: NextFunction,
 ) => {
@@ -51,6 +60,10 @@ export const editDiscussion = async (
     if (!objectId) {
       res.status(400).json({ error: "Invalid ID format" });
     }
+    if (!userUid) {
+      res.status(403).json({ error: "User not signed in" });
+      return
+    }
 
     const discussion = await discussionPost.findByIdAndUpdate(
       objectId,
@@ -61,6 +74,10 @@ export const editDiscussion = async (
     if (!discussion) {
       res.status(404).json({ error: "Discussion not found" });
     }
+    if (discussion.userId !== userUid) {
+      res.status(403).json({ error: "Unauthorized: You can only delete your own posts" });
+      return;
+    }
 
     res.status(200).json({ message: "Discussion updated successfully", discussion });
   } catch (error) {
@@ -70,16 +87,26 @@ export const editDiscussion = async (
 
 // Delete a discussion post
 export const deleteDiscussion = async (
-  req: Request<{ id: string }>,
+  req:  AuthenticatedRequest & Request<{ id: string }>,
   res: Response,
   next: NextFunction,
 ) => {
   try {
     const { id } = req.params;
     const discussion = await discussionPost.findByIdAndDelete(id);
+    const { userUid } = req.body as { userUid: string };
 
     if (!discussion) {
       res.status(404).json({ error: "Discussion not found" });
+    }
+    if (!userUid) {
+      res.status(403).json({ error: "User not signed in" });
+      return
+    }
+    const discussion = discussions[index];
+    if (discussion.userId !== userUid) {
+      res.status(403).json({ error: "Unauthorized: You can only delete your own posts" });
+      return;
     }
 
     res.status(200).json({ message: "Discussion deleted successfully" });
@@ -90,12 +117,17 @@ export const deleteDiscussion = async (
 
 // Delete multiple discussion posts
 export const deleteMultipleDiscussions = async (
-  req: Request<unknown, unknown, DeleteMultipleDiscussionsRequestBody>,
+  req:  AuthenticatedRequest & Request<unknown, unknown, DeleteMultipleDiscussionsRequestBody>,
   res: Response,
   next: NextFunction,
 ) => {
   try {
-    const { ids } = req.body;
+    const { ids, userUid } = req.body;
+
+    if (!userUid) {
+      res.status(403).json({ error: "User not signed in" });
+    }
+
     const result = await discussionPost.deleteMany({ _id: { $in: ids } });
 
     res.status(200).json({
