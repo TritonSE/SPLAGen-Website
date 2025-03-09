@@ -2,7 +2,7 @@
 
 import { usePathname } from "next/navigation";
 
-import SideNavbar from "./components/SideNavbar";
+import { SideNavbar } from "@/components";
 import "./globals.css";
 
 export default function RootLayout({
@@ -19,8 +19,8 @@ export default function RootLayout({
       <body className={isSignUpPage ? "bg-primary" : ""}>
         <div className="layout-container">
           <SideNavbar />
-          <section className="main-content">
-            <main className="h-full">{children}</main>
+          <section className="viewPort">
+            <main>{children}</main>
           </section>
         </div>
       </body>

@@ -1,0 +1,6 @@
+{
+  "eslint.useESLintClass": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  }
+}

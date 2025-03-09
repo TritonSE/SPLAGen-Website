@@ -15,7 +15,7 @@ type CardProps = {
 };
 
 // Changes styles depending on active page
-const NavCard = ({ iconLight, iconDark, message, navigateTo }: CardProps) => {
+export const NavCard = ({ iconLight, iconDark, message, navigateTo }: CardProps) => {
   const pathname = usePathname(); // Get the current path
   const isActive = pathname === navigateTo; // Check if the current path matches the navigation path
 
@@ -31,5 +31,3 @@ const NavCard = ({ iconLight, iconDark, message, navigateTo }: CardProps) => {
     </Link>
   );
 };
-
-export default NavCard;
