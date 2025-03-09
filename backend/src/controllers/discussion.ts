@@ -1,24 +1,24 @@
 import { Request, Response } from "express";
+import { AuthenticatedRequest } from "./auth";
 
 // Temporary storage for discussion posts
 type Discussion = {
   id: number;
   title: string;
   content: string;
-  replies: DiscussionReply[];
-};
-
-type DiscussionReply = {
-  id: number;
-  content: string;
+  userId: string;
 };
 
 const discussions: Discussion[] = [];
 
 // Create a discussion post
-export const createDiscussion = (req: Request, res: Response) => {
+export const createDiscussion = (req: AuthenticatedRequest, res: Response) => {
   try {
-    const { title, content } = req.body as { title: string; content: string };
+    const { title, content, userUid } = req.body as { title: string; content: string, userUid: string };
+    if (!userUid) {
+      res.status(403).json({ error: "User not signed in" });
+      return
+    }
     if (!title || !content) {
       res.status(400).json({ error: "Title and content are required" });
       return;
@@ -27,7 +27,7 @@ export const createDiscussion = (req: Request, res: Response) => {
       id: discussions.length + 1,
       title,
       content,
-      replies: [],
+      userId: userUid
     };
     discussions.push(newDiscussion);
     res.status(201).json({ message: "Discussion created successfully", discussion: newDiscussion });
@@ -38,19 +38,26 @@ export const createDiscussion = (req: Request, res: Response) => {
 };
 
 // Edit a discussion post
-export const editDiscussion = (req: Request, res: Response) => {
+export const editDiscussion = (req: AuthenticatedRequest, res: Response) => {
   try {
     const id = parseInt(req.params.id, 10);
-    const { title, content } = req.body as { title: string; content: string };
+    const { title, content, userUid } = req.body as { title: string; content: string, userUid: string };
 
     if (!title || !content) {
       res.status(400).json({ error: "Title and content are required to update discussion" });
       return;
     }
-
+    if (!userUid) {
+      res.status(403).json({ error: "User not signed in" });
+      return
+    }
     const discussion = discussions.find((d) => d.id === id);
     if (!discussion) {
       res.status(404).json({ error: "Discussion not found" });
+      return;
+    }
+    if (discussion.userId !== userUid) {
+      res.status(403).json({ error: "Unauthorized: You can only delete your own posts" });
       return;
     }
 
@@ -65,13 +72,23 @@ export const editDiscussion = (req: Request, res: Response) => {
 };
 
 // Delete a discussion post
-export const deleteDiscussion = (req: Request, res: Response) => {
+export const deleteDiscussion = (req: AuthenticatedRequest, res: Response) => {
   try {
     const id = parseInt(req.params.id, 10);
     const index = discussions.findIndex((discussion) => discussion.id === id);
+    const { userUid } = req.body as { userUid: string };
 
     if (index === -1) {
       res.status(404).json({ error: "Discussion not found" });
+      return;
+    }
+    if (!userUid) {
+      res.status(403).json({ error: "User not signed in" });
+      return
+    }
+    const discussion = discussions[index];
+    if (discussion.userId !== userUid) {
+      res.status(403).json({ error: "Unauthorized: You can only delete your own posts" });
       return;
     }
 
@@ -86,11 +103,14 @@ export const deleteDiscussion = (req: Request, res: Response) => {
 // Delete multiple discussion posts
 export const deleteMultipleDiscussions = (req: Request, res: Response) => {
   try {
-    const { ids } = req.body as { ids: number[] };
+    const { ids, userUid } = req.body as { ids: number[], userUid: string };
 
     if (!Array.isArray(ids) || ids.length === 0) {
       res.status(400).json({ error: "Please provide an array of discussion IDs to delete" });
       return;
+    }
+    if (!userUid) {
+      res.status(403).json({ error: "User not signed in" });
     }
 
     const initialLength = discussions.length;
@@ -98,6 +118,10 @@ export const deleteMultipleDiscussions = (req: Request, res: Response) => {
     for (const id of ids) {
       const index = discussions.findIndex((discussion) => discussion.id === id);
       if (index !== -1) {
+        const discussion = discussions[index];
+        if (discussion.userId !== userUid) {
+          continue;
+        }
         discussions.splice(index, 1);
       }
     }
