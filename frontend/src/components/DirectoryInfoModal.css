@@ -42,9 +42,9 @@
 }
 
 /* Modal Heading */
-.dir-info-modal h2 {
+.dir-info-heading {
   font-weight: 400;
-  font-size: clamp(12px, 1.25rem, 18px);
+  font-size: clamp(12px, 2rem, 18px);
   line-height: 1.5em;
 }
 

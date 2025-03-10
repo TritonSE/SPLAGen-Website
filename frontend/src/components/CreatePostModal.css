@@ -13,7 +13,7 @@
 }
 
 /* Modal container */
-.modal-container {
+.create-post-modal-container {
   background: white;
   padding: 20px;
   border-radius: 8px;
@@ -22,7 +22,7 @@
 }
 
 /* Heading style */
-.modal-container h2 {
+.create-post-modal-container h2 {
   @apply text-mainHeading;
   margin-top: 0;
   margin-bottom: 20px;

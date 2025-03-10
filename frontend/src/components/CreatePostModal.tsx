@@ -64,7 +64,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
 
   return (
     <div className="modal-overlay">
-      <div className="modal-container">
+      <div className="create-post-modal-container">
         <h2>Create New Post</h2>
         <form onSubmit={handleFormSubmit}>
           <div className="form-group">
