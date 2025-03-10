@@ -2,9 +2,7 @@
 import Link from "next/link";
 import React, { useState } from "react";
 
-import { External, LanguageSwitcher } from "@/components";
-import DirectoryInfoModal from "@/components/DirectoryInfoModal";
-//import CreatePostModal from "@/components/CreatePostModal";
+import { EditBasicInfoModal, External, LanguageSwitcher } from "@/components";
 export default function Dashboard() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -28,13 +26,9 @@ export default function Dashboard() {
           <External></External>
         </main>
         <button onClick={handleOpenModal}>Open Post Modal</button>
-        <DirectoryInfoModal
-          isOpen={isModalOpen}
-          onClose={handleCloseModal}
-          onSubmit={function (): Promise<void> {
-            throw new Error("Function not implemented.");
-          }}
-        />
+        {/* <DirectoryInfoModal isOpen={isModalOpen} onClose={handleCloseModal} /> */}
+        <EditBasicInfoModal isOpen={isModalOpen} onClose={handleCloseModal} />
+        {/* <CreatePostModal isOpen={isModalOpen} onClose={handleCloseModal} /> */}
       </div>
     </div>
   );

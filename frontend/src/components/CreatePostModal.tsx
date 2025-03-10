@@ -1,6 +1,8 @@
+"use client";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import React, { useCallback } from "react";
-import { useForm } from "react-hook-form";
+import { SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
 import "./CreatePostModal.css";
 
@@ -22,10 +24,9 @@ type PostFormData = z.infer<typeof postSchema>;
 type CreatePostModalProps = {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (data: PostFormData) => Promise<void>; // Ensuring async handling
 };
 
-const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onSubmit }) => {
+export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose }) => {
   const {
     register,
     handleSubmit,
@@ -34,6 +35,18 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onSu
   } = useForm<PostFormData>({
     resolver: zodResolver(postSchema),
   });
+
+  const onSubmit = useCallback<SubmitHandler<PostFormData>>(
+    (data) => {
+      try {
+        //TODO Submit to backend
+        console.log("data", data);
+      } catch (error) {
+        console.error("Request failed:", error);
+      }
+    },
+    [onClose],
+  );
 
   const handleFormSubmit = useCallback(
     (e: React.FormEvent<HTMLFormElement>): void => {
@@ -44,7 +57,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onSu
         onClose();
       })();
     },
-    [onSubmit, reset, onClose, handleSubmit]
+    [onSubmit, reset, onClose, handleSubmit],
   );
 
   if (!isOpen) return null;
@@ -62,13 +75,13 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onSu
               {...register("title")}
               placeholder="Post title name"
             />
-            <p className="error-message">{errors.title?.message ?? ""}</p>
+            <p className="error-message">{errors.title?.message ?? "\u00A0"}</p>
           </div>
 
           <div className="form-group">
             <label htmlFor="post-message">Message</label>
             <textarea id="post-message" {...register("message")} placeholder="Message" />
-            <p className="error-message">{errors.message?.message ?? ""}</p>
+            <p className="error-message">{errors.message?.message ?? "\u00A0"}</p>
           </div>
 
           <div className="modal-actions">
@@ -82,5 +95,3 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onSu
     </div>
   );
 };
-
-export default CreatePostModal;

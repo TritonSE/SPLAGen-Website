@@ -45,7 +45,6 @@
 /* Input and textarea styling */
 .form-group input,
 .form-group textarea {
-  @apply text-black;
   width: 100%;
   padding: 10px;
   border: 1px solid #ccc;
@@ -100,7 +99,7 @@ button[type="button"] {
 }
 
 .error-message {
-  color: red;
+  color: var(--color-error);
   font-size: 14px;
   min-height: 18px;
   margin-top: 4px;
