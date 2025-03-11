@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import dynamic from "next/dynamic";
 import Image from "next/image";
 import React, { useCallback } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
@@ -8,7 +9,11 @@ import { z } from "zod";
 
 import "./DirectoryInfoModal.css";
 import ExitButton from "@/../public/Icons/ExitButton.svg";
-import { CountrySelector } from "@/components/CountrySelector";
+
+// Lazy load CountrySelector component to avoid hydration error
+const CountrySelector = dynamic(() => import("@/components").then((mod) => mod.CountrySelector), {
+  ssr: false,
+});
 
 // Define validation schema using Zod
 const countrySchema = z.object({
