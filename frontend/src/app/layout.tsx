@@ -1,4 +1,4 @@
-import { SideNavbar } from "@/components";
+import { Navbar } from "@/components";
 
 import "./globals.css";
 
@@ -11,7 +11,7 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <div className="layout-container">
-          <SideNavbar />
+          <Navbar />
           <section className="viewPort">
             <main>{children}</main>
           </section>
