@@ -1,6 +1,6 @@
 .SideNavbar {
   display: flex;
-  width: clamp(185px, 26vw, 250px);
+  width: var(--nav-width);
   background-color: var(--color-primary2);
   padding: clamp(4px, 2vw, 20px);
   color: white;

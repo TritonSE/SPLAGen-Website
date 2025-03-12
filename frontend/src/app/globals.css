@@ -34,7 +34,7 @@
   --color-grey5: #6c6c6c;
   --color-grey6: #484848;
 
-  --nav-width: clamp(160px, 20vw, 250px);
+  --nav-width: clamp(185px, 26vw, 250px);
 }
 
 body {
