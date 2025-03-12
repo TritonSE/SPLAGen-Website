@@ -34,10 +34,12 @@ export const deleteMultipleDiscussions = [
   body("ids")
     .isArray({ min: 1 })
     .withMessage("IDs must be an array with at least one element")
-    .custom((ids: unknown) => 
-      Array.isArray(ids) && ids.every((id) => mongoose.Types.ObjectId.isValid(id))
-    )
-    .withMessage("All IDs must be valid MongoDB ObjectIds"),
+    .custom((ids: string[]) => {
+      if (!ids.every((id: string) => mongoose.Types.ObjectId.isValid(id))) {
+        throw new Error("All IDs must be valid MongoDB ObjectIds");
+      }
+      return true;
+    }),
   validateRequest,
 ];
 
