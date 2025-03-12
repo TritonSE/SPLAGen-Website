@@ -13,9 +13,6 @@ import { mongoURI } from "./config";
 // Load environment variables
 dotenv.config();
 
-// Load environment variables
-dotenv.config();
-
 // Connect to MongoDB
 void mongoose
   .connect(mongoURI)

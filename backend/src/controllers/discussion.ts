@@ -1,8 +1,29 @@
 import { Request, Response, NextFunction } from "express";
 import discussionPost from "../models/discussionPost";
 
+type DiscussionRequestBody = {
+  userId: string;
+  title: string;
+  message: string;
+  channel: string;
+};
+
+type EditDiscussionRequestBody = {
+  title?: string;
+  message?: string;
+  channel?: string;
+};
+
+type DeleteMultipleDiscussionsRequestBody = {
+  ids: string[];
+};
+
 // Create a discussion post
-export const createDiscussion = async (req: Request, res: Response, next: NextFunction) => {
+export const createDiscussion = async (
+  req: Request<{}, {}, DiscussionRequestBody>,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { userId, title, message, channel } = req.body;
     const newDiscussion = new discussionPost({ userId, title, message, channel, replies: [] });
@@ -14,7 +35,11 @@ export const createDiscussion = async (req: Request, res: Response, next: NextFu
 };
 
 // Edit a discussion post
-export const editDiscussion = async (req: Request, res: Response, next: NextFunction) => {
+export const editDiscussion = async (
+  req: Request<{ id: string }, {}, EditDiscussionRequestBody>,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { id } = req.params;
     const { title, message, channel } = req.body;
@@ -31,7 +56,11 @@ export const editDiscussion = async (req: Request, res: Response, next: NextFunc
 };
 
 // Delete a discussion post
-export const deleteDiscussion = async (req: Request, res: Response, next: NextFunction) => {
+export const deleteDiscussion = async (
+  req: Request<{ id: string }>,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { id } = req.params;
     const discussion = await discussionPost.findByIdAndDelete(id);
@@ -47,7 +76,11 @@ export const deleteDiscussion = async (req: Request, res: Response, next: NextFu
 };
 
 // Delete multiple discussion posts
-export const deleteMultipleDiscussions = async (req: Request, res: Response, next: NextFunction) => {
+export const deleteMultipleDiscussions = async (
+  req: Request<{}, {}, DeleteMultipleDiscussionsRequestBody>,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { ids } = req.body;
     const result = await discussionPost.deleteMany({ _id: { $in: ids } });
@@ -61,7 +94,11 @@ export const deleteMultipleDiscussions = async (req: Request, res: Response, nex
 };
 
 // Get multiple discussion posts
-export const getMultipleDiscussions = async (req: Request, res: Response, next: NextFunction) => {
+export const getMultipleDiscussions = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const discussions = await discussionPost.find();
     res.status(200).json({ discussions });
@@ -71,7 +108,11 @@ export const getMultipleDiscussions = async (req: Request, res: Response, next: 
 };
 
 // Get an individual discussion post
-export const getDiscussion = async (req: Request, res: Response, next: NextFunction) => {
+export const getDiscussion = async (
+  req: Request<{ id: string }>,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { id } = req.params;
     const discussion = await discussionPost.findById(id);
