@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import discussionPost from "../models/discussionPost";
+import { Types } from "mongoose"; 
 
 type DiscussionRequestBody = {
   userId: string;
@@ -43,8 +44,15 @@ export const editDiscussion = async (
   try {
     const { id } = req.params;
     const { title, message, channel } = req.body;
-    const discussion = await discussionPost.findByIdAndUpdate(id, { title, message, channel }, { new: true });
-    
+
+    // Ensure the id is valid
+    const objectId = Types.ObjectId.isValid(id) ? new Types.ObjectId(id) : null;
+    if (!objectId) {
+      res.status(400).json({ error: "Invalid ID format" });
+    }
+
+    const discussion = await discussionPost.findByIdAndUpdate(objectId, { title, message, channel }, { new: true });
+
     if (!discussion) {
       res.status(404).json({ error: "Discussion not found" });
     }
@@ -54,6 +62,7 @@ export const editDiscussion = async (
     next(error);
   }
 };
+
 
 // Delete a discussion post
 export const deleteDiscussion = async (
@@ -84,14 +93,15 @@ export const deleteMultipleDiscussions = async (
   try {
     const { ids } = req.body;
     const result = await discussionPost.deleteMany({ _id: { $in: ids } });
-    
+
     res.status(200).json({
-      message: `${result.deletedCount} discussion(s) deleted successfully`,
+      message: `${result.deletedCount.toString()} discussion(s) deleted successfully`,
     });
   } catch (error) {
     next(error);
   }
 };
+
 
 // Get multiple discussion posts
 export const getMultipleDiscussions = async (
