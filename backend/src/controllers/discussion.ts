@@ -1,6 +1,7 @@
-import { Request, Response, NextFunction } from "express";
+import { NextFunction, Request, Response } from "express";
+import { Types } from "mongoose";
+
 import discussionPost from "../models/discussionPost";
-import { Types } from "mongoose"; 
 
 type DiscussionRequestBody = {
   userId: string;
@@ -23,7 +24,7 @@ type DeleteMultipleDiscussionsRequestBody = {
 export const createDiscussion = async (
   req: Request<{}, {}, DiscussionRequestBody>,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const { userId, title, message, channel } = req.body;
@@ -39,7 +40,7 @@ export const createDiscussion = async (
 export const editDiscussion = async (
   req: Request<{ id: string }, {}, EditDiscussionRequestBody>,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const { id } = req.params;
@@ -51,7 +52,11 @@ export const editDiscussion = async (
       res.status(400).json({ error: "Invalid ID format" });
     }
 
-    const discussion = await discussionPost.findByIdAndUpdate(objectId, { title, message, channel }, { new: true });
+    const discussion = await discussionPost.findByIdAndUpdate(
+      objectId,
+      { title, message, channel },
+      { new: true },
+    );
 
     if (!discussion) {
       res.status(404).json({ error: "Discussion not found" });
@@ -63,12 +68,11 @@ export const editDiscussion = async (
   }
 };
 
-
 // Delete a discussion post
 export const deleteDiscussion = async (
   req: Request<{ id: string }>,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const { id } = req.params;
@@ -88,7 +92,7 @@ export const deleteDiscussion = async (
 export const deleteMultipleDiscussions = async (
   req: Request<{}, {}, DeleteMultipleDiscussionsRequestBody>,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const { ids } = req.body;
@@ -102,13 +106,8 @@ export const deleteMultipleDiscussions = async (
   }
 };
 
-
 // Get multiple discussion posts
-export const getMultipleDiscussions = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const getMultipleDiscussions = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const discussions = await discussionPost.find();
     res.status(200).json({ discussions });
@@ -121,12 +120,12 @@ export const getMultipleDiscussions = async (
 export const getDiscussion = async (
   req: Request<{ id: string }>,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const { id } = req.params;
     const discussion = await discussionPost.findById(id);
-    
+
     if (!discussion) {
       res.status(404).json({ error: "Discussion not found" });
     }

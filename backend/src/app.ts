@@ -3,12 +3,11 @@ import express, { Express, NextFunction, Request, Response } from "express";
 import { isHttpError } from "http-errors";
 import mongoose from "mongoose";
 
-import announcementRoutes from "../src/routes/announcement";
-import discussionRoutes from "../src/routes/discussion";
-import replyRoutes from "../src/routes/reply";
-import userRoutes from "../src/routes/user";
-
 import { mongoURI } from "./config";
+import announcementRoutes from "./routes/announcement";
+import discussionRoutes from "./routes/discussion";
+import replyRoutes from "./routes/reply";
+import userRoutes from "./routes/user";
 
 // Load environment variables
 dotenv.config();
@@ -27,7 +26,6 @@ void mongoose
     }
   });
 
-
 const app: Express = express();
 const port = process.env.PORT ?? 3001;
 
@@ -38,7 +36,6 @@ app.use("/api/users", userRoutes);
 app.use("/api/discussions", discussionRoutes);
 app.use("/api/replies", replyRoutes);
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.get("/", (req: Request, res: Response) => {
   res.send("Express + TypeScript Server");
 });
@@ -64,7 +61,7 @@ app.use((error: unknown, req: Request, res: Response, next: NextFunction) => {
 });
 
 // Start the server
-//eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+
 app.listen(port, () => {
   console.log(`[server]: Server is running at http://localhost:${port}`);
 });
