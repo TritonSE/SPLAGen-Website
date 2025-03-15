@@ -21,6 +21,7 @@
   --color-background: #eff3f7;
   --color-surface: #ffffff;
 
+  --color-active: #211e62;
   --color-success: #3bb966;
   --color-error: #b93b3b;
   --color-text1: #333435;
@@ -84,6 +85,10 @@ main {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
+.longButton:active {
+  background-color: var(--color-active);
+}
+
 .disabledButton {
   background-color: var(--color-grey5);
   transition:
@@ -95,4 +100,22 @@ main {
   cursor: not-allowed;
   background-color: var(--color-grey5);
   box-shadow: none;
+}
+
+.button {
+  background: var(--color-primary2);
+  color: var(--color-surface);
+  border-radius: 4px;
+}
+
+.button:hover {
+  background: var(--color-purplegrey);
+}
+
+.button:disabled {
+  background: var(--color-grey2);
+}
+
+.button:active {
+  background: var(--color-active);
 }

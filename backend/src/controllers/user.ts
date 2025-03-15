@@ -1,5 +1,6 @@
 import { Request, RequestHandler, Response } from "express";
-import User from '../models/user'
+
+import User from "../models/user";
 
 // Temporary storage until database is set up
 type User = {

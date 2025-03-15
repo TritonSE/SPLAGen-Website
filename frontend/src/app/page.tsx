@@ -1,8 +1,18 @@
+"use client"; // This marks the component as a client component
 import Link from "next/link";
+import React, { useState } from "react";
 
-import { External, LanguageSwitcher } from "@/components";
-
+import { EditBasicInfoModal, External, LanguageSwitcher } from "@/components";
 export default function Dashboard() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleOpenModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
   return (
     <div>
       <h1> Dashboard/Home </h1>
@@ -15,6 +25,10 @@ export default function Dashboard() {
           {/* External is my text component */}
           <External></External>
         </main>
+        <button onClick={handleOpenModal}>Open Post Modal</button>
+        {/* <DirectoryInfoModal isOpen={isModalOpen} onClose={handleCloseModal} /> */}
+        <EditBasicInfoModal isOpen={isModalOpen} onClose={handleCloseModal} />
+        {/* <CreatePostModal isOpen={isModalOpen} onClose={handleCloseModal} /> */}
       </div>
     </div>
   );
