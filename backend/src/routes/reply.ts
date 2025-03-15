@@ -8,13 +8,13 @@ const router = express.Router();
 /**
  * Reply Routes
  * POST /api/replies - Create a reply post
- * GET /api/replies/:discussionId - Get reply posts for a discussion
+ * GET /api/replies/:postId - Get reply posts for a discussion
  * PUT /api/replies/:id - Edit a reply post
  * DELETE /api/replies/:id - Delete a reply post
  */
 
 router.post("/", ReplyValidator.createReply, ReplyController.createReply);
-router.get("/:discussionId", ReplyValidator.getReplies, ReplyController.getReplies);
+router.get("/:postId", ReplyValidator.getReplies, ReplyController.getReplies);
 router.put("/:id", ReplyValidator.editReply, ReplyController.editReply);
 router.delete("/:id", ReplyValidator.deleteReply, ReplyController.deleteReply);
 
