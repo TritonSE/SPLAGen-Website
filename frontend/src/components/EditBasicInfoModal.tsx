@@ -6,9 +6,9 @@ import React, { useCallback } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
 
-import ExitButton from "../../public/Icons/ExitButton.svg";
+import ExitButton from "@/../public/Icons/ExitButton.svg";
 import "./EditBasicInfoModal.css";
-import { editBasicInfoRequest } from "../api/requests";
+import { editBasicInfoRequest } from "@/api/requests";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 

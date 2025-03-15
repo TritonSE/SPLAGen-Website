@@ -4,8 +4,8 @@ import { useStateMachine } from "little-state-machine";
 import { useCallback } from "react";
 import { useForm } from "react-hook-form";
 
-import { onboardingState } from "../../state/stateTypes";
-import updateOnboardingForm from "../../state/updateOnboardingForm";
+import { onboardingState } from "@/state/stateTypes";
+import updateOnboardingForm from "@/state/updateOnboardingForm";
 
 type Step1Props = {
   onNext: (data: onboardingState["data"]) => void;

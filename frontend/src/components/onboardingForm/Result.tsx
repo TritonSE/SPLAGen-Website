@@ -2,7 +2,7 @@
 
 import { useStateMachine } from "little-state-machine";
 
-import updateOnboardingForm from "../../state/updateOnboardingForm";
+import updateOnboardingForm from "@/state/updateOnboardingForm";
 
 type ResultProps = {
   onReset: () => void;

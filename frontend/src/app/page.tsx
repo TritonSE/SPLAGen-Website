@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { External, LanguageSwitcher } from "../components";
+import { External, LanguageSwitcher } from "@/components";
 
 export default function Dashboard() {
   return (

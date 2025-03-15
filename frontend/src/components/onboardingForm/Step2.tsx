@@ -3,8 +3,8 @@
 import { useStateMachine } from "little-state-machine";
 import { useCallback } from "react";
 
-import { onboardingState } from "../../state/stateTypes";
-import updateOnboardingForm from "../../state/updateOnboardingForm";
+import { onboardingState } from "@/state/stateTypes";
+import updateOnboardingForm from "@/state/updateOnboardingForm";
 
 type Step2Props = {
   onNext: (data: onboardingState["data"]) => void;

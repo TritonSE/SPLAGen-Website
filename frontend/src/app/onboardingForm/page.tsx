@@ -3,9 +3,9 @@
 import { useStateMachine } from "little-state-machine";
 import { useCallback, useState } from "react";
 
-import { Result, Step1, Step2, Step3A, Step3B } from "../../components/onboardingForm";
-import { onboardingState } from "../../state/stateTypes";
-import updateOnboardingForm from "../../state/updateOnboardingForm";
+import { Result, Step1, Step2, Step3A, Step3B } from "@/components/onboardingForm";
+import { onboardingState } from "@/state/stateTypes";
+import updateOnboardingForm from "@/state/updateOnboardingForm";
 
 export default function OnboardingForm() {
   const [step, setStep] = useState(1);
