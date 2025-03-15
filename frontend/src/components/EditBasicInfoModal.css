@@ -63,7 +63,7 @@ h2 {
 }
 
 .modal-footer button:hover {
-  background: #1f1542;
+  background: var(--color-purplegrey);
 }
 
 .modal-footer button span {
