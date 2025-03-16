@@ -131,3 +131,10 @@ dist
 WiredTiger*
 mongodb/*.lock
 data/db/*
+*.bson
+*.lock
+data/db/
+*.wt
+*.bson
+*.lock
+data/db/
