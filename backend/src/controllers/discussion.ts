@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+
 import { AuthenticatedRequest } from "./auth";
 
 // Temporary storage for discussion posts
@@ -14,10 +15,14 @@ const discussions: Discussion[] = [];
 // Create a discussion post
 export const createDiscussion = (req: AuthenticatedRequest, res: Response) => {
   try {
-    const { title, content, userUid } = req.body as { title: string; content: string, userUid: string };
+    const { title, content, userUid } = req.body as {
+      title: string;
+      content: string;
+      userUid: string;
+    };
     if (!userUid) {
       res.status(403).json({ error: "User not signed in" });
-      return
+      return;
     }
     if (!title || !content) {
       res.status(400).json({ error: "Title and content are required" });
@@ -27,7 +32,7 @@ export const createDiscussion = (req: AuthenticatedRequest, res: Response) => {
       id: discussions.length + 1,
       title,
       content,
-      userId: userUid
+      userId: userUid,
     };
     discussions.push(newDiscussion);
     res.status(201).json({ message: "Discussion created successfully", discussion: newDiscussion });
@@ -41,7 +46,11 @@ export const createDiscussion = (req: AuthenticatedRequest, res: Response) => {
 export const editDiscussion = (req: AuthenticatedRequest, res: Response) => {
   try {
     const id = parseInt(req.params.id, 10);
-    const { title, content, userUid } = req.body as { title: string; content: string, userUid: string };
+    const { title, content, userUid } = req.body as {
+      title: string;
+      content: string;
+      userUid: string;
+    };
 
     if (!title || !content) {
       res.status(400).json({ error: "Title and content are required to update discussion" });
@@ -49,7 +58,7 @@ export const editDiscussion = (req: AuthenticatedRequest, res: Response) => {
     }
     if (!userUid) {
       res.status(403).json({ error: "User not signed in" });
-      return
+      return;
     }
     const discussion = discussions.find((d) => d.id === id);
     if (!discussion) {
@@ -84,7 +93,7 @@ export const deleteDiscussion = (req: AuthenticatedRequest, res: Response) => {
     }
     if (!userUid) {
       res.status(403).json({ error: "User not signed in" });
-      return
+      return;
     }
     const discussion = discussions[index];
     if (discussion.userId !== userUid) {
@@ -103,7 +112,7 @@ export const deleteDiscussion = (req: AuthenticatedRequest, res: Response) => {
 // Delete multiple discussion posts
 export const deleteMultipleDiscussions = (req: Request, res: Response) => {
   try {
-    const { ids, userUid } = req.body as { ids: number[], userUid: string };
+    const { ids, userUid } = req.body as { ids: number[]; userUid: string };
 
     if (!Array.isArray(ids) || ids.length === 0) {
       res.status(400).json({ error: "Please provide an array of discussion IDs to delete" });

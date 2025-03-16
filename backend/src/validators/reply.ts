@@ -1,5 +1,6 @@
 import { body, param } from "express-validator";
-import { validateRequest } from "./validateRequestHelper"
+
+import { validateRequest } from "./validateRequestHelper";
 
 export const createReply = [
   body("content").isString().notEmpty().trim().withMessage("Content is required"),
