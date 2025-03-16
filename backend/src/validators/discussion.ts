@@ -1,15 +1,6 @@
-import { NextFunction, Request, Response } from "express";
-import { Result, ValidationError, body, param, query, validationResult } from "express-validator";
+import { body, param, query } from "express-validator";
 
-function validateRequest(req: Request, res: Response, next: NextFunction): void {
-  const errors: Result<ValidationError> = validationResult(req);
-  if (!errors.isEmpty()) {
-    const errorList: ValidationError[] = errors.array();
-    res.status(400).json({ errors: errorList });
-    return;
-  }
-  next();
-}
+import { validateRequest } from "./validateRequestHelper";
 
 export const createDiscussion = [
   body("title").isString().notEmpty().trim().withMessage("Title is required"),

@@ -5,6 +5,7 @@ type Reply = {
   id: number;
   discussionId: number;
   content: string;
+  userId: string;
 };
 
 // Temporary storage until database is set up
@@ -12,10 +13,18 @@ const replies: Reply[] = [];
 
 export const createReply = (req: Request, res: Response) => {
   try {
-    const { discussionId, content } = req.body as { discussionId: string; content: string };
+    const { discussionId, content, userUid } = req.body as {
+      discussionId: string;
+      content: string;
+      userUid: string;
+    };
 
     if (!discussionId || !content) {
       res.status(400).json({ error: "discussionId and content are required" });
+      return;
+    }
+    if (!userUid) {
+      res.status(403).json({ error: "User not signed in" });
       return;
     }
 
@@ -23,6 +32,7 @@ export const createReply = (req: Request, res: Response) => {
       id: replies.length + 1,
       discussionId: parseInt(discussionId, 10),
       content,
+      userId: userUid,
     };
 
     replies.push(newReply);
@@ -54,16 +64,26 @@ export const getReplies = (req: Request, res: Response) => {
 export const editReply = (req: Request, res: Response) => {
   try {
     const id = parseInt(req.params.id, 10);
-    const { content } = req.body as { content: string };
+    const { content, userUid } = req.body as { content: string; userUid: string };
 
     if (!content) {
       res.status(400).json({ error: "Content is required to update reply" });
       return;
     }
 
+    if (!userUid) {
+      res.status(403).json({ error: "User not signed in" });
+      return;
+    }
+
     const reply = replies.find((r) => r.id === id);
     if (!reply) {
       res.status(404).json({ error: "Reply not found" });
+      return;
+    }
+
+    if (reply.userId !== userUid) {
+      res.status(403).json({ error: "Unauthorized: You can only edit your own replies" });
       return;
     }
 
@@ -78,15 +98,25 @@ export const editReply = (req: Request, res: Response) => {
 export const deleteReply = (req: Request, res: Response) => {
   try {
     const id = parseInt(req.params.id, 10);
+    const { userUid } = req.body as { userUid: string };
 
     if (isNaN(id)) {
       res.status(400).json({ error: "Valid Reply ID is required" });
+      return;
+    }
+    if (!userUid) {
+      res.status(403).json({ error: "User not signed in" });
       return;
     }
 
     const replyIndex = replies.findIndex((reply) => reply.id === id);
     if (replyIndex === -1) {
       res.status(404).json({ error: "Reply not found" });
+      return;
+    }
+    const reply = replies[replyIndex];
+    if (reply.userId !== userUid) {
+      res.status(403).json({ error: "Unauthorized: You can only delete your own replies" });
       return;
     }
 
