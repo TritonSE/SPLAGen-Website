@@ -135,6 +135,3 @@ data/db/*
 *.lock
 data/db/
 *.wt
-*.bson
-*.lock
-data/db/
