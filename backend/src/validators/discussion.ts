@@ -1,5 +1,6 @@
 import { body, param, query } from "express-validator";
-import { validateRequest } from "./validateRequestHelper"
+
+import { validateRequest } from "./validateRequestHelper";
 
 export const createDiscussion = [
   body("title").isString().notEmpty().trim().withMessage("Title is required"),

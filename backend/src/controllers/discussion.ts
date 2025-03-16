@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from "express";
+
 import { AuthenticatedRequest } from "./auth";
 import { Types } from "mongoose";
 
@@ -31,7 +32,7 @@ export const createDiscussion = async (
     const { userId, title, message, channel } = req.body;
     if (!userUid) {
       res.status(403).json({ error: "User not signed in" });
-      return
+      return;
     }
     if (!title || !content) {
       res.status(400).json({ error: "Title and content are required" });
@@ -62,7 +63,7 @@ export const editDiscussion = async (
     }
     if (!userUid) {
       res.status(403).json({ error: "User not signed in" });
-      return
+      return;
     }
 
     const discussion = await discussionPost.findByIdAndUpdate(
@@ -101,7 +102,7 @@ export const deleteDiscussion = async (
     }
     if (!userUid) {
       res.status(403).json({ error: "User not signed in" });
-      return
+      return;
     }
     const discussion = discussions[index];
     if (discussion.userId !== userUid) {

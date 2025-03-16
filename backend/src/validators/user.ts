@@ -1,6 +1,6 @@
 import { body, param } from "express-validator";
-import { validateRequest } from "./validateRequestHelper"
 
+import { validateRequest } from "./validateRequestHelper";
 
 export const createUser = [
   body("name").isString().notEmpty().trim().withMessage("Name is required"),

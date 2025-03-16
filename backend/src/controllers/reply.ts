@@ -5,7 +5,7 @@ type Reply = {
   id: number;
   discussionId: number;
   content: string;
-  userId: string
+  userId: string;
 };
 
 // Temporary storage until database is set up
@@ -13,7 +13,11 @@ const replies: Reply[] = [];
 
 export const createReply = (req: Request, res: Response) => {
   try {
-    const { discussionId, content, userUid } = req.body as { discussionId: string; content: string, userUid: string };
+    const { discussionId, content, userUid } = req.body as {
+      discussionId: string;
+      content: string;
+      userUid: string;
+    };
 
     if (!discussionId || !content) {
       res.status(400).json({ error: "discussionId and content are required" });
@@ -21,14 +25,14 @@ export const createReply = (req: Request, res: Response) => {
     }
     if (!userUid) {
       res.status(403).json({ error: "User not signed in" });
-      return
+      return;
     }
 
     const newReply: Reply = {
       id: replies.length + 1,
       discussionId: parseInt(discussionId, 10),
       content,
-      userId: userUid
+      userId: userUid,
     };
 
     replies.push(newReply);
@@ -60,7 +64,7 @@ export const getReplies = (req: Request, res: Response) => {
 export const editReply = (req: Request, res: Response) => {
   try {
     const id = parseInt(req.params.id, 10);
-    const { content, userUid } = req.body as { content: string, userUid: string };
+    const { content, userUid } = req.body as { content: string; userUid: string };
 
     if (!content) {
       res.status(400).json({ error: "Content is required to update reply" });
@@ -69,7 +73,7 @@ export const editReply = (req: Request, res: Response) => {
 
     if (!userUid) {
       res.status(403).json({ error: "User not signed in" });
-      return
+      return;
     }
 
     const reply = replies.find((r) => r.id === id);
@@ -102,7 +106,7 @@ export const deleteReply = (req: Request, res: Response) => {
     }
     if (!userUid) {
       res.status(403).json({ error: "User not signed in" });
-      return
+      return;
     }
 
     const replyIndex = replies.findIndex((reply) => reply.id === id);
