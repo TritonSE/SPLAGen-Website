@@ -131,13 +131,13 @@ export const Step2: React.FC<Step2Props> = ({ onNext, onBack }) => {
           <Radio id="radio-7" label="Student" checked={answers.field4 === "Student"} onChange={() => { handleSelection("field4", "Student"); }} />
           <ExpandableSection
             title="Student Membership"
-            content="Associate membership is for individuals who do not meet the full membership criteria but have a professional interest in genetic counseling..."
+            content="Student membership will be granted to students enrolled in genetic counseling programs offered by an accredited institution, as well as to students enrolled in other degree-granting programs and who are interested in supporting the mission of society. Interested students can submit an application and, upon approval by officials, student membership can be granted or denied. Student members have the privileges of full members; however, they will not be granted a vote on issues or elections open to full and associate members. Student members are not eligible to serve on the Board of Directors or as committee chairs, with the exception of any committee specifically created for students. Student leadership roles will be filled by genetic counseling students."
           />
 
           <Radio id="radio-8" label="Associate Member" checked={answers.field4 === "Associate Member"} onChange={() => { handleSelection("field4", "Associate Member"); }} />
           <ExpandableSection
             title="Associate Membership"
-            content="Associate membership is for individuals who do not meet the full membership criteria but have a professional interest in genetic counseling..."
+            content="Associate membership will be granted to all applicants interested in supporting the mission of Splagen and who are not eligible for full or student membership. Interested individuals can submit an application and, upon approval by officials, associated membership can be granted or denied. Associate members have all the privileges of full members, but are not eligible for a position on the Board of Directors and can only vote, hold positions as committee chairs and leadership positions related to their specialty and professional background."
           />
       
         </div>

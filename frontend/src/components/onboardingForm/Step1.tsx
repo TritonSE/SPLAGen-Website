@@ -1,13 +1,21 @@
 "use client";
 
 import { useStateMachine } from "little-state-machine";
+import dynamic from 'next/dynamic'
 import { useCallback, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 
-import { Checkmark, CountrySelector, type CountryOption } from "@/components";
+import styles from "./Step1.module.css";
+
+import type {CountryOption} from "@/components";
+
+import { Checkmark } from "@/components";
 import { onboardingState } from "@/state/stateTypes";
 import updateOnboardingForm from "@/state/updateOnboardingForm";
-import styles from "./Step1.module.css";
+
+const CountrySelector = dynamic(() => import('@/components').then(mod => mod.CountrySelector), {
+  ssr: false
+});
 
 type Step1Props = {
   onNext: (data: onboardingState["data"]) => void;
@@ -21,6 +29,10 @@ export const Step1 = ({ onNext }: Step1Props) => {
   const [healthcareExpanded, setHealthcareExpanded] = useState(false);
 
   const [associateExpanded, setAssociateExpanded] = useState(false);
+
+  const [geneticExpanded, setGeneticExpanded] = useState(false);
+
+  const [studentExpanded, setStudentExpanded] = useState(false);
 
   const { register, handleSubmit, control } = useForm<onboardingState["data"]>({
     defaultValues: state.onboardingForm,
@@ -74,7 +86,7 @@ export const Step1 = ({ onNext }: Step1Props) => {
             defaultValue={state.onboardingForm?.country || ""}
             render={({ field }) => (
               <CountrySelector
-                value={selectedCountry || state.onboardingForm?.country}
+                value={selectedCountry ?? state.onboardingForm?.country}
                 onChange={(option) => {
                   setSelectedCountry(option);
                   field.onChange(option);
@@ -139,7 +151,7 @@ export const Step1 = ({ onNext }: Step1Props) => {
             {healthcareExpanded && (
               <div className={styles.expandableContent}>
                 <p>
-                Full membership should be extended to any individual who has an MD, master's or doctorate degree in a related field, such as nursing, social work or public health, and has had formal training in genetic counseling with at least 1 year of formal clinical training in genetics or has obtained a certificate in genetic counseling training and has at least 3 years of clinical experience in a role where their primary responsibility is genetic counseling. Full members can attend all meetings of members, vote, serve as officers, committee chairs and on the Board of Directors.
+                Full membership should be extended to any individual who has an MD, master&apos;s or doctorate degree in a related field, such as nursing, social work or public health, and has had formal training in genetic counseling with at least 1 year of formal clinical training in genetics or has obtained a certificate in genetic counseling training and has at least 3 years of clinical experience in a role where their primary responsibility is genetic counseling. Full members can attend all meetings of members, vote, serve as officers, committee chairs and on the Board of Directors.
                 </p>
               </div>
             )}
@@ -167,8 +179,56 @@ export const Step1 = ({ onNext }: Step1Props) => {
               </div>
             )}
           </div>
-        </div>
 
+
+          <h4>Genetic Counselor</h4>
+
+          {/* Genetic Counselor Membership Expandable */}
+          <div className={styles.expandableSection}>
+            <div
+              className={styles.expandableHeader}
+              onClick={() => {
+                setGeneticExpanded(!geneticExpanded);
+              }}
+            >
+              <span className={styles.expandIcon}>{geneticExpanded ? "−" : "+"}</span>
+              <h4 className={styles.expandableTitle}>Genetic Counselor Membership</h4>
+            </div>
+
+            {geneticExpanded && (
+              <div className={styles.expandableContent}>
+                <p>
+                {"Full membership should be extended to any individual who holds a master's degree from an accredited genetic counseling training program. Full members can attend all meetings open to members, vote, serve as officers, committee chairs and on the Board of Directors."}
+                </p>
+              </div>
+            )}
+          </div>
+
+          <h4>Student</h4>
+
+          {/* Student Membership Expandable */}
+
+          <div className={styles.expandableSection}>
+            <div
+              className={styles.expandableHeader}
+              onClick={() => {
+                setStudentExpanded(!studentExpanded);
+              }}
+            >
+              <span className={styles.expandIcon}>{studentExpanded ? "−" : "+"}</span>
+              <h4 className={styles.expandableTitle}>Student Membership</h4>
+            </div>
+
+            {studentExpanded && (
+              <div className={styles.expandableContent}>
+                <p>
+                {"Student membership will be granted to students enrolled in genetic counseling programs offered by an accredited institution, as well as to students enrolled in other degree-granting programs and who are interested in supporting the mission of society. Interested students can submit an application and, upon approval by officials, student membership can be granted or denied. Student members have the privileges of full members; however, they will not be granted a vote on issues or elections open to full and associate members. Student members are not eligible to serve on the Board of Directors or as committee chairs, with the exception of any committee specifically created for students. Student leadership roles will be filled by genetic counseling students."}
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+        
         <div>
           <button type="submit">Next</button>
         </div>

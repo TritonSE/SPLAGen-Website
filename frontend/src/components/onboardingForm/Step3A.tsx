@@ -3,16 +3,14 @@
 import { useStateMachine } from "little-state-machine";
 import React from "react";
 
-import { onboardingState } from "@/state/stateTypes";
-
 type Step3AProps = {
   onNext: () => void;
   onBack: () => void;
 };
 
 export const Step3A: React.FC<Step3AProps> = ({ onNext, onBack }) => {
-  const { state } = useStateMachine<onboardingState>();
-  const membershipType = state.onboardingForm.field4; // Assuming field4 stores membership type
+  const { state } = useStateMachine();
+  const membershipType = state.onboardingForm.membership; // Assuming field4 stores membership type
 
   let membershipText = "";
 
