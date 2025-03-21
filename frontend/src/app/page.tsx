@@ -24,6 +24,7 @@ export default function Dashboard() {
 
       <div className="grid grid-rows-[20px_1fr_20px] items-center min-h-screen">
         <main className="flex flex-col gap-8 row-start-2 items-center">
+          <Link href="/phoneInputDemo"> Go to phone input demo </Link>
           {/* Added the LanguageSwitcher component */}
           <LanguageSwitcher />
           {/* External is my text component */}
