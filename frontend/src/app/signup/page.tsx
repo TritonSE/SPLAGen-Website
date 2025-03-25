@@ -131,7 +131,7 @@ const SignUpPage = () => {
               className={`w-30 py-2 px-4 rounded-lg font-bold text-white mt-4 hover:bg-[#BCBCCF] ${
                 isValid
                   ? "bg-primary hover:bg-primary-dark"
-                  : "bg-gray-300 cursor-not-allowed pointer-events-none"
+                  : "bg-disabled cursor-not-allowed pointer-events-none"
               }`}
             >
               Continue

@@ -1,143 +1,137 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
+import { Types } from "mongoose";
 
-// Temporary storage for discussion posts
-type Discussion = {
-  id: number;
+import discussionPost from "../models/discussionPost";
+
+type DiscussionRequestBody = {
+  userId: string;
   title: string;
-  content: string;
-  replies: DiscussionReply[];
+  message: string;
+  channel: string;
 };
 
-type DiscussionReply = {
-  id: number;
-  content: string;
+type EditDiscussionRequestBody = {
+  title?: string;
+  message?: string;
+  channel?: string;
 };
 
-const discussions: Discussion[] = [];
+type DeleteMultipleDiscussionsRequestBody = {
+  ids: string[];
+};
 
 // Create a discussion post
-export const createDiscussion = (req: Request, res: Response) => {
+export const createDiscussion = async (
+  req: Request<unknown, unknown, DiscussionRequestBody>,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
-    const { title, content } = req.body as { title: string; content: string };
-    if (!title || !content) {
-      res.status(400).json({ error: "Title and content are required" });
-      return;
-    }
-    const newDiscussion: Discussion = {
-      id: discussions.length + 1,
-      title,
-      content,
-      replies: [],
-    };
-    discussions.push(newDiscussion);
+    const { userId, title, message, channel } = req.body;
+    const newDiscussion = new discussionPost({ userId, title, message, channel, replies: [] });
+    await newDiscussion.save();
     res.status(201).json({ message: "Discussion created successfully", discussion: newDiscussion });
   } catch (error) {
-    console.error("Error creating discussion:", error);
-    res.status(500).json({ error: "Internal server error" });
+    next(error);
   }
 };
 
 // Edit a discussion post
-export const editDiscussion = (req: Request, res: Response) => {
+export const editDiscussion = async (
+  req: Request<{ id: string }, unknown, EditDiscussionRequestBody>,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
-    const id = parseInt(req.params.id, 10);
-    const { title, content } = req.body as { title: string; content: string };
+    const { id } = req.params;
+    const { title, message, channel } = req.body;
 
-    if (!title || !content) {
-      res.status(400).json({ error: "Title and content are required to update discussion" });
-      return;
+    // Ensure the id is valid
+    const objectId = Types.ObjectId.isValid(id) ? new Types.ObjectId(id) : null;
+    if (!objectId) {
+      res.status(400).json({ error: "Invalid ID format" });
     }
 
-    const discussion = discussions.find((d) => d.id === id);
+    const discussion = await discussionPost.findByIdAndUpdate(
+      objectId,
+      { title, message, channel },
+      { new: true },
+    );
+
     if (!discussion) {
       res.status(404).json({ error: "Discussion not found" });
-      return;
     }
-
-    discussion.title = title;
-    discussion.content = content;
 
     res.status(200).json({ message: "Discussion updated successfully", discussion });
   } catch (error) {
-    console.error("Error editing discussion:", error);
-    res.status(500).json({ error: "Internal server error" });
+    next(error);
   }
 };
 
 // Delete a discussion post
-export const deleteDiscussion = (req: Request, res: Response) => {
+export const deleteDiscussion = async (
+  req: Request<{ id: string }>,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
-    const id = parseInt(req.params.id, 10);
-    const index = discussions.findIndex((discussion) => discussion.id === id);
+    const { id } = req.params;
+    const discussion = await discussionPost.findByIdAndDelete(id);
 
-    if (index === -1) {
+    if (!discussion) {
       res.status(404).json({ error: "Discussion not found" });
-      return;
     }
 
-    discussions.splice(index, 1);
     res.status(200).json({ message: "Discussion deleted successfully" });
   } catch (error) {
-    console.error("Error deleting discussion:", error);
-    res.status(500).json({ error: "Internal server error" });
+    next(error);
   }
 };
 
 // Delete multiple discussion posts
-export const deleteMultipleDiscussions = (req: Request, res: Response) => {
+export const deleteMultipleDiscussions = async (
+  req: Request<unknown, unknown, DeleteMultipleDiscussionsRequestBody>,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
-    const { ids } = req.body as { ids: number[] };
-
-    if (!Array.isArray(ids) || ids.length === 0) {
-      res.status(400).json({ error: "Please provide an array of discussion IDs to delete" });
-      return;
-    }
-
-    const initialLength = discussions.length;
-
-    for (const id of ids) {
-      const index = discussions.findIndex((discussion) => discussion.id === id);
-      if (index !== -1) {
-        discussions.splice(index, 1);
-      }
-    }
-
-    const finalLength = discussions.length;
+    const { ids } = req.body;
+    const result = await discussionPost.deleteMany({ _id: { $in: ids } });
 
     res.status(200).json({
-      message: `${(initialLength - finalLength).toString()} discussion(s) deleted successfully`,
-      remainingDiscussions: discussions,
+      message: `${result.deletedCount.toString()} discussion(s) deleted successfully`,
     });
   } catch (error) {
-    console.error("Error deleting multiple discussions:", error);
-    res.status(500).json({ error: "Internal server error" });
+    next(error);
   }
 };
 
 // Get multiple discussion posts
-export const getMultipleDiscussions = (_req: Request, res: Response) => {
+export const getMultipleDiscussions = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    const discussions = await discussionPost.find();
     res.status(200).json({ discussions });
   } catch (error) {
-    console.error("Error getting discussions:", error);
-    res.status(500).json({ error: "Internal server error" });
+    next(error);
   }
 };
 
 // Get an individual discussion post
-export const getDiscussion = (req: Request, res: Response) => {
+export const getDiscussion = async (
+  req: Request<{ id: string }>,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
-    const id = parseInt(req.params.id, 10);
-    const discussion = discussions.find((d) => d.id === id);
+    const { id } = req.params;
+    const discussion = await discussionPost.findById(id);
 
     if (!discussion) {
       res.status(404).json({ error: "Discussion not found" });
-      return;
     }
 
     res.status(200).json({ discussion });
   } catch (error) {
-    console.error("Error getting discussion:", error);
-    res.status(500).json({ error: "Internal server error" });
+    next(error);
   }
 };
