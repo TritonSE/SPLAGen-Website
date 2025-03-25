@@ -85,10 +85,12 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
           </div>
 
           <div className="modal-actions">
-            <button type="button" onClick={onClose}>
+            <button className="createPost-cancel" type="button" onClick={onClose}>
               Cancel
             </button>
-            <button type="submit">Post</button>
+            <button className="createPost-submit button" type="submit">
+              Post
+            </button>
           </div>
         </form>
       </div>

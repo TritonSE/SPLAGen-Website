@@ -1,5 +1,8 @@
-import { SideNavbar } from "@/components";
+"use client";
 
+import { usePathname } from "next/navigation";
+
+import { SideNavbar } from "@/components";
 import "./globals.css";
 
 export default function RootLayout({
@@ -7,9 +10,13 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const pathname = usePathname();
+
+  const isSignUpPage = pathname === "/signup";
+
   return (
     <html lang="en">
-      <body>
+      <body className={isSignUpPage ? "bg-primary" : ""}>
         <div className="layout-container">
           <SideNavbar />
           <section className="viewPort">

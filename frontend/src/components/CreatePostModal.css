@@ -23,7 +23,7 @@
 
 /* Heading style */
 .create-post-modal-container h2 {
-  @apply text-mainHeading;
+  @apply text-primary;
   margin-top: 0;
   margin-bottom: 20px;
   font-size: 24px; /* Set size for the heading */
@@ -74,28 +74,28 @@
   font-size: 16px; /* Set size for buttons */
 }
 
-/* Button hover effect */
-.modal-actions button:hover {
-  background-color: #f0f0f0;
-}
-
 /* Submit button styling */
-button[type="submit"] {
-  @apply bg-mainHeading text-mainHeading;
+.createPost-submit {
+  @apply bg-primary text-primary;
   color: white;
   font-size: 16px; /* Set size for the submit button */
 }
 
 /* Submit button hover effect */
-button[type="submit"]:hover {
-  @apply bg-mainHeading;
+.createPost-submit:hover {
+  @apply bg-primary;
 }
 
-button[type="button"] {
+.createPost-cancel {
   border: 1px solid gray;
   border-radius: 4px;
   padding: 8px 12px;
   cursor: pointer;
+}
+
+/* Button hover effect */
+.createPost-cancel:hover {
+  background-color: #f0f0f0;
 }
 
 .error-message {
