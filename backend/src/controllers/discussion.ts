@@ -22,7 +22,7 @@ type DeleteMultipleDiscussionsRequestBody = {
 
 // Create a discussion post
 export const createDiscussion = async (
-  req: Request<{}, {}, DiscussionRequestBody>,
+  req: Request<unknown, unknown, DiscussionRequestBody>,
   res: Response,
   next: NextFunction,
 ) => {
@@ -38,7 +38,7 @@ export const createDiscussion = async (
 
 // Edit a discussion post
 export const editDiscussion = async (
-  req: Request<{ id: string }, {}, EditDiscussionRequestBody>,
+  req: Request<{ id: string }, unknown, EditDiscussionRequestBody>,
   res: Response,
   next: NextFunction,
 ) => {
@@ -90,7 +90,7 @@ export const deleteDiscussion = async (
 
 // Delete multiple discussion posts
 export const deleteMultipleDiscussions = async (
-  req: Request<{}, {}, DeleteMultipleDiscussionsRequestBody>,
+  req: Request<unknown, unknown, DeleteMultipleDiscussionsRequestBody>,
   res: Response,
   next: NextFunction,
 ) => {
