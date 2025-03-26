@@ -1,4 +1,5 @@
 import { body, param, query } from "express-validator";
+import mongoose from "mongoose";
 
 import { validateRequest } from "./validateRequestHelper";
 

@@ -1,11 +1,17 @@
 import { InferSchemaType, Schema, model } from "mongoose";
 
+export enum UserRole {
+  SUPERADMIN = "superadmin",
+  ADMIN = "admin",
+  COUNSELOR = "counselor",
+  STUDENT = "student",
+}
+
 const userSchema = new Schema(
   {
     firebaseId: { type: String, required: true },
-
+    role: { type: String, enum: ["superadmin", "admin", "member"], required: true },
     account: {
-      type: { type: String, enum: ["superadmin", "admin", "counselor", "student"], required: true },
       inDirectory: { type: Boolean, required: true },
       profilePicture: { type: String, default: "" },
       // can they have multiple memberships?

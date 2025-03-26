@@ -33,16 +33,20 @@ void mongoose
 
 const app: Express = express();
 const port = process.env.PORT ?? 3001;
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
 app.use("/api/announcement", announcementRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/discussions", discussionRoutes);
 app.use("/api/replies", replyRoutes);
 app.use("/api/directory", directoryRoutes);
+
 app.get("/", (req: Request, res: Response) => {
   res.send("Express + TypeScript Server");
 });
+
 // Error handling middleware
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use((error: unknown, req: Request, res: Response, next: NextFunction) => {
@@ -51,6 +55,7 @@ app.use((error: unknown, req: Request, res: Response, next: NextFunction) => {
   let errorMessage = "An error has occurred.";
 
   // Check if the error is an instance of HttpError
+  if (isHttpError(error)) {
     // error.status is unique to the http error class, it allows us to pass status codes with errors
     statusCode = error.status;
     errorMessage = error.message;

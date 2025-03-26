@@ -1,5 +1,6 @@
-import { Request, Response } from "express";
+import { NextFunction, Response } from "express";
 
+import { AuthenticatedRequest } from "../middleware/auth";
 import UserModel from "../models/user";
 import { sendApprovalEmail, sendDenialEmail } from "../services/emailService";
 
@@ -13,8 +14,9 @@ type DenyDirectoryRequestBody = {
 };
 
 export const approveDirectoryEntry = async (
-  req: Request<unknown, unknown, ApproveDirectoryRequestBody>,
+  req: AuthenticatedRequest<unknown, unknown, ApproveDirectoryRequestBody>,
   res: Response,
+  next: NextFunction,
 ) => {
   try {
     const { firebaseId } = req.body;
@@ -41,14 +43,14 @@ export const approveDirectoryEntry = async (
 
     res.status(200).json({ message: "Directory entry approved and email sent" });
   } catch (error) {
-    console.error("Error approving directory entry:", error);
-    res.status(500).json({ error: "Internal server error" });
+    next(error);
   }
 };
 
 export const denyDirectoryEntry = async (
-  req: Request<unknown, unknown, DenyDirectoryRequestBody>,
+  req: AuthenticatedRequest<unknown, unknown, DenyDirectoryRequestBody>,
   res: Response,
+  next: NextFunction,
 ) => {
   try {
     const { firebaseId, reason } = req.body;
@@ -75,7 +77,6 @@ export const denyDirectoryEntry = async (
 
     res.status(200).json({ message: "Directory entry denied and email sent" });
   } catch (error) {
-    console.error("Error denying directory entry:", error);
-    res.status(500).json({ error: "Internal server error" });
+    next(error);
   }
 };
