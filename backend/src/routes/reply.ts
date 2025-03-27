@@ -1,8 +1,8 @@
 import express from "express";
 
 import * as ReplyController from "../controllers/reply";
+import { requireSignedIn } from "../middleware/auth";
 import * as ReplyValidator from "../validators/reply";
-
 const router = express.Router();
 
 /**
@@ -13,9 +13,14 @@ const router = express.Router();
  * DELETE /api/replies/:id - Delete a reply post
  */
 
-router.post("/", ReplyValidator.createReply, ReplyController.createReply);
-router.get("/:discussionId", ReplyValidator.getReplies, ReplyController.getReplies);
-router.put("/:id", ReplyValidator.editReply, ReplyController.editReply);
-router.delete("/:id", ReplyValidator.deleteReply, ReplyController.deleteReply);
+router.post("/", requireSignedIn, ReplyValidator.createReply, ReplyController.createReply);
+router.get(
+  "/:discussionId",
+  requireSignedIn,
+  ReplyValidator.getReplies,
+  ReplyController.getReplies,
+);
+router.put("/:id", requireSignedIn, ReplyValidator.editReply, ReplyController.editReply);
+router.delete("/:id", requireSignedIn, ReplyValidator.deleteReply, ReplyController.deleteReply);
 
 export default router;

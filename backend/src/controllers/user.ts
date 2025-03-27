@@ -3,17 +3,22 @@ import { Request, RequestHandler, Response } from "express";
 import User from "../models/user";
 
 // Temporary storage until database is set up
-type User = {
+export type User = {
   id: number;
   name: string;
   email: string;
+  accountType: string;
 };
 
-const users: User[] = [];
+export const users: User[] = [];
 
 export const createUser = (req: Request, res: Response) => {
   try {
-    const { name, email } = req.body as { name: string; email: string };
+    const { name, email, accountType } = req.body as {
+      name: string;
+      email: string;
+      accountType: string;
+    };
     if (!name || !email) {
       res.status(400).json({ error: "Name and email are required" });
       return;
@@ -22,6 +27,7 @@ export const createUser = (req: Request, res: Response) => {
       id: users.length + 1,
       name,
       email,
+      accountType,
     };
     users.push(newUser);
     res.status(201).json({ message: "User created successfully", user: newUser });
