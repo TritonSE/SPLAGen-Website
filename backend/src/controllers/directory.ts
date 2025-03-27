@@ -1,10 +1,11 @@
 import { NextFunction, Response } from "express";
 
 import { AuthenticatedRequest } from "../middleware/auth";
-import UserModel from "../models/user";
-import { sendApprovalEmail, sendDenialEmail } from "../services/emailService";
+import UserModel, { UserMembership } from "../models/user";
+import { sendDirectoryApprovalEmail, sendDirectoryDenialEmail } from "../services/emailService";
 
 type ApproveDirectoryRequestBody = {
+  //TODO: maybe MongoID of user to be approved denied depending on the frontend"
   firebaseId: string;
 };
 
@@ -19,27 +20,35 @@ export const approveDirectoryEntry = async (
   next: NextFunction,
 ) => {
   try {
-    const { firebaseId } = req.body;
+    const pendingUserUid = req.body.firebaseId;
 
-    if (!firebaseId) {
-      res.status(400).json({ error: "ID is required" });
-      return;
-    }
+    const user = await UserModel.findOne({ firebaseId: pendingUserUid });
 
-    // Send the approval email
-
-    const user = await UserModel.findOne({ firebaseId });
-
-    if (!user || !user.personal) {
+    if (!user || !user.personal || !user.account) {
       res.status(404).json({ error: "User not found" });
       return;
     }
 
+    if (user.account.inDirectory !== "pending") {
+      res.status(400).json({ error: "User has not requested to be in the directory" });
+      return;
+    }
+
+    if (
+      ![UserMembership.GENETIC_COUNSELOR, UserMembership.HEALTHCARE_PROVIDER].includes(
+        user.account.membership as UserMembership,
+      )
+    ) {
+      res.status(400).json({ error: "User is not a genetic counselor or healthcare provider" });
+      return;
+    }
+
+    user.account.inDirectory = true;
     await user.save();
 
     const { firstName, email } = user.personal;
 
-    await sendApprovalEmail(email, firstName);
+    await sendDirectoryApprovalEmail(email, firstName);
 
     res.status(200).json({ message: "Directory entry approved and email sent" });
   } catch (error) {
@@ -53,27 +62,28 @@ export const denyDirectoryEntry = async (
   next: NextFunction,
 ) => {
   try {
+    // firebaseID for the the user to be denied
     const { firebaseId, reason } = req.body;
-
-    if (!firebaseId || !reason) {
-      res.status(400).json({ error: "Email, name, and reason are required" });
-      return;
-    }
-
-    // Send the denial email
 
     const user = await UserModel.findOne({ firebaseId });
 
-    if (!user || !user.personal) {
+    if (!user || !user.personal || !user.account) {
       res.status(404).json({ error: "User not found" });
       return;
     }
+
+    if (user.account.inDirectory !== "pending") {
+      res.status(400).json({ error: "User has not requested to be in the directory" });
+      return;
+    }
+
+    user.account.inDirectory = false;
 
     await user.save();
 
     const { firstName, email } = user.personal;
 
-    await sendDenialEmail(email, firstName, reason);
+    await sendDirectoryDenialEmail(email, firstName, reason);
 
     res.status(200).json({ message: "Directory entry denied and email sent" });
   } catch (error) {

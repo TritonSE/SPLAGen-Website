@@ -31,7 +31,7 @@ export const createDiscussion = async (
     const { title, message, channel } = req.body;
     const userId = req.mongoID;
 
-    const newDiscussion = new discussionPost({ userId, title, message, channel, replies: [] });
+    const newDiscussion = new discussionPost({ userId, title, message, channel });
     await newDiscussion.save();
 
     res.status(201).json({ message: "Discussion created successfully", discussion: newDiscussion });

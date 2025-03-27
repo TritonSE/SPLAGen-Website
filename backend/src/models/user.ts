@@ -3,16 +3,31 @@ import { InferSchemaType, Schema, model } from "mongoose";
 export enum UserRole {
   SUPERADMIN = "superadmin",
   ADMIN = "admin",
-  COUNSELOR = "counselor",
-  STUDENT = "student",
+  MEMBER = "member",
 }
 
+export enum UserMembership {
+  STUDENT = "student",
+  GENETIC_COUNSELOR = "geneticCounselor",
+  HEALTHCARE_PROVIDER = "healthcareProvider",
+  ASSOCIATE = "associate",
+}
 const userSchema = new Schema(
   {
     firebaseId: { type: String, required: true },
     role: { type: String, enum: ["superadmin", "admin", "member"], required: true },
     account: {
-      inDirectory: { type: Boolean, required: true },
+      inDirectory: {
+        type: Schema.Types.Mixed, // Allows boolean or string
+        default: "pending",
+        validate: {
+          validator: function (v: string | boolean) {
+            return v === true || v === false || v === "pending";
+          },
+          message: "Status must be true, false, or 'pending'",
+        },
+        required: true,
+      },
       profilePicture: { type: String, default: "" },
       // can they have multiple memberships?
       membership: {
