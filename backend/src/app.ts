@@ -2,6 +2,7 @@
  * Initializes mongoose and express.
  */
 
+import cors from "cors";
 import dotenv from "dotenv";
 import express, { Express, NextFunction, Request, Response } from "express";
 import { isHttpError } from "http-errors";
@@ -36,6 +37,11 @@ const port = process.env.PORT ?? 3001;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(
+  cors({
+    origin: process.env.FRONTEND_ORIGIN,
+  }),
+);
 
 app.use("/api/announcement", announcementRoutes);
 app.use("/api/users", userRoutes);
