@@ -26,7 +26,7 @@ export const UserContext = createContext<IUserContext>({
   user: null,
   loadingUser: true,
   reloadUser: () => undefined,
-  onboardingStep: 1,
+  onboardingStep: 0,
   setOnboardingStep: () => undefined,
 });
 
@@ -41,9 +41,12 @@ export const UserContextProvider = ({ children }: { children: ReactNode }) => {
   const [loadingUser, setLoadingUser] = useState(true);
   const [onboardingStep, setOnboardingStep] = useState<OnboardingStep>(0);
 
-  const setOnboardingStepHandler = useCallback((step: OnboardingStep) => {
-    setOnboardingStep(step);
-  }, []);
+  const setOnboardingStepHandler = useCallback(
+    (step: OnboardingStep) => {
+      setOnboardingStep(step);
+    },
+    [setOnboardingStep],
+  );
 
   //   const { auth } = initFirebase();
 
@@ -98,11 +101,11 @@ export const UserContextProvider = ({ children }: { children: ReactNode }) => {
     //       }),
     //   );
     // }
-  }, [setUser, setLoadingUser, getWhoAmI]);
+  }, [setUser, setLoadingUser]);
 
   useEffect(() => {
     reloadUser();
-  }, []);
+  }, [reloadUser]);
 
   //TODO: switch to this useeffect when firebase is set up
   // useEffect(reloadUser, [initialLoading, firebaseUser]);

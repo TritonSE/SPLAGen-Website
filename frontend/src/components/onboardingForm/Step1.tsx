@@ -23,7 +23,7 @@ export const Step1 = ({ onNext }: Step1Props) => {
       actions.updateOnboardingForm(data);
       onNext(data);
     },
-    [actions.updateOnboardingForm, onNext],
+    [actions, onNext],
   );
 
   const handleFormSubmit = useCallback(

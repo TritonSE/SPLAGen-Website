@@ -25,7 +25,7 @@ export default function OnboardingForm() {
         }
       });
     },
-    [actions.updateOnboardingForm, setStep],
+    [actions, setStep],
   );
 
   const handleBack = useCallback(() => {
@@ -39,7 +39,7 @@ export default function OnboardingForm() {
       field1: "",
     });
     setStep(1);
-  }, [actions.updateOnboardingForm, setStep]);
+  }, [actions, setStep]);
 
   return (
     <div className="grid grid-rows-[20px_1fr_20px] items-center min-h-screen">

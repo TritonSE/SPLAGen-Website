@@ -36,17 +36,14 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
     resolver: zodResolver(postSchema),
   });
 
-  const onSubmit = useCallback<SubmitHandler<PostFormData>>(
-    (data) => {
-      try {
-        //TODO Submit to backend
-        console.log("data", data);
-      } catch (error) {
-        console.error("Request failed:", error);
-      }
-    },
-    [onClose],
-  );
+  const onSubmit = useCallback<SubmitHandler<PostFormData>>((data) => {
+    try {
+      //TODO Submit to backend
+      console.log("data", data);
+    } catch (error) {
+      console.error("Request failed:", error);
+    }
+  }, []);
 
   const handleFormSubmit = useCallback(
     (e: React.FormEvent<HTMLFormElement>): void => {

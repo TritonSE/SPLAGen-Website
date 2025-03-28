@@ -116,10 +116,10 @@ export const Navbar: React.FC = () => {
         setNavStateByRole();
         break;
     }
-  }, [pathname]);
+  }, [pathname, setNavStateByRole, setNavState]);
 
   // Set the navState based on user role
-  useEffect(setNavStateByRole, [user]);
+  useEffect(setNavStateByRole, [user, setNavStateByRole]);
 
   const renderNavItems = useCallback(() => {
     switch (navState) {
@@ -138,7 +138,7 @@ export const Navbar: React.FC = () => {
       case NavStateType.blank:
         return null;
     }
-  }, [navState]);
+  }, [navState, onboardingStep]);
 
   return (
     <section className={styles.SideNavbar}>

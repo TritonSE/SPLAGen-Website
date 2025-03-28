@@ -53,28 +53,31 @@ const Login: React.FC = () => {
   }, [setValue, setRememberMe]);
 
   // Form submission handler
-  const onSubmit: SubmitHandler<FormFields> = useCallback(async (data) => {
-    try {
-      await new Promise((resolve) => {
-        setTimeout(resolve, 1000);
-      });
+  const onSubmit: SubmitHandler<FormFields> = useCallback(
+    async (data) => {
+      try {
+        await new Promise((resolve) => {
+          setTimeout(resolve, 1000);
+        });
 
-      // Simulate API call with a 1-second delay...
-      // Note how only email is saved...not the password.
-      if (data.rememberMe) {
-        localStorage.setItem("rememberedEmail", data.email);
-        localStorage.setItem("rememberMe", "true");
-      } else {
-        localStorage.removeItem("rememberedEmail");
-        localStorage.setItem("rememberMe", "false");
+        // Simulate API call with a 1-second delay...
+        // Note how only email is saved...not the password.
+        if (data.rememberMe) {
+          localStorage.setItem("rememberedEmail", data.email);
+          localStorage.setItem("rememberMe", "true");
+        } else {
+          localStorage.removeItem("rememberedEmail");
+          localStorage.setItem("rememberMe", "false");
+        }
+      } catch (error) {
+        console.error(error);
+        setError("root", {
+          message: "We couldn't find an account with the given email and password.",
+        });
       }
-    } catch (error) {
-      console.error(error);
-      setError("root", {
-        message: "We couldn't find an account with the given email and password.",
-      });
-    }
-  }, []);
+    },
+    [setError],
+  );
 
   // Handler for 'remember me' checkbox changes
   const handleRememberMeChange = useCallback(
@@ -82,7 +85,7 @@ const Login: React.FC = () => {
       setRememberMe(checked);
       setValue("rememberMe", checked);
     },
-    [setValue],
+    [setRememberMe, setValue],
   );
 
   const handleFormSubmit = useCallback(
