@@ -1,5 +1,7 @@
+import env from "@/util/validateEnv";
+
 type Method = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
-const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+const API_BASE_URL = env.NEXT_PUBLIC_BACKEND_URL;
 
 /**
  * A wrapper around the built-in `fetch()` function that abstracts away some of
@@ -70,14 +72,10 @@ async function assertOk(response: Response): Promise<void> {
  * @returns The Response object returned by `fetch()`
  */
 export async function get(url: string, headers: Record<string, string> = {}): Promise<Response> {
-  if (API_BASE_URL) {
-    // GET requests do not have a body
-    const response = await fetchRequest("GET", API_BASE_URL + url, undefined, headers);
-    await assertOk(response);
-    return response;
-  } else {
-    throw new Error("Get Error: API_BASE_URL is not defined");
-  }
+  // GET requests do not have a body
+  const response = await fetchRequest("GET", API_BASE_URL + url, undefined, headers);
+  await assertOk(response);
+  return response;
 }
 
 /**
@@ -93,13 +91,9 @@ export async function post(
   body: unknown,
   headers: Record<string, string> = {},
 ): Promise<Response> {
-  if (API_BASE_URL) {
-    const response = await fetchRequest("POST", API_BASE_URL + url, body, headers);
-    await assertOk(response);
-    return response;
-  } else {
-    throw new Error("Post Error: API_BASE_URL is not defined");
-  }
+  const response = await fetchRequest("POST", API_BASE_URL + url, body, headers);
+  await assertOk(response);
+  return response;
 }
 
 /**
@@ -115,13 +109,9 @@ export async function put(
   body: unknown,
   headers: Record<string, string> = {},
 ): Promise<Response> {
-  if (API_BASE_URL) {
-    const response = await fetchRequest("PUT", API_BASE_URL + url, body, headers);
-    await assertOk(response);
-    return response;
-  } else {
-    throw new Error("Put Error: API_BASE_URL is not defined");
-  }
+  const response = await fetchRequest("PUT", API_BASE_URL + url, body, headers);
+  await assertOk(response);
+  return response;
 }
 
 /**
@@ -137,13 +127,9 @@ export async function patch(
   body: unknown,
   headers: Record<string, string> = {},
 ): Promise<Response> {
-  if (API_BASE_URL) {
-    const response = await fetchRequest("PATCH", API_BASE_URL + url, body, headers);
-    await assertOk(response);
-    return response;
-  } else {
-    throw new Error("Patch Error: API_BASE_URL is not defined");
-  }
+  const response = await fetchRequest("PATCH", API_BASE_URL + url, body, headers);
+  await assertOk(response);
+  return response;
 }
 
 /**
@@ -157,13 +143,9 @@ export async function httpDelete(
   url: string,
   headers: Record<string, string> = {},
 ): Promise<Response> {
-  if (API_BASE_URL) {
-    const response = await fetchRequest("DELETE", API_BASE_URL + url, undefined, headers);
-    await assertOk(response);
-    return response;
-  } else {
-    throw new Error("Delete Error: API_BASE_URL is not defined");
-  }
+  const response = await fetchRequest("DELETE", API_BASE_URL + url, undefined, headers);
+  await assertOk(response);
+  return response;
 }
 
 export type APIData<T> = { success: true; data: T };
