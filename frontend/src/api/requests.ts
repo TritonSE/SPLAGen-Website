@@ -1,5 +1,5 @@
 type Method = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 /**
  * A wrapper around the built-in `fetch()` function that abstracts away some of
@@ -206,27 +206,4 @@ export function handleAPIError(error: unknown): APIError {
     return { success: false, error };
   }
   return { success: false, error: `Unknown error: ${String(error)}` };
-}
-
-//TODO: edit to use fetchRequest
-export async function editBasicInfoRequest(
-  method: Method,
-  url: string,
-  body: unknown,
-  headers: Record<string, string>,
-): Promise<Response> {
-  const hasBody = body !== undefined;
-
-  const newHeaders = { ...headers };
-  if (hasBody) {
-    newHeaders["Content-Type"] = "application/json";
-  }
-
-  const response = await fetch(url, {
-    method,
-    headers: newHeaders,
-    body: hasBody ? JSON.stringify(body) : undefined,
-  });
-
-  return response;
 }

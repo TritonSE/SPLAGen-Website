@@ -1,11 +1,12 @@
 "use client";
 
 // import { User as FirebaseUser, onAuthStateChanged } from "firebase/auth";
-import { ReactNode, createContext, useEffect, useState } from "react";
+import { ReactNode, createContext, useCallback, useEffect, useState } from "react";
 
-import { User, getWhoAmI } from "../api/users";
+import { User, getWhoAmI } from "@/api/users";
 // import { initFirebase } from "@/firebase/firebase";
 
+//TODO: uncommet firebase code when ready
 type IUserContext = {
   //   firebaseUser: FirebaseUser | null;
   user: User | null;
@@ -13,6 +14,10 @@ type IUserContext = {
   reloadUser: () => unknown;
 };
 
+/**
+ * A context that provides the current Firebase and Splagen (MongoDB) user data,
+ * automatically fetching them when the page loads.
+ */
 export const UserContext = createContext<IUserContext>({
   //   firebaseUser: null,
   user: null,
@@ -31,19 +36,23 @@ export const UserContextProvider = ({ children }: { children: ReactNode }) => {
   const [loadingUser, setLoadingUser] = useState(true);
 
   //   const { auth } = initFirebase();
+
+  /**
+   * Callback triggered by Firebase when the user logs in/out, or on page load
+   */
   //   onAuthStateChanged(auth, (firebaseUser) => {
   //     setFirebaseUser(firebaseUser);
   //     setInitialLoading(false);
   //   });
 
-  const reloadUser = () => {
+  const reloadUser = useCallback(() => {
     // if (initialLoading) {
     //   return;
     // }
     setLoadingUser(true);
     setUser(null);
 
-    // Delete this after firebase is set up and uncomment the other chunk
+    // TODO: Delete this after firebase is set up and uncomment the chunk below
     getWhoAmI("temp_firebase_token") // Make the API call
       .then((res) => {
         if (res.success) {
@@ -79,11 +88,14 @@ export const UserContextProvider = ({ children }: { children: ReactNode }) => {
     //       }),
     //   );
     // }
-  };
+  }, [setUser, setLoadingUser, getWhoAmI]);
 
   useEffect(() => {
     reloadUser();
   }, []);
+
+  //TODO: switch to this useeffect when firebase is set up
+  // useEffect(reloadUser, [initialLoading, firebaseUser]);
 
   return (
     <UserContext.Provider

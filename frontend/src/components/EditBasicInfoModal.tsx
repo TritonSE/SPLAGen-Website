@@ -6,15 +6,10 @@ import React, { useCallback } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
 
+// import { UserContext } from "@/contexts/userContext";
 import ExitButton from "@/../public/Icons/ExitButton.svg";
 import "./EditBasicInfoModal.css";
-import { editBasicInfoRequest } from "@/api/requests";
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
-
-if (!API_BASE_URL) {
-  throw new Error("API_BASE_URL is not defined in the environment variables.");
-}
+import { editBasicInfoRequest } from "@/api/users";
 
 const ExitButtonSrc: string = ExitButton as unknown as string;
 
@@ -60,6 +55,8 @@ export const EditBasicInfoModal = ({
     resolver: zodResolver(schema),
   });
 
+  // const { firebaseUser } = useContext(UserContext);
+
   const onSubmit = useCallback<SubmitHandler<FormData>>(
     async (data) => {
       const formattedData = {
@@ -67,19 +64,17 @@ export const EditBasicInfoModal = ({
         phone: normalizePhoneNumber(data.phone),
       };
 
-      try {
-        const response = await editBasicInfoRequest(
-          "POST",
-          `/users/personal-information`,
-          formattedData,
-          {},
-        );
-        if (response.ok) {
-          onClose();
-        }
-      } catch (error) {
-        console.error("Request failed:", error);
+      // const firebaseToken = await firebaseUser?.getIdToken();
+      // if (!firebaseToken || editingItemId === null) {
+      //  //TODO Error handling?
+      //   return;
+      // }
+
+      const response = await editBasicInfoRequest(formattedData, "firebaseToken");
+      if (response.success) {
+        onClose();
       }
+      //TODO: else error handling? PAP's notifications?
     },
     [onClose],
   );

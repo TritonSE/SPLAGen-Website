@@ -1,5 +1,6 @@
 import { Request, RequestHandler, Response } from "express";
 
+import { AuthenticatedRequest } from "../middleware/auth";
 import User from "../models/user";
 
 // Temporary storage until database is set up
@@ -11,6 +12,32 @@ export type User = {
 };
 
 export const users: User[] = [];
+
+/**
+ * Retrieves data about the current user (their MongoDB ID, Firebase UID, and role, personal object).
+ * Requires the user to be signed in.
+ */
+export const getWhoAmI: RequestHandler = async (req: AuthenticatedRequest, res, next) => {
+  try {
+    const { firebaseUid } = req;
+    const user = await User.findOne({ firebaseId: firebaseUid });
+
+    if (!user) {
+      res.status(404).json({ error: "User not found" });
+      return;
+    }
+
+    const { _id, firebaseId, role, personal } = user;
+    res.status(200).send({
+      _id,
+      firebaseId,
+      role,
+      personal,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
 export const createUser = (req: Request, res: Response) => {
   try {

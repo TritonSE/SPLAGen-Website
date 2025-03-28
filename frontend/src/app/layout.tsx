@@ -1,9 +1,8 @@
 "use client";
-import { UserContextProvider } from "../contexts/userContext";
-
 import { usePathname } from "next/navigation";
 
 import { SideNavbar } from "@/components";
+import { UserContextProvider } from "@/contexts/userContext";
 import "./globals.css";
 
 export default function RootLayout({
@@ -17,16 +16,15 @@ export default function RootLayout({
 
   return (
     <html lang="en">
-        //TODO fix up and check ordering
       <body className={isSignUpPage ? "bg-primary" : ""}>
-      <UserContextProvider>
-        <div className="layout-container">
-          <SideNavbar />
-          <section className="viewPort">
-            <main>{children}</main>
-          </section>
-        </div>
-      </UserContextProvider>
+        <UserContextProvider>
+          <div className="layout-container">
+            <SideNavbar />
+            <section className="viewPort">
+              <main>{children}</main>
+            </section>
+          </div>
+        </UserContextProvider>
       </body>
     </html>
   );
