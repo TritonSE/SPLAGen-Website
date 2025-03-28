@@ -8,12 +8,14 @@ const router = express.Router();
 
 /**
  * User directory routes
+ * GET /api/users/whoami - Get current user
  * POST /api/users - Add user to directory
  * DELETE /api/users/:id - Remove user from directory
  * GET /api/users - Get all users in directory
  * GET /api/users/:id - Get specific user from directory
  */
 
+router.get("/whoami", requireSignedIn, UserController.getWhoAmI);
 router.post("/", UserValidator.createUser, UserController.createUser);
 router.delete(
   "/:id",

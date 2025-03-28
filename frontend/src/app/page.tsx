@@ -1,8 +1,10 @@
-"use client"; // This marks the component as a client component
+"use client";
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 
 import { EditBasicInfoModal, External, LanguageSwitcher } from "@/components";
+import { UserContext } from "@/contexts/userContext";
+
 export default function Dashboard() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -13,6 +15,8 @@ export default function Dashboard() {
   const handleCloseModal = () => {
     setIsModalOpen(false);
   };
+
+  const { user } = useContext(UserContext);
   return (
     <div>
       <h1> Dashboard/Home </h1>
@@ -24,6 +28,12 @@ export default function Dashboard() {
           <LanguageSwitcher />
           {/* External is my text component */}
           <External></External>
+
+          {user && (
+            <p>
+              {user.personal.firstName} {user.firebaseId}
+            </p>
+          )}
         </main>
         <button onClick={handleOpenModal}>Open Post Modal</button>
         {/* <DirectoryInfoModal isOpen={isModalOpen} onClose={handleCloseModal} /> */}

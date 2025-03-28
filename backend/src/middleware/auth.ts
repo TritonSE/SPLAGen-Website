@@ -28,7 +28,7 @@ export const requireSignedIn = async (
   res: Response,
   next: NextFunction,
 ) => {
-  // TODO Us this when Firebase is set up
+  // TODO uncomment when Firebase is set up
   // const authHeader = req.headers.authorization;
   // // Token should be "Bearer: <token>"
   // const token = authHeader?.split("Bearer ")[1];
@@ -43,7 +43,7 @@ export const requireSignedIn = async (
   //   return res.status(401).send("Token was invalid.");
   // })
 
-  //TODO: remove temporary user info
+  //TODO: remove temporary user info (the line below)
   const userInfo = { uid: "unique-firebase-id-002" };
   if (userInfo) {
     const user = await UserModel.findOne({ firebaseId: userInfo.uid });
