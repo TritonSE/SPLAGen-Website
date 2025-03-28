@@ -24,9 +24,9 @@ const PhoneDemo: React.FC = () => {
     },
   });
 
-  const onSubmit: SubmitHandler<z.infer<typeof PhoneSchema>> = (data) => {
+  const onSubmit: SubmitHandler<z.infer<typeof PhoneSchema>> = useCallback((data) => {
     console.log(data);
-  };
+  }, []);
 
   const handleFormSubmit = useCallback(
     (e: React.FormEvent<HTMLFormElement>) => {
