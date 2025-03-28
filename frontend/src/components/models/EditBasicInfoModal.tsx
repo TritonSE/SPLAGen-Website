@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
 import React, { useCallback } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
+import { isValidPhoneNumber } from "react-phone-number-input";
 import { z } from "zod";
 
 // import { UserContext } from "@/contexts/userContext";
@@ -28,17 +29,10 @@ const schema = z.object({
   firstName: z.string().min(1, "First Name is required"),
   lastName: z.string().min(1, "Last Name is required"),
   email: z.string().min(1, "Email is required").email("Invalid email format"),
-  phone: z
-    .string()
-    .min(7, "Phone number must be at least 7 characters")
-    .max(15, "Phone number must be at most 15 characters")
-    .regex(phoneRegex, "Invalid phone number format"),
+  phone: z.string().refine(isValidPhoneNumber, {
+    message: "Invalid phone number, include country code and phone number",
+  }),
 });
-
-// Function to normalize phone numbers before sending them
-const normalizePhoneNumber = (phone: string) => {
-  return phone.replace(/[-.\s()]/g, ""); // Remove spaces, dashes, dots, and parentheses
-};
 
 export const EditBasicInfoModal = ({
   isOpen,
@@ -59,24 +53,39 @@ export const EditBasicInfoModal = ({
 
   const onSubmit = useCallback<SubmitHandler<FormData>>(
     async (data) => {
-      const formattedData = {
-        ...data,
-        phone: normalizePhoneNumber(data.phone),
-      };
-
       // const firebaseToken = await firebaseUser?.getIdToken();
       // if (!firebaseToken || editingItemId === null) {
       //  //TODO Error handling?
       //   return;
       // }
 
-      const response = await editBasicInfoRequest(formattedData, "firebaseToken");
+      const response = await editBasicInfoRequest(data, "firebaseToken");
       if (response.success) {
         onClose();
       }
       //TODO: else error handling? PAP's notifications?
     },
     [onClose],
+  );
+
+  //TODO: populate the form with backend data
+  // useEffect(() => {
+  //   // Simulating an API call
+  //   setTimeout(() => {
+  //     const fetchedData = {
+  //       name: "Jane Doe",
+  //       email: "janedoe@example.com",
+  //     };
+  //     reset(fetchedData); // Populates the form with fetched data
+  //   }, 1000);
+  // }, [reset]);
+
+  const handleFormSubmit = useCallback(
+    (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      void handleSubmit(onSubmit)();
+    },
+    [handleSubmit, onSubmit],
   );
 
   return isOpen ? (
@@ -88,13 +97,7 @@ export const EditBasicInfoModal = ({
         <div className="modal-header">
           <h2> Edit Basic Info</h2>
         </div>
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            void handleSubmit(onSubmit)(e);
-          }}
-          className="modal-body"
-        >
+        <form onSubmit={handleFormSubmit} className="modal-body">
           <div className="inputField">
             <label>First Name*</label>
             <input {...register("firstName")} placeholder="First Name" />
@@ -127,7 +130,7 @@ export const EditBasicInfoModal = ({
 
           <div className="inputField">
             <label>Phone*</label>
-            <input type="tel" {...register("phone")} placeholder="Phone" />
+            <input type="tel" {...register("phone")} placeholder="+1 (123) 456 7890" />
             <p className="error">
               {errors.phone?.message && typeof errors.phone.message === "string"
                 ? errors.phone.message
