@@ -1,7 +1,7 @@
 "use client";
 import { usePathname } from "next/navigation";
 
-import { SideNavbar } from "@/components";
+import { Navbar } from "@/components";
 import { UserContextProvider } from "@/contexts/userContext";
 import "./globals.css";
 
@@ -19,7 +19,7 @@ export default function RootLayout({
       <body className={isSignUpPage ? "bg-primary" : ""}>
         <UserContextProvider>
           <div className="layout-container">
-            <SideNavbar />
+            <Navbar />
             <section className="viewPort">
               <main>{children}</main>
             </section>

@@ -4,6 +4,7 @@
 import { ReactNode, createContext, useCallback, useEffect, useState } from "react";
 
 import { User, getWhoAmI } from "@/api/users";
+import { OnboardingStep } from "@/components/navbar/VerticalStepper";
 // import { initFirebase } from "@/firebase/firebase";
 
 //TODO: uncommet firebase code when ready
@@ -12,6 +13,8 @@ type IUserContext = {
   user: User | null;
   loadingUser: boolean;
   reloadUser: () => unknown;
+  onboardingStep: OnboardingStep;
+  setOnboardingStep: (step: OnboardingStep) => void;
 };
 
 /**
@@ -23,6 +26,8 @@ export const UserContext = createContext<IUserContext>({
   user: null,
   loadingUser: true,
   reloadUser: () => undefined,
+  onboardingStep: 0,
+  setOnboardingStep: () => undefined,
 });
 
 /**
@@ -34,6 +39,14 @@ export const UserContextProvider = ({ children }: { children: ReactNode }) => {
   //   const [initialLoading, setInitialLoading] = useState(true);
   const [user, setUser] = useState<User | null>(null);
   const [loadingUser, setLoadingUser] = useState(true);
+  const [onboardingStep, setOnboardingStep] = useState<OnboardingStep>(0);
+
+  const setOnboardingStepHandler = useCallback(
+    (step: OnboardingStep) => {
+      setOnboardingStep(step);
+    },
+    [setOnboardingStep],
+  );
 
   //   const { auth } = initFirebase();
 
@@ -88,11 +101,11 @@ export const UserContextProvider = ({ children }: { children: ReactNode }) => {
     //       }),
     //   );
     // }
-  }, [setUser, setLoadingUser, getWhoAmI]);
+  }, [setUser, setLoadingUser]);
 
   useEffect(() => {
     reloadUser();
-  }, []);
+  }, [reloadUser]);
 
   //TODO: switch to this useeffect when firebase is set up
   // useEffect(reloadUser, [initialLoading, firebaseUser]);
@@ -104,6 +117,8 @@ export const UserContextProvider = ({ children }: { children: ReactNode }) => {
         user,
         loadingUser,
         reloadUser,
+        onboardingStep,
+        setOnboardingStep: setOnboardingStepHandler,
       }}
     >
       {children}

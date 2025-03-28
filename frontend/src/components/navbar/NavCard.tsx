@@ -27,7 +27,7 @@ export const NavCard = ({ iconLight, iconDark, message, navigateTo }: CardProps)
         width={24}
         height={24}
       />
-      {message}
+      <span> {message} </span>
     </Link>
   );
 };

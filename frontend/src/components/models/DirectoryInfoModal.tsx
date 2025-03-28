@@ -58,22 +58,19 @@ export const DirectoryInfoModal: React.FC<DirectoryInfoModalProps> = ({ isOpen, 
     resolver: zodResolver(directoryInfoSchema),
   });
 
-  const onSubmit = useCallback<SubmitHandler<DirectoryInfoFormData>>(
-    (data) => {
-      const formattedData = {
-        ...data,
-        country: data.country.label,
-      };
+  const onSubmit = useCallback<SubmitHandler<DirectoryInfoFormData>>((data) => {
+    const formattedData = {
+      ...data,
+      country: data.country.label,
+    };
 
-      try {
-        //TODO Submit to backend
-        console.log("data", formattedData);
-      } catch (error) {
-        console.error("Request failed:", error);
-      }
-    },
-    [onClose],
-  );
+    try {
+      //TODO Submit to backend
+      console.log("data", formattedData);
+    } catch (error) {
+      console.error("Request failed:", error);
+    }
+  }, []);
 
   const handleFormSubmit = useCallback(
     (e: React.FormEvent<HTMLFormElement>) => {
