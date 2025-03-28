@@ -1,10 +1,10 @@
 export { CountrySelector } from "./CountrySelector";
-export { EditBasicInfoModal } from "./EditBasicInfoModal";
+export { EditBasicInfoModal } from "./models/EditBasicInfoModal";
 export { Checkmark } from "./CheckMark";
 export { LanguageSwitcher } from "./languageSwitcher";
-export { NavCard } from "./NavCard";
-export { Navbar } from "./Navbar";
+export { NavCard } from "./navbar/NavCard";
+export { Navbar } from "./navbar/Navbar";
 export { External } from "./translationDemo";
-export { CreatePostModal } from "./CreatePostModal";
-export { DirectoryInfoModal } from "./DirectoryInfoModal";
-export { VerticalStepper } from "./VerticalStepper";
+export { CreatePostModal } from "./models/CreatePostModal";
+export { DirectoryInfoModal } from "./models/DirectoryInfoModal";
+export { VerticalStepper } from "./navbar/VerticalStepper";

@@ -4,7 +4,7 @@
 import { ReactNode, createContext, useCallback, useEffect, useState } from "react";
 
 import { User, getWhoAmI } from "@/api/users";
-import { OnboardingStep } from "@/components/VerticalStepper";
+import { OnboardingStep } from "@/components/navbar/VerticalStepper";
 // import { initFirebase } from "@/firebase/firebase";
 
 //TODO: uncommet firebase code when ready
