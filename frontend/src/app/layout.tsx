@@ -19,7 +19,7 @@ export default function RootLayout({
       <body className={isSignUpPage ? "bg-primary" : ""}>
         <UserContextProvider>
           <div className="layout-container">
-          <Navbar />
+            <Navbar />
             <section className="viewPort">
               <main>{children}</main>
             </section>

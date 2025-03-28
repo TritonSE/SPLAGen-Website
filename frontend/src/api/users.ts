@@ -5,7 +5,7 @@ import { APIResult, get, handleAPIError, post } from "./requests";
 export type User = {
   _id: string;
   firebaseId: string;
-  role: string;
+  role: "member" | "admin" | "superadmin";
   personal: {
     firstName: string;
     lastName: string;

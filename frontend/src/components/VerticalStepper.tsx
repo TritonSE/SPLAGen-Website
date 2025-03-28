@@ -1,9 +1,11 @@
 import { Step } from "./Step";
 import styles from "./VerticalStepper.module.css";
 
+export type OnboardingStep = 0 | 1 | 2;
+
 type VerticalStepperProps = {
   steps: string[];
-  activeStep: number;
+  activeStep: OnboardingStep | 3;
 };
 
 export const VerticalStepper: React.FC<VerticalStepperProps> = ({ steps, activeStep }) => {

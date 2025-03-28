@@ -31,7 +31,7 @@ export default function Dashboard() {
 
           {user && (
             <p>
-              {user.personal.firstName} {user.firebaseId}
+              {user.personal.firstName} {user.role}
             </p>
           )}
         </main>

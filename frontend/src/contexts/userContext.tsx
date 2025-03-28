@@ -4,6 +4,7 @@
 import { ReactNode, createContext, useCallback, useEffect, useState } from "react";
 
 import { User, getWhoAmI } from "@/api/users";
+import { OnboardingStep } from "@/components/VerticalStepper";
 // import { initFirebase } from "@/firebase/firebase";
 
 //TODO: uncommet firebase code when ready
@@ -12,6 +13,8 @@ type IUserContext = {
   user: User | null;
   loadingUser: boolean;
   reloadUser: () => unknown;
+  onboardingStep: OnboardingStep;
+  setOnboardingStep: (step: OnboardingStep) => void;
 };
 
 /**
@@ -23,6 +26,8 @@ export const UserContext = createContext<IUserContext>({
   user: null,
   loadingUser: true,
   reloadUser: () => undefined,
+  onboardingStep: 1,
+  setOnboardingStep: () => undefined,
 });
 
 /**
@@ -34,6 +39,11 @@ export const UserContextProvider = ({ children }: { children: ReactNode }) => {
   //   const [initialLoading, setInitialLoading] = useState(true);
   const [user, setUser] = useState<User | null>(null);
   const [loadingUser, setLoadingUser] = useState(true);
+  const [onboardingStep, setOnboardingStep] = useState<OnboardingStep>(0);
+
+  const setOnboardingStepHandler = useCallback((step: OnboardingStep) => {
+    setOnboardingStep(step);
+  }, []);
 
   //   const { auth } = initFirebase();
 
@@ -104,6 +114,8 @@ export const UserContextProvider = ({ children }: { children: ReactNode }) => {
         user,
         loadingUser,
         reloadUser,
+        onboardingStep,
+        setOnboardingStep: setOnboardingStepHandler,
       }}
     >
       {children}
