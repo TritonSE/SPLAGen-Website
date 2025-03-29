@@ -40,6 +40,7 @@ export default function Dashboard() {
         {/* <DirectoryInfoModal isOpen={isModalOpen} onClose={handleCloseModal} /> */}
         <EditBasicInfoModal isOpen={isModalOpen} onClose={handleCloseModal} />
         {/* <CreatePostModal isOpen={isModalOpen} onClose={handleCloseModal} /> */}
+        {/* <ProfessionalInfoModal isOpen={isModalOpen} onClose={handleCloseModal} /> */}
       </div>
     </div>
   );
