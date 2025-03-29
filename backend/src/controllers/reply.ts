@@ -1,20 +1,26 @@
-import { NextFunction, Request, Response } from "express";
-import Reply from "../models/reply";
+import { NextFunction, Response } from "express";
 
-// Temporary storage until database is set up
-type Reply = {
-  id: number;
-  discussionId: number;
-  content: string;
-  userId: string;
+import { AuthenticatedRequest } from "../middleware/auth";
+import Reply from "../models/reply";
+import { UserRole } from "../models/user";
+
+type CreateReplyRequestBody = {
+  postId: string;
+  message: string;
 };
 
-// Temporary storage until database is set up
-const replies: Reply[] = [];
+type EditReplyRequestBody = {
+  message: string;
+};
 
-export const createReply = async (req: Request, res: Response, next: NextFunction) => {
+export const createReply = async (
+  req: AuthenticatedRequest<unknown, unknown, CreateReplyRequestBody>,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
-    const { userId, postId, message } = req.body;
+    const userId = req.mongoID;
+    const { postId, message } = req.body;
 
     const newReply = new Reply({ userId, postId, message });
     await newReply.save();
@@ -25,7 +31,11 @@ export const createReply = async (req: Request, res: Response, next: NextFunctio
   }
 };
 
-export const getReplies = async (req: Request, res: Response, next: NextFunction) => {
+export const getReplies = async (
+  req: AuthenticatedRequest<{ postId: string }>,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const { postId } = req.params;
     const discussionReplies = await Reply.find({ postId });
@@ -35,37 +45,69 @@ export const getReplies = async (req: Request, res: Response, next: NextFunction
   }
 };
 
-export const editReply = async (req: Request, res: Response, next: NextFunction) => {
+export const editReply = async (
+  req: AuthenticatedRequest<{ id: string }, unknown, EditReplyRequestBody>,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
+    const userUid = req.mongoID;
     const { id } = req.params;
     const { message } = req.body;
 
-    //TODO: verify that user can edit
-    const updatedReply = await Reply.findByIdAndUpdate(id, { message }, { new: true });
-    if (!updatedReply) {
+    // Find the reply by ID
+    const reply = await Reply.findById(id);
+    if (!reply) {
       res.status(404).json({ error: "Reply not found" });
+      return;
     }
 
-    res.status(200).json({ message: "Reply updated successfully", reply: updatedReply });
+    // Check if the user is the owner of the reply
+    if (!reply.userId.equals(userUid)) {
+      res.status(403).json({ error: "Unauthorized: You can only edit your own replies" });
+      return;
+    }
+
+    // Update the reply
+    reply.message = message;
+    await reply.save();
+
+    res.status(200).json({ message: "Reply updated successfully", reply });
   } catch (error) {
     next(error);
   }
 };
 
-export const deleteReply = async (req: Request, res: Response, next: NextFunction) => {
+export const deleteReply = async (
+  req: AuthenticatedRequest<{ id: string }>,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const { id } = req.params;
+    const userUid = req.mongoID;
+    const role = req.role;
 
-    //TODO: check that user can delete reply user/admin
-    const deletedReply = await Reply.findByIdAndDelete(id);
-    if (!deletedReply) {
+    // Find the reply by ID
+    const reply = await Reply.findById(id);
+    if (!reply) {
       res.status(404).json({ error: "Reply not found" });
-    }
-    const reply = replies[replyIndex];
-    if (reply.userId !== userUid) {
-      res.status(403).json({ error: "Unauthorized: You can only delete your own replies" });
       return;
     }
+
+    // Check if the user is the owner of the reply or an admin
+    if (
+      !reply.userId.equals(userUid) &&
+      ![UserRole.ADMIN, UserRole.SUPERADMIN].includes(role as UserRole)
+    ) {
+      res
+        .status(403)
+        .json({ error: "Unauthorized: You can only delete your own posts or are an admin" });
+      return;
+    }
+
+    // Delete the reply
+    await Reply.deleteOne({ _id: id });
 
     res.status(200).json({ message: "Reply deleted successfully" });
   } catch (error) {
