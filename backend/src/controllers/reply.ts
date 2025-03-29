@@ -1,129 +1,116 @@
-import { Request, Response } from "express";
+import { NextFunction, Response } from "express";
 
-// Temporary storage until database is set up
-type Reply = {
-  id: number;
-  discussionId: number;
-  content: string;
-  userId: string;
+import { AuthenticatedRequest } from "../middleware/auth";
+import Reply from "../models/reply";
+import { UserRole } from "../models/user";
+
+type CreateReplyRequestBody = {
+  postId: string;
+  message: string;
 };
 
-// Temporary storage until database is set up
-const replies: Reply[] = [];
+type EditReplyRequestBody = {
+  message: string;
+};
 
-export const createReply = (req: Request, res: Response) => {
+export const createReply = async (
+  req: AuthenticatedRequest<unknown, unknown, CreateReplyRequestBody>,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
-    const { discussionId, content, userUid } = req.body as {
-      discussionId: string;
-      content: string;
-      userUid: string;
-    };
+    const userId = req.mongoID;
+    const { postId, message } = req.body;
 
-    if (!discussionId || !content) {
-      res.status(400).json({ error: "discussionId and content are required" });
-      return;
-    }
-    if (!userUid) {
-      res.status(403).json({ error: "User not signed in" });
-      return;
-    }
+    const newReply = new Reply({ userId, postId, message });
+    await newReply.save();
 
-    const newReply: Reply = {
-      id: replies.length + 1,
-      discussionId: parseInt(discussionId, 10),
-      content,
-      userId: userUid,
-    };
-
-    replies.push(newReply);
     res.status(201).json({ message: "Reply created successfully", reply: newReply });
   } catch (error) {
-    console.error("Error creating reply:", error);
-    res.status(500).json({ error: "Internal server error" });
+    next(error);
   }
 };
 
-export const getReplies = (req: Request, res: Response) => {
+export const getReplies = async (
+  req: AuthenticatedRequest<{ postId: string }>,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
-    const discussionId = parseInt(req.params.discussionId, 10);
-
-    if (isNaN(discussionId)) {
-      res.status(400).json({ error: "Valid Discussion ID is required" });
-      return;
-    }
-
-    const discussionReplies = replies.filter((reply) => reply.discussionId === discussionId);
-
+    const { postId } = req.params;
+    const discussionReplies = await Reply.find({ postId });
     res.status(200).json({ replies: discussionReplies });
   } catch (error) {
-    console.error("Error fetching replies:", error);
-    res.status(500).json({ error: "Internal server error" });
+    next(error);
   }
 };
 
-export const editReply = (req: Request, res: Response) => {
+export const editReply = async (
+  req: AuthenticatedRequest<{ id: string }, unknown, EditReplyRequestBody>,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
-    const id = parseInt(req.params.id, 10);
-    const { content, userUid } = req.body as { content: string; userUid: string };
+    const userUid = req.mongoID;
+    const { id } = req.params;
+    const { message } = req.body;
 
-    if (!content) {
-      res.status(400).json({ error: "Content is required to update reply" });
-      return;
-    }
-
-    if (!userUid) {
-      res.status(403).json({ error: "User not signed in" });
-      return;
-    }
-
-    const reply = replies.find((r) => r.id === id);
+    // Find the reply by ID
+    const reply = await Reply.findById(id);
     if (!reply) {
       res.status(404).json({ error: "Reply not found" });
       return;
     }
 
-    if (reply.userId !== userUid) {
+    // Check if the user is the owner of the reply
+    if (!reply.userId.equals(userUid)) {
       res.status(403).json({ error: "Unauthorized: You can only edit your own replies" });
       return;
     }
 
-    reply.content = content;
+    // Update the reply
+    reply.message = message;
+    await reply.save();
+
     res.status(200).json({ message: "Reply updated successfully", reply });
   } catch (error) {
-    console.error("Error editing reply:", error);
-    res.status(500).json({ error: "Internal server error" });
+    next(error);
   }
 };
 
-export const deleteReply = (req: Request, res: Response) => {
+export const deleteReply = async (
+  req: AuthenticatedRequest<{ id: string }>,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
-    const id = parseInt(req.params.id, 10);
-    const { userUid } = req.body as { userUid: string };
+    const { id } = req.params;
+    const userUid = req.mongoID;
+    const role = req.role;
 
-    if (isNaN(id)) {
-      res.status(400).json({ error: "Valid Reply ID is required" });
-      return;
-    }
-    if (!userUid) {
-      res.status(403).json({ error: "User not signed in" });
-      return;
-    }
-
-    const replyIndex = replies.findIndex((reply) => reply.id === id);
-    if (replyIndex === -1) {
+    // Find the reply by ID
+    const reply = await Reply.findById(id);
+    if (!reply) {
       res.status(404).json({ error: "Reply not found" });
       return;
     }
-    const reply = replies[replyIndex];
-    if (reply.userId !== userUid) {
-      res.status(403).json({ error: "Unauthorized: You can only delete your own replies" });
+
+    // Check if the user is the owner of the reply or an admin
+    if (
+      !reply.userId.equals(userUid) &&
+      ![UserRole.ADMIN, UserRole.SUPERADMIN].includes(role as UserRole)
+    ) {
+      res
+        .status(403)
+        .json({ error: "Unauthorized: You can only delete your own posts or are an admin" });
       return;
     }
 
-    replies.splice(replyIndex, 1);
+    // Delete the reply
+    await Reply.deleteOne({ _id: id });
+
     res.status(200).json({ message: "Reply deleted successfully" });
   } catch (error) {
-    console.error("Error deleting reply:", error);
-    res.status(500).json({ error: "Internal server error" });
+    next(error);
   }
 };

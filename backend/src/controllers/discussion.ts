@@ -3,6 +3,7 @@ import { Types } from "mongoose";
 
 import { AuthenticatedRequest } from "../middleware/auth";
 import discussionPost from "../models/discussionPost";
+import Reply from "../models/reply";
 import { UserRole } from "../models/user";
 
 type DiscussionRequestBody = {
@@ -110,11 +111,20 @@ export const deleteDiscussion = async (
       !discussion.userId.equals(userUid) &&
       ![UserRole.ADMIN, UserRole.SUPERADMIN].includes(role as UserRole)
     ) {
-      res.status(403).json({ error: "Unauthorized: You can only delete your own posts" });
+      res
+        .status(403)
+        .json({ error: "Unauthorized: You can only delete your own posts or are an admin" });
       return;
     }
 
-    await discussionPost.deleteOne({ _id: id });
+    const result = await discussionPost.deleteOne({ _id: id });
+    if (!result.acknowledged) {
+      res.status(400).json({ error: "Discussion was not deleted" });
+      return;
+    }
+
+    // Delete replies associated with the discussion
+    await Reply.deleteMany({ postId: id });
 
     res.status(200).json({ message: "Discussion deleted successfully" });
   } catch (error) {
@@ -132,6 +142,13 @@ export const deleteMultipleDiscussions = async (
     const { ids } = req.body;
 
     const result = await discussionPost.deleteMany({ _id: { $in: ids } });
+    if (!result.acknowledged) {
+      res.status(400).json({ error: "Discussions was not deleted" });
+      return;
+    }
+
+    // Delete replies associated with the discussions
+    await Reply.deleteMany({ postId: { $in: ids } });
 
     res.status(200).json({
       message: `${result.deletedCount.toString()} discussion(s) deleted successfully`,
