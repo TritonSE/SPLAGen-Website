@@ -21,10 +21,6 @@ type FormData = {
   phone: string;
 };
 
-//Source: https://gist.github.com/jacurtis/ccb9ad32664d3b894c12
-//eslint-disable-next-line
-const phoneRegex = /\+?([\d|\(][\h|\(\d{3}\)|\.|\-|\d]{4,}\d)/;
-
 const schema = z.object({
   firstName: z.string().min(1, "First Name is required"),
   lastName: z.string().min(1, "Last Name is required"),
