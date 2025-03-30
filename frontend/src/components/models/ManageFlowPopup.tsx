@@ -101,12 +101,10 @@ export const InviteAdminPopup = ({
   user,
   onCancel,
   isOpen,
-  // onConfirm,
 }: {
   user: { name: string; userId: string };
   isOpen: boolean;
   onCancel: () => void;
-  // onConfirm: () => void;
 }) => {
   const onConfirm = () => {
     //TODO send request to backend
