@@ -10,3 +10,10 @@ export { DirectoryInfoModal } from "./models/DirectoryInfoModal";
 export { VerticalStepper } from "./navbar/VerticalStepper";
 export { ProfessionalInfoModal } from "./models/ProfessionalInfoModal";
 export { PillButton } from "./PillButton";
+export { Button } from "./Button";
+export {
+  DenyDirectoryRequestPopup,
+  ApproveDirectoryRequestPopup,
+  InviteAdminPopup,
+  RemoveAdminPopup,
+} from "./models/ManageFlowPopup";

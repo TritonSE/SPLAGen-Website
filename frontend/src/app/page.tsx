@@ -20,11 +20,18 @@ export default function Dashboard() {
   return (
     <div>
       <h1> Dashboard/Home </h1>
-      <Link href="/login">go to login</Link>
+      <p>
+        <Link href="/login">go to login</Link>
+      </p>
+      <p>
+        <Link href="/phoneInputDemo"> Go to phone input demo </Link>
+      </p>
+      <p>
+        <Link href="flowPopupDemo"> Go to flow popup demo </Link>
+      </p>
 
       <div className="grid grid-rows-[20px_1fr_20px] items-center min-h-screen">
         <main className="flex flex-col gap-8 row-start-2 items-center">
-          <Link href="/phoneInputDemo"> Go to phone input demo </Link>
           {/* Added the LanguageSwitcher component */}
           <LanguageSwitcher />
           {/* External is my text component */}
@@ -35,12 +42,12 @@ export default function Dashboard() {
               {user.personal.firstName} {user.role}
             </p>
           )}
+          <button onClick={handleOpenModal}>Open Post Modal</button>
+          {/* <DirectoryInfoModal isOpen={isModalOpen} onClose={handleCloseModal} /> */}
+          <EditBasicInfoModal isOpen={isModalOpen} onClose={handleCloseModal} />
+          {/* <CreatePostModal isOpen={isModalOpen} onClose={handleCloseModal} /> */}
+          {/* <ProfessionalInfoModal isOpen={isModalOpen} onClose={handleCloseModal} /> */}
         </main>
-        <button onClick={handleOpenModal}>Open Post Modal</button>
-        {/* <DirectoryInfoModal isOpen={isModalOpen} onClose={handleCloseModal} /> */}
-        <EditBasicInfoModal isOpen={isModalOpen} onClose={handleCloseModal} />
-        {/* <CreatePostModal isOpen={isModalOpen} onClose={handleCloseModal} /> */}
-        {/* <ProfessionalInfoModal isOpen={isModalOpen} onClose={handleCloseModal} /> */}
       </div>
     </div>
   );
