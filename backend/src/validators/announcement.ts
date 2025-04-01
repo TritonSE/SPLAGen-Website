@@ -5,7 +5,7 @@ import { validateRequest } from "./validateRequestHelper";
 export const createAnnouncement = [
   body("title").isString().notEmpty().trim().withMessage("Title is required"),
   body("message").isString().notEmpty().trim().withMessage("Message text is required"),
-  body("receipients")
+  body("recipients")
     .custom((value) => {
       if (typeof value === "string") {
         return value === "everyone";

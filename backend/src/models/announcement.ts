@@ -4,7 +4,7 @@ const announcementSchema = new Schema(
   {
     userId: { type: Schema.Types.ObjectId, required: true },
     title: { type: String, required: true },
-    receipients: {
+    recipients: {
       type: Schema.Types.Mixed, // Allows either a string or an array
       required: true,
       default: "everyone",

@@ -7,7 +7,7 @@ import { UserRole } from "../models/user";
 type createAnnouncementRequestBody = {
   title: string;
   message: string;
-  receipients: "everyone" | string[];
+  recipients: "everyone" | string[];
 };
 
 export const createAnnouncement = async (
@@ -16,10 +16,10 @@ export const createAnnouncement = async (
   next: NextFunction,
 ) => {
   try {
-    const { title, message, receipients } = req.body;
+    const { title, message, recipients } = req.body;
     const userId = req.mongoID;
 
-    const newAnnouncement = new Announcement({ userId, title, message, receipients });
+    const newAnnouncement = new Announcement({ userId, title, message, recipients });
 
     await newAnnouncement.save();
     res
@@ -58,7 +58,7 @@ export const getMultipleAnnouncements = async (
     let query = {};
     if (![UserRole.ADMIN, UserRole.SUPERADMIN].includes(userRole as UserRole)) {
       // If the user is not an admin or super admin, filter announcements by their email
-      query = { receipients: { $in: [userEmail, "everyone"] } };
+      query = { recipients: { $in: [userEmail, "everyone"] } };
     }
 
     const announcements = await Announcement.find(query);
