@@ -17,6 +17,7 @@ export type AuthenticatedRequest<P = unknown, ResBody = unknown, ReqBody = unkno
   firebaseUid?: string;
   mongoID?: Types.ObjectId;
   role?: string;
+  userEmail?: string;
 };
 
 /**
@@ -44,7 +45,8 @@ export const requireSignedIn = async (
   // })
 
   //TODO: remove temporary user info (the line below)
-  const userInfo = { uid: "unique-firebase-id-002" };
+  const userInfo = { uid: "unique-firebase-id-001" }; //MEMBER
+  // const userInfo = { uid: "unique-firebase-id-002" }; //admin
   if (userInfo) {
     const user = await UserModel.findOne({ firebaseId: userInfo.uid });
 
@@ -56,6 +58,8 @@ export const requireSignedIn = async (
     req.firebaseUid = userInfo.uid;
     req.role = user.role;
     req.mongoID = user._id;
+    req.userEmail = user.personal?.email;
+
     next();
     return;
   }

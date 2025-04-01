@@ -49,7 +49,7 @@ app.use(
   }),
 );
 
-app.use("/api/announcement", announcementRoutes);
+app.use("/api/announcements", announcementRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/discussions", discussionRoutes);
 app.use("/api/replies", replyRoutes);
