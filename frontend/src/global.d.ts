@@ -7,10 +7,20 @@ declare module "little-state-machine" {
     onboardingForm: {
       professionalTitle: string;
       country: CountryOption;
-      languages: string[];
-      accredited: boolean;
-      advancedDegree: boolean;
-      
+      languages: string[]; // check all we need
+      membership: string;
+      // Associate specific
+      specializations: string[];
+      isOrganizationRepresentative: boolean;
+      jobTitle: string;
+      organizationName: string;
+      // Student specific
+      degree: string;
+      schoolCountry: CountryOption;
+      schoolName: string;
+      universityEmail: string;
+      programName: string;
+      graduationDate: string;
     };
     directoryForm: {
       field: string;

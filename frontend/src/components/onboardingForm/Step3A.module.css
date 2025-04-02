@@ -1,0 +1,90 @@
+.container {
+    width: 654px;
+    gap: 45;
+    padding: 52px 63px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-radius: 15px;
+    flex-shrink: 0;
+    background: #FFF;
+    margin: -40px;
+    margin-left: -108px;
+}
+
+.welcome {
+    width: 100%; /* Take full width of container */
+    color: var(--Primary-Blue-2, #3B3B62);
+    text-align: center; /* Changed from center to left as per "align-self: start" in your original */
+    /* font-family: "DM Sans"; */
+    font-size: 32px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+    margin: 0; /* Reset default margins */
+}
+
+.iconContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+}
+
+.text {
+    color: #000;
+    text-align: center;
+    /* font-family: "DM Sans"; */
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.membershipCategory {
+    color: var(--Primary-Blue-2, #3B3B62);
+    font-family: "DM Sans", sans-serif;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+    display: inline;
+}
+
+.buttonContainer {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.backButton {
+    color: #000;
+    text-align: center;
+    font-family: "DM Sans", sans-serif;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 24px; /* 120% */
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 12px 24px;
+}
+
+.continueButton {
+    display: flex;
+    padding: 12px 24px;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    border-radius: 10px;
+    background: #211E62;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-family: "DM Sans", sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+}

@@ -12,9 +12,11 @@ import updateOnboardingForm from "@/state/updateOnboardingForm";
 type Step2Props = {
   onNext: (data: onboardingState["data"]) => void;
   onBack: () => void;
+  onStudentFlow: () => void;
+  onAssociateFlow: () => void;
 };
 
-export const Step2: React.FC<Step2Props> = ({ onNext, onBack }) => {
+export const Step2: React.FC<Step2Props> = ({ onNext, onBack, onStudentFlow, onAssociateFlow }) => {
   const { state, actions } = useStateMachine({ actions: { updateOnboardingForm } });
   const [answers, setAnswers] = useState<Record<string, string>>({}); // To store all question answers
 
@@ -38,16 +40,47 @@ export const Step2: React.FC<Step2Props> = ({ onNext, onBack }) => {
       }
   
       setAnswers(updatedAnswers);
-      actions.updateOnboardingForm(updatedAnswers);
   
-      // If the first question is "Yes," trigger `onNext` immediately
-      if ((question === "field1" && answer === "yes") || question === "field3") {
-        const updatedData = {...state.onboardingForm, updatedAnswers}
+      if (question === "field1" && answer === "yes") {
+        const updatedData = {
+          ...state.onboardingForm,
+          membership: "Healthcare Professional"
+        };
         actions.updateOnboardingForm(updatedData);
         onNext(updatedData);
       }
+      
+      // If the third question is answered and is "Yes", trigger onNext
+      if (question === "field3") {
+        const updatedData = {
+          ...state.onboardingForm,
+          membership: "Healthcare Professional"
+        };
+        actions.updateOnboardingForm(updatedData);
+        onNext(updatedData);
+      }
+      
+      // If they select Student, go to Student flow
+      if (question === "field4" && answer === "Student") {
+        const updatedData = {
+          ...state.onboardingForm,
+          membership: "Student"
+        };
+        actions.updateOnboardingForm(updatedData);
+        onStudentFlow();
+      }
+      
+      // If they select Associate Member, go to Associate flow
+      if (question === "field4" && answer === "Associate Member") {
+        const updatedData = {
+          ...state.onboardingForm,
+          membership: "Associate Member"
+        };
+        actions.updateOnboardingForm(updatedData);
+        onAssociateFlow();
+      }
     },
-    [answers, actions.updateOnboardingForm, onNext]
+    [answers, actions, state.onboardingForm, onNext, onStudentFlow, onAssociateFlow]
   );
 
   // Render the questions dynamically based on the answers
@@ -79,7 +112,7 @@ export const Step2: React.FC<Step2Props> = ({ onNext, onBack }) => {
         {answers.field1 === "no" && (
           <div>
             <p className={styles.subtitle}>
-            Do you hold a MD, master’s or PhD in a field such as medicine, nursing, social work, biology, public health?
+            Do you hold a MD, master&apos;s or PhD in a field such as medicine, nursing, social work, biology, public health?
             </p>
             <div className={styles.buttonGroup}>
               <Radio

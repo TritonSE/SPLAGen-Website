@@ -1,16 +1,21 @@
 "use client";
 
 import { useStateMachine } from "little-state-machine";
+import Image from "next/image";
 import React from "react";
 
+import styles from "./Step3A.module.css";
+
+import { onboardingState } from "@/state/stateTypes";
+
 type Step3AProps = {
-  onNext: () => void;
+  onNext: (data: onboardingState["data"]) => void;
   onBack: () => void;
 };
 
 export const Step3A: React.FC<Step3AProps> = ({ onNext, onBack }) => {
   const { state } = useStateMachine();
-  const membershipType = state.onboardingForm.membership; // Assuming field4 stores membership type
+  const membershipType = state.onboardingForm.membership;
 
   let membershipText = "";
 
@@ -18,28 +23,40 @@ export const Step3A: React.FC<Step3AProps> = ({ onNext, onBack }) => {
     case "Student":
       membershipText = "a Student";
       break;
-    case "Associate Member":
-      membershipText = "an Associate Member";
+    case "Healthcare Professional":
+      membershipText = "a Healthcare Professional";
       break;
     default:
-        membershipText = "a Healthcare Professional";
+        membershipText = "an Associate Member";
   }
 
   const handleContinue = () => {
-    onNext();
+    onNext(state.onboardingForm);
   };
 
   return (
-    <div className="space-y-4">
-      <h2>Welcome to SPLAGen!</h2>
+    <div className={styles.container}>
+      <h2 className={styles.welcome}>Welcome to SPLAGen!</h2>
+      
+      <div className={styles.iconContainer}>
+        <Image 
+          src="/icons/ic_round-check-box.svg"
+          alt="Checkbox icon"
+          width={81}
+          height={81}
+        />
+      </div>
 
-      <p>You are being added to SPLAGEN&apos;s full membership as {membershipText}.</p>
+      <p className={styles.text}>
+        You are being added to SPLAGen&apos;s full membership as {" "}
+        <span className={styles.membershipCategory}>{membershipText}</span>.
+      </p>
 
-      <div className="flex justify-between">
-        <button type="button" onClick={onBack} className="px-4 py-2 bg-gray-500 text-white rounded">
+      <div className={styles.buttonContainer}>
+        <button type="button" onClick={onBack} className={styles.backButton}>
           Back
         </button>
-        <button type="button" onClick={handleContinue} className="px-4 py-2 bg-blue-500 text-white rounded">
+        <button type="button" onClick={handleContinue} className={styles.continueButton}>
           Continue
         </button>
       </div>
