@@ -8,7 +8,7 @@ const initialState: GlobalState = {
     membership: "",
     // Associate
     specializations: [],
-    isOrganizationRepresentative: false, // null?
+    isOrganizationRepresentative: "",
     jobTitle: "",
     organizationName: "",
     // Student

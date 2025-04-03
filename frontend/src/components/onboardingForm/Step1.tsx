@@ -144,7 +144,7 @@ export const Step1 = ({ onNext }: Step1Props) => {
                 setHealthcareExpanded(!healthcareExpanded);
               }}
             >
-              <span className={styles.expandIcon}>{healthcareExpanded ? "-" : "+"}</span>
+              <span className={styles.expandIcon}>{healthcareExpanded ? "X" : "+"}</span>
               <h4 className={styles.expandableTitle}>Healthcare Provider Membership</h4>
             </div>
 
@@ -167,7 +167,7 @@ export const Step1 = ({ onNext }: Step1Props) => {
                 setAssociateExpanded(!associateExpanded);
               }}
             >
-              <span className={styles.expandIcon}>{associateExpanded ? "−" : "+"}</span>
+              <span className={styles.expandIcon}>{associateExpanded ? "X" : "+"}</span>
               <h4 className={styles.expandableTitle}>Associate Membership</h4>
             </div>
 
@@ -191,7 +191,7 @@ export const Step1 = ({ onNext }: Step1Props) => {
                 setGeneticExpanded(!geneticExpanded);
               }}
             >
-              <span className={styles.expandIcon}>{geneticExpanded ? "−" : "+"}</span>
+              <span className={styles.expandIcon}>{geneticExpanded ? "X" : "+"}</span>
               <h4 className={styles.expandableTitle}>Genetic Counselor Membership</h4>
             </div>
 
@@ -215,7 +215,7 @@ export const Step1 = ({ onNext }: Step1Props) => {
                 setStudentExpanded(!studentExpanded);
               }}
             >
-              <span className={styles.expandIcon}>{studentExpanded ? "−" : "+"}</span>
+              <span className={styles.expandIcon}>{studentExpanded ? "X" : "+"}</span>
               <h4 className={styles.expandableTitle}>Student Membership</h4>
             </div>
 
@@ -229,8 +229,11 @@ export const Step1 = ({ onNext }: Step1Props) => {
           </div>
         </div>
         
-        <div>
-          <button type="submit">Next</button>
+        <div className={styles.buttonContainer}>
+          <button type="button" className={styles.backButton}>  {/* make on back */}
+            Back
+          </button>
+          <button type="submit" className={styles.continueButton}>Continue</button>
         </div>
       </form>
     </div>

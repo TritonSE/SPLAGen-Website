@@ -62,26 +62,41 @@
   background-color: var(--color-primary1);
 }
 
-.navigation {
-  margin-top: 24px;
+.buttonContainer {
   display: flex;
-  justify-content: flex-start;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.continueButton {
+  display: flex;
+  padding: 12px 24px;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  border-radius: 10px;
+  background: #211E62;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-family: "DM Sans", sans-serif;
+  font-size: 16px;
 }
 
 .backButton {
-  padding: 12px 24px;
-  border-radius: 5px;
-  background-color: #6c757d;
-  color: white;
-  border: none;
-  font-family: "DM-sans", sans-serif;
-  font-size: 18px;
+  color: #000;
+  text-align: center;
+  font-family: "DM Sans", sans-serif;
+  font-size: 20px;
+  font-style: normal;
   font-weight: 500;
+  line-height: 24px; /* 120% */
+  background: transparent;
+  border: none;
   cursor: pointer;
-}
-
-.backButton:hover {
-  background-color: #5a6268;
+  padding: 12px 24px;
 }
 
 .expandableSection:empty {

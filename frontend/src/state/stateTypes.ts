@@ -7,8 +7,9 @@ export type onboardingState = {
     languages: string[];
     membership: string;
     // Associate specific
+    // see user modal
     specializations: string[];
-    isOrganizationRepresentative: boolean;
+    isOrganizationRepresentative: string;
     jobTitle: string;
     organizationName: string;
     // Student specific

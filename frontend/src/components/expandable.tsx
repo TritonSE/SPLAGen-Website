@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import styles from "@/components/onboardingForm/Step2.module.css";
+import styles from "@/components/expandable.module.css";
 
 export const ExpandableSection = ({ title, content }: { title: string; content: string }) => {
   const [expanded, setExpanded] = useState(false);
@@ -13,7 +13,7 @@ export const ExpandableSection = ({ title, content }: { title: string; content: 
         className={styles.expandableHeader}
         onClick={() => { setExpanded(!expanded); }}
       >
-        <span className={styles.expandIcon}>{expanded ? "-" : "+"}</span>
+        <span className={styles.expandIcon}>{expanded ? "X" : "+"}</span>
         <h4 className={styles.expandableTitle}>{title}</h4>
       </div>
       {expanded && <div className={styles.expandableContent}><p>{content}</p></div>}

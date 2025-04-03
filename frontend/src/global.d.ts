@@ -11,7 +11,7 @@ declare module "little-state-machine" {
       membership: string;
       // Associate specific
       specializations: string[];
-      isOrganizationRepresentative: boolean;
+      isOrganizationRepresentative: string;
       jobTitle: string;
       organizationName: string;
       // Student specific

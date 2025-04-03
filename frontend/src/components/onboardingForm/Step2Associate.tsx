@@ -62,7 +62,7 @@ export const Step2Associate = ({ onNext, onBack }: Step2AssociateProps) => {
   };
 
   const handleRepresentativeSelection = (value: string) => {
-    setValue("isOrganizationRepresentative", value === "yes");
+    setValue("isOrganizationRepresentative", value);
   };
 
   return (
@@ -112,18 +112,18 @@ export const Step2Associate = ({ onNext, onBack }: Step2AssociateProps) => {
         <div>
           <label className={styles.label}>Are you a representative of an organization?</label>
           <div className={styles.radioGroup}>
-            <Radio
-              id="representative-yes"
-              label="Yes"
-              checked={isRepresentative}
-              onChange={() => { handleRepresentativeSelection("yes"); }}
-            />
-            <Radio
-              id="representative-no"
-              label="No"
-              checked={!isRepresentative}
-              onChange={() => { handleRepresentativeSelection("no"); }}
-            />
+          <Radio
+            id="representative-yes"
+            label="Yes"
+            checked={isRepresentative === "yes"}
+            onChange={() => { handleRepresentativeSelection("yes"); }}
+          />
+          <Radio
+            id="representative-no"
+            label="No"
+            checked={isRepresentative === "no"}
+            onChange={() => { handleRepresentativeSelection("no"); }}
+          />
           </div>
         </div>
 
@@ -141,7 +141,7 @@ export const Step2Associate = ({ onNext, onBack }: Step2AssociateProps) => {
             Back
           </button>
           <button type="submit" className={styles.continueButton}>
-            Next
+            Continue
           </button>
         </div>
       </form>

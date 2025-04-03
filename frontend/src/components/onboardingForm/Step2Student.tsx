@@ -143,7 +143,7 @@ export const Step2Student = ({ onNext, onBack }: Step2StudentProps) => {
             Back
           </button>
           <button type="submit" className={styles.continueButton}>
-            Next
+            Continue
           </button>
         </div>
       </form>

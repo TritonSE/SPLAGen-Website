@@ -20,11 +20,11 @@ export const Step2: React.FC<Step2Props> = ({ onNext, onBack, onStudentFlow, onA
   const { state, actions } = useStateMachine({ actions: { updateOnboardingForm } });
   const [answers, setAnswers] = useState<Record<string, string>>({}); // To store all question answers
 
-  // Handle selection for each question
+  // Handle selection for each question - only updates state, no navigation
   const handleSelection = useCallback(
     (question: string, answer: string) => {
       let updatedAnswers = { ...answers };
-  
+
       // Reset dependent fields when an earlier question changes
       if (question === "field1") {
         updatedAnswers = { field1: answer }; // Reset everything except field1
@@ -38,52 +38,61 @@ export const Step2: React.FC<Step2Props> = ({ onNext, onBack, onStudentFlow, onA
       } else {
         updatedAnswers[question] = answer; // Normal update
       }
-  
+
       setAnswers(updatedAnswers);
-  
-      if (question === "field1" && answer === "yes") {
-        const updatedData = {
-          ...state.onboardingForm,
-          membership: "Healthcare Professional"
-        };
-        actions.updateOnboardingForm(updatedData);
-        onNext(updatedData);
-      }
-      
-      // If the third question is answered and is "Yes", trigger onNext
-      if (question === "field3") {
-        const updatedData = {
-          ...state.onboardingForm,
-          membership: "Healthcare Professional"
-        };
-        actions.updateOnboardingForm(updatedData);
-        onNext(updatedData);
-      }
-      
-      // If they select Student, go to Student flow
-      if (question === "field4" && answer === "Student") {
-        const updatedData = {
-          ...state.onboardingForm,
-          membership: "Student"
-        };
-        actions.updateOnboardingForm(updatedData);
-        onStudentFlow();
-      }
-      
-      // If they select Associate Member, go to Associate flow
-      if (question === "field4" && answer === "Associate Member") {
-        const updatedData = {
-          ...state.onboardingForm,
-          membership: "Associate Member"
-        };
-        actions.updateOnboardingForm(updatedData);
-        onAssociateFlow();
-      }
     },
-    [answers, actions, state.onboardingForm, onNext, onStudentFlow, onAssociateFlow]
+    [answers]
   );
 
-  // Render the questions dynamically based on the answers
+  const isContinueEnabled = useCallback(() => {
+    const condition1 = answers.field1 === "yes";
+    const condition2 = answers.field1 === "no" && answers.field2 === "yes" && (answers.field3 !== undefined && answers.field3 !== null);
+    const condition3 = answers.field1 === "no" && answers.field2 === "no" && (answers.field4 !== undefined && answers.field4 !== null);
+    const enabled = condition1 || condition2 || condition3;
+    return enabled;
+  }, [answers]);
+
+  const handleContinue = useCallback(() => {
+    let updatedData;
+
+    if (answers.field1 === "yes") {
+      updatedData = {
+        ...state.onboardingForm,
+        membership: "Healthcare Professional"
+      };
+      actions.updateOnboardingForm(updatedData);
+      onNext(updatedData);
+    } else if (answers.field1 === "no" && answers.field2 === "yes" && (answers.field3 !== undefined && answers.field3 !== null)) {
+      updatedData = {
+        ...state.onboardingForm,
+        membership: "Healthcare Professional"
+      };
+      actions.updateOnboardingForm(updatedData);
+      onNext(updatedData);
+    } else if (answers.field3 === "yes") {
+      updatedData = {
+        ...state.onboardingForm,
+        membership: "Healthcare Professional"
+      };
+      actions.updateOnboardingForm(updatedData);
+      onNext(updatedData);
+    } else if (answers.field4 === "Student") {
+      updatedData = {
+        ...state.onboardingForm,
+        membership: "Student"
+      };
+      actions.updateOnboardingForm(updatedData);
+      onStudentFlow();
+    } else if (answers.field4 === "Associate Member") {
+      updatedData = {
+        ...state.onboardingForm,
+        membership: "Associate Member"
+      };
+      actions.updateOnboardingForm(updatedData);
+      onAssociateFlow();
+    }
+  }, [answers, actions, state.onboardingForm, onNext, onStudentFlow, onAssociateFlow]);
+
   const renderQuestions = () => {
     return (
       <>
@@ -107,7 +116,7 @@ export const Step2: React.FC<Step2Props> = ({ onNext, onBack, onStudentFlow, onA
             />
           </div>
         </div>
-  
+
         {/* Show Question 2 only if field1 is "no" */}
         {answers.field1 === "no" && (
           <div>
@@ -130,7 +139,7 @@ export const Step2: React.FC<Step2Props> = ({ onNext, onBack, onStudentFlow, onA
             </div>
           </div>
         )}
-  
+
         {/* Show Question 3 only if field2 is "yes" */}
         {answers.field2 === "yes" && (
           <div>
@@ -153,14 +162,14 @@ export const Step2: React.FC<Step2Props> = ({ onNext, onBack, onStudentFlow, onA
             </div>
           </div>
         )}
-  
+
         {/* Show Question 4 only if field2 is "no" */}
         {answers.field2 === "no" && (
         <div>
           <p className={styles.subtitle}>
-          Select the following membership category that best suits you. 
+          Select the following membership category that best suits you.
           </p>
-          
+
           <Radio id="radio-7" label="Student" checked={answers.field4 === "Student"} onChange={() => { handleSelection("field4", "Student"); }} />
           <ExpandableSection
             title="Student Membership"
@@ -172,9 +181,9 @@ export const Step2: React.FC<Step2Props> = ({ onNext, onBack, onStudentFlow, onA
             title="Associate Membership"
             content="Associate membership will be granted to all applicants interested in supporting the mission of Splagen and who are not eligible for full or student membership. Interested individuals can submit an application and, upon approval by officials, associated membership can be granted or denied. Associate members have all the privileges of full members, but are not eligible for a position on the Board of Directors and can only vote, hold positions as committee chairs and leadership positions related to their specialty and professional background."
           />
-      
+
         </div>
-        
+
       )}
       </>
     );
@@ -188,10 +197,17 @@ export const Step2: React.FC<Step2Props> = ({ onNext, onBack, onStudentFlow, onA
         </div>
 
         {renderQuestions()}
-
-        <div className={styles.navigation}>
+        <div className={styles.buttonContainer}>
           <button type="button" onClick={onBack} className={styles.backButton}>
             Back
+          </button>
+          <button
+            type="button"
+            onClick={handleContinue}
+            className={`${styles.continueButton} ${!isContinueEnabled() ? styles.disabledButton : ''}`}
+            disabled={!isContinueEnabled()}
+          >
+            Continue
           </button>
         </div>
       </form>

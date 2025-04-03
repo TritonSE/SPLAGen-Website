@@ -171,3 +171,39 @@
 .expandableContent p:last-child {
   margin-bottom: 0;
 }
+
+.buttonContainer {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.continueButton {
+  display: flex;
+  padding: 12px 24px;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  border-radius: 10px;
+  background: #211E62;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-family: "DM Sans", sans-serif;
+  font-size: 16px;
+}
+
+.backButton {
+  color: #000;
+  text-align: center;
+  font-family: "DM Sans", sans-serif;
+  font-size: 20px;
+  font-style: normal;
+  line-height: 24px; /* 120% */
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 12px 24px;
+}
