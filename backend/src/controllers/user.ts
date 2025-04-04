@@ -135,7 +135,7 @@ export const getAllUsers = async (_req: AuthenticatedRequest, res: Response, nex
 };
 
 
-export const getUser = async (req: AuthenticatedRequest<{ firebaseId: string }>, res: Response, _next: NextFunction) => {
+export const getUser = async (req: AuthenticatedRequest<{ firebaseId: string }>, res: Response, next: NextFunction) => {
   try {
     const { firebaseId } = req.params;
     const user = await UserModel.findOne({ firebaseId });
@@ -149,19 +149,10 @@ export const getUser = async (req: AuthenticatedRequest<{ firebaseId: string }>,
     return;
   } catch (error) {
     console.error("Error getting user:", error);
-    res.status(500).json({ error: "Internal server error" });
+    next(error);
     return;
   }
 };
-
-// Testing code for getPersonalInformation below:
-// export const getPersonalInformation: RequestHandler = async (req, res, next) => {
-//   try {
-//     res.status(200).send("Get personal information route works!");
-//   } catch (error) {
-//     next(error);
-//   }
-// };
 
 
 export const getPersonalInformation = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
