@@ -30,7 +30,7 @@ export const createAnnouncement = async (
   }
 };
 
-export const editAnnouncement: RequestHandler = async (req, res, next) => {
+export const editAnnouncement: RequestHandler = (req, res, next) => {
   try {
     res.status(200).send("Edit announcement route works!");
   } catch (error) {
@@ -38,7 +38,7 @@ export const editAnnouncement: RequestHandler = async (req, res, next) => {
   }
 };
 
-export const deleteAnnouncement: RequestHandler = async (req, res, next) => {
+export const deleteAnnouncement: RequestHandler = (req, res, next) => {
   try {
     res.status(200).send("Delete announcement route works!");
   } catch (error) {
@@ -69,7 +69,7 @@ export const getMultipleAnnouncements = async (
   }
 };
 
-export const getIndividualAnnouncementDetails: RequestHandler = async (req, res, next) => {
+export const getIndividualAnnouncementDetails: RequestHandler = (req, res, next) => {
   try {
     //TODO: validate that the user is allowed to see the announcement
     res.status(200).send("Get individual announcement details route works!");
