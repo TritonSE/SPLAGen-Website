@@ -7,7 +7,7 @@ import React, { useCallback } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
 
-import ExitButton from "@/../public/Icons/ExitButton.svg";
+import ExitButton from "@/../public/icons/ExitButton.svg";
 import "./ProfessionalInfoModal.css";
 import { PillButton } from "@/components";
 
