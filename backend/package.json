@@ -16,7 +16,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@types/express-validator": "^2.20.33",
     "@types/firebase": "^2.4.32",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
