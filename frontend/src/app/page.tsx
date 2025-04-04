@@ -29,6 +29,9 @@ export default function Dashboard() {
       <p>
         <Link href="flowPopupDemo"> Go to flow popup demo </Link>
       </p>
+      <p>
+        <Link href="/profile"> Go to flow profile page WIP demo </Link>
+      </p>
 
       <div className="grid grid-rows-[20px_1fr_20px] items-center min-h-screen">
         <main className="flex flex-col gap-8 row-start-2 items-center">
