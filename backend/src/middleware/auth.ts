@@ -1,14 +1,12 @@
 import { NextFunction, Request, Response } from "express";
+import admin from "firebase-admin"; // Import Firebase Admin SDK
 import { Types } from "mongoose";
 
 import UserModel, { UserRole } from "../models/user";
 
 const DEFAULT_ERROR = 403;
 
-/**
- * Define this custom type for a request to include the "userUid"
- * property, which middleware will set and validate
- */
+// Define this custom type for a request to include the "firebaseUid"
 export type AuthenticatedRequest<P = unknown, ResBody = unknown, ReqBody = unknown> = Request<
   P,
   ResBody,
@@ -20,53 +18,65 @@ export type AuthenticatedRequest<P = unknown, ResBody = unknown, ReqBody = unkno
   userEmail?: string;
 };
 
-/**
- * A middleware that requires the user to be signed in and have a valid Firebase token
- * in the "Authorization" header
- */
+// Firebase Authentication Verification
+const verifyFirebaseToken = async (token: string) => {
+  try {
+    // Verify Firebase token using Firebase Admin SDK
+    const decodedToken = await admin.auth().verifyIdToken(token);
+    return decodedToken; // returns decoded user data, including UID
+  } catch (error) {
+    console.error("Error verifying Firebase token:", error);
+    throw new Error("Token is invalid");
+  }
+};
+
+// Middleware to require the user to be signed in with a valid Firebase token
 export const requireSignedIn = async (
   req: AuthenticatedRequest,
   res: Response,
   next: NextFunction,
 ) => {
-  // TODO uncomment when Firebase is set up
-  // const authHeader = req.headers.authorization;
-  // // Token should be "Bearer: <token>"
-  // const token = authHeader?.split("Bearer ")[1];
-  // if (!token) {
-  //  return res.status(401).send("Token was not found in header. Be sure to use Bearer <Token> syntax");
-  // }
+  // Extract the Firebase token from the "Authorization" header
+  const authHeader = req.headers.authorization;
+  if (!authHeader?.startsWith("Bearer ")) {
+    res.status(403).send("Authorization token is missing or invalid.");
+    return;
+  }
 
-  // let userInfo;
-  // try {
-  //   userInfo = await decodeAuthToken(token);
-  // } catch (error) {
-  //   return res.status(401).send("Token was invalid.");
-  // })
+  const token = authHeader.split("Bearer ")[1];
 
-  //TODO: remove temporary user info (the line below)
-  const userInfo = { uid: "unique-firebase-id-001" }; //MEMBER
-  // const userInfo = { uid: "unique-firebase-id-002" }; //admin
-  if (userInfo) {
-    const user = await UserModel.findOne({ firebaseId: userInfo.uid });
+  try {
+    // Verify the Firebase ID token
+    const decodedToken = await verifyFirebaseToken(token);
 
-    if (!user) {
-      res.status(401).send("User not found");
+    if (decodedToken.email === undefined || !decodedToken.email_verified) {
+      res.status(403).json({ error: "Please verify your email first!" });
       return;
     }
 
-    req.firebaseUid = userInfo.uid;
+    // Fetch the user from MongoDB using the firebaseUid
+    const user = await UserModel.findOne({ firebaseId: decodedToken.uid });
+
+    if (!user) {
+      res.status(401).send("User not found.");
+      return;
+    }
+
+    // Attach user details to the request object for downstream routes
+    req.firebaseUid = decodedToken.uid;
     req.role = user.role;
     req.mongoID = user._id;
     req.userEmail = user.personal?.email;
 
     next();
+  } catch (error) {
+    console.error("Firebase token verification failed:", error);
+    res.status(401).send("Token verification failed. Please log in again.");
     return;
   }
-
-  res.status(401).send("Token was invalid.");
 };
 
+// Middleware to require the user to be an admin or superadmin
 export const requireAdminOrSuperAdmin = async (
   req: AuthenticatedRequest,
   res: Response,
@@ -74,19 +84,23 @@ export const requireAdminOrSuperAdmin = async (
 ) => {
   try {
     const { firebaseUid } = req;
-
     const user = await UserModel.findOne({ firebaseId: firebaseUid });
+
     if (!user || ![UserRole.ADMIN, UserRole.SUPERADMIN].includes(user.role as UserRole)) {
-      res.status(DEFAULT_ERROR).send("User is not an admin or super admin");
+      //return res.status(DEFAULT_ERROR).send("User is not an admin or super admin");
+      next(new Error("User is not an admin or super admin"));
       return;
     }
 
     next();
+    return;
   } catch (error) {
     next(error);
+    return;
   }
 };
 
+// Middleware to require the user to be a superadmin
 export const requireSuperAdmin = async (
   req: AuthenticatedRequest,
   res: Response,
@@ -95,10 +109,11 @@ export const requireSuperAdmin = async (
   try {
     const { firebaseUid } = req;
     const user = await UserModel.findOne({ firebaseId: firebaseUid });
+
     if (!user || user.role !== UserRole.SUPERADMIN) {
-      res.status(DEFAULT_ERROR).send("User is not a super admin");
-      return;
+      return res.status(DEFAULT_ERROR).send("User is not a super admin");
     }
+
     next();
   } catch (error) {
     next(error);
