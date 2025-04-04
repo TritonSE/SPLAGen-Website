@@ -86,12 +86,16 @@ export const requireAdminOrSuperAdmin = async (
     const user = await UserModel.findOne({ firebaseId: firebaseUid });
 
     if (!user || ![UserRole.ADMIN, UserRole.SUPERADMIN].includes(user.role as UserRole)) {
-      return res.status(DEFAULT_ERROR).send("User is not an admin or super admin");
+      //return res.status(DEFAULT_ERROR).send("User is not an admin or super admin");
+      next(new Error("User is not an admin or super admin")); 
+      return;
     }
 
     next();
+    return;
   } catch (error) {
     next(error);
+    return;
   }
 };
 

@@ -1,24 +1,24 @@
 import dotenv from "dotenv";
 
-//load the env variables from .env file
-dotenv.config({ path: ".env" });
+// Load environment variables from .env file
+dotenv.config();
 
 function throwIfUndefined(envVar: string | undefined, error: Error) {
   if (!envVar) throw error;
   return envVar;
 }
 
-const port = throwIfUndefined(process.env.PORT, new Error("No Port Found"));
+// Firebase configuration from environment variables
+const firebaseConfig = {
+  projectId: throwIfUndefined(process.env.PROJECT_ID, new Error("PROJECT_ID is missing in the .env")),
+  clientEmail: throwIfUndefined(process.env.CLIENT_EMAIL, new Error("CLIENT_EMAIL is missing in the .env")),
+  privateKey: throwIfUndefined(
+    process.env.PRIVATE_KEY?.replace(/\\n/g, "\n"), 
+    new Error("PRIVATE_KEY is missing or incorrectly formatted in the .env")
+  ),
+};
+
 const mongoURI = throwIfUndefined(process.env.MONGO_URI, new Error("No Mongo URI Found"));
-const serviceAccountKey = throwIfUndefined(
-  process.env.SERVICE_ACCOUNT_KEY,
-  new Error("No Service Account Key"),
-);
-// console.log(`SERVICE_ACCOUNT_KEY: ${serviceAccountKey}`);
+const port = throwIfUndefined(process.env.PORT, new Error("No Port Found"));
 
-const firebaseConfig = throwIfUndefined(
-  process.env.APP_FIREBASE_CONFIG,
-  new Error("No Firebase Config"),
-);
-
-export { port, mongoURI, serviceAccountKey, firebaseConfig };
+export { firebaseConfig, mongoURI, port };
