@@ -44,7 +44,7 @@ export type CreateUserRequestBody = {
       workEmail?: string;
       workPhone?: string;
       services?: (
-        | "pediatrics"
+        "pediatrics"
         | "cardiovascular"
         | "neurogenetics"
         | "rareDiseases"

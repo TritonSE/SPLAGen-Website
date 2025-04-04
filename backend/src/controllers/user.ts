@@ -1,5 +1,5 @@
-import { NextFunction, Request, Response } from "express";
-import admin from "firebase-admin";
+import { NextFunction, Response } from "express";
+
 
 import { AuthenticatedRequest } from "../middleware/auth";
 import UserModel from "../models/user";
@@ -14,8 +14,8 @@ import { CreateUserRequestBody,
 } from "./types/userTypes";
 
 export const createUser = async (
-  req: Request<Record<string, never>, Record<string, never>, CreateUserRequestBody>,
-  res: Response,
+  req: AuthenticatedRequest<unknown, unknown, CreateUserRequestBody>, 
+  res: Response, 
   next: NextFunction
 ) => {
   try {
@@ -25,7 +25,7 @@ export const createUser = async (
     const userRecord = await firebaseAdminAuth.createUser({
       email: personal.email,
       password,
-    } as admin.auth.CreateRequest);
+    });
 
     // Create new user in MongoDB
     const newUser = await UserModel.create({
@@ -39,18 +39,24 @@ export const createUser = async (
     });
 
     res.status(201).json(newUser);
+    return;
   } catch (error) {
     console.error("Error creating user:", error);
     next(error);
+    return;
   }
 };
 
-
-export const authenticateUser = async (req: Request, res: Response, next: NextFunction) => {
+export const authenticateUser = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+) => {
   try {
-    const { token } = req.body;
-    const decodedToken = await firebaseAdminAuth.verifyIdToken(token);
-    const user = await UserModel.findOne({ firebaseId: decodedToken.uid });
+    const { firebaseUid } = req;
+
+    // Fetch user from MongoDB using firebaseUid (firebaseUid should already be added by requireSignedIn)
+    const user = await UserModel.findOne({ firebaseId: firebaseUid });
 
     if (!user) {
       res.status(404).json({ error: "User not found" });
@@ -58,17 +64,19 @@ export const authenticateUser = async (req: Request, res: Response, next: NextFu
     }
 
     res.status(200).json({
-      firebaseId: decodedToken.uid,
+      firebaseId: firebaseUid,
       role: user.role,
       personal: user.personal,
       email: user.personal?.email,
     });
+    return;
   } catch (error) {
     console.error("Error during user authentication:", error);
-    res.status(401).json({ error: "Authentication failed" });
+    next(error);
     return;
   }
 };
+
 
 export const getWhoAmI = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
@@ -93,7 +101,11 @@ export const getWhoAmI = async (req: AuthenticatedRequest, res: Response, next: 
   }
 };
 
-export const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
+export const deleteUser = async (
+  req: AuthenticatedRequest<{ firebaseId: string }>, 
+  res: Response, 
+  next: NextFunction
+) => {
   try {
     const { firebaseId } = req.params;
 
@@ -110,7 +122,7 @@ export const deleteUser = async (req: Request, res: Response, next: NextFunction
   }
 };
 
-export const getAllUsers = async (_req: Request, res: Response, next: NextFunction) => {
+export const getAllUsers = async (_req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
     const users = await UserModel.find({}).exec();
     res.status(200).json({ users });
@@ -118,12 +130,12 @@ export const getAllUsers = async (_req: Request, res: Response, next: NextFuncti
   } catch (error) {
     console.error("Error getting users:", error);
     next(error);
-    return
+    return;
   }
 };
 
 
-export const getUser = async (req: Request, res: Response, next: NextFunction) => {
+export const getUser = async (req: AuthenticatedRequest<{ firebaseId: string }>, res: Response, _next: NextFunction) => {
   try {
     const { firebaseId } = req.params;
     const user = await UserModel.findOne({ firebaseId });
@@ -173,7 +185,7 @@ export const getPersonalInformation = async (req: AuthenticatedRequest, res: Res
 
 
 export const editPersonalInformation = async (
-  req: AuthenticatedRequest<{}, {}, EditUserPersonalInformationRequestBody>, 
+  req: AuthenticatedRequest<unknown, unknown, EditUserPersonalInformationRequestBody>, 
   res: Response, 
   next: NextFunction
 ) => {
@@ -229,7 +241,7 @@ export const getProfessionalInformation = async (req: AuthenticatedRequest, res:
 
 
 export const editProfessionalInformation = async (
-  req: AuthenticatedRequest<{}, {}, EditUserProfessionalInformationRequestBody>, 
+  req: AuthenticatedRequest<unknown, unknown, EditUserProfessionalInformationRequestBody>, 
   res: Response, 
   next: NextFunction
 ) => {
@@ -286,7 +298,7 @@ export const getDirectoryPersonalInformation = async (req: AuthenticatedRequest,
 
 
 export const editDirectoryPersonalInformation = async (
-  req: AuthenticatedRequest<{}, {}, EditDirectoryPersonalInformationRequestBody>, 
+  req: AuthenticatedRequest<unknown, unknown, EditDirectoryPersonalInformationRequestBody>, 
   res: Response, 
   next: NextFunction
 ) => {
@@ -341,7 +353,7 @@ export const getDirectoryDisplayInfo = async (req: AuthenticatedRequest, res: Re
 
 
 export const editDirectoryDisplayInfo = async (
-  req: AuthenticatedRequest<{}, {}, EditDirectoryDisplayInformationRequestBody>, 
+  req: AuthenticatedRequest<unknown, unknown, EditDirectoryDisplayInformationRequestBody>, 
   res: Response, 
   next: NextFunction
 ) => {

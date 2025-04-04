@@ -25,6 +25,7 @@ const verifyFirebaseToken = async (token: string) => {
     const decodedToken = await admin.auth().verifyIdToken(token);
     return decodedToken;  // returns decoded user data, including UID
   } catch (error) {
+    console.error("Error verifying Firebase token:", error);
     throw new Error("Token is invalid");
   }
 };

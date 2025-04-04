@@ -45,6 +45,7 @@ app.use(express.urlencoded({ extended: true }));
 // https://expressjs.com/en/resources/middleware/cors.html
 // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin
 app.use(
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
   cors({
     origin: process.env.FRONTEND_ORIGIN,
   }),
