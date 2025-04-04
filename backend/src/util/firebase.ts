@@ -7,9 +7,9 @@ import { firebaseConfig } from "../config";
 if (!admin.apps.length) {
   admin.initializeApp({
     credential: admin.credential.cert({
-      projectId: firebaseConfig.projectId,
-      clientEmail: firebaseConfig.clientEmail,
-      privateKey: firebaseConfig.privateKey,
+      projectId: firebaseConfig.project_id,
+      clientEmail: firebaseConfig.client_email,
+      privateKey: firebaseConfig.private_key,
     }),
   });
 }
