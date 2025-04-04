@@ -1,7 +1,7 @@
 import admin from "firebase-admin";
 
 // Import the firebaseConfig from config.ts
-import { firebaseConfig } from "../config"; 
+import { firebaseConfig } from "../config";
 
 // Initialize Firebase if it hasn't been initialized already
 if (!admin.apps.length) {

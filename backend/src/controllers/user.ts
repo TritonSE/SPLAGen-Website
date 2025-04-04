@@ -1,22 +1,22 @@
 import { NextFunction, Response } from "express";
 
-
 import { AuthenticatedRequest } from "../middleware/auth";
 import UserModel from "../models/user";
 import { firebaseAdminAuth } from "../util/firebase";
 import { deleteUserFromFirebase, deleteUserFromMongoDB } from "../util/user";
 
-import { CreateUserRequestBody,
+import {
+  CreateUserRequestBody,
   EditDirectoryDisplayInformationRequestBody,
   EditDirectoryPersonalInformationRequestBody,
   EditUserPersonalInformationRequestBody,
-  EditUserProfessionalInformationRequestBody
+  EditUserProfessionalInformationRequestBody,
 } from "./types/userTypes";
 
 export const createUser = async (
   req: AuthenticatedRequest<unknown, unknown, CreateUserRequestBody>,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const { account, personal, professional, education, clinic, display, password } = req.body;
@@ -50,7 +50,7 @@ export const createUser = async (
 export const authenticateUser = async (
   req: AuthenticatedRequest,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const { firebaseUid } = req;
@@ -101,9 +101,9 @@ export const getWhoAmI = async (req: AuthenticatedRequest, res: Response, next: 
 };
 
 export const deleteUser = async (
-  req: AuthenticatedRequest<{ firebaseId: string }>, 
-  res: Response, 
-  next: NextFunction
+  req: AuthenticatedRequest<{ firebaseId: string }>,
+  res: Response,
+  next: NextFunction,
 ) => {
   try {
     const { firebaseId } = req.params;
@@ -121,7 +121,11 @@ export const deleteUser = async (
   }
 };
 
-export const getAllUsers = async (_req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+export const getAllUsers = async (
+  _req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const users = await UserModel.find({}).exec();
     res.status(200).json({ users });
@@ -133,7 +137,11 @@ export const getAllUsers = async (_req: AuthenticatedRequest, res: Response, nex
   }
 };
 
-export const getUser = async (req: AuthenticatedRequest<{ firebaseId: string }>, res: Response, next: NextFunction) => {
+export const getUser = async (
+  req: AuthenticatedRequest<{ firebaseId: string }>,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const { firebaseId } = req.params;
     const user = await UserModel.findOne({ firebaseId });
@@ -152,7 +160,11 @@ export const getUser = async (req: AuthenticatedRequest<{ firebaseId: string }>,
   }
 };
 
-export const getPersonalInformation = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+export const getPersonalInformation = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const { firebaseUid } = req;
     const user = await UserModel.findOne({ firebaseId: firebaseUid });
@@ -172,9 +184,9 @@ export const getPersonalInformation = async (req: AuthenticatedRequest, res: Res
 };
 
 export const editPersonalInformation = async (
-  req: AuthenticatedRequest<unknown, unknown, EditUserPersonalInformationRequestBody>, 
-  res: Response, 
-  next: NextFunction
+  req: AuthenticatedRequest<unknown, unknown, EditUserPersonalInformationRequestBody>,
+  res: Response,
+  next: NextFunction,
 ) => {
   try {
     const { firebaseUid } = req;
@@ -188,7 +200,7 @@ export const editPersonalInformation = async (
         "personal.email": newEmail,
         "personal.phone": newPhone,
       },
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     );
 
     if (!updatedUser) {
@@ -196,7 +208,9 @@ export const editPersonalInformation = async (
       return;
     }
 
-    res.status(200).json({ message: "Personal information updated", personal: updatedUser.personal });
+    res
+      .status(200)
+      .json({ message: "Personal information updated", personal: updatedUser.personal });
     return;
   } catch (error) {
     console.error("Error updating personal information:", error);
@@ -205,7 +219,11 @@ export const editPersonalInformation = async (
   }
 };
 
-export const getProfessionalInformation = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+export const getProfessionalInformation = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const { firebaseUid } = req;
     const user = await UserModel.findOne({ firebaseId: firebaseUid });
@@ -225,9 +243,9 @@ export const getProfessionalInformation = async (req: AuthenticatedRequest, res:
 };
 
 export const editProfessionalInformation = async (
-  req: AuthenticatedRequest<unknown, unknown, EditUserProfessionalInformationRequestBody>, 
-  res: Response, 
-  next: NextFunction
+  req: AuthenticatedRequest<unknown, unknown, EditUserProfessionalInformationRequestBody>,
+  res: Response,
+  next: NextFunction,
 ) => {
   try {
     const { firebaseUid } = req;
@@ -241,7 +259,7 @@ export const editProfessionalInformation = async (
         "professional.otherPrefLanguages": newOtherPrefLanguages,
         "professional.country": newCountry,
       },
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     );
 
     if (!updatedUser) {
@@ -249,7 +267,12 @@ export const editProfessionalInformation = async (
       return;
     }
 
-    res.status(200).json({ message: "Professional information updated", professional: updatedUser.professional });
+    res
+      .status(200)
+      .json({
+        message: "Professional information updated",
+        professional: updatedUser.professional,
+      });
     return;
   } catch (error) {
     console.error("Error updating professional information:", error);
@@ -258,7 +281,11 @@ export const editProfessionalInformation = async (
   }
 };
 
-export const getDirectoryPersonalInformation = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+export const getDirectoryPersonalInformation = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const { firebaseUid } = req;
     const user = await UserModel.findOne({ firebaseId: firebaseUid });
@@ -281,7 +308,7 @@ export const getDirectoryPersonalInformation = async (req: AuthenticatedRequest,
 export const editDirectoryPersonalInformation = async (
   req: AuthenticatedRequest<unknown, unknown, EditDirectoryPersonalInformationRequestBody>,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const { firebaseUid } = req;
@@ -312,7 +339,7 @@ export const editDirectoryPersonalInformation = async (
         "clinic.location.state": newClinicState,
         "clinic.location.zipCode": newClinicZipPostCode,
       },
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     );
 
     if (!updatedUser) {
@@ -332,7 +359,11 @@ export const editDirectoryPersonalInformation = async (
   }
 };
 
-export const getDirectoryDisplayInfo = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+export const getDirectoryDisplayInfo = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const { firebaseUid } = req;
     const user = await UserModel.findOne({ firebaseId: firebaseUid });
@@ -352,13 +383,21 @@ export const getDirectoryDisplayInfo = async (req: AuthenticatedRequest, res: Re
 };
 
 export const editDirectoryDisplayInfo = async (
-  req: AuthenticatedRequest<unknown, unknown, EditDirectoryDisplayInformationRequestBody>, 
-  res: Response, 
-  next: NextFunction
+  req: AuthenticatedRequest<unknown, unknown, EditDirectoryDisplayInformationRequestBody>,
+  res: Response,
+  next: NextFunction,
 ) => {
   try {
     const { firebaseUid } = req;
-    const { newWorkEmail, newWorkPhone, newServices, newLanguages, newLicense, newRemoteOption, newRequestOption } = req.body;
+    const {
+      newWorkEmail,
+      newWorkPhone,
+      newServices,
+      newLanguages,
+      newLicense,
+      newRemoteOption,
+      newRequestOption,
+    } = req.body;
 
     const updatedUser = await UserModel.findOneAndUpdate(
       { firebaseId: firebaseUid },
@@ -371,7 +410,7 @@ export const editDirectoryDisplayInfo = async (
         "display.options.remote": newRemoteOption,
         "display.options.openToRequests": newRequestOption,
       },
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     );
 
     if (!updatedUser) {
@@ -379,7 +418,9 @@ export const editDirectoryDisplayInfo = async (
       return;
     }
 
-    res.status(200).json({ message: "Directory display information updated", display: updatedUser.display });
+    res
+      .status(200)
+      .json({ message: "Directory display information updated", display: updatedUser.display });
     return;
   } catch (error) {
     console.error("Error updating directory display information:", error);

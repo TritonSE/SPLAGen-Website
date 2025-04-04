@@ -10,11 +10,17 @@ function throwIfUndefined(envVar: string | undefined, error: Error) {
 
 // Firebase configuration from environment variables
 const firebaseConfig = {
-  projectId: throwIfUndefined(process.env.PROJECT_ID, new Error("PROJECT_ID is missing in the .env")),
-  clientEmail: throwIfUndefined(process.env.CLIENT_EMAIL, new Error("CLIENT_EMAIL is missing in the .env")),
+  projectId: throwIfUndefined(
+    process.env.PROJECT_ID,
+    new Error("PROJECT_ID is missing in the .env"),
+  ),
+  clientEmail: throwIfUndefined(
+    process.env.CLIENT_EMAIL,
+    new Error("CLIENT_EMAIL is missing in the .env"),
+  ),
   privateKey: throwIfUndefined(
-    process.env.PRIVATE_KEY?.replace(/\\n/g, "\n"), 
-    new Error("PRIVATE_KEY is missing or incorrectly formatted in the .env")
+    process.env.PRIVATE_KEY?.replace(/\\n/g, "\n"),
+    new Error("PRIVATE_KEY is missing or incorrectly formatted in the .env"),
   ),
 };
 

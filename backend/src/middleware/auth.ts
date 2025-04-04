@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import admin from "firebase-admin";  // Import Firebase Admin SDK
+import admin from "firebase-admin"; // Import Firebase Admin SDK
 import { Types } from "mongoose";
 
 import UserModel, { UserRole } from "../models/user";
@@ -23,7 +23,7 @@ const verifyFirebaseToken = async (token: string) => {
   try {
     // Verify Firebase token using Firebase Admin SDK
     const decodedToken = await admin.auth().verifyIdToken(token);
-    return decodedToken;  // returns decoded user data, including UID
+    return decodedToken; // returns decoded user data, including UID
   } catch (error) {
     console.error("Error verifying Firebase token:", error);
     throw new Error("Token is invalid");
@@ -44,7 +44,7 @@ export const requireSignedIn = async (
   }
 
   const token = authHeader.split("Bearer ")[1];
-  
+
   try {
     // Verify the Firebase ID token
     const decodedToken = await verifyFirebaseToken(token);
@@ -88,7 +88,7 @@ export const requireAdminOrSuperAdmin = async (
 
     if (!user || ![UserRole.ADMIN, UserRole.SUPERADMIN].includes(user.role as UserRole)) {
       //return res.status(DEFAULT_ERROR).send("User is not an admin or super admin");
-      next(new Error("User is not an admin or super admin")); 
+      next(new Error("User is not an admin or super admin"));
       return;
     }
 
