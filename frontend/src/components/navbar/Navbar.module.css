@@ -1,0 +1,54 @@
+.SideNavbar {
+  display: flex;
+  width: var(--nav-width);
+  background-color: var(--color-primary2);
+  padding: clamp(4px, 2vw, 20px);
+  color: white;
+  font-size: 1rem;
+  display: flex;
+  height: 100vh;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 1100;
+}
+
+.decoration {
+  display: flex;
+  align-items: center;
+  margin-bottom: clamp(10px, 10vh, 80px);
+  font-size: 26px;
+  gap: 12px;
+}
+
+@media (max-height: 300px) {
+  .decoration {
+    display: none;
+  }
+}
+
+@media (max-height: 400px) {
+  .overview {
+    display: none;
+  }
+}
+
+@media (max-width: 550px) {
+  .decoration strong {
+    display: none;
+  }
+}
+
+@media (max-width: 800px) {
+  .decoration {
+    justify-content: center;
+  }
+}
+
+#logo {
+  width: 48px;
+  height: auto;
+}
+
+#logout {
+  margin-top: auto;
+}

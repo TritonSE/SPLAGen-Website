@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
-import { APIResult, DELETE, GET, PATCH, POST, handleAPIError } from "./requests";
 import { getAuth, signOut } from "firebase/auth";
+
+import { APIResult, DELETE, GET, PATCH, POST, handleAPIError } from "./requests";
 
 export type User = {
   _id: string;
@@ -29,14 +30,14 @@ export const verifyUser = async (firebaseToken: string): Promise<APIResult<User>
 };
 
 export const logoutUser = async () => {
-    const auth = getAuth();
-    try {
-        await signOut(auth);
-        console.log("User logged out successfully.");
-    } catch (error) {
-        console.error("Error logging out:", error);
-        throw error;
-    }
+  const auth = getAuth();
+  try {
+    await signOut(auth);
+    console.log("User logged out successfully.");
+  } catch (error) {
+    console.error("Error logging out:", error);
+    throw error;
+  }
 };
 
 export async function getNotApprovedUsers(firebaseToken: string): Promise<APIResult<User[]>> {

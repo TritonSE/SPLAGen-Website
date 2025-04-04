@@ -1,45 +1,19 @@
-/**
-* Based on the TSE onboarding API client implementation:
- * https://github.com/TritonSE/onboarding/blob/main/frontend/src/api/requests.ts
- */
+import env from "@/util/validateEnv";
 
-/**
- * Custom type definition for the HTTP methods handled by this module.
- */
 type Method = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
-// Set NEXT_PUBLIC_API_BASE_URL to http://localhost:4000/api in env file
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "/api";
+const API_BASE_URL = env.NEXT_PUBLIC_BACKEND_URL;
 
 /**
- * Throws an error if the status code of the HTTP response indicates an error. If an HTTP error was
- * raised, throws an error.
+ * A wrapper around the built-in `fetch()` function that abstracts away some of
+ * the low-level details so we can focus on the important parts of each request.
+ * See https://developer.mozilla.org/en-US/docs/Web/API/fetch for information
+ * about the Fetch API.
  *
- * @param response A `Response` object returned by `fetch()`
- * @throws An `Error` object if the response status was not successful (2xx) or a redirect (3xx)
- */
-async function assertOK(response: Response): Promise<void> {
-  if (response.ok) {
-    return;
-  }
-
-  let message = `${response.status} ${response.statusText}`;
-
-  const text = await response.text();
-  if (text) {
-    message += `: ${text}`;
-  }
-
-  throw new Error(message);
-}
-
-/**
- * Wrapper for the `fetch()` function.
- *
- * @param method The HTTP method (see `Method`)
- * @param url The URL to request from
- * @param body The request body (or undefined, if none)
- * @param headers The request headers
- * @returns A `Response` object returned by `fetch()`
+ * @param method The HTTP method to use
+ * @param url The URL to request
+ * @param body The body of the request, or undefined if there is none
+ * @param headers The headers of the request
+ * @returns The Response object returned by `fetch()
  */
 async function fetchRequest(
   method: Method,
@@ -47,141 +21,164 @@ async function fetchRequest(
   body: unknown,
   headers: Record<string, string>,
 ): Promise<Response> {
+  const hasBody = body !== undefined;
+
   const newHeaders = { ...headers };
-  if (body !== undefined) {
+  if (hasBody) {
     newHeaders["Content-Type"] = "application/json";
   }
 
   const response = await fetch(url, {
     method,
     headers: newHeaders,
-    body: body !== undefined ? JSON.stringify(body) : undefined,
+    body: hasBody ? JSON.stringify(body) : undefined,
   });
-  await assertOK(response);
 
   return response;
 }
 
 /**
- * Sends a GET request to the indicated API URL.
+ * Throws an error if the given response's status code indicates an error
+ * occurred, else does nothing.
  *
- * @param url The URL to request from
- * @param headers The request headers
- * @returns A `Response` object returned by `fetch()`
+ * @param response A response returned by `fetch()` or `fetchRequest()`
+ * @throws An error if the response was not successful (200-299) or a redirect
+ * (300-399)
  */
-export async function GET(url: string, headers: Record<string, string> = {}): Promise<Response> {
-  return await fetchRequest("GET", API_BASE_URL + url, undefined, headers);
+async function assertOk(response: Response): Promise<void> {
+  if (response.ok) {
+    return;
+  }
+
+  let message = `${response.status.toString()} ${response.statusText}`;
+
+  try {
+    const text = await response.text();
+    if (text) {
+      message += ": " + text;
+    }
+  } catch (e) {
+    console.log(e);
+  }
+
+  throw new Error(message);
 }
 
 /**
- * Sends a POST request with the provided request body to the indicated API URL.
+ * Sends a GET request to the provided API URL.
  *
- * @param url The URL to request from
- * @param body The request body (or undefined, if none)
- * @param headers The request headers
- * @returns A `Response` object returned by `fetch()`
+ * @param url The URL to request
+ * @param headers The headers of the request (optional)
+ * @returns The Response object returned by `fetch()`
  */
-export async function POST(
+export async function get(url: string, headers: Record<string, string> = {}): Promise<Response> {
+  // GET requests do not have a body
+  const response = await fetchRequest("GET", API_BASE_URL + url, undefined, headers);
+  await assertOk(response);
+  return response;
+}
+
+/**
+ * Sends a POST request to the provided API URL.
+ *
+ * @param url The URL to request
+ * @param body The body of the request, or undefined if there is none
+ * @param headers The headers of the request (optional)
+ * @returns The Response object returned by `fetch()`
+ */
+export async function post(
   url: string,
   body: unknown,
   headers: Record<string, string> = {},
 ): Promise<Response> {
-  return await fetchRequest("POST", API_BASE_URL + url, body, headers);
+  const response = await fetchRequest("POST", API_BASE_URL + url, body, headers);
+  await assertOk(response);
+  return response;
 }
 
 /**
- * Sends a PUT request with the provided request body to the indicated API URL.
+ * Sends a PUT request to the provided API URL.
  *
- * @param url The URL to request from
- * @param body The request body (or undefined, if none)
- * @param headers The request headers
- * @returns A `Response` object returned by `fetch()`
+ * @param url The URL to request
+ * @param body The body of the request, or undefined if there is none
+ * @param headers The headers of the request (optional)
+ * @returns The Response object returned by `fetch()`
  */
-export async function PUT(
+export async function put(
   url: string,
   body: unknown,
   headers: Record<string, string> = {},
 ): Promise<Response> {
-  return await fetchRequest("PUT", API_BASE_URL + url, body, headers);
+  const response = await fetchRequest("PUT", API_BASE_URL + url, body, headers);
+  await assertOk(response);
+  return response;
 }
 
 /**
- * Sends a PATCH request with the provided request body to the indicated API URL.
+ * Sends a PATCH request to the provided API URL.
  *
- * @param url The URL to request from
- * @param body The request body (or undefined, if none)
- * @param headers The request headers
- * @returns A `Response` object returned by `fetch()`
+ * @param url The URL to request
+ * @param body The body of the request, or undefined if there is none
+ * @param headers The headers of the request (optional)
+ * @returns The Response object returned by `fetch()`
  */
-export async function PATCH(
+export async function patch(
   url: string,
   body: unknown,
   headers: Record<string, string> = {},
 ): Promise<Response> {
-  return await fetchRequest("PATCH", API_BASE_URL + url, body, headers);
+  const response = await fetchRequest("PATCH", API_BASE_URL + url, body, headers);
+  await assertOk(response);
+  return response;
 }
 
 /**
- * Sends a DELETE request with the provided request body to the indicated API URL.
+ * Sends a DELETE request to the provided API URL.
  *
- * @param url The URL to request from
- * @param body The request body (or undefined, if none)
- * @param headers The request headers
- * @returns A `Response` object returned by `fetch()`
+ * @param url The URL to request
+ * @param headers The headers of the request (optional)
+ * @returns The Response object returned by `fetch()`
  */
-export async function DELETE(
+export async function httpDelete(
   url: string,
-  body: unknown,
   headers: Record<string, string> = {},
 ): Promise<Response> {
-  return await fetchRequest("DELETE", API_BASE_URL + url, body, headers);
+  const response = await fetchRequest("DELETE", API_BASE_URL + url, undefined, headers);
+  await assertOk(response);
+  return response;
 }
 
-/**
- * Utility type for the result of a successful API result. See `APIResult`.
- */
 export type APIData<T> = { success: true; data: T };
-/**
- * Utility type for the result of an unsuccessful API result. See `APIResult`.
- */
 export type APIError = { success: false; error: string };
 /**
  * Utility type for the result of an API request. API client functions should
- * return an object of this type, which allows implementations of the functions
- * to perform more straightforward exception-checking without requiring
- * extensive `try`-`catch` hadnling, making use of TypeScript's type narrowing
- * feature.
+ * always return an object of this type (without throwing an exception if
+ * something goes wrong). This allows users of the functions to perform easier
+ * error checking without excessive try-catch statements, making use of
+ * TypeScript's type narrowing feature. Specifically, by checking whether the
+ * `success` field is true or false, you'll know whether you can access the
+ * `data` field with the actual API response or the `error` field with an error
+ * message.
  *
- * By checking the value of the `success` field, it can be quickly determined
- * whether the `data` field (containing an actual API response) or the `error`
- * field (containing an error message) should be accessed.
- *
- * Recommended usage:
- *
+ * For example, assume we have some API function with the type definition
+ * `doSomeRequest: (parameters: SomeParameters) => Promise<APIResult<SomeData>>`.
+ * Then we could use it in a frontend component as follows:
  * ```
- * if (result.success) {
- *   console.log(result.data);
- * } else {
- *   console.error(result.error);
- * }
+ * doSomeRequest(parameters).then((result: APIResult<SomeData>) => {
+ *   if (result.success) {
+ *     console.log(result.data); // do something with the data, which is of type SomeData
+ *   } else {
+ *     console.error(result.error); // do something to inform the user of the error
+ *   }
+ * })
  * ```
  */
 export type APIResult<T> = APIData<T> | APIError;
 
 /**
- * Helper function for API client functions for consistent error handling.
+ * Helper function for API client functions to handle errors consistently.
  *
- * Recommended usage:
- *
- * ```
- * try {
- *   ...
- * } catch (error) {
- *   return handleAPIError(error);
- * }
- * ```
- *
- * @param error The error thrown by a lower-level API function
+ * @param error An error thrown by a lower-level API function
  * @returns An `APIError` object with a message from the given error
  */
 export function handleAPIError(error: unknown): APIError {
@@ -190,5 +187,5 @@ export function handleAPIError(error: unknown): APIError {
   } else if (typeof error === "string") {
     return { success: false, error };
   }
-  return { success: false, error: `Unknown error; ${String(error)}` };
+  return { success: false, error: `Unknown error: ${String(error)}` };
 }
