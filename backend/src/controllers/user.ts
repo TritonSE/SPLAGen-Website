@@ -267,12 +267,10 @@ export const editProfessionalInformation = async (
       return;
     }
 
-    res
-      .status(200)
-      .json({
-        message: "Professional information updated",
-        professional: updatedUser.professional,
-      });
+    res.status(200).json({
+      message: "Professional information updated",
+      professional: updatedUser.professional,
+    });
     return;
   } catch (error) {
     console.error("Error updating professional information:", error);
