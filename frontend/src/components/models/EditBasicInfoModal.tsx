@@ -8,7 +8,7 @@ import { isValidPhoneNumber } from "react-phone-number-input";
 import { z } from "zod";
 
 // import { UserContext } from "@/contexts/userContext";
-import ExitButton from "@/../public/Icons/ExitButton.svg";
+import ExitButton from "@/../public/icons/ExitButton.svg";
 import "./EditBasicInfoModal.css";
 import { editBasicInfoRequest } from "@/api/users";
 
