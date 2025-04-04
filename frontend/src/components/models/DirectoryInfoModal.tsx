@@ -8,7 +8,7 @@ import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
 
 import "./DirectoryInfoModal.css";
-import ExitButton from "@/../public/Icons/ExitButton.svg";
+import ExitButton from "@/../public/icons/ExitButton.svg";
 
 // Lazy load CountrySelector component to avoid hydration error
 const CountrySelector = dynamic(() => import("@/components").then((mod) => mod.CountrySelector), {
