@@ -1,73 +1,59 @@
 import express from "express";
 
-import { requireAdmin, requireSignedIn, requireStaffOrAdmin } from "../middleware/auth";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
-import UserModel from "../models/user";
 import * as UserController from "../controllers/user";
+import { requireAdminOrSuperAdmin, requireSignedIn } from "../middleware/auth";
 import * as UserValidator from "../validators/user";
 
 const router = express.Router();
 
+/**
+ * User directory routes
+ * GET /api/users/whoami - Get current user
+ * POST /api/users - Add user to directory
+ * DELETE /api/users/:id - Remove user from directory
+ * GET /api/users - Get all users in directory
+ * GET /api/users/:id - Get specific user from directory
+ */
+
 router.get("/whoami", requireSignedIn, UserController.getWhoAmI);
-router.get("/", requireSignedIn, requireAdmin, UserController.getUsers);
-router.post(
-  "/",
+router.post("/", UserValidator.createUser, UserController.createUser);
+router.delete(
+  "/:id",
   requireSignedIn,
-  requireAdmin,
-  UserValidator.createUser,
-  UserController.createUser,
+  requireAdminOrSuperAdmin,
+  UserValidator.deleteUser,
+  UserController.deleteUser,
 );
-router.post('/signup', async (req, res) => {
-  const { email, password } = req.body;
-  const auth = getAuth();
-  
-  try {
-    // Create user in Firebase
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    const uid = userCredential.user.uid;
+router.get("/", requireSignedIn, UserController.getAllUsers);
+router.get("/:id", requireSignedIn, UserValidator.getUser, UserController.getUser);
+router.post("/authenticate", requireSignedIn, UserController.authenticateUser);
 
-    // Store UID in MongoDB
-    await UserModel.create({ email, firebaseUID: uid });
+// Personal information routes
+router.get("/personal-information", requireSignedIn, UserController.getPersonalInformation);
+router.post("/personal-information", requireSignedIn, UserController.editPersonalInformation);
 
-    res.status(201).send({ message: 'User created successfully', uid });
-  } 
-  catch (error) {
-    res.status(500).send({ error: "Cannot create user" });
-  }
-});
+// Professional information routes
+router.get("/professional-information", requireSignedIn, UserController.getProfessionalInformation);
+router.post(
+  "/professional-information",
+  requireSignedIn,
+  UserController.editProfessionalInformation,
+);
 
-router.post('/login', async (req, res) => {
-  const { token } = req.body;
+// Directory personal information routes
+router.get(
+  "/directory/personal-information",
+  requireSignedIn,
+  UserController.getDirectoryPersonalInformation,
+);
+router.post(
+  "/directory/personal-information",
+  requireSignedIn,
+  UserController.editDirectoryPersonalInformation,
+);
 
-  try {
-    // Verify Firebase token
-    const decodedToken = await getAuth();
-    const firebaseUID = decodedToken.currentUser?.uid;
-
-    // Fetch user from database
-    const user = await UserModel.findOne({ firebaseUID });
-    if (!user) {
-      return res.status(404).send({ message: 'User not found' });
-    }
-
-    res.status(200).send({ user });
-  } catch (error) {
-    res.status(401).send({ error: 'Invalid token' });
-  }
-});
-// router.patch(
-//   "/:uid/password",
-//   requireSignedIn,
-//   requireAdmin,
-//   UserValidator.changeUserPassword,
-//   UserController.changeUserPassword,
-// );
-// router.post(
-//   "/notifyResetPassword",
-//   requireSignedIn,
-//   requireStaffOrAdmin,
-//   UserController.notifyResetPassword,
-// );
-// router.delete("/:uid", requireSignedIn, requireAdmin, UserController.deleteUser);
+// Directory display info routes
+router.get("/directory/display-info", requireSignedIn, UserController.getDirectoryDisplayInfo);
+router.post("/directory/display-info", requireSignedIn, UserController.editDirectoryDisplayInfo);
 
 export default router;
