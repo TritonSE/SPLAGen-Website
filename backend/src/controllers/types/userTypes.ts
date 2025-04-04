@@ -37,6 +37,9 @@ export type CreateUserRequestBody = {
         country?: string;
         address?: string;
         suite?: string;
+        city?: string;
+        state?: string;
+        zipCode?: string;
       };
     };
   
@@ -99,6 +102,11 @@ export type EditDirectoryPersonalInformationRequestBody = UserId & {
     newEducationInstitution: string,
     newClinicName: string,
     newClinicAddress: string,
+    newClinicCountry:string,
+    newClinicApartmentSuite?: string,
+    newClinicCity?: string,
+    newClinicState?: string,
+    newClinicZipPostCode?: string,
     newClinicWebsiteUrl: string
 }
 

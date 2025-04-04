@@ -14,8 +14,8 @@ import { CreateUserRequestBody,
 } from "./types/userTypes";
 
 export const createUser = async (
-  req: AuthenticatedRequest<unknown, unknown, CreateUserRequestBody>, 
-  res: Response, 
+  req: AuthenticatedRequest<unknown, unknown, CreateUserRequestBody>,
+  res: Response,
   next: NextFunction
 ) => {
   try {
@@ -77,7 +77,6 @@ export const authenticateUser = async (
   }
 };
 
-
 export const getWhoAmI = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
     const { firebaseUid } = req;
@@ -134,7 +133,6 @@ export const getAllUsers = async (_req: AuthenticatedRequest, res: Response, nex
   }
 };
 
-
 export const getUser = async (req: AuthenticatedRequest<{ firebaseId: string }>, res: Response, next: NextFunction) => {
   try {
     const { firebaseId } = req.params;
@@ -154,7 +152,6 @@ export const getUser = async (req: AuthenticatedRequest<{ firebaseId: string }>,
   }
 };
 
-
 export const getPersonalInformation = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
     const { firebaseUid } = req;
@@ -173,7 +170,6 @@ export const getPersonalInformation = async (req: AuthenticatedRequest, res: Res
     return;
   }
 };
-
 
 export const editPersonalInformation = async (
   req: AuthenticatedRequest<unknown, unknown, EditUserPersonalInformationRequestBody>, 
@@ -209,8 +205,6 @@ export const editPersonalInformation = async (
   }
 };
 
-
-
 export const getProfessionalInformation = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
     const { firebaseUid } = req;
@@ -229,7 +223,6 @@ export const getProfessionalInformation = async (req: AuthenticatedRequest, res:
     return;
   }
 };
-
 
 export const editProfessionalInformation = async (
   req: AuthenticatedRequest<unknown, unknown, EditUserProfessionalInformationRequestBody>, 
@@ -265,8 +258,6 @@ export const editProfessionalInformation = async (
   }
 };
 
-
-
 export const getDirectoryPersonalInformation = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
     const { firebaseUid } = req;
@@ -287,15 +278,25 @@ export const getDirectoryPersonalInformation = async (req: AuthenticatedRequest,
   }
 };
 
-
 export const editDirectoryPersonalInformation = async (
-  req: AuthenticatedRequest<unknown, unknown, EditDirectoryPersonalInformationRequestBody>, 
-  res: Response, 
+  req: AuthenticatedRequest<unknown, unknown, EditDirectoryPersonalInformationRequestBody>,
+  res: Response,
   next: NextFunction
 ) => {
   try {
     const { firebaseUid } = req;
-    const { newDegree, newEducationInstitution, newClinicName, newClinicWebsiteUrl, newClinicAddress } = req.body;
+    const {
+      newDegree,
+      newEducationInstitution,
+      newClinicName,
+      newClinicWebsiteUrl,
+      newClinicAddress,
+      newClinicCountry,
+      newClinicApartmentSuite,
+      newClinicCity,
+      newClinicState,
+      newClinicZipPostCode,
+    } = req.body;
 
     const updatedUser = await UserModel.findOneAndUpdate(
       { firebaseId: firebaseUid },
@@ -305,6 +306,11 @@ export const editDirectoryPersonalInformation = async (
         "clinic.name": newClinicName,
         "clinic.url": newClinicWebsiteUrl,
         "clinic.location.address": newClinicAddress,
+        "clinic.location.country": newClinicCountry,
+        "clinic.location.suite": newClinicApartmentSuite,
+        "clinic.location.city": newClinicCity,
+        "clinic.location.state": newClinicState,
+        "clinic.location.zipCode": newClinicZipPostCode,
       },
       { new: true, runValidators: true }
     );
@@ -314,7 +320,10 @@ export const editDirectoryPersonalInformation = async (
       return;
     }
 
-    res.status(200).json({ message: "Directory personal information updated", directoryInfo: { ...updatedUser.education, ...updatedUser.clinic } });
+    res.status(200).json({
+      message: "Directory personal information updated",
+      directoryInfo: { ...updatedUser.education, ...updatedUser.clinic },
+    });
     return;
   } catch (error) {
     console.error("Error updating directory personal information:", error);
@@ -341,7 +350,6 @@ export const getDirectoryDisplayInfo = async (req: AuthenticatedRequest, res: Re
     return;
   }
 };
-
 
 export const editDirectoryDisplayInfo = async (
   req: AuthenticatedRequest<unknown, unknown, EditDirectoryDisplayInformationRequestBody>, 
