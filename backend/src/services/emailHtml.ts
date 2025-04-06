@@ -25,7 +25,7 @@ const DIRECTORY_APPROVAL_EMAIL = `
 
 <p style="margin-bottom: 20px;"> You can view the information posted in our directory here: <a href="https://www.splagen.org/en/en/directory">https://www.splagen.org/en/en/directory</a> </p>
 
-<p style="margin-bottom: 20px;"> Your information for the directory can always be edited by going to the membership page by logging into the membership page and clicking your profile picture in the top right corner. </p>
+<p style="margin-bottom: 20px;"> Your information for the directory can always be edited by going to the membership portal and clicking your profile picture in the top right corner. </p>
 
 <p style="margin-bottom: 20px;"> If you have any questions, please don't hesitate to contact us at <a href="mailto:info@splagen.org" style="color: blue;">info@splagen.org</a>. </p>
 
