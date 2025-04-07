@@ -1,22 +1,21 @@
 "use client";
 import React, { useState } from "react";
+
 import styles from "./FilterableTable.module.css";
 
-interface Column {
+type Column = {
   key: string;
   label: string;
   render?: (row: any) => React.ReactNode;
-}
+};
 
-interface FilterableTableProps {
+type FilterableTableProps = {
   data: any[];
   columns: Column[];
-  filters: {
-    [category: string]: string[];
-  };
+  filters: Record<string, string[]>;
   title?: string;
   csvFilename?: string;
-}
+};
 
 export const FilterableTable: React.FC<FilterableTableProps> = ({
   data,
@@ -26,12 +25,16 @@ export const FilterableTable: React.FC<FilterableTableProps> = ({
   csvFilename = "data.csv",
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [activeFilters, setActiveFilters] = useState<{ [key: string]: string[] }>({});
+  const [activeFilters, setActiveFilters] = useState<Record<string, string[]>>({});
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-  const toggleFilter = () => setIsFilterOpen((prev) => !prev);
+  const toggleFilter = () => {
+    setIsFilterOpen((prev) => !prev);
+  };
 
-  const resetFilters = () => setActiveFilters({});
+  const resetFilters = () => {
+    setActiveFilters({});
+  };
 
   const handleFilterChange = (category: string, value: string) => {
     setActiveFilters((prev) => ({
@@ -63,7 +66,7 @@ export const FilterableTable: React.FC<FilterableTableProps> = ({
   const downloadCSV = () => {
     const header = columns.map((col) => col.label).join(",");
     const rows = filteredData.map((row) =>
-      columns.map((col) => `"${row[col.key] ?? ""}"`).join(",")
+      columns.map((col) => `"${row[col.key] ?? ""}"`).join(","),
     );
 
     const csv = [header, ...rows].join("\n");
@@ -87,7 +90,9 @@ export const FilterableTable: React.FC<FilterableTableProps> = ({
           type="text"
           placeholder="Search..."
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={(e) => {
+            setSearchTerm(e.target.value);
+          }}
           className={styles["search-bar"]}
         />
         <button onClick={toggleFilter} className={styles["action-button"]}>
@@ -98,11 +103,7 @@ export const FilterableTable: React.FC<FilterableTableProps> = ({
         </button>
       </div>
 
-      <div
-        className={`${styles["filter-sidebar"]} ${
-          isFilterOpen ? styles.open : ""
-        }`}
-      >
+      <div className={`${styles["filter-sidebar"]} ${isFilterOpen ? styles.open : ""}`}>
         {Object.entries(filters).map(([category, options]) => (
           <div key={category} className={styles["filter-category"]}>
             <h4>{category}</h4>
@@ -111,7 +112,9 @@ export const FilterableTable: React.FC<FilterableTableProps> = ({
                 <input
                   type="checkbox"
                   checked={activeFilters[category]?.includes(option) || false}
-                  onChange={() => handleFilterChange(category, option)}
+                  onChange={() => {
+                    handleFilterChange(category, option);
+                  }}
                 />
                 {option}
               </label>
@@ -137,9 +140,7 @@ export const FilterableTable: React.FC<FilterableTableProps> = ({
             {filteredData.map((row, idx) => (
               <tr key={idx}>
                 {columns.map((col) => (
-                  <td key={col.key}>
-                    {col.render ? col.render(row) : row[col.key]}
-                  </td>
+                  <td key={col.key}>{col.render ? col.render(row) : row[col.key]}</td>
                 ))}
               </tr>
             ))}

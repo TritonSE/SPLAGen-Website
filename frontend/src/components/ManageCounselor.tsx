@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
 import { FilterableTable } from "./FilterableTable";
-import styles from './FilterableTable.module.css';
+import styles from "./FilterableTable.module.css";
 
 const dummyData = [
   {
@@ -12,7 +12,8 @@ const dummyData = [
     Title: "Medical Geneticist", // Capitalized 'title'
     Membership: "Student Member", // Capitalized 'membership'
     Education: "Bachelors", // Capitalized 'education'
-    Location: { // Capitalized 'location'
+    Location: {
+      // Capitalized 'location'
       Address: "79664 Eisenlohrstrasse 6, Wehr, Baden-Württemberg", // Capitalized 'address'
       Hospital: "UC San Diego Health", // Capitalized 'hospital'
       Country: "Germany", // Capitalized 'country'
@@ -110,15 +111,17 @@ export const ManageCounselor = () => {
       label: "SERVICE",
       render: (row: any) =>
         row.Services.map((s: string, i: number) => {
-            // Generate a class for each service based on its name
-            const serviceClass = s.toLowerCase().replace(/\s+/g, '-'); // Converts "Pediatric Genetics" -> "pediatric-genetics"
-            return (
-              <span key={i} className={`${styles["service-tag"]} ${styles[serviceClass] || styles["default"]}`}>
-                {s}
-              </span>
-            );
+          // Generate a class for each service based on its name
+          const serviceClass = s.toLowerCase().replace(/\s+/g, "-"); // Converts "Pediatric Genetics" -> "pediatric-genetics"
+          return (
+            <span
+              key={i}
+              className={`${styles["service-tag"]} ${styles[serviceClass] || styles.default}`}
+            >
+              {s}
+            </span>
+          );
         }),
-        
     },
     { key: "Joined", label: "JOINED" },
   ];
