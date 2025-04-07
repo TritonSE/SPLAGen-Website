@@ -95,7 +95,7 @@ export const ManageCounselor = () => {
       label: "LOCATION",
       render: (row: any) => (
         <>
-          <div>{row.Location.Address}</div>
+          <div> {row.Location.Address}</div>
           <div>{row.Location.Hospital}</div>
           <div>{row.Location.Country}</div>
         </>

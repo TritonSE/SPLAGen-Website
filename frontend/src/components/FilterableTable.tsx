@@ -97,9 +97,11 @@ export const FilterableTable: React.FC<FilterableTableProps> = ({
         />
         <button onClick={toggleFilter} className={styles["action-button"]}>
           Filter
+          <img src="/icons/filter.svg" alt="Filter icon" className={styles["button-icon"]} />
         </button>
         <button onClick={downloadCSV} className={styles["action-button"]}>
           Download
+          <img src="/icons/download.svg" alt="Download icon" className={styles["button-icon"]} />
         </button>
       </div>
 
