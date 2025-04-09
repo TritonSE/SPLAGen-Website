@@ -9,7 +9,9 @@ const Profile: React.FC = () => {
       medium
       <ProfilePicture size="medium" />
       large
-      <ProfilePicture size="large" />
+      <br />
+      This large component takes in the letter d as an optional prop.
+      <ProfilePicture size="large" letter="d" />
     </div>
   );
 };
