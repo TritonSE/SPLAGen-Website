@@ -2,7 +2,7 @@ import { GlobalState, createStore } from "little-state-machine";
 
 const initialState: GlobalState = {
   onboardingForm: {
-    professionalTitle: "",
+    professionalTitle: {value:"", label:""},
     country: {value:"", label:""}, // how to make display default
     languages: [],
     membership: "",

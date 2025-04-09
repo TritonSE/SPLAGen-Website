@@ -1,11 +1,11 @@
 import "little-state-machine";
-import { CountryOption } from "./components";
+import { CountryOption, ProfessionalTitleOption } from "./components";
 
 declare module "little-state-machine" {
   // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
   interface GlobalState {
     onboardingForm: {
-      professionalTitle: string;
+      professionalTitle: ProfessionalTitleOption;
       country: CountryOption;
       languages: string[]; // check all we need
       membership: string;

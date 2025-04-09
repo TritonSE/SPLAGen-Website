@@ -1,6 +1,7 @@
 "use client";
 import { Radio } from "@tritonse/tse-constellation";
 import { useStateMachine } from "little-state-machine";
+import Image from 'next/image';
 import { useCallback, useState } from "react";
 
 import styles from "./Step2.module.css";
@@ -169,18 +170,24 @@ export const Step2: React.FC<Step2Props> = ({ onNext, onBack, onStudentFlow, onA
           <p className={styles.subtitle}>
           Select the following membership category that best suits you.
           </p>
+          
+          <div className={styles.radioGroup}>
+            <Radio id="radio-7" label="Student" checked={answers.field4 === "Student"} onChange={() => { handleSelection("field4", "Student"); }} />
+            <div className={styles.expandableIndent}>
+              <ExpandableSection
+                title="Student Membership"
+                content="Student membership will be granted to students enrolled in genetic counseling programs offered by an accredited institution, as well as to students enrolled in other degree-granting programs and who are interested in supporting the mission of society. Interested students can submit an application and, upon approval by officials, student membership can be granted or denied. Student members have the privileges of full members; however, they will not be granted a vote on issues or elections open to full and associate members. Student members are not eligible to serve on the Board of Directors or as committee chairs, with the exception of any committee specifically created for students. Student leadership roles will be filled by genetic counseling students."
+              />
+            </div>
 
-          <Radio id="radio-7" label="Student" checked={answers.field4 === "Student"} onChange={() => { handleSelection("field4", "Student"); }} />
-          <ExpandableSection
-            title="Student Membership"
-            content="Student membership will be granted to students enrolled in genetic counseling programs offered by an accredited institution, as well as to students enrolled in other degree-granting programs and who are interested in supporting the mission of society. Interested students can submit an application and, upon approval by officials, student membership can be granted or denied. Student members have the privileges of full members; however, they will not be granted a vote on issues or elections open to full and associate members. Student members are not eligible to serve on the Board of Directors or as committee chairs, with the exception of any committee specifically created for students. Student leadership roles will be filled by genetic counseling students."
-          />
-
-          <Radio id="radio-8" label="Associate Member" checked={answers.field4 === "Associate Member"} onChange={() => { handleSelection("field4", "Associate Member"); }} />
-          <ExpandableSection
-            title="Associate Membership"
-            content="Associate membership will be granted to all applicants interested in supporting the mission of Splagen and who are not eligible for full or student membership. Interested individuals can submit an application and, upon approval by officials, associated membership can be granted or denied. Associate members have all the privileges of full members, but are not eligible for a position on the Board of Directors and can only vote, hold positions as committee chairs and leadership positions related to their specialty and professional background."
-          />
+            <Radio id="radio-8" label="Associate Member" checked={answers.field4 === "Associate Member"} onChange={() => { handleSelection("field4", "Associate Member"); }} />     
+            <div className = {styles.expandableIndent}>
+              <ExpandableSection
+                title="Associate Membership"
+                content="Associate membership will be granted to all applicants interested in supporting the mission of Splagen and who are not eligible for full or student membership. Interested individuals can submit an application and, upon approval by officials, associated membership can be granted or denied. Associate members have all the privileges of full members, but are not eligible for a position on the Board of Directors and can only vote, hold positions as committee chairs and leadership positions related to their specialty and professional background."
+              />
+            </div>
+          </div>
 
         </div>
 
@@ -197,8 +204,15 @@ export const Step2: React.FC<Step2Props> = ({ onNext, onBack, onStudentFlow, onA
         </div>
 
         {renderQuestions()}
+        
         <div className={styles.buttonContainer}>
           <button type="button" onClick={onBack} className={styles.backButton}>
+            <Image
+              src="/icons/ic_caretleft.svg"
+              alt="Back Icon"
+              width={24}
+              height={24}
+            />
             Back
           </button>
           <button

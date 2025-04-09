@@ -1,8 +1,8 @@
-import { CountryOption } from "@/components";
+import { CountryOption, ProfessionalTitleOption } from "@/components";
 
 export type onboardingState = {
   data: {
-    professionalTitle: string;
+    professionalTitle: ProfessionalTitleOption;
     country: CountryOption;
     languages: string[];
     membership: string;

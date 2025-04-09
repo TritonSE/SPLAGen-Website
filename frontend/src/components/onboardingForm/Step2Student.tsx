@@ -3,6 +3,7 @@
 import { Radio } from "@tritonse/tse-constellation";
 import { useStateMachine } from "little-state-machine";
 import dynamic from 'next/dynamic';
+import Image from 'next/image';
 import { useCallback, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 
@@ -140,6 +141,12 @@ export const Step2Student = ({ onNext, onBack }: Step2StudentProps) => {
 
         <div className={styles.buttonContainer}>
           <button type="button" onClick={onBack} className={styles.backButton}>
+            <Image
+              src="/icons/ic_caretleft.svg"
+              alt="Back Icon"
+              width={24}
+              height={24}
+            />
             Back
           </button>
           <button type="submit" className={styles.continueButton}>

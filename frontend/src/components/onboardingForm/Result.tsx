@@ -15,7 +15,7 @@ export const Result = ({ onReset }: ResultProps) => {
     <div>
       <h2 className="text-xl font-bold">Form Submission Result</h2>
       <p>
-        <strong>Professional Title:</strong> {state.onboardingForm.professionalTitle}
+        <strong>Professional Title:</strong> {state.onboardingForm.professionalTitle.value}
       </p>
       <p>
         <strong>Country:</strong> {state.onboardingForm.country.value}

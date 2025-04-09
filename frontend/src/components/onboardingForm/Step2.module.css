@@ -1,5 +1,5 @@
 .container {
-  width: 522px;
+  width: 593px;
   max-height: 80vh;
   display: flex;
   flex-direction: column;
@@ -23,6 +23,7 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  gap: 34px;
 }
 
 .title {
@@ -32,7 +33,6 @@
   font-style: normal;
   font-weight: 700;
   line-height: normal;
-  margin-bottom: 16px;
 }
 
 .subtitle {
@@ -42,14 +42,12 @@
   font-style: normal;
   font-weight: 400;
   line-height: normal;
-  margin-top: 8px;
-  margin-bottom: 16px;
 }
 
 .buttonGroup {
   display: flex;
-  gap: 16px;
-  margin-top: 16px;
+  gap: 35px;
+  margin-top: 24px;
 }
 
 .optionButton {
@@ -91,54 +89,24 @@
   font-family: "DM Sans", sans-serif;
   font-size: 20px;
   font-style: normal;
-  font-weight: 500;
-  line-height: 24px; /* 120% */
+  line-height: 24px;
   background: transparent;
   border: none;
   cursor: pointer;
-  padding: 12px 24px;
-}
-
-.expandableSection:empty {
-  display: none;
-}
-
-.expandableHeader {
   display: flex;
-  padding: 8px 8px 8px 16px;
-  align-items: center;
-  gap: 8px;
-  align-self: stretch;
-  cursor: pointer;
-  background-color: transparent;
 }
 
-.expandIcon {
+.radioGroup {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 24px;
-  height: 24px;
-  font-size: 18px;
-  font-weight: bold;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-top: 32px;
 }
 
-.expandableTitle {
-  font-size: 18px;
-  font-weight: 500;
-  margin: 0;
-}
-
-.expandableContent {
-  padding: 16px;
-  background-color: white;
-}
-
-.expandableContent p {
-  margin-bottom: 12px;
-}
-
-.expandableContent p:last-child {
-  margin-bottom: 0;
+.expandableIndent {
+  padding-left: 38px;
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 20px;
 }
 

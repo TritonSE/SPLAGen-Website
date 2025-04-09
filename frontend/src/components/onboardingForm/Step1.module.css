@@ -3,7 +3,7 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 522px;
+  width: 528px;
   max-height: 80vh; /* Limit height to 80% of viewport height */
   display: flex;
   flex-direction: column;
@@ -31,7 +31,7 @@
 
 .form > div {
   width: 100%;
-  margin-bottom: 16px;
+  margin-bottom: 8px;
 }
 
 .form button {
@@ -65,6 +65,18 @@
   font-weight: 400;
   line-height: normal;
   margin-top: 16px;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.optionalText {
+  color: var(--Neutral-Gray4, #909090);
+  font-family: "DM Sans", sans-serif;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%;
+  letter-spacing: 0.32px;
 }
 
 .input {
@@ -105,6 +117,15 @@
   margin-top: 24px;
 }
 
+.membershipLabel {
+  color: #000;
+  font-family: "DM Sans", sans-serif;;
+  font-size: 17px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+}
+
 .sectionTitle {
   color: #000;
   font-family: "DM Sans", sans-serif;
@@ -123,53 +144,6 @@
   font-weight: 400;
   line-height: normal;
   margin-bottom: 16px;
-}
-
-.expandableSection {
-  border-radius: 4px;
-  border: 1px solid var(--Neutral-Gray2, #d9d9d9);
-  background: var(--Neutral-White, #fff);
-  margin-bottom: 12px;
-  overflow: hidden;
-}
-
-.expandableHeader {
-  display: flex;
-  padding: 8px 8px 8px 16px;
-  align-items: center;
-  gap: 8px;
-  align-self: stretch;
-  cursor: pointer;
-  background-color: transparent;
-}
-
-.expandIcon {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 24px;
-  height: 24px;
-  font-size: 18px;
-  font-weight: bold;
-}
-
-.expandableTitle {
-  font-size: 18px;
-  font-weight: 500;
-  margin: 0;
-}
-
-.expandableContent {
-  padding: 16px;
-  background-color: white;
-}
-
-.expandableContent p {
-  margin-bottom: 12px;
-}
-
-.expandableContent p:last-child {
-  margin-bottom: 0;
 }
 
 .buttonContainer {
@@ -201,9 +175,9 @@
   font-family: "DM Sans", sans-serif;
   font-size: 20px;
   font-style: normal;
-  line-height: 24px; /* 120% */
+  line-height: 24px;
   background: transparent;
   border: none;
   cursor: pointer;
-  padding: 12px 24px;
+  display: flex;
 }

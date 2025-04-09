@@ -6,3 +6,4 @@ export { NavCard } from "./NavCard";
 export { SideNavbar } from "./SideNavbar";
 export { External } from "./translationDemo";
 export { ExpandableSection } from "./expandable";
+export {ProfessionalTitleSelector, type ProfessionalTitleOption} from "./TitleSelector"

@@ -54,6 +54,12 @@ export const Step3A: React.FC<Step3AProps> = ({ onNext, onBack }) => {
 
       <div className={styles.buttonContainer}>
         <button type="button" onClick={onBack} className={styles.backButton}>
+          <Image
+            src="/icons/ic_caretleft.svg"
+            alt="Back Icon"
+            width={24}
+            height={24}
+          />
           Back
         </button>
         <button type="button" onClick={handleContinue} className={styles.continueButton}>

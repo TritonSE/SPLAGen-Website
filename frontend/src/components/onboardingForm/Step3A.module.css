@@ -57,23 +57,9 @@
     justify-content: space-between;
     align-items: center;
     margin-top: 10px;
-}
-
-.backButton {
-    color: #000;
-    text-align: center;
-    font-family: "DM Sans", sans-serif;
-    font-size: 20px;
-    font-style: normal;
-    font-weight: 500;
-    line-height: 24px; /* 120% */
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    padding: 12px 24px;
-}
-
-.continueButton {
+  }
+  
+  .continueButton {
     display: flex;
     padding: 12px 24px;
     justify-content: center;
@@ -86,5 +72,17 @@
     cursor: pointer;
     font-family: "DM Sans", sans-serif;
     font-size: 16px;
-    font-weight: 500;
-}
+  }
+  
+  .backButton {
+    color: #000;
+    text-align: center;
+    font-family: "DM Sans", sans-serif;
+    font-size: 20px;
+    font-style: normal;
+    line-height: 24px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    display: flex;
+  }

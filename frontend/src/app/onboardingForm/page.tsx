@@ -39,7 +39,7 @@ export default function OnboardingForm() {
 
   const handleReset = useCallback(() => {
     actions.updateOnboardingForm({
-      professionalTitle: "",
+      professionalTitle: {value: "", label: ""},
       country: {value: "", label: ""},
       languages: [],
     });
