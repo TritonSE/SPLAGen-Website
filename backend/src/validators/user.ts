@@ -32,17 +32,14 @@ export const createUser = [
 ];
 
 export const deleteUser = [
-  param("firebaseId").isString().notEmpty().withMessage("Valid Firebase ID is required"),
   validateRequest,
 ];
 
 export const getUser = [
-  param("firebaseId").isString().notEmpty().withMessage("Valid Firebase ID is required"),
   validateRequest,
 ];
 
 export const getPersonalInformation = [
-  param("firebaseId").isString().notEmpty().withMessage("Valid Firebase ID is required"),
   validateRequest,
 ];
 
@@ -55,7 +52,6 @@ export const editPersonalInformation = [
 ];
 
 export const getProfessionalInformation = [
-  param("firebaseId").isString().notEmpty().withMessage("Valid Firebase ID is required"),
   validateRequest,
 ];
 
@@ -71,7 +67,6 @@ export const editProfessionalInformation = [
 ];
 
 export const getDirectoryPersonalInformation = [
-  param("firebaseId").isString().notEmpty().withMessage("Valid Firebase ID is required"),
   validateRequest,
 ];
 
@@ -88,7 +83,6 @@ export const editDirectoryPersonalInformation = [
 ];
 
 export const getDirectoryDisplayInfo = [
-  param("firebaseId").isString().notEmpty().withMessage("Valid Firebase ID is required"),
   validateRequest,
 ];
 

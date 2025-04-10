@@ -25,8 +25,13 @@ const verifyFirebaseToken = async (token: string) => {
     const decodedToken = await firebaseAdminAuth.verifyIdToken(token);
     return decodedToken; // returns decoded user data, including UID
   } catch (error) {
-    console.error("Error verifying Firebase token:", error);
-    throw new Error("Token is invalid");
+    if (!(error instanceof Error)) {
+      console.error("Unknown error verifying Firebase token:", error);
+      throw new Error(`Token verification failed for token: ${token}. Unknown error occurred.`);
+    } else {
+      console.error("Error verifying Firebase token:", error);
+      throw new Error(`Token verification failed for token: ${token}. Error details: ${error}`);
+    }
   }
 };
 
@@ -38,12 +43,14 @@ export const requireSignedIn = async (
 ) => {
   // Extract the Firebase token from the "Authorization" header
   const authHeader = req.headers.authorization;
-  if (!authHeader?.startsWith("Bearer ")) {
+
+  // Check if the header starts with "Bearer " and if the token is non-empty
+  const token = authHeader?.split("Bearer ")[1];
+
+  if (!token) {
     res.status(403).send("Authorization token is missing or invalid.");
     return;
   }
-
-  const token = authHeader.split("Bearer ")[1];
 
   try {
     // Verify the Firebase ID token
