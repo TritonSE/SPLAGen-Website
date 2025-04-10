@@ -94,7 +94,7 @@ const userSchema = new Schema(
         suite: { type: String },
         city: { type: String },
         state: { type: String },
-        zipPostCode: { type: String }
+        zipPostCode: { type: String },
       },
     },
 

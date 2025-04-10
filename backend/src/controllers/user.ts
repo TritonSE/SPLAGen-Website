@@ -31,10 +31,10 @@ export const createUser = async (
     const newUser = await UserModel.create({
       firebaseId: userRecord.uid,
       role: "member",
-      account: {...account,inDirectory:false},
+      account: { ...account, inDirectory: false },
       personal,
       professional,
-      education
+      education,
     });
 
     res.status(201).json(newUser);

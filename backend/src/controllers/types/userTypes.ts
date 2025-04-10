@@ -28,10 +28,10 @@ export type CreateUserRequestBody = {
   };
 
   associate: {
-    title?: string,
+    title?: string;
     specialization?: [
       {
-        type: string,
+        type: string;
         enum: [
           "rare disease advocacy",
           "research",
@@ -45,11 +45,11 @@ export type CreateUserRequestBody = {
           "professor",
           "bioinformatics",
           "biotech sales and marketing",
-        ],
+        ];
       },
-    ],
-    organization?: string,
-  },
+    ];
+    organization?: string;
+  };
 };
 
 export type EditUserPersonalInformationRequestBody = {
