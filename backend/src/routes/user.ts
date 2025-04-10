@@ -26,10 +26,13 @@ router.delete(
 );
 router.get("/", requireSignedIn, UserController.getAllUsers);
 router.get("/:id", requireSignedIn, UserValidator.getUser, UserController.getUser);
+router.post("/authenticate", requireSignedIn, UserController.authenticateUser);
 
+// Personal information routes
 router.get("/personal-information", requireSignedIn, UserController.getPersonalInformation);
 router.post("/personal-information", requireSignedIn, UserController.editPersonalInformation);
 
+// Professional information routes
 router.get("/professional-information", requireSignedIn, UserController.getProfessionalInformation);
 router.post(
   "/professional-information",
@@ -37,6 +40,7 @@ router.post(
   UserController.editProfessionalInformation,
 );
 
+// Directory personal information routes
 router.get(
   "/directory/personal-information",
   requireSignedIn,
@@ -48,6 +52,7 @@ router.post(
   UserController.editDirectoryPersonalInformation,
 );
 
+// Directory display info routes
 router.get("/directory/display-info", requireSignedIn, UserController.getDirectoryDisplayInfo);
 router.post("/directory/display-info", requireSignedIn, UserController.editDirectoryDisplayInfo);
 
