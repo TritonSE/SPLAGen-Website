@@ -19,7 +19,7 @@ export const createUser = async (
   next: NextFunction,
 ) => {
   try {
-    const { account, personal, professional, education, clinic, display, password } = req.body;
+    const { account, personal, professional, education, password } = req.body;
 
     // Create user in Firebase
     const userRecord = await firebaseAdminAuth.createUser({
@@ -31,7 +31,7 @@ export const createUser = async (
     const newUser = await UserModel.create({
       firebaseId: userRecord.uid,
       role: "member",
-      account: { ...account, inDirectory: false },
+      account: {...account,inDirectory:false},
       personal,
       professional,
       education,
@@ -152,7 +152,7 @@ export const getUser = async (
       return;
     }
 
-    res.status(200).json(user);
+    next();
     return;
   } catch (error) {
     console.error("Error getting user:", error);

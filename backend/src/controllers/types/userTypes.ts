@@ -1,5 +1,4 @@
 export type CreateUserRequestBody = {
-  //Don't need to pass the type=role
   password: string;
   account: {
     membership: "student" | "geneticCounselor" | "healthcareProvider" | "associate";
@@ -27,28 +26,47 @@ export type CreateUserRequestBody = {
     email?: string;
     gradDate?: string;
   };
+
+  associate: {
+    title?: string,
+    specialization?: [
+      {
+        type: string,
+        enum: [
+          "rare disease advocacy",
+          "research",
+          "public health",
+          "bioethics",
+          "law",
+          "biology",
+          "medical writer",
+          "medical science liason",
+          "laboratory scientist",
+          "professor",
+          "bioinformatics",
+          "biotech sales and marketing",
+        ],
+      },
+    ],
+    organization?: string,
+  },
 };
 
-export type UserId = {
-  //same as firebaseId
-  uid: string;
-};
-
-export type EditUserPersonalInformationRequestBody = UserId & {
+export type EditUserPersonalInformationRequestBody = {
   newFirstName: string;
   newLastName: string;
   newEmail: string;
   newPhone: string;
 };
 
-export type EditUserProfessionalInformationRequestBody = UserId & {
+export type EditUserProfessionalInformationRequestBody = {
   newTitle: string;
   newPrefLanguages: ("english" | "spanish" | "portuguese" | "other")[];
   newOtherPrefLanguages: string;
   newCountry: string;
 };
 
-export type EditDirectoryPersonalInformationRequestBody = UserId & {
+export type EditDirectoryPersonalInformationRequestBody = {
   newDegree: string;
   newEducationInstitution: string;
   newClinicName: string;
@@ -61,7 +79,7 @@ export type EditDirectoryPersonalInformationRequestBody = UserId & {
   newClinicWebsiteUrl: string;
 };
 
-export type EditDirectoryDisplayInformationRequestBody = UserId & {
+export type EditDirectoryDisplayInformationRequestBody = {
   newWorkEmail: string;
   newWorkPhone: string;
   newServices: (

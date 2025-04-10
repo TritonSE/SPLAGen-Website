@@ -30,11 +30,11 @@ router.post("/authenticate", requireSignedIn, UserController.authenticateUser);
 
 // Personal information routes
 router.get("/personal-information", requireSignedIn, UserController.getPersonalInformation);
-router.post("/personal-information", requireSignedIn, UserController.editPersonalInformation);
+router.put("/personal-information", requireSignedIn, UserController.editPersonalInformation);
 
 // Professional information routes
 router.get("/professional-information", requireSignedIn, UserController.getProfessionalInformation);
-router.post(
+router.put(
   "/professional-information",
   requireSignedIn,
   UserController.editProfessionalInformation,
@@ -46,7 +46,7 @@ router.get(
   requireSignedIn,
   UserController.getDirectoryPersonalInformation,
 );
-router.post(
+router.put(
   "/directory/personal-information",
   requireSignedIn,
   UserController.editDirectoryPersonalInformation,
@@ -54,6 +54,6 @@ router.post(
 
 // Directory display info routes
 router.get("/directory/display-info", requireSignedIn, UserController.getDirectoryDisplayInfo);
-router.post("/directory/display-info", requireSignedIn, UserController.editDirectoryDisplayInfo);
+router.put("/directory/display-info", requireSignedIn, UserController.editDirectoryDisplayInfo);
 
 export default router;
