@@ -1,4 +1,4 @@
-import { NextFunction, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 
 import { AuthenticatedRequest } from "../middleware/auth";
 import UserModel from "../models/user";
@@ -14,7 +14,7 @@ import {
 } from "./types/userTypes";
 
 export const createUser = async (
-  req: AuthenticatedRequest<unknown, unknown, CreateUserRequestBody>,
+  req: Request<unknown, unknown, CreateUserRequestBody>,
   res: Response,
   next: NextFunction,
 ) => {
@@ -34,9 +34,7 @@ export const createUser = async (
       account: {...account,inDirectory:false},
       personal,
       professional,
-      education,
-      clinic,
-      display,
+      education
     });
 
     res.status(201).json(newUser);
