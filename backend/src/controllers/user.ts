@@ -30,7 +30,8 @@ export const createUser = async (
     // Create new user in MongoDB
     const newUser = await UserModel.create({
       firebaseId: userRecord.uid,
-      account,
+      role: "member",
+      account: { ...account, inDirectory: false },
       personal,
       professional,
       education,

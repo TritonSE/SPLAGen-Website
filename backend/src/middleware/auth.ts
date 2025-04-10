@@ -93,10 +93,8 @@ export const requireAdminOrSuperAdmin = async (
     }
 
     next();
-    return;
   } catch (error) {
     next(error);
-    return;
   }
 };
 
@@ -111,7 +109,8 @@ export const requireSuperAdmin = async (
     const user = await UserModel.findOne({ firebaseId: firebaseUid });
 
     if (!user || user.role !== UserRole.SUPERADMIN) {
-      return res.status(DEFAULT_ERROR).send("User is not a super admin");
+      res.status(DEFAULT_ERROR).send("User is not a super admin");
+      return;
     }
 
     next();

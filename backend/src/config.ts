@@ -1,4 +1,4 @@
-import dotenv from "dotenv";
+import env from "./util/validateEnv";
 
 export type FirebaseConfig = {
   type: string;
@@ -14,23 +14,10 @@ export type FirebaseConfig = {
   universe_domain: string;
 };
 
-// Load environment variables from .env file
-dotenv.config();
-
-function throwIfUndefined(envVar: string | undefined, error: Error) {
-  if (!envVar) throw error;
-  return envVar;
-}
-
 // Parse the Firebase configuration JSON string
 let firebaseConfig: FirebaseConfig;
 try {
-  firebaseConfig = JSON.parse(
-    throwIfUndefined(
-      process.env.BACKEND_FIREBASE_SETTINGS,
-      new Error("BACKEND_FIREBASE_SETTINGS is missing in the .env"),
-    ),
-  ) as FirebaseConfig;
+  firebaseConfig = JSON.parse(env.BACKEND_FIREBASE_SETTINGS as string) as FirebaseConfig;
 } catch (error) {
   console.log(error);
   throw new Error("Error parsing BACKEND_FIREBASE_SETTINGS in the .env file:");
@@ -53,7 +40,7 @@ try {
 //   ),
 // };
 
-const mongoURI = throwIfUndefined(process.env.MONGO_URI, new Error("No Mongo URI Found"));
-const port = throwIfUndefined(process.env.PORT, new Error("No Port Found"));
+const mongoURI = env.MONGODB_URI;
+const port = env.PORT;
 
 export { firebaseConfig, mongoURI, port };

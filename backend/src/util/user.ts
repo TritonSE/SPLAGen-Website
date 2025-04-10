@@ -9,5 +9,5 @@ export const deleteUserFromFirebase = async (userId: string): Promise<void> => {
 
 // delete user from MongoDB
 export const deleteUserFromMongoDB = async (userId: string): Promise<void> => {
-  await UserModel.findByIdAndDelete(userId);
+  await UserModel.deleteOne({ firebaseId: userId });
 };

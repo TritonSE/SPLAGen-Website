@@ -12,6 +12,7 @@ export enum UserMembership {
   HEALTHCARE_PROVIDER = "healthcareProvider",
   ASSOCIATE = "associate",
 }
+
 const userSchema = new Schema(
   {
     firebaseId: { type: String, required: true },
@@ -58,6 +59,30 @@ const userSchema = new Schema(
       institution: { type: String },
       email: { type: String },
       gradDate: { type: String },
+    },
+
+    associate: {
+      title: { type: String },
+      specialization: [
+        {
+          type: String,
+          enum: [
+            "rare disease advocacy",
+            "research",
+            "public health",
+            "bioethics",
+            "law",
+            "biology",
+            "medical writer",
+            "medical science liason",
+            "laboratory scientist",
+            "professor",
+            "bioinformatics",
+            "biotech sales and marketing",
+          ],
+        },
+      ],
+      organization: { type: String },
     },
 
     clinic: {

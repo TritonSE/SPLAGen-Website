@@ -1,9 +1,7 @@
 export type CreateUserRequestBody = {
+  //Don't need to pass the type=role
   password: string;
   account: {
-    type: "superadmin" | "admin" | "counselor" | "student";
-    inDirectory: boolean;
-    profilePicture?: string;
     membership: "student" | "geneticCounselor" | "healthcareProvider" | "associate";
   };
 
@@ -28,52 +26,6 @@ export type CreateUserRequestBody = {
     institution?: string;
     email?: string;
     gradDate?: string;
-  };
-
-  clinic?: {
-    name?: string;
-    url?: string;
-    location?: {
-      country?: string;
-      address?: string;
-      suite?: string;
-      city?: string;
-      state?: string;
-      zipCode?: string;
-    };
-  };
-
-  display?: {
-    workEmail?: string;
-    workPhone?: string;
-    services?: (
-      | "pediatrics"
-      | "cardiovascular"
-      | "neurogenetics"
-      | "rareDiseases"
-      | "cancer"
-      | "biochemical"
-      | "prenatal"
-      | "adult"
-      | "psychiatric"
-      | "reproductive"
-      | "ophthalmic"
-      | "research"
-      | "pharmacogenomics"
-      | "metabolic"
-      | "other"
-    )[];
-    languages?: ("english" | "spanish" | "portuguese" | "other")[];
-    license?: string[];
-    options?: {
-      openToAppointments?: boolean;
-      openToRequests?: boolean;
-      remote?: boolean;
-    };
-    comments?: {
-      noLicense?: string;
-      additional?: string;
-    };
   };
 };
 
