@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from "express";
-import admin from "firebase-admin"; // Import Firebase Admin SDK
 import { Types } from "mongoose";
 
 import UserModel, { UserRole } from "../models/user";
+import { firebaseAdminAuth } from "../util/firebase";
 
 const DEFAULT_ERROR = 403;
 
@@ -22,7 +22,7 @@ export type AuthenticatedRequest<P = unknown, ResBody = unknown, ReqBody = unkno
 const verifyFirebaseToken = async (token: string) => {
   try {
     // Verify Firebase token using Firebase Admin SDK
-    const decodedToken = await admin.auth().verifyIdToken(token);
+    const decodedToken = await firebaseAdminAuth.verifyIdToken(token);
     return decodedToken; // returns decoded user data, including UID
   } catch (error) {
     console.error("Error verifying Firebase token:", error);
