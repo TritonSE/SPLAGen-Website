@@ -1,4 +1,4 @@
-import { body, param } from "express-validator";
+import { body } from "express-validator";
 
 import { validateRequest } from "./validateRequestHelper";
 
@@ -31,17 +31,11 @@ export const createUser = [
   validateRequest,
 ];
 
-export const deleteUser = [
-  validateRequest,
-];
+export const deleteUser = [validateRequest];
 
-export const getUser = [
-  validateRequest,
-];
+export const getUser = [validateRequest];
 
-export const getPersonalInformation = [
-  validateRequest,
-];
+export const getPersonalInformation = [validateRequest];
 
 export const editPersonalInformation = [
   body("newFirstName").isString().notEmpty().withMessage("First name is required"),
@@ -51,9 +45,7 @@ export const editPersonalInformation = [
   validateRequest,
 ];
 
-export const getProfessionalInformation = [
-  validateRequest,
-];
+export const getProfessionalInformation = [validateRequest];
 
 export const editProfessionalInformation = [
   body("newTitle").optional().isString().withMessage("Title must be a string"),
@@ -66,9 +58,7 @@ export const editProfessionalInformation = [
   validateRequest,
 ];
 
-export const getDirectoryPersonalInformation = [
-  validateRequest,
-];
+export const getDirectoryPersonalInformation = [validateRequest];
 
 export const editDirectoryPersonalInformation = [
   body("newDegree").isString().withMessage("Degree must be a string"),
@@ -82,9 +72,7 @@ export const editDirectoryPersonalInformation = [
   validateRequest,
 ];
 
-export const getDirectoryDisplayInfo = [
-  validateRequest,
-];
+export const getDirectoryDisplayInfo = [validateRequest];
 
 export const editDirectoryDisplayInfo = [
   body("newWorkEmail").optional().isEmail().withMessage("Valid work email is required"),
