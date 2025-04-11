@@ -1,6 +1,7 @@
 "use client";
 import Image from "next/image";
 import { ReactNode } from "react";
+import { useTranslation } from "react-i18next";
 
 import styles from "./TwoButtonPopup.module.css";
 
@@ -19,12 +20,14 @@ export type TwoButtonPopupProps = {
 export const TwoButtonPopup = ({
   isOpen,
   variant = "info",
-  confirmLabel = "Confirm",
+  confirmLabel = "confirm",
   onConfirm,
-  cancelLabel = "Cancel",
+  cancelLabel = "cancel",
   onCancel,
   children,
 }: TwoButtonPopupProps) => {
+  const { t } = useTranslation();
+
   const infoIcon = "/icons/info_icon.svg";
   const questionIcon = "/icons/question_icon.svg";
   const warningIcon = "/icons/warning_icon.svg";
@@ -48,8 +51,8 @@ export const TwoButtonPopup = ({
         {children}
 
         <div className={styles.buttonContainer}>
-          <Button variant="secondary" onClick={onCancel} label={cancelLabel} />
-          <Button variant="primary" onClick={onConfirm} label={confirmLabel} />
+          <Button variant="secondary" onClick={onCancel} label={t(cancelLabel)} />
+          <Button variant="primary" onClick={onConfirm} label={t(confirmLabel)} />
         </div>
       </div>
     </div>
