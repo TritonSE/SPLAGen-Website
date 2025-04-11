@@ -4,14 +4,6 @@ import { validateRequest } from "./validateRequestHelper";
 
 export const createUser = [
   body("account").notEmpty().withMessage("Account information is required"),
-  body("account.type")
-    .isIn(["superadmin", "admin", "counselor", "student"])
-    .withMessage("Account type must be one of: superadmin, admin, counselor, student"),
-  body("account.inDirectory").isBoolean().withMessage("Directory status must be a boolean"),
-  body("account.profilePicture")
-    .optional()
-    .isString()
-    .withMessage("Profile picture must be a string"),
   body("account.membership")
     .isIn(["student", "geneticCounselor", "healthcareProvider", "associate"])
     .withMessage("Invalid membership type"),
