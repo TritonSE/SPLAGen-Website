@@ -17,3 +17,4 @@ export {
   InviteAdminPopup,
   RemoveAdminPopup,
 } from "./models/ManageFlowPopup";
+export { I18nClientReady } from "./I18nClientReady";

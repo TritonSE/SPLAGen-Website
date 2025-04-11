@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { Trans, useTranslation } from "react-i18next";
 
 import styles from "./ManageFlowPopup.module.css";
 import { TwoButtonPopup } from "./TwoButtonPopup";
@@ -15,6 +16,7 @@ export const DenyDirectoryRequestPopup = ({
   onCancel: () => void;
 }) => {
   const [reason, setReason] = useState<string>("");
+  const { t } = useTranslation();
   const onConfirm = () => {
     //TODO send denyal to backend
     //TODO is reason required? if so/not update backend check
@@ -29,29 +31,29 @@ export const DenyDirectoryRequestPopup = ({
     <TwoButtonPopup
       isOpen={true}
       variant="warning"
-      confirmLabel="Deny Request"
+      confirmLabel="deny-request"
       onConfirm={onConfirm}
       onCancel={onCancel}
     >
       <p className={styles.title}>
-        {" "}
-        Are you sure you want to deny <strong>{user.name}</strong>’s request?
+        <Trans
+          i18nKey="deny-request-question"
+          values={{ name: user.name }}
+          components={{ strong: <strong /> }}
+        />
       </p>
-      <p className={styles.message}>
-        This action is irreversible. They will remain part of the counselor database but will not
-        appear in the directory. To be added, they will need to submit a new request.
-      </p>
+      <p className={styles.message}>{t("deny-directory-action-warning")}</p>
 
       <div className={styles.noteContainer}>
         <label className={styles.label} htmlFor="reason">
-          Send a note to: ({user.email})
+          {t("send-note-to", { email: user.email })}
         </label>
         <textarea
           value={reason}
           onChange={(e) => {
             setReason(e.target.value);
           }}
-          placeholder="Let them know why"
+          placeholder={t("let-them-know-why")}
           className={styles.textarea}
         />
       </div>
@@ -63,13 +65,13 @@ export const ApproveDirectoryRequestPopup = ({
   user,
   onCancel,
   isOpen,
-  // onConfirm,
 }: {
   user: { name: string; userId: string };
   isOpen: boolean;
   onCancel: () => void;
-  // onConfirm: () => void;
 }) => {
+  const { t } = useTranslation();
+
   const onConfirm = () => {
     //TODO send request to backend
     console.log("Confirmed");
@@ -81,18 +83,18 @@ export const ApproveDirectoryRequestPopup = ({
     <TwoButtonPopup
       isOpen={true}
       variant="question"
-      confirmLabel="Approve Request"
+      confirmLabel="approve-request"
       onConfirm={onConfirm}
       onCancel={onCancel}
     >
       <p className={styles.title}>
-        {" "}
-        Approve <strong>{user.name}</strong>’s request to be part of the directory?
+        <Trans
+          i18nKey="approve-request-question"
+          values={{ name: user.name }}
+          components={{ strong: <strong /> }}
+        />
       </p>
-      <p className={styles.message}>
-        The counselor will be approved and added to the directory. Any future updates will require
-        manual update.
-      </p>
+      <p className={styles.message}>{t("approve-directory-action-warning")}</p>
     </TwoButtonPopup>
   );
 };
@@ -106,6 +108,8 @@ export const InviteAdminPopup = ({
   isOpen: boolean;
   onCancel: () => void;
 }) => {
+  const { t } = useTranslation();
+
   const onConfirm = () => {
     //TODO send request to backend
     console.log("Confirmed");
@@ -117,18 +121,18 @@ export const InviteAdminPopup = ({
     <TwoButtonPopup
       isOpen={true}
       variant="info"
-      confirmLabel="Send Invite"
+      confirmLabel={"send-invite"}
       onConfirm={onConfirm}
       onCancel={onCancel}
     >
       <p className={styles.title}>
-        {" "}
-        Invite <strong>{user.name}</strong> to be an admin?
+        <Trans
+          i18nKey="invite-admin-question"
+          values={{ name: user.name }}
+          components={{ strong: <strong /> }}
+        />
       </p>
-      <p className={styles.message}>
-        They’ll have access to manage counselors, create announcements, and moderating
-        discussions.{" "}
-      </p>
+      <p className={styles.message}>{t("invite-admin-action-warning")}</p>
     </TwoButtonPopup>
   );
 };
@@ -142,6 +146,8 @@ export const RemoveAdminPopup = ({
   isOpen: boolean;
   onCancel: () => void;
 }) => {
+  const { t } = useTranslation();
+
   const [reason, setReason] = useState<string>("");
   const onConfirm = () => {
     //TODO send denyal to backend
@@ -157,29 +163,29 @@ export const RemoveAdminPopup = ({
     <TwoButtonPopup
       isOpen={true}
       variant="warning"
-      confirmLabel="Remove Admin"
+      confirmLabel="remove-admin"
       onConfirm={onConfirm}
       onCancel={onCancel}
     >
       <p className={styles.title}>
-        {" "}
-        Are you sure you want to remove <strong>{user.name}</strong> as an admin?
+        <Trans
+          i18nKey="remove-admin-question"
+          values={{ name: user.name }}
+          components={{ strong: <strong /> }}
+        />
       </p>
-      <p className={styles.message}>
-        {user.name} will remain as a genetic counselor but will lose all admin privileges. To make
-        her an admin again, you will have to resend an invitation.
-      </p>
+      <p className={styles.message}>{t("remove-admin-action-warning", { name: user.name })}</p>
 
       <div className={styles.noteContainer}>
         <label className={styles.label} htmlFor="reason">
-          Send a note to: ({user.email})
+          {t("send-note-to", { email: user.email })}
         </label>
         <textarea
           value={reason}
           onChange={(e) => {
             setReason(e.target.value);
           }}
-          placeholder="Let them know why"
+          placeholder={t("let-them-know-why")}
           className={styles.textarea}
         />
       </div>
