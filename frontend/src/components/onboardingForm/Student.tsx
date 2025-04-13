@@ -36,7 +36,7 @@ export const Student = ({ onNext, onBack }: StudentProps) => {
       actions.updateOnboardingForm(data);
       onNext(data);
     },
-    [actions.updateOnboardingForm, onNext],
+    [actions, onNext],
   );
 
   const handleFormSubmit = useCallback(

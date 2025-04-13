@@ -1,8 +1,8 @@
 .SideNavbar {
   display: flex;
-  width: clamp(160px, 20vw, 250px);
+  width: var(--nav-width);
   background-color: var(--color-primary2);
-  padding: clamp(4px, 1vw, 40px);
+  padding: clamp(4px, 2vw, 20px);
   color: white;
   font-size: 1rem;
   display: flex;
@@ -15,7 +15,7 @@
 .decoration {
   display: flex;
   align-items: center;
-  margin-bottom: clamp(10px, 5vh, 80px);
+  margin-bottom: clamp(10px, 10vh, 80px);
   font-size: 26px;
   gap: 12px;
 }
@@ -27,13 +27,13 @@
 }
 
 @media (max-height: 400px) {
-  #overview {
+  .overview {
     display: none;
   }
 }
 
-@media (max-width: 500px) {
-  .decoration img {
+@media (max-width: 550px) {
+  .decoration strong {
     display: none;
   }
 }

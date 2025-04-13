@@ -3,17 +3,31 @@ import { InferSchemaType, Schema, model } from "mongoose";
 const announcementSchema = new Schema(
   {
     userId: { type: Schema.Types.ObjectId, required: true },
-    message: {
-      title: { type: String, required: true },
-      channel: { type: String, required: true, default: "everyone" },
-      // text as markdown?
-      text: { type: String, required: true },
+    title: { type: String, required: true },
+    recipients: {
+      type: Schema.Types.Mixed, // Allows either a string or an array
+      required: true,
+      default: "everyone",
+      validate: {
+        validator: function (value: "everyone" | string[]) {
+          if (typeof value === "string") {
+            return value === "everyone";
+          }
+          if (Array.isArray(value)) {
+            return value.every(
+              (email) => typeof email === "string" && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email),
+            );
+          }
+          return false;
+        },
+        message: "Channel must be 'everyone' or an array of valid email addresses.",
+      },
     },
-    //Files should be urls?
-    files: [{ type: String }],
-    commentsAllowed: { type: Boolean, required: true },
-    comments: [{ type: Schema.Types.ObjectId, ref: "AnnouncementComment" }],
+    message: { type: String, required: true },
   },
+  // files: [{ type: String }],
+  // commentsAllowed: { type: Boolean, required: true },
+  // comments: [{ type: Schema.Types.ObjectId, ref: "AnnouncementComment" }],
   { timestamps: true },
 );
 

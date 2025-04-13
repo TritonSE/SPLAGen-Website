@@ -30,7 +30,7 @@ export default function OnboardingForm() {
         }
       });
     },
-    [actions.updateOnboardingForm, setStep],
+    [actions, setStep],
   );
 
   const handleBack = useCallback(() => {
@@ -44,7 +44,7 @@ export default function OnboardingForm() {
       languages: [],
     });
     setStep(1);
-  }, [actions.updateOnboardingForm, setStep]);
+  }, [actions, setStep]);
 
   // Special flow handlers for Student and Associate Member paths
   const handleStudentFlow = useCallback(() => {

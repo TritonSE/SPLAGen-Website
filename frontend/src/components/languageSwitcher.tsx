@@ -8,6 +8,7 @@ export const LanguageSwitcher = () => {
   const changeLanguage = async (lng: string) => {
     try {
       await i18n.changeLanguage(lng);
+      localStorage.setItem("i18nextLng", lng);
     } catch (error) {
       console.error("Failed to change language:", error);
     }

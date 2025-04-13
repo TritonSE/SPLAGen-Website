@@ -77,7 +77,7 @@
 
     // Disabled because of too many false positives.
     "@typescript-eslint/no-unnecessary-condition": "off",
-    "react-hooks/exhaustive-deps": "off",
+    "react-hooks/exhaustive-deps": "warn",
     "no-relative-import-paths/no-relative-import-paths": ["warn", { "allowSameFolder": true }]
   }
 }

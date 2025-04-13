@@ -1,31 +1,23 @@
-import { NextFunction, Request, Response } from "express";
-import { Result, ValidationError, body, param, query, validationResult } from "express-validator";
+import { body, param, query } from "express-validator";
+import mongoose from "mongoose";
 
-function validateRequest(req: Request, res: Response, next: NextFunction): void {
-  const errors: Result<ValidationError> = validationResult(req);
-  if (!errors.isEmpty()) {
-    const errorList: ValidationError[] = errors.array();
-    res.status(400).json({ errors: errorList });
-    return;
-  }
-  next();
-}
+import { validateRequest } from "./validateRequestHelper";
 
 export const createDiscussion = [
   body("title").isString().notEmpty().trim().withMessage("Title is required"),
-  body("content").isString().notEmpty().trim().withMessage("Content is required"),
+  body("message").isString().notEmpty().trim().withMessage("Message is required"),
   validateRequest,
 ];
 
 export const editDiscussion = [
-  param("id").toInt().isInt().withMessage("Valid discussion ID is required"),
+  param("id").isMongoId().withMessage("Invalid MongoDB ObjectId"),
   body("title").optional().isString().trim().withMessage("Title must be a string"),
   body("content").optional().isString().trim().withMessage("Content must be a string"),
   validateRequest,
 ];
 
 export const deleteDiscussion = [
-  param("id").toInt().isInt().withMessage("Valid discussion ID is required"),
+  param("id").isMongoId().withMessage("Invalid MongoDB ObjectId"),
   validateRequest,
 ];
 
@@ -33,11 +25,12 @@ export const deleteMultipleDiscussions = [
   body("ids")
     .isArray({ min: 1 })
     .withMessage("IDs must be an array with at least one element")
-    .custom(
-      (ids: unknown) =>
-        Array.isArray(ids) && ids.every((id) => typeof id === "number" && Number.isInteger(id)),
-    )
-    .withMessage("All IDs must be integers"),
+    .custom((ids: string[]) => {
+      if (!ids.every((id: string) => mongoose.Types.ObjectId.isValid(id))) {
+        throw new Error("All IDs must be valid MongoDB ObjectIds");
+      }
+      return true;
+    }),
   validateRequest,
 ];
 
@@ -52,6 +45,6 @@ export const getMultipleDiscussions = [
 ];
 
 export const getDiscussion = [
-  param("id").toInt().isInt().withMessage("Valid discussion ID is required"),
+  param("id").isMongoId().withMessage("Invalid MongoDB ObjectId"),
   validateRequest,
 ];
