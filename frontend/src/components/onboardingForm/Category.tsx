@@ -4,30 +4,34 @@ import { useStateMachine } from "little-state-machine";
 import Image from "next/image";
 import React from "react";
 
-import styles from "./Step3A.module.css";
+import styles from "./Category.module.css";
 
 import { onboardingState } from "@/state/stateTypes";
 
-type Step3AProps = {
+type CategoryProps = {
   onNext: (data: onboardingState["data"]) => void;
   onBack: () => void;
 };
 
-export const Step3A: React.FC<Step3AProps> = ({ onNext, onBack }) => {
+export const Category: React.FC<CategoryProps> = ({ onNext, onBack }) => {
   const { state } = useStateMachine();
   const membershipType = state.onboardingForm.membership;
 
+  let article = "";
   let membershipText = "";
 
   switch (membershipType) {
     case "Student":
-      membershipText = "a Student";
+      article = "a";
+      membershipText = "Student";
       break;
     case "Healthcare Professional":
-      membershipText = "a Healthcare Professional";
+      article = "a";
+      membershipText = "Healthcare Professional";
       break;
     default:
-        membershipText = "an Associate Member";
+      article = "an";
+      membershipText = "Associate Member";
   }
 
   const handleContinue = () => {
@@ -40,7 +44,7 @@ export const Step3A: React.FC<Step3AProps> = ({ onNext, onBack }) => {
       
       <div className={styles.iconContainer}>
         <Image 
-          src="/icons/ic_round-check-box.svg"
+          src="/icons/ic_success.svg"
           alt="Checkbox icon"
           width={81}
           height={81}
@@ -49,6 +53,7 @@ export const Step3A: React.FC<Step3AProps> = ({ onNext, onBack }) => {
 
       <p className={styles.text}>
         You are being added to SPLAGen&apos;s full membership as {" "}
+        {article}{" "}
         <span className={styles.membershipCategory}>{membershipText}</span>.
       </p>
 

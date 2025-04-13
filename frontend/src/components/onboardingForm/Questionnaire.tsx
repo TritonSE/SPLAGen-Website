@@ -4,40 +4,39 @@ import { useStateMachine } from "little-state-machine";
 import Image from 'next/image';
 import { useCallback, useState } from "react";
 
-import styles from "./Step2.module.css";
+import styles from "./Questionnaire.module.css";
 
 import { ExpandableSection } from "@/components";
 import { onboardingState } from "@/state/stateTypes";
 import updateOnboardingForm from "@/state/updateOnboardingForm";
 
-type Step2Props = {
+type QuestionnaireProps = {
   onNext: (data: onboardingState["data"]) => void;
   onBack: () => void;
   onStudentFlow: () => void;
   onAssociateFlow: () => void;
 };
 
-export const Step2: React.FC<Step2Props> = ({ onNext, onBack, onStudentFlow, onAssociateFlow }) => {
+export const Questionnaire: React.FC<QuestionnaireProps> = ({ onNext, onBack, onStudentFlow, onAssociateFlow }) => {
   const { state, actions } = useStateMachine({ actions: { updateOnboardingForm } });
-  const [answers, setAnswers] = useState<Record<string, string>>({}); // To store all question answers
+  const [answers, setAnswers] = useState<Record<string, string>>({}); 
 
-  // Handle selection for each question - only updates state, no navigation
   const handleSelection = useCallback(
     (question: string, answer: string) => {
       let updatedAnswers = { ...answers };
 
       // Reset dependent fields when an earlier question changes
       if (question === "field1") {
-        updatedAnswers = { field1: answer }; // Reset everything except field1
+        updatedAnswers = { field1: answer };
       } else if (question === "field2") {
-        updatedAnswers = { ...answers, field2: answer }; // Reset field3 and field4
+        updatedAnswers = { ...answers, field2: answer };
         delete updatedAnswers.field3;
         delete updatedAnswers.field4;
       } else if (question === "field3") {
-        updatedAnswers = { ...answers, field3: answer }; // Reset field4
+        updatedAnswers = { ...answers, field3: answer };
         delete updatedAnswers.field4;
       } else {
-        updatedAnswers[question] = answer; // Normal update
+        updatedAnswers[question] = answer;
       }
 
       setAnswers(updatedAnswers);

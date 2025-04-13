@@ -7,7 +7,7 @@ import Image from 'next/image';
 import { useCallback, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 
-import styles from "./Step2Student.module.css";
+import styles from "./Student.module.css";
 
 import type { CountryOption } from "@/components";
 
@@ -18,16 +18,16 @@ const CountrySelector = dynamic(() => import('@/components').then(mod => mod.Cou
   ssr: false
 });
 
-type Step2StudentProps = {
+type StudentProps = {
   onNext: (data: onboardingState["data"]) => void;
   onBack: () => void;
 };
 
-export const Step2Student = ({ onNext, onBack }: Step2StudentProps) => {
+export const Student = ({ onNext, onBack }: StudentProps) => {
   const { state, actions } = useStateMachine({ actions: { updateOnboardingForm } });
   const [selectedCountry, setSelectedCountry] = useState<CountryOption | null>(null);
 
-  const { register, handleSubmit, control, watch, setValue } = useForm({
+  const { register, handleSubmit, control, watch, setValue, reset } = useForm({
     defaultValues: state.onboardingForm,
   });
 
@@ -52,6 +52,26 @@ export const Step2Student = ({ onNext, onBack }: Step2StudentProps) => {
   const handleDegreeSelection = (value: string) => {
     setValue("degree", value);
   };
+
+  const handleBack = useCallback(() => {
+    const clearedData = {
+      ...state.onboardingForm,
+      schoolCountry: {value:"", label:""},
+      schoolName: "",
+      universityEmail: "",
+      degree: "",
+      programName: "",
+      graduationDate: ""
+    };
+    
+    actions.updateOnboardingForm(clearedData);
+    
+    reset(clearedData);
+
+    setSelectedCountry(null);
+    
+    onBack();
+  }, [state.onboardingForm, actions, reset, onBack]);
 
   return (
     <div className={styles.container}>
@@ -140,7 +160,7 @@ export const Step2Student = ({ onNext, onBack }: Step2StudentProps) => {
         </div>
 
         <div className={styles.buttonContainer}>
-          <button type="button" onClick={onBack} className={styles.backButton}>
+          <button type="button" onClick={handleBack} className={styles.backButton}>
             <Image
               src="/icons/ic_caretleft.svg"
               alt="Back Icon"

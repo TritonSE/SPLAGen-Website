@@ -4,12 +4,12 @@ import { useStateMachine } from "little-state-machine";
 import { useCallback, useState } from "react";
 
 import { 
+  Associate, 
+  Basics, 
+  Category, 
+  Questionnaire, 
   Result, 
-  Step1, 
-  Step2, 
-  Step2Associate, 
-  Step2Student, 
-  Step3A, 
+  Student, 
 } from "@/components/onboardingForm";
 import { onboardingState } from "@/state/stateTypes";
 import updateOnboardingForm from "@/state/updateOnboardingForm";
@@ -52,10 +52,9 @@ export default function OnboardingForm() {
   }, [setStep]);
 
   const handleAssociateFlow = useCallback(() => {
-    setStep(2.2); // Use decimal to represent the associate sub-step
+    setStep(2.2); 
   }, [setStep]);
 
-  // Determine next step based on membership type
   const continueFromIntermediateStep = useCallback(() => {
     setStep(3); // Go to Step3A after either intermediate step
   }, [setStep]);
@@ -64,10 +63,10 @@ export default function OnboardingForm() {
     <div className="grid grid-rows-[20px_1fr_20px] items-center min-h-screen">
       <main className="flex flex-col gap-8 row-start-2 items-center">
         <div className="max-w-md mx-auto p-6 bg-white shadow-md rounded">
-          {step === 1 && <Step1 onNext={handleNext} />}
+          {step === 1 && <Basics onNext={handleNext} />}
           
           {step === 2 && (
-            <Step2 
+            <Questionnaire 
               onNext={handleNext} 
               onBack={handleBack} 
               onStudentFlow={handleStudentFlow}
@@ -76,21 +75,21 @@ export default function OnboardingForm() {
           )}
           
           {step === 2.1 && (
-            <Step2Student
+            <Student
               onNext={continueFromIntermediateStep}
               onBack={() => {setStep(2)}}
             />
           )}
           
           {step === 2.2 && (
-            <Step2Associate
+            <Associate
               onNext={continueFromIntermediateStep}
               onBack={() => {setStep(2)}}
             />
           )}
           
           {step === 3 && (
-            <Step3A
+            <Category
               onNext={handleNext}
               onBack={() => {
                 // If we're coming from an intermediate step, go back to Step2

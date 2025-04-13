@@ -6,17 +6,17 @@ import Image from 'next/image';
 import { useCallback } from "react";
 import { Controller, useForm } from "react-hook-form";
 
-import styles from "./Step2Associate.module.css";
+import styles from "./Associate.module.css";
 
 import { onboardingState } from "@/state/stateTypes";
 import updateOnboardingForm from "@/state/updateOnboardingForm";
 
-type Step2AssociateProps = {
+type AssociateProps = {
   onNext: (data: onboardingState["data"]) => void;
   onBack: () => void;
 };
 
-export const Step2Associate = ({ onNext, onBack }: Step2AssociateProps) => {
+export const Associate = ({ onNext, onBack }: AssociateProps) => {
   const { state, actions } = useStateMachine({ actions: { updateOnboardingForm } });
 
   const specializations = [
@@ -26,7 +26,7 @@ export const Step2Associate = ({ onNext, onBack }: Step2AssociateProps) => {
     "Bioinformatics", "Biotech sales and marketing"
   ];
 
-  const { register, handleSubmit, control, watch, setValue } = useForm({
+  const { register, handleSubmit, control, watch, setValue, reset } = useForm({
     defaultValues: state.onboardingForm,
   });
 
@@ -65,6 +65,22 @@ export const Step2Associate = ({ onNext, onBack }: Step2AssociateProps) => {
   const handleRepresentativeSelection = (value: string) => {
     setValue("isOrganizationRepresentative", value);
   };
+
+  const handleBack = useCallback(() => {
+    const clearedData = {
+      ...state.onboardingForm,
+      jobTitle: "",
+      specializations: [],
+      isOrganizationRepresentative: "",
+      organizationName: ""
+    };
+    
+    actions.updateOnboardingForm(clearedData);
+    
+    reset(clearedData);
+    
+    onBack();
+  }, [state.onboardingForm, actions, reset, onBack]);
 
   return (
     <div className={styles.container}>
@@ -138,7 +154,7 @@ export const Step2Associate = ({ onNext, onBack }: Step2AssociateProps) => {
         </div>
 
         <div className={styles.buttonContainer}>
-          <button type="button" onClick={onBack} className={styles.backButton}>
+          <button type="button" onClick={handleBack} className={styles.backButton}>
             <Image
               src="/icons/ic_caretleft.svg"
               alt="Back Icon"

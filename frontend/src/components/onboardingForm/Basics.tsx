@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { useCallback, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 
-import styles from "./Step1.module.css";
+import styles from "./Basics.module.css";
 
 import type {CountryOption, ProfessionalTitleOption} from "@/components";
 
@@ -23,11 +23,11 @@ const ProfessionalTitleSelector = dynamic(() => import('@/components').then(mod 
   ssr: false
 });
 
-type Step1Props = {
+type BasicsProps = {
   onNext: (data: onboardingState["data"]) => void;
 };
 
-export const Step1 = ({ onNext }: Step1Props) => {
+export const Basics = ({ onNext }: BasicsProps) => {
   const { state, actions } = useStateMachine({ actions: { updateOnboardingForm } });
 
   const [selectedCountry, setSelectedCountry] = useState<CountryOption | null>(null);
