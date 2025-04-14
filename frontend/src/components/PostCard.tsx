@@ -4,10 +4,10 @@ import React from "react";
 import "./PostCard.css";
 
 type PostCard = {
-  profileImage: string;
+  profileImage?: string;
   authorName: string;
   date: string;
-  time: string;
+  time?: string;
   title: string;
   audience?: string;
   message: string;
@@ -22,18 +22,22 @@ const PostCard: React.FC<PostCard> = ({
   title,
   audience,
   message,
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
   onClick = () => {},
 }) => {
   return (
     <div className="postcard-container" onClick={onClick}>
-      {/* LEFT SIDE */}
+      {/* LEFT SIDE: Profile Image + Author Info + Timestamp */}
       <div className="postcard-left">
-        <img src={profileImage} alt={`${authorName}'s profile`} className="postcard-profile-img" />
+        <img
+          src={profileImage || "default-profile.jpg"} // Fallback if no profile image is provided
+          alt={`${authorName}'s profile`}
+          className="postcard-profile-img"
+        />
         <div className="postcard-author-info">
           <div className="postcard-author-name">{authorName}</div>
           <div className="postcard-timestamp">
-            {date}, {time}
+            {date}
+            {time ? `, ${time}` : ""}
           </div>
         </div>
       </div>
@@ -41,7 +45,7 @@ const PostCard: React.FC<PostCard> = ({
       {/* DIVIDER */}
       <div className="postcard-divider" />
 
-      {/* RIGHT SIDE */}
+      {/* RIGHT SIDE: Title, Audience, and Message */}
       <div className="postcard-right">
         <div className="postcard-title">{title}</div>
         {audience && <div className="postcard-audience">{audience}</div>}

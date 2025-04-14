@@ -4,11 +4,12 @@
   border-radius: 10px;
   padding: 1.25rem 2rem;
   display: flex;
-  flex-wrap: wrap;
-  align-items: stretch;
-  justify-content: space-between;
-  cursor: pointer;
+  flex-wrap: nowrap;
+  align-items: center;
   gap: 1rem;
+  cursor: pointer;
+  width: 100%;
+  margin: 0 auto;
 }
 
 .postcard-left {
@@ -43,18 +44,14 @@
   color: #444;
 }
 
-.postcard-divider {
-  width: 1px;
-  background-color: #ccc;
-  margin: 0 1.5rem;
-}
-
+/* RIGHT SIDE: Title, Audience, and Message */
 .postcard-right {
   display: flex;
   flex-direction: column;
   flex: 3;
-  min-width: 250px;
-  gap: 0.5rem;
+  min-width: 300px;
+  gap: 0.1rem;
+  margin-left: -15rem;
 }
 
 .postcard-title {

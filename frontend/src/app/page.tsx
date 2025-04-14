@@ -9,10 +9,6 @@ import { UserContext } from "@/contexts/userContext";
 export default function Dashboard() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleOpenModal = () => {
-    setIsModalOpen(true);
-  };
-
   const handleCloseModal = () => {
     setIsModalOpen(false);
   };
@@ -42,8 +38,6 @@ export default function Dashboard() {
               {user.personal.firstName} {user.role}
             </p>
           )}
-
-          <button onClick={handleOpenModal}>Open Post Modal</button>
           <EditBasicInfoModal isOpen={isModalOpen} onClose={handleCloseModal} />
 
           {/* Render a sample PostCard */}
