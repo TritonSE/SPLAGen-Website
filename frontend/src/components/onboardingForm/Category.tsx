@@ -2,7 +2,7 @@
 
 import { useStateMachine } from "little-state-machine";
 import Image from "next/image";
-import React from "react";
+import { useCallback, useMemo } from "react";
 
 import styles from "./Category.module.css";
 
@@ -17,59 +17,55 @@ export const Category: React.FC<CategoryProps> = ({ onNext, onBack }) => {
   const { state } = useStateMachine();
   const membershipType = state.onboardingForm.membership;
 
-  let article = "";
-  let membershipText = "";
+  const [article, membershipText] = useMemo(() => {
+    switch (membershipType) {
+      case "Student":
+        return ["a", "Student"];
+      case "Healthcare Professional":
+        return ["a", "Healthcare Professional"];
+      default:
+        return ["an", "Associate Member"];
+    }
+  }, [membershipType]);
 
-  switch (membershipType) {
-    case "Student":
-      article = "a";
-      membershipText = "Student";
-      break;
-    case "Healthcare Professional":
-      article = "a";
-      membershipText = "Healthcare Professional";
-      break;
-    default:
-      article = "an";
-      membershipText = "Associate Member";
-  }
-
-  const handleContinue = () => {
+  const handleContinue = useCallback(() => {
     onNext(state.onboardingForm);
-  };
+  }, [state, onNext]);
 
   return (
-    <div className={styles.container}>
-      <h2 className={styles.welcome}>Welcome to SPLAGen!</h2>
-      
-      <div className={styles.iconContainer}>
-        <Image 
-          src="/icons/ic_success.svg"
-          alt="Checkbox icon"
-          width={81}
-          height={81}
-        />
-      </div>
-
-      <p className={styles.text}>
-        You are being added to SPLAGen&apos;s full membership as {" "}
-        {article}{" "}
-        <span className={styles.membershipCategory}>{membershipText}</span>.
-      </p>
-
-      <div className={styles.buttonContainer}>
-        <button type="button" onClick={onBack} className={styles.backButton}>
-          <Image
-            src="/icons/ic_caretleft.svg"
-            alt="Back Icon"
-            width={24}
-            height={24}
+    <div className = {styles.darkContainer}>
+      <div className={styles.container}>
+        <h2 className={styles.welcome}>Welcome to SPLAGen!</h2>
+        
+        <div className={styles.iconContainer}>
+          <Image 
+            src="/icons/ic_success.svg"
+            alt="Checkbox icon"
+            width={81}
+            height={81}
           />
-          Back
-        </button>
-        <button type="button" onClick={handleContinue} className={styles.continueButton}>
-          Continue
-        </button>
+        </div>
+
+        <p className={styles.text}>
+          You are being added to SPLAGen&apos;s full membership as {" "}
+          {article}{" "}
+          <span className={styles.membershipCategory}>{membershipText}</span>.
+        </p>
+
+        <div className={styles.buttonContainer}>
+          <button type="button" onClick={onBack} className={styles.backButton}>
+            <Image
+              src="/icons/ic_caretleft.svg"
+              alt="Back Icon"
+              width={24}
+              height={24}
+            />
+            Back
+          </button>
+          <button type="button" onClick={handleContinue} className={styles.continueButton}>
+            Continue
+          </button>
+        </div>
       </div>
     </div>
   );

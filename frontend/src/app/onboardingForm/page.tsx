@@ -60,9 +60,7 @@ export default function OnboardingForm() {
   }, [setStep]);
 
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center min-h-screen">
-      <main className="flex flex-col gap-8 row-start-2 items-center">
-        <div className="max-w-md mx-auto p-6 bg-white shadow-md rounded">
+    <div className="w-full h-full">
           {step === 1 && <Basics onNext={handleNext} />}
           
           {step === 2 && (
@@ -94,8 +92,10 @@ export default function OnboardingForm() {
               onBack={() => {
                 // If we're coming from an intermediate step, go back to Step2
                 const membership = state.onboardingForm.membership;
-                if (membership === "Student" || membership === "Associate Member") {
-                  setStep(2);
+                if (membership === "Student") {
+                  setStep(2.1);
+                } else if (membership === "Associate Member") {
+                  setStep(2.2);
                 } else {
                   setStep(2);
                 }
@@ -105,7 +105,5 @@ export default function OnboardingForm() {
           
           {step === 5 && <Result onReset={handleReset} />}
         </div>
-      </main>
-    </div>
   );
 }

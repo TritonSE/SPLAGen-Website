@@ -1,4 +1,8 @@
 .container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   width: 593px;
   max-height: 80vh;
   display: flex;
@@ -7,8 +11,7 @@
   border-radius: 10px;
   background: var(--color-surface);
   padding: 20px;
-  margin: -40px;
-  margin-left: -108px;
+  margin-left: 108px;
   overflow-y: auto; /* Enable vertical scrolling */
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -75,7 +78,7 @@
   align-items: center;
   gap: 10px;
   border-radius: 10px;
-  background: #211E62;
+  background: var(--color-primary2);
   color: white;
   border: none;
   cursor: pointer;

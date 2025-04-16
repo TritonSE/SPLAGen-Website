@@ -43,7 +43,7 @@ export const Basics = ({ onNext }: BasicsProps) => {
       actions.updateOnboardingForm(data);
       onNext(data);
     },
-    [actions.updateOnboardingForm, onNext],
+    [actions, onNext],
   );
 
   const handleFormSubmit = useCallback(
@@ -65,7 +65,7 @@ export const Basics = ({ onNext }: BasicsProps) => {
     <div className={styles.container}>
       <form onSubmit={handleFormSubmit} className={styles.form}>
         <div>
-          <h2 className={styles.title}>{"Let's start with the basics"}</h2>
+          <h2 className={styles.title}>Let&apos;s start with the basics</h2>
           <p className={styles.subtitle}>Help us get to know you</p>
         </div>
         

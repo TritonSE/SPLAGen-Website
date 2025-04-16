@@ -3,7 +3,7 @@
 import { Radio } from "@tritonse/tse-constellation";
 import { useStateMachine } from "little-state-machine";
 import Image from 'next/image';
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
 
 import styles from "./Associate.module.css";
@@ -35,7 +35,7 @@ export const Associate = ({ onNext, onBack }: AssociateProps) => {
       actions.updateOnboardingForm(data);
       onNext(data);
     },
-    [actions.updateOnboardingForm, onNext],
+    [actions, onNext],
   );
 
   const handleFormSubmit = useCallback(
@@ -46,10 +46,14 @@ export const Associate = ({ onNext, onBack }: AssociateProps) => {
     [handleSubmit, onSubmit],
   );
 
-  const watchSpecializations = watch("specializations") || [];
+  const rawSpecializations = watch("specializations");
+  const watchSpecializations = useMemo(
+    () => rawSpecializations || [],
+    [rawSpecializations]
+  );
   const isRepresentative = watch("isOrganizationRepresentative");
 
-  const toggleSpecialization = (specialization: string) => {
+  const toggleSpecialization = useCallback((specialization: string) => {
     const currentSpecializations = [...watchSpecializations];
     const index = currentSpecializations.indexOf(specialization);
     
@@ -60,11 +64,11 @@ export const Associate = ({ onNext, onBack }: AssociateProps) => {
     }
     
     setValue("specializations", currentSpecializations);
-  };
+  }, [setValue, watchSpecializations]);
 
-  const handleRepresentativeSelection = (value: string) => {
+  const handleRepresentativeSelection = useCallback((value: string) => {
     setValue("isOrganizationRepresentative", value);
-  };
+  }, [setValue]);
 
   const handleBack = useCallback(() => {
     const clearedData = {

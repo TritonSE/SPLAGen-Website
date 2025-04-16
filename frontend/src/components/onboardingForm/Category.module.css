@@ -1,4 +1,17 @@
+/* .darkContainer {
+    display: flex;
+    padding: 149.5px 228.5px 333.5px 227.5px;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.50);
+} */
+
 .container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     width: 654px;
     gap: 45;
     padding: 52px 63px;
@@ -7,14 +20,13 @@
     align-items: center;
     border-radius: 15px;
     flex-shrink: 0;
-    background: #FFF;
-    margin: -40px;
-    margin-left: -108px;
+    background: white;
+    margin-left: 108px;
 }
 
 .welcome {
     width: 100%;
-    color: var(--Primary-Blue-2, #3B3B62);
+    color: var(--color-primary2);
     text-align: center; 
     font-size: 32px;
     font-style: normal;
@@ -40,7 +52,7 @@
 }
 
 .membershipCategory {
-    color: var(--Primary-Blue-2, #3B3B62);
+    color: var(--color-primary2);
     font-family: "DM Sans", sans-serif;
     font-size: 20px;
     font-style: normal;
@@ -64,7 +76,7 @@
     align-items: center;
     gap: 10px;
     border-radius: 10px;
-    background: #211E62;
+    background: var(--color-primary2);
     color: white;
     border: none;
     cursor: pointer;

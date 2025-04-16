@@ -49,9 +49,9 @@ export const Student = ({ onNext, onBack }: StudentProps) => {
 
   const selectedDegree = watch("degree") || "";
   
-  const handleDegreeSelection = (value: string) => {
+  const handleDegreeSelection = useCallback((value: string) => {
     setValue("degree", value);
-  };
+  }, [setValue]);
 
   const handleBack = useCallback(() => {
     const clearedData = {

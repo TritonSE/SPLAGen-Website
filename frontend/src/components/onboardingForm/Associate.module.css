@@ -132,7 +132,7 @@
   align-items: center;
   gap: 10px;
   border-radius: 10px;
-  background: #211E62;
+  background: var(--color-primary2);
   color: white;
   border: none;
   cursor: pointer;

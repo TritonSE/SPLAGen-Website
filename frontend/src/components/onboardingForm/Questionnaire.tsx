@@ -2,7 +2,7 @@
 import { Radio } from "@tritonse/tse-constellation";
 import { useStateMachine } from "little-state-machine";
 import Image from 'next/image';
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 import styles from "./Questionnaire.module.css";
 
@@ -41,15 +41,21 @@ export const Questionnaire: React.FC<QuestionnaireProps> = ({ onNext, onBack, on
 
       setAnswers(updatedAnswers);
     },
-    [answers]
+    [answers, setAnswers]
   );
 
-  const isContinueEnabled = useCallback(() => {
+  const isContinueEnabled = useMemo(() => {
     const condition1 = answers.field1 === "yes";
-    const condition2 = answers.field1 === "no" && answers.field2 === "yes" && (answers.field3 !== undefined && answers.field3 !== null);
-    const condition3 = answers.field1 === "no" && answers.field2 === "no" && (answers.field4 !== undefined && answers.field4 !== null);
-    const enabled = condition1 || condition2 || condition3;
-    return enabled;
+    const condition2 =
+      answers.field1 === "no" &&
+      answers.field2 === "yes" &&
+      answers.field3 !== null;
+    const condition3 =
+      answers.field1 === "no" &&
+      answers.field2 === "no" &&
+      answers.field4 !== null;
+  
+    return condition1 || condition2 || condition3;
   }, [answers]);
 
   const handleContinue = useCallback(() => {
@@ -217,8 +223,8 @@ export const Questionnaire: React.FC<QuestionnaireProps> = ({ onNext, onBack, on
           <button
             type="button"
             onClick={handleContinue}
-            className={`${styles.continueButton} ${!isContinueEnabled() ? styles.disabledButton : ''}`}
-            disabled={!isContinueEnabled()}
+            className={`${styles.continueButton} ${!isContinueEnabled ? styles.disabledButton : ''}`}
+            disabled={!isContinueEnabled}
           >
             Continue
           </button>
