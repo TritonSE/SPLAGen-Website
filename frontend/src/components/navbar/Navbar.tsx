@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useContext, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import { NavCard } from "./NavCard";
 import cardStyle from "./NavCard.module.css";
@@ -34,35 +35,35 @@ const DashboardProps: CardProps = {
   iconDark: "dashboard_dark.svg",
   iconLight: "dashboard_light.svg",
   navigateTo: "/",
-  message: "Dashboard",
+  message: "dashboard",
 };
 
 const DiscussionProps: CardProps = {
   iconDark: "discussion_dark.svg",
   iconLight: "discussion_light.svg",
   navigateTo: "/discussion",
-  message: "Discussion",
+  message: "discussion",
 };
 
 const AnnouncementsProps: CardProps = {
   iconDark: "announcements_dark.svg",
   iconLight: "announcements_light.svg",
   navigateTo: "/announcements",
-  message: "Announcements",
+  message: "announcements",
 };
 
 const MembersProps: CardProps = {
   iconDark: "members_dark.svg",
   iconLight: "members_light.svg",
   navigateTo: "/members",
-  message: "Members",
+  message: "members",
 };
 
 const AdminsProps: CardProps = {
   iconDark: "admins_dark.svg",
   iconLight: "admins_light.svg",
   navigateTo: "/admins",
-  message: "Admins",
+  message: "admins",
 };
 
 // Navigation items
@@ -72,12 +73,13 @@ const adminItems: CardProps[] = [...memberItems, MembersProps];
 
 const superAdminItems: CardProps[] = [...adminItems, AdminsProps];
 
-const onboardingStepLabels = ["Account Setup", "Personal Information", "Membership"];
-const directoryStepLabels = [...onboardingStepLabels, "Directory"];
+const onboardingStepLabels = ["account-setup", "personal-info", "membership"];
+const directoryStepLabels = [...onboardingStepLabels, "directory"];
 
 export const Navbar: React.FC = () => {
   const [navState, setNavState] = useState<NavStateType>(NavStateType.member);
   const { user, onboardingStep } = useContext(UserContext);
+  const { t } = useTranslation();
 
   const setNavStateByRole = useCallback(() => {
     if (user) {
@@ -159,7 +161,7 @@ export const Navbar: React.FC = () => {
               : "none",
           }}
         >
-          OVERVIEW
+          {t("overview")}
         </span>
         {renderNavItems()}
       </div>
@@ -172,7 +174,7 @@ export const Navbar: React.FC = () => {
         }}
       >
         <Image src="/icons/logout_light.svg" alt="Logout" width={24} height={24} />
-        Log out
+        {t("log-out")}
       </button>
     </section>
   );
