@@ -33,7 +33,7 @@ export const getWhoAmI: RequestHandler = async (req: AuthenticatedRequest, res, 
       firebaseId,
       role,
       personal,
-      account
+      account,
     });
   } catch (error) {
     next(error);
