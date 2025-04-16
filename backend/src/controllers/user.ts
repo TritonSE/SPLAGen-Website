@@ -27,12 +27,13 @@ export const getWhoAmI: RequestHandler = async (req: AuthenticatedRequest, res, 
       return;
     }
 
-    const { _id, firebaseId, role, personal } = user;
+    const { _id, firebaseId, role, personal, account } = user;
     res.status(200).send({
       _id,
       firebaseId,
       role,
       personal,
+      account
     });
   } catch (error) {
     next(error);

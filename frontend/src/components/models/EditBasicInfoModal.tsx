@@ -2,16 +2,21 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
-import React, { useCallback } from "react";
+import React, { useCallback, useContext, useEffect } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { isValidPhoneNumber } from "react-phone-number-input";
 import { z } from "zod";
 
-// import { UserContext } from "@/contexts/userContext";
 import ExitButton from "@/../public/icons/ExitButton.svg";
 import "./EditBasicInfoModal.css";
 import { editBasicInfoRequest } from "@/api/users";
+import { UserContext } from "@/contexts/userContext";
+
+// CHANGES MADE by Jesus:
+// - Extracted `reset` from useForm to fix TS/ESLint error: "Unsafe call of an `any` type"
+// - Used `reset` inside useEffect to prefill the form if `user` exists (from UserContext)
+// - The form now auto-populates with user.personal data (firstName, lastName, email, phone)
 
 const ExitButtonSrc: string = ExitButton as unknown as string;
 
@@ -44,11 +49,13 @@ export const EditBasicInfoModal = ({
     register,
     handleSubmit,
     formState: { errors },
+    reset,
   } = useForm<FormData>({
     resolver: zodResolver(schema(t)),
   });
 
   // const { firebaseUser } = useContext(UserContext);
+  const { user } = useContext(UserContext);
 
   const onSubmit = useCallback<SubmitHandler<FormData>>(
     async (data) => {
@@ -78,6 +85,18 @@ export const EditBasicInfoModal = ({
   //     reset(fetchedData); // Populates the form with fetched data
   //   }, 1000);
   // }, [reset]);
+
+  // populate form with user context data
+  useEffect(() => {
+    if (user) {
+      reset({
+        firstName: user.personal.firstName || "",
+        lastName: user.personal.lastName || "",
+        email: user.personal.email || "",
+        phone: user.personal.phone ?? "",
+      });
+    }
+  }, [user, reset]);
 
   const handleFormSubmit = useCallback(
     (e: React.FormEvent<HTMLFormElement>) => {

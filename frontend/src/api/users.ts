@@ -12,6 +12,11 @@ export type User = {
     email: string;
     phone?: string;
   };
+  account: {
+    inDirectory: boolean | string;
+    profilePicture: string;
+    membership: "student" | "geneticCounselor" | "healthcareProvider" | "associate";
+  };
 };
 
 export type BasicInfo = {

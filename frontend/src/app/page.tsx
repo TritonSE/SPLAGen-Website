@@ -30,6 +30,9 @@ export default function Dashboard() {
         <Link href="flowPopupDemo"> Go to flow popup demo </Link>
       </p>
       <p>
+        <Link href="editProfile"> link to profile page </Link>
+      </p>
+      <p>
         <Link href="/profile"> Go to flow profile page WIP demo </Link>
       </p>
 
