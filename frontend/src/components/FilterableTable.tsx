@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 
 import styles from "./FilterableTable.module.css";
 
@@ -28,9 +28,9 @@ export const FilterableTable: React.FC<FilterableTableProps> = ({
   const [activeFilters, setActiveFilters] = useState<Record<string, string[]>>({});
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-  const toggleFilter = () => {
+  const toggleFilterPanel = useCallback(() => {
     setIsFilterOpen((prev) => !prev);
-  };
+  }, [setIsFilterOpen]);
 
   const resetFilters = () => {
     setActiveFilters({});
