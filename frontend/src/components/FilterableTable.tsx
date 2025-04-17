@@ -6,11 +6,11 @@ import styles from "./FilterableTable.module.css";
 type Column = {
   key: string;
   label: string;
-  render?: (row: any) => React.ReactNode;
+  render?: (row: Record<string,unknown>) => React.ReactNode;
 };
 
 type FilterableTableProps = {
-  data: any[];
+  data: Record<string,unknown>[];
   columns: Column[];
   filters: Record<string, string[]>;
   title?: string;

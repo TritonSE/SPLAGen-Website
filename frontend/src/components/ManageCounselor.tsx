@@ -9,18 +9,18 @@ const dummyData = [
     name: "John Doe",
     email: "johndoe@example.com",
     phone: "(123) 456-7890",
-    Title: "Medical Geneticist", // Capitalized 'title'
-    Membership: "Student Member", // Capitalized 'membership'
-    Education: "Bachelors", // Capitalized 'education'
+    Title: "Medical Geneticist", 
+    Membership: "Student Member", 
+    Education: "Bachelors", 
     Location: {
-      // Capitalized 'location'
-      Address: "79664 Eisenlohrstrasse 6, Wehr, Baden-Württemberg", // Capitalized 'address'
-      Hospital: "UC San Diego Health", // Capitalized 'hospital'
-      Country: "Germany", // Capitalized 'country'
+
+      Address: "79664 Eisenlohrstrasse 6, Wehr, Baden-Württemberg",
+      Hospital: "UC San Diego Health", 
+      Country: "Germany", 
     },
-    Languages: ["English", "Spanish"], // Capitalized 'languages'
-    Services: ["Pediatric Genetics", "Cancer Genetics"], // Capitalized 'services'
-    Joined: "01/12/2025", // Capitalized 'joined'
+    Languages: ["English", "Spanish"], 
+    Services: ["Pediatric Genetics", "Cancer Genetics"], 
+    Joined: "01/12/2025", 
   },
   {
     id: 2,
@@ -93,9 +93,9 @@ export const ManageCounselor = () => {
     {
       key: "Location",
       label: "LOCATION",
-      render: (row: any) => (
+      render: (row: Record<string,Record<string,unknown>>) => (
         <>
-          <div> {row.Location.Address}</div>
+          <span> <img src="/icons/location.svg" alt="Filter icon" className={styles["location-icon"]} /> {row.Location.Address}</div>
           <div>{row.Location.Hospital}</div>
           <div>{row.Location.Country}</div>
         </>

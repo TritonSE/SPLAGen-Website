@@ -1,5 +1,3 @@
-import { ManageCounselor } from "../components";
-
 import LanguageSwitcher from "./components/languageSwitcher";
 import External from "./components/translationDemo";
 
@@ -11,7 +9,6 @@ export default function Home() {
         <LanguageSwitcher />
         {/* External is my text component */}
         <External></External>
-        <ManageCounselor></ManageCounselor>
       </main>
     </div>
   );
