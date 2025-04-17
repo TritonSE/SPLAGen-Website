@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import Image from "next/image";
 import React, { useCallback } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 import { z } from "zod";
 
 import "./DirectoryInfoModal.css";
@@ -16,30 +17,32 @@ const CountrySelector = dynamic(() => import("@/components").then((mod) => mod.C
 });
 
 // Define validation schema using Zod
-const countrySchema = z.object({
-  value: z.string().min(1, "Invalid country selection"),
-  label: z.string().min(1),
-});
+const countrySchema = (t: (key: string) => string) =>
+  z.object({
+    value: z.string().min(1, t("invalid-country-selection")),
+    label: z.string().min(1),
+  });
 
-const directoryInfoSchema = z.object({
-  degree: z.string().min(3, "Degree must be at least 3 characters"),
-  institution: z.string().min(3, "Institution must be at least 3 characters"),
-  clinic: z.string().optional(),
-  website: z.string().url("Invalid website URL").optional(),
-  country: countrySchema
-    .nullable()
-    .refine((val) => val !== null, { message: "Country selection is required" }),
-  addressLine: z.string().min(3, "Address must be at least 3 characters").optional(),
-  apartment: z.string().optional(),
-  city: z.string().min(2, "City must be at least 2 characters").optional(),
-  state: z.string().min(2, "State must be at least 2 characters").optional(),
-  postcode: z
-    .string()
-    .min(3, "Postcode must be at least 3 characters")
-    .max(10, "Postcode must be at most 10 characters"),
-});
+const directoryInfoSchema = (t: (key: string) => string) =>
+  z.object({
+    degree: z.string().min(3, t("degree-3-characters")),
+    institution: z.string().min(3, t("institution-3-characters")),
+    clinic: z.string().optional(),
+    website: z.string().url(t("invalid-website-url")).optional(),
+    country: countrySchema(t)
+      .nullable()
+      .refine((val) => val !== null, { message: t("required-country-selection") }),
+    addressLine: z.string().min(3, t("address-3-characters")).optional(),
+    apartment: z.string().optional(),
+    city: z.string().min(2, t("city-2-characters")).optional(),
+    state: z.string().min(2, t("state-2-characters")).optional(),
+    postcode: z
+      .string()
+      .min(3, t("postcode-3-characters"))
+      .max(10, t("postcode-10-max-characters")),
+  });
 
-type DirectoryInfoFormData = z.infer<typeof directoryInfoSchema>;
+type DirectoryInfoFormData = z.infer<ReturnType<typeof directoryInfoSchema>>;
 
 type DirectoryInfoModalProps = {
   isOpen: boolean;
@@ -48,6 +51,7 @@ type DirectoryInfoModalProps = {
 const ExitButtonSrc: string = ExitButton as unknown as string;
 
 export const DirectoryInfoModal: React.FC<DirectoryInfoModalProps> = ({ isOpen, onClose }) => {
+  const { t } = useTranslation();
   const {
     register,
     handleSubmit,
@@ -55,7 +59,7 @@ export const DirectoryInfoModal: React.FC<DirectoryInfoModalProps> = ({ isOpen, 
     reset,
     control,
   } = useForm<DirectoryInfoFormData>({
-    resolver: zodResolver(directoryInfoSchema),
+    resolver: zodResolver(directoryInfoSchema(t)),
   });
 
   const onSubmit = useCallback<SubmitHandler<DirectoryInfoFormData>>((data) => {
@@ -97,29 +101,41 @@ export const DirectoryInfoModal: React.FC<DirectoryInfoModalProps> = ({ isOpen, 
         <button className="close-button" onClick={onClose}>
           <Image src={ExitButtonSrc} alt="Exit" />
         </button>
-        <h2 className="dir-info-heading">Edit Directory Info</h2>
+        <h2 className="dir-info-heading">{t("edit-directory-info")}</h2>
         <form onSubmit={handleFormSubmit} className="modal-form">
           <div className="dir-info-form-group">
-            <label htmlFor="degree">Degree/Certification</label>
-            <input id="degree" {...register("degree")} placeholder="e.g. Master's Degree" />
+            <label htmlFor="degree">{t("degree-certification")}</label>
+            <input
+              id="degree"
+              {...register("degree")}
+              placeholder={t("degree-certification-placeholder")}
+            />
             <p className="error-message">{errors.degree?.message ?? "\u00A0"}</p>
           </div>
 
           <div className="dir-info-form-group">
-            <label htmlFor="institution">Institution</label>
-            <input id="institution" {...register("institution")} placeholder="e.g. UC San Diego" />
+            <label htmlFor="institution">{t("institution")}</label>
+            <input
+              id="institution"
+              {...register("institution")}
+              placeholder={t("institution-placeholder")}
+            />
             <p className="error-message">{errors.institution?.message ?? "\u00A0"}</p>
           </div>
 
           <div className="dir-info-form-group">
-            <label htmlFor="website">Clinic Website Link</label>
-            <input id="website" {...register("website")} placeholder="https://example.com" />
+            <label htmlFor="website">{t("clinic-website-link")}</label>
+            <input
+              id="website"
+              {...register("website")}
+              placeholder={t("clinic-website-link-placeholder")}
+            />
             <p className="error-message">{errors.website?.message ?? "\u00A0"}</p>
           </div>
 
           <div className="directoryInfo-address">
             <div className="dir-info-form-group">
-              <label>Address of Clinic</label>
+              <label>{t("clinic-address")}</label>
               <Controller
                 control={control}
                 name="country"
@@ -127,33 +143,37 @@ export const DirectoryInfoModal: React.FC<DirectoryInfoModalProps> = ({ isOpen, 
                   <CountrySelector
                     value={field.value}
                     onChange={field.onChange}
-                    placeholder="Country..."
+                    placeholder={t("country-ellipsis")}
                   />
                 )}
               />
             </div>
 
             <div className="dir-info-form-group">
-              <input id="addressLine" {...register("addressLine")} placeholder="Address Line" />
+              <input
+                id="addressLine"
+                {...register("addressLine")}
+                placeholder={t("address-line")}
+              />
             </div>
 
             <div className="dir-info-form-group">
               <input
                 id="apartment"
                 {...register("apartment")}
-                placeholder="Apartment, suite, etc."
+                placeholder={t("apartment-suite-etc")}
               />
             </div>
 
             <div className="city-state-postcode">
               <div className="dir-info-form-group">
-                <input id="city" {...register("city")} placeholder="City" />
+                <input id="city" {...register("city")} placeholder={t("city")} />
               </div>
               <div className="dir-info-form-group">
-                <input id="state" {...register("state")} placeholder="State" />
+                <input id="state" {...register("state")} placeholder={t("state")} />
               </div>
               <div className="dir-info-form-group">
-                <input id="postcode" {...register("postcode")} placeholder="Postcode" />
+                <input id="postcode" {...register("postcode")} placeholder={t("postcode")} />
               </div>
             </div>
           </div>
@@ -180,7 +200,7 @@ export const DirectoryInfoModal: React.FC<DirectoryInfoModalProps> = ({ isOpen, 
 
           <div>
             <button type="submit" className="save-button button">
-              Save
+              {t("save")}
             </button>
           </div>
         </form>

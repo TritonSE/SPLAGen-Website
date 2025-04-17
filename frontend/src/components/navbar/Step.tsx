@@ -1,4 +1,6 @@
+"use client";
 import Image from "next/image";
+import { useTranslation } from "react-i18next";
 
 import styles from "./Step.module.css";
 
@@ -11,6 +13,7 @@ type StepProps = {
 
 export const Step: React.FC<StepProps> = ({ step, index, caseType, isLast }) => {
   let icon, iconStyle, textStyle;
+  const { t } = useTranslation();
 
   switch (caseType) {
     case "done":
@@ -36,7 +39,7 @@ export const Step: React.FC<StepProps> = ({ step, index, caseType, isLast }) => 
         <div className={`${styles.stepIcon} ${iconStyle}`}>{icon}</div>
         {!isLast && <div className={styles.stepLine}></div>}
       </div>
-      <div className={`${styles.stepText} ${textStyle}`}>{step}</div>
+      <div className={`${styles.stepText} ${textStyle}`}>{t(step)}</div>
     </div>
   );
 };
