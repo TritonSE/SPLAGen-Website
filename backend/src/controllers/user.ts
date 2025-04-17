@@ -3,7 +3,7 @@ import { NextFunction, Request, Response } from "express";
 import { AuthenticatedRequest } from "../middleware/auth";
 import UserModel from "../models/user";
 import { firebaseAdminAuth } from "../util/firebase";
-import { deleteUserFromFirebase, deleteUserFromMongoDB } from "../util/user";
+import { deleteUserFromFirebase, deleteUserFromMongoDB, getUserFromMongoDB } from "../util/user";
 
 import {
   CreateUserRequestBody,
@@ -142,14 +142,14 @@ export const getUser = async (
 ) => {
   try {
     const { firebaseId } = req.params;
-    const user = await UserModel.findOne({ firebaseId });
+    const user = await getUserFromMongoDB(firebaseId);
 
     if (!user) {
       res.status(404).json({ error: "User not found" });
       return;
     }
 
-    next();
+    res.status(200).json(user);
     return;
   } catch (error) {
     console.error("Error getting user:", error);
