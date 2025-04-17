@@ -1,4 +1,4 @@
-import { body } from "express-validator";
+import { body, param } from "express-validator";
 
 import { validateRequest } from "./validateRequestHelper";
 
@@ -23,11 +23,15 @@ export const createUser = [
   validateRequest,
 ];
 
-export const deleteUser = [validateRequest];
+export const deleteUser = [
+  param("firebaseId").notEmpty().withMessage("Valid user ID is required"),
+  validateRequest,
+];
 
-export const getUser = [validateRequest];
-
-export const getPersonalInformation = [validateRequest];
+export const getUser = [
+  param("firebaseId").notEmpty().withMessage("Valid user ID is required"),
+  validateRequest,
+];
 
 export const editPersonalInformation = [
   body("newFirstName").isString().notEmpty().withMessage("First name is required"),
@@ -37,42 +41,63 @@ export const editPersonalInformation = [
   validateRequest,
 ];
 
-export const getProfessionalInformation = [validateRequest];
-
 export const editProfessionalInformation = [
-  body("newTitle").optional().isString().withMessage("Title must be a string"),
-  body("newPrefLanguages").optional().isArray().withMessage("Preferred languages must be an array"),
+  body("newTitle").isString().withMessage("Title must be a string"),
+  body("newPrefLanguages").isArray({ min: 1 }).withMessage("Preferred languages must be an array"),
+  body("newPrefLanguages.*")
+    .isIn(["english", "spanish", "portuguese", "other"])
+    .withMessage("Invalid preferred language"),
   body("newOtherPrefLanguages")
-    .optional()
     .isString()
     .withMessage("Other preferred languages must be a string"),
-  body("newCountry").optional().isString().withMessage("Country must be a string"),
+  body("newCountry").isString().withMessage("Country must be a string"),
   validateRequest,
 ];
-
-export const getDirectoryPersonalInformation = [validateRequest];
 
 export const editDirectoryPersonalInformation = [
   body("newDegree").isString().withMessage("Degree must be a string"),
-  body("newEducationInstitution").isString().withMessage("Education institution must be a string"),
-  body("newClinicName").isString().withMessage("Clinic name must be a string"),
-  body("newClinicWebsiteUrl")
-    .optional()
-    .isString()
-    .withMessage("Clinic website URL must be a string"),
-  body("newClinicAddress").isString().withMessage("Clinic address must be a string"),
+  body("newEducationInstitution").isString().withMessage("Education institution is required"),
+  body("newClinicName").isString().withMessage("Clinic name is required"),
+  body("newClinicWebsiteUrl").isString().withMessage("Website must be a string"),
+  body("newClinicAddress").isString().withMessage("Address is required"),
+  body("newClinicCountry").isString().withMessage("Country is required"),
+  body("newClinicApartmentSuite").optional().isString(),
+  body("newClinicCity").optional().isString(),
+  body("newClinicState").optional().isString(),
+  body("newClinicZipPostCode").optional().isString(),
   validateRequest,
 ];
 
-export const getDirectoryDisplayInfo = [validateRequest];
-
 export const editDirectoryDisplayInfo = [
-  body("newWorkEmail").optional().isEmail().withMessage("Valid work email is required"),
-  body("newWorkPhone").optional().isString().withMessage("Valid work phone number is required"),
-  body("newServices").optional().isArray().withMessage("Services must be an array of strings"),
-  body("newLanguages").optional().isArray().withMessage("Languages must be an array of strings"),
-  body("newLicense").optional().isArray().withMessage("License must be an array of strings"),
-  body("newRemoteOption").optional().isBoolean().withMessage("Remote option must be a boolean"),
-  body("newRequestOption").optional().isBoolean().withMessage("Request option must be a boolean"),
+  body("newWorkEmail").isEmail().withMessage("Valid work email is required"),
+  body("newWorkPhone").isString().withMessage("Work phone must be a string"),
+  body("newServices").isArray({ min: 1 }).withMessage("Services must be a non-empty array"),
+  body("newServices.*")
+    .isIn([
+      "pediatrics",
+      "cardiovascular",
+      "neurogenetics",
+      "rareDiseases",
+      "cancer",
+      "biochemical",
+      "prenatal",
+      "adult",
+      "psychiatric",
+      "reproductive",
+      "ophthalmic",
+      "research",
+      "pharmacogenomics",
+      "metabolic",
+      "other",
+    ])
+    .withMessage("Invalid service entry"),
+  body("newLanguages").isArray({ min: 1 }).withMessage("Languages must be a non-empty array"),
+  body("newLanguages.*")
+    .isIn(["english", "spanish", "portuguese", "other"])
+    .withMessage("Invalid language entry"),
+  body("newLicense").isArray().withMessage("License must be an array"),
+  body("newLicense.*").isString().withMessage("Each license entry must be a string"),
+  body("newRemoteOption").isBoolean().withMessage("Remote option must be a boolean"),
+  body("newRequestOption").isBoolean().withMessage("Request option must be a boolean"),
   validateRequest,
 ];
