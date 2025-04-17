@@ -23,7 +23,7 @@ export const ProfessionalTitleSelector: React.FC<ProfessionalTitleSelectorProps>
     { value: "medical_geneticist", label: "Medical Geneticist" },
     { value: "genetic_counselor", label: "Genetic Counselor" },
     { value: "student", label: "Student" },
-    { value: "other", label: "Other" }
+    { value: "other", label: "Other" },
   ];
 
   const changeHandler = useCallback(

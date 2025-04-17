@@ -1,27 +1,29 @@
 "use client";
 
 import { useStateMachine } from "little-state-machine";
-import dynamic from 'next/dynamic'
-import Image from 'next/image';
+import dynamic from "next/dynamic";
+import Image from "next/image";
 import { useCallback, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 
 import styles from "./Basics.module.css";
 
-import type {CountryOption, ProfessionalTitleOption} from "@/components";
+import type { CountryOption, ProfessionalTitleOption } from "@/components";
 
-import { Checkmark, ExpandableSection } from "@/components";
+import { Button, Checkmark, ExpandableSection } from "@/components";
 import { onboardingState } from "@/state/stateTypes";
 import updateOnboardingForm from "@/state/updateOnboardingForm";
 
-
-const CountrySelector = dynamic(() => import('@/components').then(mod => mod.CountrySelector), {
-  ssr: false
+const CountrySelector = dynamic(() => import("@/components").then((mod) => mod.CountrySelector), {
+  ssr: false,
 });
 
-const ProfessionalTitleSelector = dynamic(() => import('@/components').then(mod => mod.ProfessionalTitleSelector), {
-  ssr: false
-});
+const ProfessionalTitleSelector = dynamic(
+  () => import("@/components").then((mod) => mod.ProfessionalTitleSelector),
+  {
+    ssr: false,
+  },
+);
 
 type BasicsProps = {
   onNext: (data: onboardingState["data"]) => void;
@@ -32,8 +34,9 @@ export const Basics = ({ onNext }: BasicsProps) => {
 
   const [selectedCountry, setSelectedCountry] = useState<CountryOption | null>(null);
 
-  const [selectedProfessionalTitle, setSelectedProfessionalTitle] = useState<ProfessionalTitleOption | null>(null);
-  
+  const [selectedProfessionalTitle, setSelectedProfessionalTitle] =
+    useState<ProfessionalTitleOption | null>(null);
+
   const { handleSubmit, control } = useForm<onboardingState["data"]>({
     defaultValues: state.onboardingForm,
   });
@@ -68,7 +71,7 @@ export const Basics = ({ onNext }: BasicsProps) => {
           <h2 className={styles.title}>Let&apos;s start with the basics</h2>
           <p className={styles.subtitle}>Help us get to know you</p>
         </div>
-        
+
         <div>
           <label className={styles.label}>Professional Title</label>
           <Controller
@@ -103,6 +106,7 @@ export const Basics = ({ onNext }: BasicsProps) => {
                   setSelectedCountry(option);
                   field.onChange(option);
                 }}
+                placeholder="Select country"
               />
             )}
           />
@@ -143,7 +147,7 @@ export const Basics = ({ onNext }: BasicsProps) => {
           <h3 className={styles.sectionTitle}>Membership</h3>
           <p className={styles.sectionText}>
             The next section of the questionnaire will place you in a membership category. First,
-            review the different types below.
+            review the different types below by clicking on the &quot;+&quot; icon.
           </p>
 
           <h4 className={styles.membershipLabel}>Healthcare Provider</h4>
@@ -170,18 +174,14 @@ export const Basics = ({ onNext }: BasicsProps) => {
             content="Student membership will be granted to students enrolled in genetic counseling programs offered by an accredited institution, as well as to students enrolled in other degree-granting programs and who are interested in supporting the mission of society. Interested students can submit an application and, upon approval by officials, student membership can be granted or denied. Student members have the privileges of full members; however, they will not be granted a vote on issues or elections open to full and associate members. Student members are not eligible to serve on the Board of Directors or as committee chairs, with the exception of any committee specifically created for students. Student leadership roles will be filled by genetic counseling students."
           />
         </div>
-        
+
         <div className={styles.buttonContainer}>
-        <button type="button" className={styles.backButton}>
-          <Image
-            src="/icons/ic_caretleft.svg"
-            alt="Back Icon"
-            width={24}
-            height={24}
-          />
-          Back
-        </button>
-          <button type="submit" className={styles.continueButton}>Continue</button>
+          <button type="button" className={styles.backButton}>
+            <Image src="/icons/ic_caretleft.svg" alt="Back Icon" width={24} height={24} />
+            Back
+          </button>
+
+          <Button type="submit" label="Continue" />
         </div>
       </form>
     </div>

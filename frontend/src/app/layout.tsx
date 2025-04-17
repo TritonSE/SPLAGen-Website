@@ -1,5 +1,6 @@
 "use client";
 import { usePathname } from "next/navigation";
+import { useMemo } from "react";
 import { I18nextProvider } from "react-i18next";
 
 import { I18nClientReady, Navbar } from "@/components";
@@ -14,18 +15,20 @@ export default function RootLayout({
 }>) {
   const pathname = usePathname();
 
-  const isSignUpPage = pathname === "/signup";
+  const isOnboardingFlow = useMemo(() => {
+    return ["/signup", "/login", "/onboardingForm", "/directory"].includes(pathname);
+  }, [pathname]);
 
   return (
     <html lang="en">
-      <body className={isSignUpPage ? "bg-primary" : ""}>
+      <body>
         <UserContextProvider>
           <I18nextProvider i18n={i18n}>
             <I18nClientReady>
               <div className="layout-container">
                 <Navbar />
-                <section className="viewPort">
-                  <main>{children}</main>
+                <section className={`viewPort ${isOnboardingFlow ? "purpleBackground" : ""}`}>
+                  <main className={isOnboardingFlow ? "whiteBackground" : ""}>{children}</main>
                 </section>
               </div>
             </I18nClientReady>

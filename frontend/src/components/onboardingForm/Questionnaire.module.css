@@ -3,7 +3,7 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 593px;
+  width: 60%;
   max-height: 80vh;
   display: flex;
   flex-direction: column;
@@ -11,7 +11,7 @@
   border-radius: 10px;
   background: var(--color-surface);
   padding: 20px;
-  margin-left: 108px;
+  margin-left: 9rem;
   overflow-y: auto; /* Enable vertical scrolling */
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -71,21 +71,6 @@
   margin-top: 10px;
 }
 
-.continueButton {
-  display: flex;
-  padding: 12px 24px;
-  justify-content: center;
-  align-items: center;
-  gap: 10px;
-  border-radius: 10px;
-  background: var(--color-primary2);
-  color: white;
-  border: none;
-  cursor: pointer;
-  font-family: "DM Sans", sans-serif;
-  font-size: 16px;
-}
-
 .backButton {
   color: #000;
   text-align: center;
@@ -112,4 +97,3 @@
   box-sizing: border-box;
   margin-bottom: 20px;
 }
-

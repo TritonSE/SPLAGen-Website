@@ -1,31 +1,23 @@
 .container {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 522px;
-  max-height: 80vh;
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  border-radius: 10px;
-  background: var(--color-surface);
-  padding: 20px;
-  overflow-y: auto;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  margin-left: 108px;
-}
-
-.container::-webkit-scrollbar {
-  display: none;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem 0;
 }
 
 .form {
-  width: 100%;
+  width: 70%;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  overflow-y: scroll;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  max-height: 80vh;
+}
+
+.form::-webkit-scrollbar {
+  display: none;
 }
 
 .form > div {
@@ -35,21 +27,15 @@
 
 .title {
   color: var(--color-primary2);
-  font-family: "DM-sans", sans-serif;
   font-size: 32px;
-  font-style: normal;
   font-weight: 700;
-  line-height: normal;
   margin-bottom: 8px;
 }
 
 .label {
   color: var(--color-text1);
-  font-family: "DM-sans", sans-serif;
   font-size: 20px;
-  font-style: normal;
   font-weight: 400;
-  line-height: normal;
 }
 
 .input {
@@ -78,7 +64,6 @@
   border: 1px solid rgba(0, 0, 0, 0.4);
   background: var(--color-surface);
   cursor: pointer;
-  font-family: "DM-sans", sans-serif;
   font-size: 16px;
   transition: all 0.2s ease;
 }
@@ -97,36 +82,15 @@
   margin-top: 10px;
 }
 
-.continueButton {
-  display: flex;
-  padding: 12px 24px;
-  justify-content: center;
-  align-items: center;
-  gap: 10px;
-  border-radius: 10px;
-  background: var(--color-primary2);
-  color: white;
-  border: none;
-  cursor: pointer;
-  font-family: "DM Sans", sans-serif;
-  font-size: 16px;
-}
-
 .backButton {
   color: #000;
   text-align: center;
-  font-family: "DM Sans", sans-serif;
   font-size: 20px;
-  font-style: normal;
   line-height: 24px;
   background: transparent;
   border: none;
   cursor: pointer;
   display: flex;
-}
-
-.continueButton:hover {
-  opacity: 0.9;
 }
 
 .radioGroup {

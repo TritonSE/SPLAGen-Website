@@ -18,7 +18,7 @@ export default function Dashboard() {
 
   const { user } = useContext(UserContext);
   return (
-    <div>
+    <div className="p-4">
       <h1> Dashboard/Home </h1>
       <p>
         <Link href="/login">go to login</Link>

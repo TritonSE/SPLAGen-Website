@@ -1,98 +1,74 @@
-/* .darkContainer {
-    display: flex;
-    padding: 149.5px 228.5px 333.5px 227.5px;
-    justify-content: center;
-    align-items: center;
-    border-radius: 10px;
-    background: rgba(0, 0, 0, 0.50);
-} */
+.darkContainer {
+  background: #1e1e31;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
 .container {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 654px;
-    gap: 45;
-    padding: 52px 63px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    border-radius: 15px;
-    flex-shrink: 0;
-    background: white;
-    margin-left: 108px;
+  background: var(--color-surface);
+  width: 80%;
+  max-width: 700px;
+  border-radius: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 2rem 3rem;
 }
 
 .welcome {
-    width: 100%;
-    color: var(--color-primary2);
-    text-align: center; 
-    font-size: 32px;
-    font-style: normal;
-    font-weight: 700;
-    line-height: normal;
-    margin: 0; 
+  width: 100%;
+  color: var(--color-primary2);
+  text-align: center;
+  font-size: 32px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
+  margin: 0;
 }
 
 .iconContainer {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: 0 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
 }
 
 .text {
-    color: #000;
-    text-align: center;
-    font-size: 20px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
+  text-align: center;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
 }
 
 .membershipCategory {
-    color: var(--color-primary2);
-    font-family: "DM Sans", sans-serif;
-    font-size: 20px;
-    font-style: normal;
-    font-weight: 500;
-    line-height: normal;
-    display: inline;
+  color: var(--color-primary2);
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  display: inline;
 }
 
 .buttonContainer {
-    display: flex;
-    width: 100%;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 10px;
-  }
-  
-  .continueButton {
-    display: flex;
-    padding: 12px 24px;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-    border-radius: 10px;
-    background: var(--color-primary2);
-    color: white;
-    border: none;
-    cursor: pointer;
-    font-family: "DM Sans", sans-serif;
-    font-size: 16px;
-  }
-  
-  .backButton {
-    color: #000;
-    text-align: center;
-    font-family: "DM Sans", sans-serif;
-    font-size: 20px;
-    font-style: normal;
-    line-height: 24px;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    display: flex;
-  }
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.backButton {
+  color: #000;
+  text-align: center;
+  font-size: 20px;
+  font-style: normal;
+  line-height: 24px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+}

@@ -2,8 +2,8 @@ import { GlobalState, createStore } from "little-state-machine";
 
 const initialState: GlobalState = {
   onboardingForm: {
-    professionalTitle: {value:"", label:""},
-    country: {value:"", label:""}, // how to make display default
+    professionalTitle: { value: "", label: "" },
+    country: { value: "", label: "" }, // how to make display default
     languages: [],
     membership: "",
     // Associate
@@ -13,7 +13,7 @@ const initialState: GlobalState = {
     organizationName: "",
     // Student
     degree: "",
-    schoolCountry: {value:"", label:""},
+    schoolCountry: { value: "", label: "" },
     schoolName: "",
     universityEmail: "",
     programName: "",

@@ -2,8 +2,8 @@
 
 import { Radio } from "@tritonse/tse-constellation";
 import { useStateMachine } from "little-state-machine";
-import dynamic from 'next/dynamic';
-import Image from 'next/image';
+import dynamic from "next/dynamic";
+import Image from "next/image";
 import { useCallback, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 
@@ -11,11 +11,12 @@ import styles from "./Student.module.css";
 
 import type { CountryOption } from "@/components";
 
+import { Button } from "@/components";
 import { onboardingState } from "@/state/stateTypes";
 import updateOnboardingForm from "@/state/updateOnboardingForm";
 
-const CountrySelector = dynamic(() => import('@/components').then(mod => mod.CountrySelector), {
-  ssr: false
+const CountrySelector = dynamic(() => import("@/components").then((mod) => mod.CountrySelector), {
+  ssr: false,
 });
 
 type StudentProps = {
@@ -34,6 +35,7 @@ export const Student = ({ onNext, onBack }: StudentProps) => {
   const onSubmit = useCallback(
     (data: onboardingState["data"]) => {
       actions.updateOnboardingForm(data);
+      // FORM VALIDATION FOR THE STUDENT EMAIL DO NOT CHECK FOR EDU NOT ALL STUDENT USERS WILL HAVE EDU
       onNext(data);
     },
     [actions, onNext],
@@ -48,28 +50,31 @@ export const Student = ({ onNext, onBack }: StudentProps) => {
   );
 
   const selectedDegree = watch("degree") || "";
-  
-  const handleDegreeSelection = useCallback((value: string) => {
-    setValue("degree", value);
-  }, [setValue]);
+
+  const handleDegreeSelection = useCallback(
+    (value: string) => {
+      setValue("degree", value);
+    },
+    [setValue],
+  );
 
   const handleBack = useCallback(() => {
     const clearedData = {
       ...state.onboardingForm,
-      schoolCountry: {value:"", label:""},
+      schoolCountry: { value: "", label: "" },
       schoolName: "",
       universityEmail: "",
       degree: "",
       programName: "",
-      graduationDate: ""
+      graduationDate: "",
     };
-    
+
     actions.updateOnboardingForm(clearedData);
-    
+
     reset(clearedData);
 
     setSelectedCountry(null);
-    
+
     onBack();
   }, [state.onboardingForm, actions, reset, onBack]);
 
@@ -112,7 +117,7 @@ export const Student = ({ onNext, onBack }: StudentProps) => {
           <input
             {...register("universityEmail")}
             className={styles.input}
-            placeholder="Enter your email ending in .edu"
+            placeholder="Enter your school email"
             type="email"
           />
         </div>
@@ -124,54 +129,45 @@ export const Student = ({ onNext, onBack }: StudentProps) => {
               id="degree-ms"
               label="MS"
               checked={selectedDegree === "MS"}
-              onChange={() => { handleDegreeSelection("MS"); }}
+              onChange={() => {
+                handleDegreeSelection("MS");
+              }}
             />
             <Radio
               id="degree-phd"
               label="PhD"
               checked={selectedDegree === "PhD"}
-              onChange={() => { handleDegreeSelection("PhD"); }}
+              onChange={() => {
+                handleDegreeSelection("PhD");
+              }}
             />
             <Radio
               id="degree-md"
               label="MD"
               checked={selectedDegree === "MD"}
-              onChange={() => { handleDegreeSelection("MD"); }}
+              onChange={() => {
+                handleDegreeSelection("MD");
+              }}
             />
           </div>
         </div>
 
         <div>
           <label className={styles.label}>Program Name or Department</label>
-          <input
-            {...register("programName")}
-            className={styles.input}
-            placeholder="Enter name"
-          />
+          <input {...register("programName")} className={styles.input} placeholder="Enter name" />
         </div>
 
         <div>
           <label className={styles.label}>Graduation Date</label>
-          <input
-            {...register("graduationDate")}
-            className={styles.input}
-            placeholder="MM/YY"
-          />
+          <input {...register("graduationDate")} className={styles.input} placeholder="MM/YY" />
         </div>
 
         <div className={styles.buttonContainer}>
           <button type="button" onClick={handleBack} className={styles.backButton}>
-            <Image
-              src="/icons/ic_caretleft.svg"
-              alt="Back Icon"
-              width={24}
-              height={24}
-            />
+            <Image src="/icons/ic_caretleft.svg" alt="Back Icon" width={24} height={24} />
             Back
           </button>
-          <button type="submit" className={styles.continueButton}>
-            Continue
-          </button>
+          <Button type="submit" label="Continue" />
         </div>
       </form>
     </div>

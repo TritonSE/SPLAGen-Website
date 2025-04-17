@@ -3,13 +3,13 @@
 import { useStateMachine } from "little-state-machine";
 import { useCallback, useState } from "react";
 
-import { 
-  Associate, 
-  Basics, 
-  Category, 
-  Questionnaire, 
-  Result, 
-  Student, 
+import {
+  Associate,
+  Basics,
+  Category,
+  Questionnaire,
+  Result,
+  Student,
 } from "@/components/onboardingForm";
 import { onboardingState } from "@/state/stateTypes";
 import updateOnboardingForm from "@/state/updateOnboardingForm";
@@ -39,8 +39,8 @@ export default function OnboardingForm() {
 
   const handleReset = useCallback(() => {
     actions.updateOnboardingForm({
-      professionalTitle: {value: "", label: ""},
-      country: {value: "", label: ""},
+      professionalTitle: { value: "", label: "" },
+      country: { value: "", label: "" },
       languages: [],
     });
     setStep(1);
@@ -52,7 +52,7 @@ export default function OnboardingForm() {
   }, [setStep]);
 
   const handleAssociateFlow = useCallback(() => {
-    setStep(2.2); 
+    setStep(2.2);
   }, [setStep]);
 
   const continueFromIntermediateStep = useCallback(() => {
@@ -61,49 +61,53 @@ export default function OnboardingForm() {
 
   return (
     <div className="w-full h-full">
-          {step === 1 && <Basics onNext={handleNext} />}
-          
-          {step === 2 && (
-            <Questionnaire 
-              onNext={handleNext} 
-              onBack={handleBack} 
-              onStudentFlow={handleStudentFlow}
-              onAssociateFlow={handleAssociateFlow}
-            />
-          )}
-          
-          {step === 2.1 && (
-            <Student
-              onNext={continueFromIntermediateStep}
-              onBack={() => {setStep(2)}}
-            />
-          )}
-          
-          {step === 2.2 && (
-            <Associate
-              onNext={continueFromIntermediateStep}
-              onBack={() => {setStep(2)}}
-            />
-          )}
-          
-          {step === 3 && (
-            <Category
-              onNext={handleNext}
-              onBack={() => {
-                // If we're coming from an intermediate step, go back to Step2
-                const membership = state.onboardingForm.membership;
-                if (membership === "Student") {
-                  setStep(2.1);
-                } else if (membership === "Associate Member") {
-                  setStep(2.2);
-                } else {
-                  setStep(2);
-                }
-              }}
-            />
-          )}
-          
-          {step === 5 && <Result onReset={handleReset} />}
-        </div>
+      {step === 1 && <Basics onNext={handleNext} />}
+
+      {step === 2 && (
+        <Questionnaire
+          onNext={handleNext}
+          onBack={handleBack}
+          onStudentFlow={handleStudentFlow}
+          onAssociateFlow={handleAssociateFlow}
+        />
+      )}
+
+      {step === 2.1 && (
+        <Student
+          onNext={continueFromIntermediateStep}
+          onBack={() => {
+            setStep(2);
+          }}
+        />
+      )}
+
+      {step === 2.2 && (
+        <Associate
+          onNext={continueFromIntermediateStep}
+          onBack={() => {
+            setStep(2);
+          }}
+        />
+      )}
+
+      {step === 3 && (
+        <Category
+          onNext={handleNext}
+          onBack={() => {
+            // If we're coming from an intermediate step, go back to Step2
+            const membership = state.onboardingForm.membership;
+            if (membership === "Student") {
+              setStep(2.1);
+            } else if (membership === "Associate Member") {
+              setStep(2.2);
+            } else {
+              setStep(2);
+            }
+          }}
+        />
+      )}
+
+      {step === 5 && <Result onReset={handleReset} />}
+    </div>
   );
 }
