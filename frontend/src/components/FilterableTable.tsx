@@ -95,7 +95,7 @@ export const FilterableTable: React.FC<FilterableTableProps> = ({
           }}
           className={styles["search-bar"]}
         />
-        <button onClick={toggleFilter} className={styles["action-button"]}>
+        <button onClick={toggleFilterPanel} className={styles["action-button"]}>
           Filter
           <img src="/icons/filter.svg" alt="Filter icon" className={styles["button-icon"]} />
         </button>
@@ -125,7 +125,7 @@ export const FilterableTable: React.FC<FilterableTableProps> = ({
         ))}
         <div className={styles["filter-actions"]}>
           <button onClick={resetFilters}>Reset</button>
-          <button onClick={toggleFilter}>Apply</button>
+          <button onClick={toggleFilterPanel}>Apply</button>
         </div>
       </div>
 
