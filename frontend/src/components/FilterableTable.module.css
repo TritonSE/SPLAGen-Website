@@ -162,7 +162,7 @@ body {
 
 .action-button.selected,
 .action-button:hover {
-  background-color: #3b3b62;
+  background-color: var(--color-primary2);
   color: white;
 }
 
@@ -192,7 +192,7 @@ body {
 }
 
 .counselor-table thead {
-  background-color: #3b3b62;
+  background-color: var(--color-primary2);
   color: white;
 }
 
