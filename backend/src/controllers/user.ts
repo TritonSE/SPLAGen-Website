@@ -19,7 +19,7 @@ export const createUser = async (
   next: NextFunction,
 ) => {
   try {
-    const { account, personal, professional, education, password } = req.body;
+    const { account, personal, professional, education, associate, password } = req.body;
 
     // Create user in Firebase
     const userRecord = await firebaseAdminAuth.createUser({
@@ -35,6 +35,7 @@ export const createUser = async (
       personal,
       professional,
       education,
+      associate,
     });
 
     res.status(201).json(newUser);
