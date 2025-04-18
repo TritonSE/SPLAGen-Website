@@ -3,8 +3,10 @@ import { Types } from "mongoose";
 
 import UserModel, { UserRole } from "../models/user";
 import { firebaseAdminAuth } from "../util/firebase";
+import env from "../util/validateEnv";
 
 const DEFAULT_ERROR = 403;
+const SECURITY_BYPASS_ENABLED = env.SECURITY_BYPASS;
 
 // Define this custom type for a request to include the "firebaseUid"
 export type AuthenticatedRequest<P = unknown, ResBody = unknown, ReqBody = unknown> = Request<
@@ -41,6 +43,25 @@ export const requireSignedIn = async (
   res: Response,
   next: NextFunction,
 ) => {
+  if (SECURITY_BYPASS_ENABLED) {
+    req.firebaseUid = "unique-firebase-id-001";
+    const user = await UserModel.findOne({ firebaseId: req.firebaseUid });
+
+    if (!user) {
+      res.status(401).send("User not found.");
+      return;
+    }
+
+    console.warn("[SECURITY BYPASS] Skipping authentication for development mode.");
+
+    req.role = user.role;
+    req.mongoID = user._id;
+    req.userEmail = user.personal?.email;
+
+    next();
+    return;
+  }
+
   // Extract the Firebase token from the "Authorization" header
   const authHeader = req.headers.authorization;
 
