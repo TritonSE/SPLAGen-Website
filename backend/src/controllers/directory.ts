@@ -95,7 +95,7 @@ export const getPublicDirectory = async (_req: Request, res: Response) => {
   try {
     const users = await UserModel.find({
       "account.inDirectory": true,
-      "account.type": "counselor",
+      "account.membership": { $in: ["counselor", "geneticCounselor", "healthcareProvider"] },
     });
 
     const directory = users.map((user) => ({
