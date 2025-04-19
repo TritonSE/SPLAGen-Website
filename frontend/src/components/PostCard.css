@@ -1,0 +1,97 @@
+.postcard-container {
+  background-color: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 1.25rem 2rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  justify-content: space-between;
+  cursor: pointer;
+  gap: 1rem;
+}
+
+.postcard-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex: 1 1 250px;
+  min-width: 200px;
+}
+
+.postcard-profile-img {
+  width: 3.2rem;
+  height: 3.2rem;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.postcard-author-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.postcard-author-name {
+  font-size: 1rem;
+  font-weight: 500;
+  color: black;
+}
+
+.postcard-timestamp {
+  font-size: 0.75rem;
+  color: #444;
+}
+
+.postcard-divider {
+  width: 1px;
+  background-color: #ccc;
+  margin: 0 1.5rem;
+}
+
+.postcard-right {
+  display: flex;
+  flex-direction: column;
+  flex: 3;
+  min-width: 250px;
+  gap: 0.5rem;
+}
+
+.postcard-title {
+  font-family: "DM Sans", sans-serif;
+  font-size: 1.125rem;
+  font-weight: bold;
+  line-height: 1.5;
+  color: black;
+  letter-spacing: 0.02rem;
+}
+
+.postcard-audience {
+  font-family: "DM Sans", sans-serif;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  color: black;
+}
+
+.postcard-message {
+  font-family: "DM Sans", sans-serif;
+  font-size: 0.75rem;
+  line-height: 1.6;
+  color: #6c6c6c;
+}
+
+/* Responsive tweaks */
+@media screen and (max-width: 768px) {
+  .postcard-container {
+    flex-direction: column;
+    padding: 1rem;
+  }
+
+  .postcard-divider {
+    display: none;
+  }
+
+  .postcard-right {
+    margin-top: 1rem;
+  }
+}
