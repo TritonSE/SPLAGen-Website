@@ -1,4 +1,4 @@
-import { NextFunction, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 
 import { AuthenticatedRequest } from "../middleware/auth";
 import UserModel, { UserMembership } from "../models/user";
@@ -88,5 +88,38 @@ export const denyDirectoryEntry = async (
     res.status(200).json({ message: "Directory entry denied and email sent" });
   } catch (error) {
     next(error);
+  }
+};
+
+export const getPublicDirectory = async (_req: Request, res: Response) => {
+  try {
+    const users = await UserModel.find({
+      "account.inDirectory": true,
+      "account.membership": { $in: ["geneticCounselor", "healthcareProvider"] },
+    });
+
+    const directory = users.map((user) => ({
+      name: `${user.personal?.firstName ?? ""} ${user.personal?.lastName ?? ""}`,
+      title: user.professional?.title ?? "Genetic Counselor",
+      address:
+        `${user.clinic?.location?.address ?? ""} ${user.clinic?.location?.suite ?? ""}`.trim(),
+      organization: user.clinic?.name ?? "",
+      email: user.display?.workEmail ?? user.personal?.email ?? "",
+      phone: user.display?.workPhone ?? user.personal?.phone ?? "",
+      specialties: user.display?.services ?? [],
+      languages: [
+        ...(user.display?.languages ?? []),
+        ...(user.professional?.prefLanguages?.includes("other") &&
+        user.professional.otherPrefLanguages
+          ? [user.professional.otherPrefLanguages]
+          : []),
+      ],
+      profileUrl: user.clinic?.url ?? "",
+    }));
+
+    res.status(200).json(directory);
+  } catch (err) {
+    console.error("Error fetching directory:", err);
+    res.status(500).json({ error: "Internal server error" });
   }
 };

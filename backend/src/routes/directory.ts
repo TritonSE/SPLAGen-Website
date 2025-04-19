@@ -20,5 +20,6 @@ router.post(
   DirectoryValidator.denyDirectoryEntry,
   DirectoryController.denyDirectoryEntry,
 );
+router.post("/public", DirectoryController.getPublicDirectory);
 
 export default router;
