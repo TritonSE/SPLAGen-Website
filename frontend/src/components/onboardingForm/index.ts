@@ -1,5 +1,6 @@
 export { Result } from "./Result";
-export { Step1 } from "./Step1";
-export { Step2 } from "./Step2";
-export { Step3A } from "./Step3A";
-export { Step3B } from "./Step3B";
+export { Basics } from "./Basics";
+export { Questionnaire } from "./Questionnaire";
+export { Student } from "./Student";
+export { Associate } from "./Associate";
+export { Category } from "./Category";
