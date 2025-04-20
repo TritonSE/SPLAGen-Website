@@ -7,7 +7,17 @@
   align-items: center;
   overflow-y: auto;
   scrollbar-width: thin;
+  flex-direction: column;
   -ms-overflow-style: none;
+}
+
+.titleBackDiv {
+  width: 100%;
+  max-width: 800px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-bottom: 10px;
 }
 
 /* Post container */
@@ -17,11 +27,10 @@
   height: clamp(350px, auto, 427px);
   display: flex;
   flex-direction: column;
-  gap: clamp(10px, 4vh, 50px);
+  gap: 10px;
   padding: 20px;
   background-color: #fff;
   border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   overflow: hidden;
 }
 
@@ -56,18 +65,40 @@
   min-height: 150px;
 }
 
-.pageTitle {
-  color: #3b3b62; /* Set color to #3b3b62 */
-  font-size: 2rem; /* Increased font size */
+.title {
+  color: #3b3b62;
+  font-size: 1.5rem;
   font-weight: bold;
   font-family: "DM-sans";
 }
 
+.backArrow {
+  color: #484848;
+  font-size: 1.2rem;
+  font-weight: normal;
+  cursor: pointer;
+  text-align: left;
+  padding: 0;
+  margin-bottom: 8px;
+  font-family: inherit;
+  transition: color 0.2s ease;
+}
+
+.backArrow:hover {
+  color: #3b3b62;
+}
+
+.pageTitle {
+  color: #3b3b62;
+  font-size: 1.3rem;
+  font-weight: normal;
+  font-family: "DM-sans";
+}
 /* Button container */
 .formActions {
   display: flex;
-  justify-content: flex-end; /* Align buttons to the right */
-  gap: 10px; /* Add space between buttons */
+  justify-content: flex-end;
+  gap: 10px;
 }
 
 /* Post button styling */
@@ -93,9 +124,9 @@
 /* Cancel button styling */
 .buttonCancel {
   padding: 10px 20px;
-  border: 2px solid #ccc; /* Grey border */
+  border: 2px solid #ccc;
   background-color: white;
-  color: #7f8c8d; /* Grey text */
+  color: #7f8c8d;
   font-size: 1rem;
   font-weight: bold;
   border-radius: 8px;
@@ -106,9 +137,9 @@
 }
 
 .buttonCancel:hover {
-  background-color: #f2f2f2; /* Light grey background on hover */
-  border-color: #bdc3c7; /* Lighter grey border on hover */
-  color: #7f8c8d; /* Ensure grey text stays the same */
+  background-color: #f2f2f2;
+  border-color: #bdc3c7;
+  color: #7f8c8d;
 }
 
 /* Media query adjustments for small screens */

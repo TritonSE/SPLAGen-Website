@@ -27,7 +27,7 @@ export default function Dashboard() {
         <Link href="/phoneInputDemo"> Go to phone input demo </Link>
       </p>
       <p>
-        <Link href="/post"> Go to post</Link>
+        <Link href="/discussion/post"> Go to post</Link>
       </p>
       <p>
         <Link href="flowPopupDemo"> Go to flow popup demo </Link>

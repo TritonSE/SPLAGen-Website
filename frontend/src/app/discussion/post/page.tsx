@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-misused-promises */
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -50,8 +49,20 @@ const CreatePostPage: React.FC = () => {
 
   return (
     <div className={styles.createPostPageContainer}>
+      <div className={styles.titleBackDiv}>
+        <h1 className={styles.title}>Discussion</h1>
+        <button
+          className={styles.backArrow}
+          onClick={() => {
+            router.push("/discussion");
+          }}
+          type="button"
+        >
+          ← Back
+        </button>
+      </div>
       <div className={styles.postPageDiv}>
-        <h1 className={styles.pageTitle}>Create New Post</h1>
+        <h2 className={styles.pageTitle}>Create New Post</h2>
         <form onSubmit={handleSubmit(onSubmit)} className={styles.createPostForm}>
           <div className={styles.formGroup}>
             <label htmlFor="post-title">Post Title</label>
