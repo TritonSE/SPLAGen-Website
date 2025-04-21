@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import Image from "next/image";
 import React, { useCallback } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 import { z } from "zod";
 
 import ExitButton from "@/../public/icons/ExitButton.svg";
@@ -18,23 +19,25 @@ const CountrySelector = dynamic(() => import("@/components").then((mod) => mod.C
 
 const ExitButtonSrc: string = ExitButton as unknown as string;
 
-const countrySchema = z.object({
-  value: z.string().min(1, "Invalid country selection"),
-  label: z.string().min(1),
-});
+const countrySchema = (t: (key: string) => string) =>
+  z.object({
+    value: z.string().min(1, t("invalid-country-selection")),
+    label: z.string().min(1),
+  });
 
-const professionalInfoSchema = z.object({
-  professionalTitle: z.string().min(1, "Professional Title is required"),
-  country: countrySchema
-    .nullable()
-    .refine((val) => val !== null, { message: "Country selection is required" }),
-  languages: z.array(z.string()).nonempty("At least one language is required"),
-  splagenDirectory: z.boolean(),
-});
+const professionalInfoSchema = (t: (key: string) => string) =>
+  z.object({
+    professionalTitle: z.string().min(1, t("professional-title-required")),
+    country: countrySchema(t)
+      .nullable()
+      .refine((val) => val !== null, { message: t("required-country-selection") }),
+    languages: z.array(z.string()).nonempty(t("one-language-required")),
+    splagenDirectory: z.boolean(),
+  });
 
-type ProfessionalInfoFormData = z.infer<typeof professionalInfoSchema>;
+type ProfessionalInfoFormData = z.infer<ReturnType<typeof professionalInfoSchema>>;
 
-const languages = ["English", "Spanish", "Portuguese", "Other"];
+const languages = ["english", "spanish", "portuguese", "other"];
 
 export const ProfessionalInfoModal = ({
   isOpen,
@@ -43,6 +46,7 @@ export const ProfessionalInfoModal = ({
   isOpen: boolean;
   onClose: () => void;
 }) => {
+  const { t } = useTranslation();
   const {
     register,
     handleSubmit,
@@ -52,18 +56,18 @@ export const ProfessionalInfoModal = ({
     setValue,
     setError,
   } = useForm<ProfessionalInfoFormData>({
-    resolver: zodResolver(professionalInfoSchema),
+    resolver: zodResolver(professionalInfoSchema(t)),
     defaultValues: {
       professionalTitle: "",
       country: undefined,
-      languages: ["English"],
+      languages: ["english"],
       splagenDirectory: false,
     },
   });
 
   const watchedLanguages = watch("languages");
   const selectedLanguages = React.useMemo(
-    () => watchedLanguages || ["English"],
+    () => watchedLanguages || ["english"],
     [watchedLanguages],
   );
 
@@ -77,16 +81,16 @@ export const ProfessionalInfoModal = ({
       if (updatedLanguages.length === 0) {
         setError("languages", {
           type: "manual",
-          message: "At least one language is required, defaulting to English",
+          message: t("one-language-required-default-english"),
         });
       }
 
       setValue(
         "languages",
-        updatedLanguages.length ? (updatedLanguages as [string, ...string[]]) : ["English"],
+        updatedLanguages.length ? (updatedLanguages as [string, ...string[]]) : ["english"],
       );
     },
-    [selectedLanguages, setValue, setError],
+    [selectedLanguages, setValue, setError, t],
   );
 
   const onSubmit = useCallback<SubmitHandler<ProfessionalInfoFormData>>(
@@ -119,15 +123,15 @@ export const ProfessionalInfoModal = ({
         <button className="close-button" onClick={onClose}>
           <Image src={ExitButtonSrc} alt="Exit" />
         </button>
-        <h2 id="prof-info-h2">Edit Professional Info</h2>
+        <h2 id="prof-info-h2">{t("edit-professional-info")}</h2>
         <form className="prof-info-form" onSubmit={handleFormSubmit}>
           {/* Professional Title */}
           <div className="prof-info-field">
-            <label htmlFor="professionalTitle">Professional Title*</label>
+            <label htmlFor="professionalTitle">{t("professional-title")}*</label>
             <input
               type="text"
               id="professionalTitle"
-              placeholder="e.g. Genetic Counselor"
+              placeholder={t("professional-title-placeholder")}
               {...register("professionalTitle")}
             />
             <p className="error-message">{errors.professionalTitle?.message ?? "\u00A0"}</p>
@@ -135,7 +139,7 @@ export const ProfessionalInfoModal = ({
 
           {/* Country */}
           <div className="prof-info-field">
-            <label>Country*</label>
+            <label>{t("country")}*</label>
             <Controller
               control={control}
               name="country"
@@ -143,7 +147,7 @@ export const ProfessionalInfoModal = ({
                 <CountrySelector
                   value={field.value}
                   onChange={field.onChange}
-                  placeholder="Country..."
+                  placeholder={t("country-ellipsis")}
                 />
               )}
             />
@@ -152,11 +156,11 @@ export const ProfessionalInfoModal = ({
 
           {/* Languages */}
           <div className="prof-info-field">
-            <label htmlFor="languages">Prefered Languages*</label>
+            <label htmlFor="languages">{t("preferred-language")}*</label>
             <div className="language-options">
               {languages.map((language) => (
                 <PillButton
-                  label={language}
+                  label={t(language)}
                   key={language}
                   isActive={selectedLanguages.includes(language)}
                   onClick={() => {
@@ -174,11 +178,11 @@ export const ProfessionalInfoModal = ({
 
           {/* SPLAGen Directory */}
           <div className="prof-info-field no-error-message-field">
-            <label>SPLAGen Directory*</label>
-            <p>{watch("splagenDirectory") ? "Yes" : "No"}</p>
+            <label>{t("splagen-directory")}*</label>
+            <p>{watch("splagenDirectory") ? t("yes") : t("no")}</p>
           </div>
           <button type="submit" id="prof-info-submit" className="button">
-            Save
+            {t("save")}
           </button>
         </form>
       </div>

@@ -3,32 +3,35 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import React, { useCallback } from "react";
 import { useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 import { z } from "zod";
 
 import style from "./SignUp.module.css";
 
-const formSchema = z.object({
-  firstName: z.string().min(1, "First name is required"),
-  lastName: z.string().min(1, "Last name is required"),
-  email: z.string().email("Invalid email address"),
-  password: z
-    .string()
-    .min(8, "Password must be at least 8 characters")
-    .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
-    .regex(/[a-z]/, "Password must contain at least one lowercase letter")
-    .regex(/\d/, "Password must contain at least one number")
-    .regex(/[!@#$%^&*(),.?":{}|<>]/, "Password must contain at least one special character"),
-});
+const formSchema = (t: (key: string) => string) =>
+  z.object({
+    firstName: z.string().min(1, t("first-name-required")),
+    lastName: z.string().min(1, t("last-name-required")),
+    email: z.string().email(t("invalid-email")),
+    password: z
+      .string()
+      .min(8, t("password-8-characters"))
+      .regex(/[A-Z]/, t("password-1-uppercase"))
+      .regex(/[a-z]/, t("password-1-lowercase"))
+      .regex(/\d/, t("password-1-number"))
+      .regex(/[!@#$%^&*(),.?":{}|<>]/, t("password-1-special")),
+  });
 
-type FormData = z.infer<typeof formSchema>;
+type FormData = z.infer<ReturnType<typeof formSchema>>;
 
 const SignUpPage = () => {
+  const { t } = useTranslation();
   const {
     register,
     handleSubmit,
     formState: { errors, isValid },
   } = useForm<FormData>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(formSchema(t)),
     mode: "onChange",
   });
 
@@ -49,20 +52,22 @@ const SignUpPage = () => {
     <div className={style.signup}>
       <div>
         <h1 className={` text-2xl font-bold text-left text-primary mb-2 ${style.signupTitle}`}>
-          Get started
+          {t("get-started")}
         </h1>
-        <p className={`text-left text-gray-600 mb-6  ${style.signupWelcome}`}>Welcome to SPAGen</p>
+        <p className={`text-left text-gray-600 mb-6  ${style.signupWelcome}`}>
+          {t("welcome-to-splagen")}
+        </p>
         <form onSubmit={handleFormSubmit} className="w-full">
           <div className={style.signupNames}>
             {/* First Name Input */}
             <div className="">
               <label className="block text-sm font-medium mb-1 text-black" htmlFor="firstName">
-                First Name
+                {t("first-name")}
               </label>
               <input
                 {...register("firstName")}
                 className="p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 placeholder-disabled"
-                placeholder="Enter your first name"
+                placeholder={t("enter-first-name")}
                 id="firstName"
               />
               <p className="text-red-500 text-xs mt-1">
@@ -73,12 +78,12 @@ const SignUpPage = () => {
             {/* Last Name Input */}
             <div className="">
               <label className="block text-sm font-medium mb-1 text-black" htmlFor="lastName">
-                Last Name
+                {t("last-name")}
               </label>
               <input
                 {...register("lastName")}
                 className="p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 placeholder-disabled"
-                placeholder="Enter your last name"
+                placeholder={t("enter-last-name")}
                 id="lastName"
               />
 
@@ -91,13 +96,13 @@ const SignUpPage = () => {
           {/* Email Input */}
           <div>
             <label className="block text-sm font-medium mb-1 text-black" htmlFor="email">
-              Enter your email
+              {t("enter-email")}
             </label>
             <input
               type="email"
               {...register("email")}
               className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 placeholder-disabled"
-              placeholder="Enter your email"
+              placeholder={t("enter-email")}
               autoComplete="email"
               id="email"
             />
@@ -109,13 +114,13 @@ const SignUpPage = () => {
           {/* Create a Password */}
           <div className="mb-4 w-full">
             <label className="block text-sm font-medium mb-1 text-black" htmlFor="password">
-              Create a Password
+              {t("create-password")}
             </label>
             <input
               type="password"
               {...register("password")}
               className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 placeholder-disabled"
-              placeholder="Create a password"
+              placeholder={t("create-password")}
               id="password"
             />
 
@@ -134,7 +139,7 @@ const SignUpPage = () => {
                   : "bg-disabled cursor-not-allowed pointer-events-none"
               }`}
             >
-              Continue
+              {t("continue")}
             </button>
           </div>
         </form>

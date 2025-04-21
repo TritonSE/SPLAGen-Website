@@ -135,3 +135,5 @@ data/db/*
 *.lock
 data/db/
 *.wt
+
+.DS_Store

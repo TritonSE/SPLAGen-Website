@@ -16,7 +16,7 @@ export default function Dashboard() {
   const { user } = useContext(UserContext);
 
   return (
-    <div>
+    <div className="p-4">
       <h1> Dashboard/Home </h1>
       <p>
         <Link href="/login">go to login</Link>
@@ -26,6 +26,9 @@ export default function Dashboard() {
       </p>
       <p>
         <Link href="flowPopupDemo"> Go to flow popup demo </Link>
+      </p>
+      <p>
+        <Link href="/profile"> Go to flow profile page WIP demo </Link>
       </p>
 
       <div className="grid grid-rows-[20px_1fr_20px] items-center min-h-screen">
