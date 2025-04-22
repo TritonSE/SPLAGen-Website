@@ -11,7 +11,7 @@ dotenv.config();
 
 export default cleanEnv(process.env, {
   PORT: port(), // Port to run backend on
-  MONGODB_URI: str(), // URI of MongoDB database to use
+  MONGO_URI: str(), // URI of MongoDB database to use
   FRONTEND_ORIGIN: str(), // URL of frontend, to allow CORS from frontend
   EMAIL_USER: email(), // Email address to use for sending emails
   EMAIL_APP_PASSWORD: str(), // App password to use for sending emails
