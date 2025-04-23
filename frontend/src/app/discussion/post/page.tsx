@@ -47,6 +47,14 @@ const CreatePostPage: React.FC = () => {
     [reset, router],
   );
 
+  const handleFormSubmit = useCallback(
+    (e: React.FormEvent) => {
+      e.preventDefault();
+      void handleSubmit(onSubmit)();
+    },
+    [handleSubmit, onSubmit],
+  );
+
   return (
     <div className={styles.createPostPageContainer}>
       <div className={styles.titleBackDiv}>
@@ -63,7 +71,7 @@ const CreatePostPage: React.FC = () => {
       </div>
       <div className={styles.postPageDiv}>
         <h2 className={styles.pageTitle}>Create New Post</h2>
-        <form onSubmit={handleSubmit(onSubmit)} className={styles.createPostForm}>
+        <form onSubmit={handleFormSubmit} className={styles.createPostForm}>
           <div className={styles.formGroup}>
             <label htmlFor="post-title">Post Title</label>
             <input
