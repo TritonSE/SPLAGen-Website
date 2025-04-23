@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 
 import { FilterableTable } from "./FilterableTable";
 import styles from "./FilterableTable.module.css";
@@ -114,11 +115,13 @@ export const ManageCounselor = () => {
       render: (row: Record<string, Record<string, unknown>>) => (
         <>
           <div>
-            <img
+            <Image
               src="/icons/location.svg"
               alt="Location icon"
+              width={16}
+              height={16}
               className={styles["location-icon"]}
-            />{" "}
+            />
             {row.Location.Address}
           </div>
           <div>{row.Location.Hospital}</div>

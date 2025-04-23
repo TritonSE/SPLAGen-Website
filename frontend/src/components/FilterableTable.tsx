@@ -93,7 +93,7 @@ export const FilterableTable: React.FC<FilterableTableProps> = ({
   };
 
   return (
-    <div className={styles["filterable-table"]}>
+    <div>
       {/* Controls */}
       <div className={styles.controls}>
         <input

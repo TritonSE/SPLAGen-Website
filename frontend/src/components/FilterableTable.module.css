@@ -1,14 +1,14 @@
-body {
+/* body {
   font-weight: 400;
   margin: 0;
   padding: 0;
-}
+} */
 
-.header {
+/* .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-}
+} */
 
 .title {
   font-size: 3rem;
@@ -22,11 +22,11 @@ body {
   margin-bottom: 3vh;
 }
 
-.search-container {
+/* .search-container {
   position: relative;
   width: 25vw;
   margin-right: 40vw;
-}
+} */
 
 .search-bar {
   width: 30rem;
@@ -173,7 +173,7 @@ body {
 /*Counselor Table*/
 
 .table-wrapper {
-  overflow: hidden;
+  overflow-x: auto;
   background-color: white;
   border-radius: 0.5rem;
   margin-top: 2rem;
