@@ -1,4 +1,4 @@
-import { ManageCounselor } from "../../components";
+import { ManageCounselor } from "@/components";
 
 export default function Home() {
   return <ManageCounselor />;

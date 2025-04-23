@@ -1,0 +1,99 @@
+.container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 60%;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  border-radius: 10px;
+  background: var(--color-surface);
+  padding: 20px;
+  margin-left: 9rem;
+  overflow-y: auto; /* Enable vertical scrolling */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.container::-webkit-scrollbar {
+  display: none;
+}
+
+.form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 34px;
+}
+
+.title {
+  color: var(--color-primary2);
+  font-family: "DM-sans", sans-serif;
+  font-size: 32px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
+}
+
+.subtitle {
+  color: var(--color-text1);
+  font-family: "DM-sans", sans-serif;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+}
+
+.buttonGroup {
+  display: flex;
+  gap: 35px;
+  margin-top: 24px;
+}
+
+.optionButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.optionButton:hover {
+  background-color: var(--color-primary1);
+}
+
+.buttonContainer {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.backButton {
+  color: #000;
+  text-align: center;
+  font-family: "DM Sans", sans-serif;
+  font-size: 20px;
+  font-style: normal;
+  line-height: 24px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+}
+
+.radioGroup {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-top: 32px;
+}
+
+.expandableIndent {
+  padding-left: 38px;
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 20px;
+}
