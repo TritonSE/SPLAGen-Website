@@ -5,7 +5,6 @@ export { LanguageSwitcher } from "./languageSwitcher";
 export { NavCard } from "./navbar/NavCard";
 export { Navbar } from "./navbar/Navbar";
 export { External } from "./translationDemo";
-//export { CreatePostModal } from "./models/CreatePostModal";
 export { DirectoryInfoModal } from "./models/DirectoryInfoModal";
 export { VerticalStepper } from "./navbar/VerticalStepper";
 export { ProfessionalInfoModal } from "./models/ProfessionalInfoModal";

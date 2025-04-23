@@ -1,7 +1,9 @@
 "use client";
 
 import React from "react";
+
 import "./PostCard.css";
+import { ProfilePicture } from "@/components/ProfilePicture";
 
 type PostCard = {
   profileImage?: string;
@@ -28,11 +30,7 @@ const PostCard: React.FC<PostCard> = ({
     <div className="postcard-container" onClick={onClick}>
       {/* LEFT SIDE: Profile Image + Author Info + Timestamp */}
       <div className="postcard-left">
-        <img
-          src={profileImage || "default-profile.jpg"} // Fallback if no profile image is provided
-          alt={`${authorName}'s profile`}
-          className="postcard-profile-img"
-        />
+        <ProfilePicture size="small" letter={authorName[0]} />
         <div className="postcard-author-info">
           <div className="postcard-author-name">{authorName}</div>
           <div className="postcard-timestamp">
