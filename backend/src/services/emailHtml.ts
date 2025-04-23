@@ -3,6 +3,8 @@ const RECIPIENT_TEXT = "[Recipient]";
 const REASON_TEXT = "[Reason]";
 
 const SIGN_OFF_HTML = `
+<p style="margin-bottom: 20px;"> <strong> This is an automated email. Please do not reply to this email. For any inquiries contact us at <a href="mailto:info@splagen.org" style="color: blue;">info@splagen.org</a> </strong> </p>
+
 <p style="margin-bottom: 20px;"> Sincerely, </p>
 
 <p style="margin-bottom: 20px;"> The Latin American Professional Society for Genetic Counseling (SPLAGen) </p>
@@ -23,13 +25,11 @@ const DIRECTORY_APPROVAL_EMAIL = `
 
 <p style="margin-bottom: 20px;"> You can view the information posted in our directory here: <a href="https://www.splagen.org/en/en/directory">https://www.splagen.org/en/en/directory</a> </p>
 
-<p style="margin-bottom: 20px;"> Your information for the directory can always be edited by going to the membership page by logging into the membership page and clicking the profile picture in the top right corner. </p>
+<p style="margin-bottom: 20px;"> Your information for the directory can always be edited by going to the membership portal and clicking your profile picture in the top right corner. </p>
 
 <p style="margin-bottom: 20px;"> If you have any questions, please don't hesitate to contact us at <a href="mailto:info@splagen.org" style="color: blue;">info@splagen.org</a>. </p>
 
-<p style="margin-bottom: 20px;"> We look forward to your active participation in SPLAGen!
-
-<p style="margin-bottom: 20px;"> <strong> This is an automated email. Please do not reply to this email. For any inqueries contact us at <a href="mailto:info@splagen.org" style="color: blue;">info@splagen.org</a> </strong> </p>
+<p style="margin-bottom: 20px;"> We look forward to your active participation in SPLAGen!</p>
 `;
 
 const DIRECTORY_DENIAL_EMAIL = `
@@ -44,8 +44,6 @@ const DIRECTORY_DENIAL_EMAIL = `
 <p style="margin-bottom: 20px;">If you believe there has been a misunderstanding or if you have questions about the application process, please don't hesitate to contact us at <a href="mailto:info@splagen.org" style="color: blue;">info@splagen.org</a>.</p>
 
 <p style="margin-bottom: 20px;">We appreciate your understanding and we look forward to your active participation in SPLAGen! </p>
-
-<p style="margin-bottom: 20px;"> <strong> This is an automated email. Please do not reply to this email. For any inqueries contact us at <a href="mailto:info@splagen.org" style="color: blue;">info@splagen.org</a> </strong> </p>
 `;
 
 export {

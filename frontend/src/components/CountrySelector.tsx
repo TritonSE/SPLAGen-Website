@@ -4,7 +4,7 @@ import React, { useCallback, useMemo } from "react";
 import Select, { SingleValue } from "react-select";
 import countryList from "react-select-country-list";
 
-type CountryOption = {
+export type CountryOption = {
   value: string;
   label: string;
 };

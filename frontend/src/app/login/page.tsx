@@ -3,6 +3,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 import { z } from "zod";
 
 import styles from "./login.module.css";
@@ -22,6 +23,7 @@ type FormFields = z.infer<typeof schema>;
 // Initialize react-hook-form
 const Login: React.FC = () => {
   const [rememberMe, setRememberMe] = useState(false);
+  const { t } = useTranslation();
 
   const {
     register,
@@ -72,11 +74,11 @@ const Login: React.FC = () => {
       } catch (error) {
         console.error(error);
         setError("root", {
-          message: "We couldn't find an account with the given email and password.",
+          message: t("login-no-account"),
         });
       }
     },
-    [setError],
+    [setError, t],
   );
 
   // Handler for 'remember me' checkbox changes
@@ -101,39 +103,43 @@ const Login: React.FC = () => {
       <div className={styles.loginPageDiv}>
         <div className={styles.decorationText}>
           <h1>
-            <strong> Log in </strong>
+            <strong> {t("log-in")} </strong>
           </h1>
-          <h3 className={styles.welcomeback}> Welcome back!</h3>
+          <h3 className={styles.welcomeback}> {t("welcome-back")}</h3>
         </div>
 
         <form onSubmit={handleFormSubmit} autoComplete="on">
           <div className={styles.inputFieldContainer}>
-            <label htmlFor="email">Email</label>
+            <label htmlFor="email">{t("email")}</label>
             <input
               {...register("email")}
               id="email"
               type="text"
-              placeholder="Email"
+              placeholder={t("email")}
               autoComplete="on"
             />
           </div>
 
           <div className={styles.inputFieldContainer}>
-            <label htmlFor="password">Password</label>
+            <label htmlFor="password">{t("password")}</label>
             <div>
               <input
                 {...register("password")}
                 id="password"
                 type="password"
-                placeholder="Password"
+                placeholder={t("password")}
               />
               <div className={styles.formError}>
-                {errors.email || errors.password ? "Login credentials invalid" : ""}
+                {errors.email || errors.password ? t("invalid-login") : ""}
               </div>
             </div>
           </div>
 
-          <Checkmark checked={rememberMe} onChange={handleRememberMeChange} label="Remember me" />
+          <Checkmark
+            checked={rememberMe}
+            onChange={handleRememberMeChange}
+            label={t("remember-me")}
+          />
 
           {/* Submit button is dynamically enabled/disabled based on form state */}
           <button
@@ -141,18 +147,18 @@ const Login: React.FC = () => {
             disabled={!isValid || isSubmitting}
             type="submit"
           >
-            {isSubmitting ? "Loading..." : "Log in"}
+            {isSubmitting ? t("loading") : t("log-in")}
           </button>
 
           {errors.root && <div className="text-red-500">{errors.root.message}</div>}
 
           <div style={{ display: "flex", flexDirection: "column" }}>
-            <Link href="/forgotLogin"> I forgot my username or password </Link>
+            <Link href="/forgotLogin"> {t("forgot-login-message")} </Link>
             <span>
-              <span style={{ color: "black" }}> Don&apos;t have an account? </span>
-              <Link href="/forgotLogin"> Create a new account </Link>
+              <span style={{ color: "black" }}> {t("dont-have-account")} </span>
+              <Link href="/signup"> {t("create-account")} </Link>
             </span>
-            <Link href="/forgotLogin"> I&apos;m an admin </Link>
+            {/* <Link href="/forgotLogin"> I&apos;m an admin </Link> */}
           </div>
         </form>
       </div>

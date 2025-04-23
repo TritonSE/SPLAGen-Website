@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
 import React, { useCallback } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 import { isValidPhoneNumber } from "react-phone-number-input";
 import { z } from "zod";
 
@@ -21,14 +22,15 @@ type FormData = {
   phone: string;
 };
 
-const schema = z.object({
-  firstName: z.string().min(1, "First Name is required"),
-  lastName: z.string().min(1, "Last Name is required"),
-  email: z.string().min(1, "Email is required").email("Invalid email format"),
-  phone: z.string().refine(isValidPhoneNumber, {
-    message: "Invalid phone number, include country code and phone number",
-  }),
-});
+const schema = (t: (key: string) => string) =>
+  z.object({
+    firstName: z.string().min(1, t("first-name-required")),
+    lastName: z.string().min(1, t("last-name-required")),
+    email: z.string().min(1, t("email-required")).email(t("invalid-email")),
+    phone: z.string().refine(isValidPhoneNumber, {
+      message: t("invalid-phone-format"),
+    }),
+  });
 
 export const EditBasicInfoModal = ({
   isOpen,
@@ -37,12 +39,13 @@ export const EditBasicInfoModal = ({
   isOpen: boolean;
   onClose: () => void;
 }) => {
+  const { t } = useTranslation();
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<FormData>({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(schema(t)),
   });
 
   // const { firebaseUser } = useContext(UserContext);
@@ -91,12 +94,12 @@ export const EditBasicInfoModal = ({
           <Image src={ExitButtonSrc} alt="Exit" />
         </button>
         <div className="modal-header">
-          <h2> Edit Basic Info</h2>
+          <h2> {t("edit-basic-info")} </h2>
         </div>
         <form onSubmit={handleFormSubmit} className="modal-body">
           <div className="inputField">
-            <label>First Name*</label>
-            <input {...register("firstName")} placeholder="First Name" />
+            <label>{t("first-name")}*</label>
+            <input {...register("firstName")} placeholder={t("first-name")} />
             <p className="error">
               {errors.firstName?.message && typeof errors.firstName.message === "string"
                 ? errors.firstName.message
@@ -105,8 +108,8 @@ export const EditBasicInfoModal = ({
           </div>
 
           <div className="inputField">
-            <label>Last Name*</label>
-            <input {...register("lastName")} placeholder="Last Name" />
+            <label>{t("last-name")}*</label>
+            <input {...register("lastName")} placeholder={t("last-name")} />
             <p className="error">
               {errors.lastName?.message && typeof errors.lastName.message === "string"
                 ? errors.lastName.message
@@ -115,8 +118,8 @@ export const EditBasicInfoModal = ({
           </div>
 
           <div className="inputField">
-            <label>Email*</label>
-            <input type="email" {...register("email")} placeholder="Email" />
+            <label>{t("email")}*</label>
+            <input type="email" {...register("email")} placeholder={t("email")} />
             <p className="error">
               {errors.email?.message && typeof errors.email.message === "string"
                 ? errors.email.message
@@ -125,7 +128,7 @@ export const EditBasicInfoModal = ({
           </div>
 
           <div className="inputField">
-            <label>Phone*</label>
+            <label>{t("phone")}*</label>
             <input type="tel" {...register("phone")} placeholder="+1 (123) 456 7890" />
             <p className="error">
               {errors.phone?.message && typeof errors.phone.message === "string"
@@ -136,7 +139,7 @@ export const EditBasicInfoModal = ({
 
           <div className="modal-footer">
             <button type="submit">
-              <span>Save</span>
+              <span>{t("save")}</span>
             </button>
           </div>
         </form>

@@ -39,7 +39,6 @@
 
 body {
   color: var(--color-text1);
-  background: var(--color-background);
   font-family: "DM-sans", Arial, Helvetica, sans-serif;
   height: 100%;
 }
@@ -49,7 +48,6 @@ body {
   height: 100vh;
   overflow-x: hidden;
   min-width: 30rem;
-  background-color: white;
 }
 
 .viewPort {
@@ -57,17 +55,25 @@ body {
   overflow-y: hidden;
   overflow-x: hidden;
   word-wrap: break-word;
+  background-color: var(--color-grey0);
+}
+
+.purpleBackground {
   background-color: var(--color-primary2);
 }
 
 main {
   margin: 2rem;
-  padding: 8px;
-  background-color: white;
   border-radius: 8px;
   height: 90%;
   overflow-y: hidden;
+  background-color: var(--color-grey0);
 }
+
+.whiteBackground {
+  background-color: var(--color-surface);
+}
+
 .longButton {
   width: 100%;
   padding: 6px;
