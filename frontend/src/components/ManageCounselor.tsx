@@ -3,24 +3,41 @@
 import { FilterableTable } from "./FilterableTable";
 import styles from "./FilterableTable.module.css";
 
+type CounselorRow = {
+  id: number;
+  name: string;
+  email: string;
+  phone: string;
+  Title: string;
+  Membership: string;
+  Education: string;
+  Location: {
+    Address: string;
+    Hospital: string;
+    Country: string;
+  };
+  Languages: string[];
+  Services: string[];
+  Joined: string;
+};
+
 const dummyData = [
   {
     id: 1,
     name: "John Doe",
     email: "johndoe@example.com",
     phone: "(123) 456-7890",
-    Title: "Medical Geneticist", 
-    Membership: "Student Member", 
-    Education: "Bachelors", 
+    Title: "Medical Geneticist",
+    Membership: "Student Member",
+    Education: "Bachelors",
     Location: {
-
       Address: "79664 Eisenlohrstrasse 6, Wehr, Baden-Württemberg",
-      Hospital: "UC San Diego Health", 
-      Country: "Germany", 
+      Hospital: "UC San Diego Health",
+      Country: "Germany",
     },
-    Languages: ["English", "Spanish"], 
-    Services: ["Pediatric Genetics", "Cancer Genetics"], 
-    Joined: "01/12/2025", 
+    Languages: ["English", "Spanish"],
+    Services: ["Pediatric Genetics", "Cancer Genetics"],
+    Joined: "01/12/2025",
   },
   {
     id: 2,
@@ -74,12 +91,13 @@ const dummyData = [
     Joined: "04/10/2022",
   },
 ];
+
 export const ManageCounselor = () => {
   const columns = [
     {
       key: "name",
       label: "NAME",
-      render: (row: any) => (
+      render: (row: CounselorRow) => (
         <>
           <div>{row.name}</div>
           <div>{row.email}</div>
@@ -93,9 +111,16 @@ export const ManageCounselor = () => {
     {
       key: "Location",
       label: "LOCATION",
-      render: (row: Record<string,Record<string,unknown>>) => (
+      render: (row: Record<string, Record<string, unknown>>) => (
         <>
-          <span> <img src="/icons/location.svg" alt="Filter icon" className={styles["location-icon"]} /> {row.Location.Address}</div>
+          <div>
+            <img
+              src="/icons/location.svg"
+              alt="Location icon"
+              className={styles["location-icon"]}
+            />{" "}
+            {row.Location.Address}
+          </div>
           <div>{row.Location.Hospital}</div>
           <div>{row.Location.Country}</div>
         </>
@@ -104,15 +129,14 @@ export const ManageCounselor = () => {
     {
       key: "Languages",
       label: "LANGUAGE",
-      render: (row: any) => row.Languages.join(", "),
+      render: (row: CounselorRow) => row.Languages.join(", "),
     },
     {
       key: "Services",
       label: "SERVICE",
-      render: (row: any) =>
+      render: (row: CounselorRow) =>
         row.Services.map((s: string, i: number) => {
-          // Generate a class for each service based on its name
-          const serviceClass = s.toLowerCase().replace(/\s+/g, "-"); // Converts "Pediatric Genetics" -> "pediatric-genetics"
+          const serviceClass = s.toLowerCase().replace(/\s+/g, "-");
           return (
             <span
               key={i}
@@ -144,12 +168,14 @@ export const ManageCounselor = () => {
   };
 
   return (
-    <FilterableTable
-      title="Manage Members"
-      data={dummyData}
-      columns={columns}
-      filters={filters}
-      csvFilename="members.csv"
-    />
+    <div>
+      <h1 className={styles.title}>Manage Members</h1>
+      <FilterableTable
+        data={dummyData}
+        columns={columns}
+        filters={filters}
+        csvFilename="members.csv"
+      />
+    </div>
   );
 };
