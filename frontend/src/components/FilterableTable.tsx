@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image"; // ✅ replaces <img>
+import Image from "next/image";
 import React, { useCallback, useMemo, useState } from "react";
 
 import styles from "./FilterableTable.module.css";

@@ -20,5 +20,4 @@ export {
 export { I18nClientReady } from "./I18nClientReady";
 export { ExpandableSection } from "./expandable";
 export { ProfessionalTitleSelector, type ProfessionalTitleOption } from "./TitleSelector";
-
-export { ManageCounselor } from "./ManageCounselor";
+export { FilterableTable } from "./FilterableTable";
