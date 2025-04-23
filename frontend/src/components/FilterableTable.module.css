@@ -1,5 +1,4 @@
 body {
-  font-family: "DM Sans", sans-serif;
   font-weight: 400;
   margin: 0;
   padding: 0;
@@ -15,13 +14,6 @@ body {
   font-size: 3rem;
   margin-right: 1.25rem;
   color: var(--color-primary2);
-}
-
-.profile-picture {
-  width: 5rem;
-  height: 5rem;
-  padding: 5px;
-  background-color: #ccc;
 }
 
 .controls {
