@@ -10,6 +10,7 @@
   flex-direction: column;
   overflow: hidden;
   z-index: 1100;
+  flex-shrink: 0;
 }
 
 .decoration {
