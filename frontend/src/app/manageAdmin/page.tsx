@@ -1,47 +1,51 @@
 "use client";
-import Image from "next/image";
 
 import { FilterableTable } from "@/components";
 import styles from "@/components/FilterableTable.module.css";
 
+// Helpers
+function capitalize(str: string) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+function capitalizeWords(str: string) {
+  return str.replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
 type AdminRow = {
   id: number;
   name: string;
-  title: string;
-  membership: string;
-  location: {
-    address: string;
-    hospital?: string;
-    country: string;
+  Title: string;
+  Membership: string;
+  Location: {
+    Country: string;
   };
-  languages: string[];
-  services: string[];
+  Languages: string[];
+  Services: string[];
 };
 
 const dummyAdmins: AdminRow[] = [
   {
     id: 1,
-    name: "Alice Brown",
-    title: "Program Manager",
-    membership: "admin",
-    location: {
-      address: "123 Admin St",
-      country: "United States",
+    name: "John Doe",
+    Title: "Medical Geneticist",
+    Membership: "Student Member",
+    Location: {
+      Country: "Germany",
     },
-    languages: ["english", "spanish"],
-    services: ["cancer genetics", "pediatric genetics"],
+    Languages: ["English", "Spanish"],
+    Services: ["Pediatric Genetics", "Cancer Genetics"],
   },
   {
     id: 2,
-    name: "Bob White",
-    title: "Operations Lead",
-    membership: "admin",
-    location: {
-      address: "456 Infra Ln",
-      country: "Brazil",
+    name: "Jane Smith",
+    Title: "Medical Geneticist",
+    Membership: "Health Professional",
+    Location: {
+      Country: "United States",
     },
-    languages: ["english"],
-    services: ["biochemical genetics", "prenatal genetics"],
+    Languages: ["English"],
+    Services: ["Cancer Genetics"],
   },
 ];
 
@@ -53,30 +57,17 @@ const ManageAdmin: React.FC = () => {
       render: (row: AdminRow) => (
         <>
           <div>{row.name}</div>
-          <div>{row.email}</div>
-          <div>{row.phone}</div>
         </>
       ),
     },
-    { key: "title", label: "TITLE" },
-    { key: "membership", label: "MEMBERSHIP" },
+    { key: "Title", label: "TITLE" },
+    { key: "Membership", label: "MEMBERSHIP" },
     {
-      key: "location",
+      key: "Location",
       label: "LOCATION",
       render: (row: AdminRow) => (
         <>
-          <div>
-            <Image
-              src="/icons/location.svg"
-              alt="Location icon"
-              width={16}
-              height={16}
-              className={styles["location-icon"]}
-            />
-            {row.location.address}
-          </div>
-          <div>{row.location.hospital}</div>
-          <div>{row.location.country}</div>
+          <div>{row.Location.Country}</div>
         </>
       ),
     },
@@ -84,7 +75,7 @@ const ManageAdmin: React.FC = () => {
       key: "languages",
       label: "LANGUAGE",
       render: (row: AdminRow) =>
-        row.languages.map((lang: string, i: number) => {
+        row.Languages.map((lang: string, i: number) => {
           const langClass = lang.toLowerCase().replace(/\s+/g, "-");
           return (
             <span
@@ -100,7 +91,7 @@ const ManageAdmin: React.FC = () => {
       key: "services",
       label: "SERVICE",
       render: (row: AdminRow) =>
-        row.services.map((s: string, i: number) => {
+        row.Services.map((s: string, i: number) => {
           const serviceClass = s.toLowerCase().replace(/\s+/g, "-");
           return (
             <span
@@ -115,25 +106,18 @@ const ManageAdmin: React.FC = () => {
   ];
 
   const filters = {
-    title: ["Program Manager", "Operations Lead", "Admin Manager", "System Admin"],
-    membership: ["superadmin", "admin"],
-    location: ["United States", "Brazil", "Canada", "Germany", "Chile"],
+    title: ["Medical Geneticist", "Genetic Counselor"],
+    membership: ["SuperAdmin", "Admin"],
+    location: ["United States", "Venezuela", "Germany", "Brazil", "Spain", "Chile"],
     services: [
-      "pediatric genetics",
-      "cardiovascular genetics",
-      "neurogenetics",
-      "rare diseases",
-      "cancer genetics",
-      "biochemical genetics",
-      "prenatal genetics",
-      "adult genetics",
-      "psychiatric genetics",
-      "reproductive genetics",
-      "ophthalmic genetics",
-      "research genetics",
-      "pharmacogenomics",
-      "metabolic genetics",
-      "other genetics",
+      "Cancer Genetics",
+      "Biochemical Genetics",
+      "Prenatal Genetics",
+      "Pediatric Genetics",
+      "Cardiovascular Genetics",
+      "Rare Diseases",
+      "Nuerogenetics",
+      "Adult Genetics",
     ],
   };
 
@@ -151,12 +135,3 @@ const ManageAdmin: React.FC = () => {
 };
 
 export default ManageAdmin;
-
-// Helpers
-function capitalize(str: string) {
-  return str.charAt(0).toUpperCase() + str.slice(1);
-}
-
-function capitalizeWords(str: string) {
-  return str.replace(/\b\w/g, (c) => c.toUpperCase());
-}
