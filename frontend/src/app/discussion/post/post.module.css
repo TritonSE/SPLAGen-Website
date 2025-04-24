@@ -85,11 +85,11 @@
 }
 
 .backArrow:hover {
-  color: #3b3b62;
+  color: var(--color-primary2);
 }
 
 .pageTitle {
-  color: #3b3b62;
+  color: var(--color-primary2);
   font-size: 1.3rem;
   font-weight: normal;
   font-family: "DM-sans";
@@ -104,8 +104,8 @@
 /* Post button styling */
 .buttonPost {
   padding: 10px 20px;
-  border: 2px solid #3b3b62; /* Purple border */
-  background-color: #3b3b62; /* Purple background */
+  border: 2px solid var(--color-primary2); /* Purple border */
+  background-color: var(--color-primary2); /* Purple background */
   color: white;
   font-size: 1rem;
   font-weight: bold;
@@ -117,16 +117,16 @@
 }
 
 .buttonPost:hover {
-  background-color: #3b3b62; /* Slightly lighter purple */
-  border-color: #3b3b62; /* Lighter purple */
+  background-color: var(--color-active); /* Slightly lighter purple */
+  border-color: var(--color-active); /* Lighter purple */
 }
 
 /* Cancel button styling */
 .buttonCancel {
   padding: 10px 20px;
-  border: 2px solid #ccc;
-  background-color: white;
-  color: #7f8c8d;
+  border: 2px solid var(--color-grey3);
+  background-color: var(--color-grey2);
+  color: var(--color-grey4);
   font-size: 1rem;
   font-weight: bold;
   border-radius: 8px;
@@ -137,9 +137,9 @@
 }
 
 .buttonCancel:hover {
-  background-color: #f2f2f2;
-  border-color: #bdc3c7;
-  color: #7f8c8d;
+  background-color: var(--color-grey2);
+  border-color: var(--color-grey3);
+  color: var(--color-grey4);
 }
 
 /* Media query adjustments for small screens */
