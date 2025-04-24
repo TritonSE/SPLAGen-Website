@@ -12,6 +12,7 @@ export enum UserMembership {
   HEALTHCARE_PROVIDER = "healthcareProvider",
   ASSOCIATE = "associate",
 }
+
 const userSchema = new Schema(
   {
     firebaseId: { type: String, required: true },
@@ -60,6 +61,30 @@ const userSchema = new Schema(
       gradDate: { type: String },
     },
 
+    associate: {
+      title: { type: String },
+      specialization: [
+        {
+          type: String,
+          enum: [
+            "rare disease advocacy",
+            "research",
+            "public health",
+            "bioethics",
+            "law",
+            "biology",
+            "medical writer",
+            "medical science liason",
+            "laboratory scientist",
+            "professor",
+            "bioinformatics",
+            "biotech sales and marketing",
+          ],
+        },
+      ],
+      organization: { type: String },
+    },
+
     clinic: {
       name: { type: String },
       url: { type: String },
@@ -67,6 +92,9 @@ const userSchema = new Schema(
         country: { type: String },
         address: { type: String },
         suite: { type: String },
+        city: { type: String },
+        state: { type: String },
+        zipPostCode: { type: String },
       },
     },
 
@@ -117,6 +145,6 @@ const userSchema = new Schema(
   { timestamps: true },
 );
 
-type User = InferSchemaType<typeof userSchema>;
+export type User = InferSchemaType<typeof userSchema>;
 
 export default model<User>("User", userSchema);

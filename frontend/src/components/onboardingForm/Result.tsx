@@ -15,17 +15,54 @@ export const Result = ({ onReset }: ResultProps) => {
     <div>
       <h2 className="text-xl font-bold">Form Submission Result</h2>
       <p>
-        <strong>Professional Title:</strong> {state.onboardingForm.professionalTitle}
+        <strong>Professional Title:</strong> {state.onboardingForm.professionalTitle.value}
       </p>
       <p>
-        <strong>Country:</strong> {state.onboardingForm.country}
+        <strong>Country:</strong> {state.onboardingForm.country.value}
       </p>
       <p>
-        <strong>Field1:</strong> {state.onboardingForm.field1}
+        <strong>Languages:</strong> {JSON.stringify(state.onboardingForm.languages)}
       </p>
-      <button type="button" onClick={onReset}>
-        Back
-      </button>
+      <p>
+        <strong>Membership Category:</strong> {state.onboardingForm.membership}
+      </p>
+      <p>
+        <strong>Associate Data</strong>
+      </p>
+      <p>
+        <strong>Specializations:</strong> {state.onboardingForm.specializations}
+      </p>
+      <p>
+        <strong>OrgRepresentative:</strong> {state.onboardingForm.isOrganizationRepresentative}
+      </p>
+      <p>
+        <strong>Title:</strong> {state.onboardingForm.jobTitle}
+      </p>
+      <p>
+        <strong>Org Name:</strong> {state.onboardingForm.organizationName}
+      </p>
+      <p>
+        <strong>Student Data</strong>
+      </p>
+      <p>
+        <strong>Degree:</strong> {state.onboardingForm.degree}
+      </p>
+      <p>
+        <strong>Country:</strong> {state.onboardingForm.schoolCountry?.value}
+      </p>
+      <p>
+        <strong>School Name:</strong> {state.onboardingForm.schoolName}
+      </p>
+      <p>
+        <strong>Email:</strong> {state.onboardingForm.universityEmail}
+      </p>
+      <p>
+        <strong>Program:</strong> {state.onboardingForm.programName}
+      </p>
+      <p>
+        <strong>Grad Date:</strong> {state.onboardingForm.graduationDate}
+      </p>
+      <button onClick={onReset}>Back</button>
     </div>
   );
 };

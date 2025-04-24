@@ -1,14 +1,6 @@
-import dotenv from "dotenv";
+import env from "./util/validateEnv";
 
-//load the env variables from .env file
-dotenv.config({ path: ".env" });
+const mongoURI = env.MONGO_URI;
+const port = env.PORT;
 
-function throwIfUndefined(envVar: string | undefined, error: Error) {
-  if (!envVar) throw error;
-  return envVar;
-}
-
-const port = throwIfUndefined(process.env.PORT, new Error("No Port Found"));
-const mongoURI = throwIfUndefined(process.env.MONGO_URI, new Error("No Mongo URI Found"));
-
-export { port, mongoURI };
+export { mongoURI, port };
