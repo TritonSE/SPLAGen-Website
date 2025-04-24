@@ -103,8 +103,9 @@
 
 /* Post button styling */
 .buttonPost {
-  padding: 10px 20px;
-  border: 2px solid var(--color-primary2); /* Purple border */
+  padding: 12px 24px;
+  align-items: center;
+  border: 1px solid var(--color-primary2); /* Purple border */
   background-color: var(--color-primary2); /* Purple background */
   color: white;
   font-size: 1rem;
@@ -123,9 +124,9 @@
 
 /* Cancel button styling */
 .buttonCancel {
-  padding: 10px 20px;
-  border: 2px solid var(--color-grey3);
-  background-color: var(--color-grey2);
+  padding: 12px 24px;
+  border: 1px solid var(--color-grey3);
+  background-color: var(--color-grey0);
   color: var(--color-grey4);
   font-size: 1rem;
   font-weight: bold;
