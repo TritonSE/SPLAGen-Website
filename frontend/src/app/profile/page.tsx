@@ -1,12 +1,12 @@
 "use client";
-
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 
 import styles from "./page.module.css";
 
-import { User, getWhoAmI, updateBasicInfoRequest } from "@/api/users";
+import { User, getWhoAmI } from "@/api/users";
 import { Button, EditBasicInfoModal, ProfessionalInfoModal } from "@/components";
+import { ProfileDropdown } from "@/components/ProfileDropdown";
 import { ProfilePicture } from "@/components/ProfilePicture";
 
 // changes
@@ -243,6 +243,8 @@ const ProfilePage: React.FC = () => {
       {jsonUserData && (
         <DisplayComponent user={jsonUserData} openBasic={openBasicModal} openPro={openProModal} />
       )}
+
+      <ProfileDropdown />
     </div>
   );
 };

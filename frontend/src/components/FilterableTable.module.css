@@ -1,0 +1,251 @@
+.title {
+  font-size: 3rem;
+  margin-right: 1.25rem;
+  color: var(--color-primary2);
+}
+
+.controls {
+  display: flex;
+  margin-top: 3vh;
+  margin-bottom: 3vh;
+}
+
+.search-bar {
+  width: 30rem;
+  height: 6vh;
+  padding: 0.625rem 2.2rem;
+  border: 1px solid var(--color-grey3);
+  border-radius: 0.7rem;
+  font-size: 0.9rem;
+}
+
+.search-icon {
+  position: absolute;
+  margin-top: 1.7vh;
+  margin-left: 0.8vw;
+  width: 1.4rem;
+  height: 1.4rem;
+}
+
+/* All Counselors+ Directory Button */
+
+.button-container {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.chooseView-button {
+  width: 5rem;
+  height: 5vh;
+  padding: 0.5rem;
+  font-size: 0.9rem;
+  border: 1px solid var(--color-grey3);
+  border-radius: 0.7rem;
+  background-color: white;
+  width: 7rem;
+}
+
+.chooseView-button:hover {
+  background-color: var(--color-primary2);
+  color: white;
+}
+
+/* Filter Sidebar Styles */
+.filter-sidebar {
+  position: fixed;
+  top: 0;
+  right: -20rem;
+  width: 17rem;
+  height: 100%;
+  background-color: white;
+  transition: right 0.3s ease;
+  padding: 1.25rem;
+  overflow-y: auto;
+}
+
+.filter-sidebar.open {
+  right: 0 !important;
+}
+
+.filter-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 1.4rem;
+}
+
+.close-button {
+  position: relative;
+  top: -1rem;
+  border: none;
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.filter-category {
+  display: flex;
+  margin-top: 1.5rem;
+  flex-direction: column;
+  font-weight: 700;
+}
+
+.filter-category label {
+  display: flex;
+  align-items: center;
+  margin-top: 0.5rem;
+  font-weight: 400;
+}
+
+.filter-category label input {
+  margin-right: 0.5rem;
+}
+
+.filter-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1.25rem;
+}
+
+.filter-actions button {
+  padding: 0.25rem 0.5rem;
+  border: 1px solid #939292;
+  background-color: white;
+  color: black;
+  border-radius: 0.313rem;
+  cursor: pointer;
+}
+
+.filter-actions button:hover {
+  background-color: #2b1d53;
+  color: white;
+}
+
+/* General styling for Filter and Download buttons */
+
+.action-button {
+  background-color: white;
+  padding-left: 0.4rem;
+  padding-right: 0.4rem;
+  border-radius: 0.7rem;
+  border: 1px solid #ddd;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  margin-left: 0.5rem;
+}
+
+.action-button.selected,
+.action-button:hover {
+  background-color: var(--color-primary2);
+  color: white;
+}
+
+.action-button .button-icon {
+  padding-left: 0.3rem;
+  width: 1.5rem;
+  height: 1.5rem;
+  filter: brightness(0);
+}
+
+.action-button.selected .button-icon,
+.action-button:hover .button-icon {
+  filter: brightness(0) invert(1);
+}
+
+/*Counselor Table*/
+
+.table-wrapper {
+  overflow-x: auto;
+  overflow-y: auto;
+  max-height: 68vh;
+  background-color: white;
+  border-radius: 0.5rem;
+  margin-top: 2rem;
+}
+
+.counselor-table {
+  width: 100%;
+}
+
+.counselor-table thead {
+  background-color: var(--color-primary2);
+  color: white;
+}
+
+.counselor-table th {
+  padding: 1rem;
+  text-align: left;
+}
+
+.counselor-table td {
+  padding-left: 1rem;
+  padding-right: 1rem;
+  font-size: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+/*Service */
+.service-tag {
+  display: block;
+  margin: 0.3rem 0.3rem;
+  padding: 0.2rem 0.2rem;
+  border-radius: 15px;
+  font-size: 1rem;
+  color: white;
+  text-align: center;
+  transition: background-color 0.3s ease;
+}
+
+.service-tag:hover {
+  opacity: 0.8;
+}
+
+.service-tag.pediatric-genetics {
+  background-color: #f9e2e2;
+  color: #ce4040;
+}
+
+.service-tag.cancer-genetics {
+  background-color: #fcdaf0;
+  color: #c43975;
+}
+
+.service-tag.rare-diseases {
+  background-color: #cfebe4;
+  color: #28715e;
+}
+
+.service-tag.prenatal-genetics {
+  background-color: #e1f0df;
+  color: #397230;
+}
+
+.service-tag.neurogenetics {
+  background-color: #ece2f3;
+  color: #6d3c94;
+}
+
+.service-tag.cardiovascular-genetics {
+  background-color: #dde4f8;
+  color: #4561ad;
+}
+
+.service-tag.biochemical-genetics {
+  background-color: #1abc9c; /* Teal * Dont know what color to put here*/
+}
+
+.service-tag.adult-genetics {
+  background-color: #ddf3f9;
+  color: #287b91;
+}
+
+.service-tag.default {
+  background-color: #95a5a6;
+}
+
+/*Location*/
+
+.location-icon {
+  width: 0.5rem;
+}
