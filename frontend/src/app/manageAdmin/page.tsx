@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+
 import { FilterableTable } from "@/components";
 import styles from "@/components/FilterableTable.module.css";
 
@@ -61,9 +62,9 @@ const ManageAdmin: React.FC = () => {
           <input
             type="checkbox"
             checked={selectedAdmin?.id === row.id}
-            onChange={() =>
-              setSelectedAdmin((prev) => (prev?.id === row.id ? null : row))
-            }
+            onChange={() => {
+              setSelectedAdmin((prev) => (prev?.id === row.id ? null : row));
+            }}
           />
           <span>{row.name}</span>
         </div>
@@ -152,7 +153,9 @@ const ManageAdmin: React.FC = () => {
           }}
         >
           <button
-            onClick={() => setSelectedAdmin(null)}
+            onClick={() => {
+              setSelectedAdmin(null);
+            }}
             style={{
               position: "absolute",
               top: "10px",
@@ -166,12 +169,24 @@ const ManageAdmin: React.FC = () => {
             ✕
           </button>
           <h2>Admin Info</h2>
-          <p><strong>Name:</strong> {selectedAdmin.name}</p>
-          <p><strong>Title:</strong> {selectedAdmin.Title}</p>
-          <p><strong>Membership:</strong> {selectedAdmin.Membership}</p>
-          <p><strong>Country:</strong> {selectedAdmin.Location.Country}</p>
-          <p><strong>Languages:</strong> {selectedAdmin.Languages.join(", ")}</p>
-          <p><strong>Services:</strong> {selectedAdmin.Services.join(", ")}</p>
+          <p>
+            <strong>Name:</strong> {selectedAdmin.name}
+          </p>
+          <p>
+            <strong>Title:</strong> {selectedAdmin.Title}
+          </p>
+          <p>
+            <strong>Membership:</strong> {selectedAdmin.Membership}
+          </p>
+          <p>
+            <strong>Country:</strong> {selectedAdmin.Location.Country}
+          </p>
+          <p>
+            <strong>Languages:</strong> {selectedAdmin.Languages.join(", ")}
+          </p>
+          <p>
+            <strong>Services:</strong> {selectedAdmin.Services.join(", ")}
+          </p>
         </div>
       )}
     </div>
