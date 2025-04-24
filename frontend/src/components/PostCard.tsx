@@ -2,7 +2,8 @@
 
 import React from "react";
 
-import "./PostCard.css";
+import styles from "./PostCard.module.css";
+
 import { ProfilePicture } from "@/components/ProfilePicture";
 
 type PostCard = {
@@ -17,37 +18,33 @@ type PostCard = {
 };
 
 const PostCard: React.FC<PostCard> = ({
-  profileImage,
   authorName,
   date,
   time,
   title,
   audience,
   message,
-  onClick = () => {},
+  onClick,
 }) => {
   return (
-    <div className="postcard-container" onClick={onClick}>
-      {/* LEFT SIDE: Profile Image + Author Info + Timestamp */}
-      <div className="postcard-left">
+    <div className={styles["postcard-container"]} onClick={onClick}>
+      <div className={styles["postcard-left"]}>
         <ProfilePicture size="small" letter={authorName[0]} />
-        <div className="postcard-author-info">
-          <div className="postcard-author-name">{authorName}</div>
-          <div className="postcard-timestamp">
+        <div className={styles["postcard-author-info"]}>
+          <div className={styles["postcard-author-name"]}>{authorName}</div>
+          <div className={styles["postcard-timestamp"]}>
             {date}
             {time ? `, ${time}` : ""}
           </div>
         </div>
       </div>
 
-      {/* DIVIDER */}
-      <div className="postcard-divider" />
+      <div className={styles["postcard-divider"]} />
 
-      {/* RIGHT SIDE: Title, Audience, and Message */}
-      <div className="postcard-right">
-        <div className="postcard-title">{title}</div>
-        {audience && <div className="postcard-audience">{audience}</div>}
-        <div className="postcard-message">{message}</div>
+      <div className={styles["postcard-right"]}>
+        <div className={styles["postcard-title"]}>{title}</div>
+        {audience && <div className={styles["postcard-audience"]}>{audience}</div>}
+        <div className={styles["postcard-message"]}>{message}</div>
       </div>
     </div>
   );
