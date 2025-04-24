@@ -1,6 +1,7 @@
 import express from "express";
-import { requireSignedIn, requireSuperAdmin } from "../middleware/auth";
+
 import * as AdminController from "../controllers/admin";
+import { requireSignedIn, requireSuperAdmin } from "../middleware/auth";
 
 const router = express.Router();
 
