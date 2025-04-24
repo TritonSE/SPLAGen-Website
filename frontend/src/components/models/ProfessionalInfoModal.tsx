@@ -10,6 +10,7 @@ import { z } from "zod";
 
 import ExitButton from "@/../public/icons/ExitButton.svg";
 import "./ProfessionalInfoModal.css";
+import { editProfessionalInfoRequest } from "@/api/users";
 import { PillButton } from "@/components";
 
 // Lazy load CountrySelector component to avoid hydration error
@@ -94,15 +95,17 @@ export const ProfessionalInfoModal = ({
   );
 
   const onSubmit = useCallback<SubmitHandler<ProfessionalInfoFormData>>(
-    (data) => {
+    async (data) => {
       const formattedData = {
         ...data,
         country: data.country.label,
       };
-      console.log("Form Data:", formattedData);
-      // Handle form submission logic here
 
-      onClose();
+      const response = await editProfessionalInfoRequest(formattedData, "firebaseToken");
+      if (response.success) {
+        onClose();
+      }
+      // TODO: error handling if needed
     },
     [onClose],
   );

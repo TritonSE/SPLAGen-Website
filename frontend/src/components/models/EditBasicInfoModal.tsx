@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
-import React, { useCallback, useContext, useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { isValidPhoneNumber } from "react-phone-number-input";
@@ -10,14 +10,7 @@ import { z } from "zod";
 
 import ExitButton from "@/../public/icons/ExitButton.svg";
 import "./EditBasicInfoModal.css";
-import { editBasicInfoRequest } from "@/api/users";
-import { UserContext } from "@/contexts/userContext";
-
-// CHANGES MADE by Jesus:
-// - Extracted `reset` from useForm to fix TS/ESLint error: "Unsafe call of an `any` type"
-// - Used `reset` inside useEffect to prefill the form if `user` exists (from UserContext)
-// - The form now auto-populates with user.personal data (firstName, lastName, email, phone)
-
+import { User, editBasicInfoRequest, getWhoAmI } from "@/api/users";
 const ExitButtonSrc: string = ExitButton as unknown as string;
 
 type FormData = {
@@ -55,7 +48,16 @@ export const EditBasicInfoModal = ({
   });
 
   // const { firebaseUser } = useContext(UserContext);
-  const { user } = useContext(UserContext);
+  // const { user, reloadUser } = useContext(UserContext);
+
+  const [jsonUserData, setJsonUserData] = useState<User | null>(null);
+
+  const fetchUserData = useCallback(async () => {
+    const res = await getWhoAmI("temp_firebase_token");
+    if (res.success) {
+      setJsonUserData(res.data);
+    }
+  }, []);
 
   const onSubmit = useCallback<SubmitHandler<FormData>>(
     async (data) => {
@@ -66,6 +68,7 @@ export const EditBasicInfoModal = ({
       // }
 
       const response = await editBasicInfoRequest(data, "firebaseToken");
+
       if (response.success) {
         onClose();
       }
@@ -88,15 +91,19 @@ export const EditBasicInfoModal = ({
 
   // populate form with user context data
   useEffect(() => {
-    if (user) {
+    fetchUserData().catch((err: unknown) => {
+      console.error("Error in fetchData:", err);
+    });
+
+    if (jsonUserData) {
       reset({
-        firstName: user.personal.firstName || "",
-        lastName: user.personal.lastName || "",
-        email: user.personal.email || "",
-        phone: user.personal.phone ?? "",
+        firstName: jsonUserData?.personal.firstName ?? "",
+        lastName: jsonUserData?.personal.lastName ?? "",
+        email: jsonUserData?.personal.email ?? "",
+        phone: jsonUserData?.personal.phone ?? "",
       });
     }
-  }, [user, reset]);
+  }, [jsonUserData, fetchUserData, reset]);
 
   const handleFormSubmit = useCallback(
     (e: React.FormEvent<HTMLFormElement>) => {

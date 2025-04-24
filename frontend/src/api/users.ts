@@ -1,4 +1,4 @@
-import { APIResult, get, handleAPIError, post } from "./requests";
+import { APIResult, get, handleAPIError, post, put } from "./requests";
 // import { User as FirebaseUser } from "firebase/auth";
 
 // Need to define user type based on user model
@@ -26,6 +26,13 @@ export type BasicInfo = {
   phone: string;
 };
 
+export type ProfessionalInfo = {
+  profTitle: string;
+  country: string;
+  languages: string;
+  inDirectory: boolean;
+};
+
 export const createAuthHeader = (firebaseToken: string) => ({
   Authorization: `Bearer ${firebaseToken}`,
 });
@@ -50,6 +57,35 @@ export async function editBasicInfoRequest(
   try {
     //TODO: API result return type needs be updated when route written
     await post("/api/users/personal-information", basicInfo, createAuthHeader(firebaseToken));
+    return { success: true, data: null };
+  } catch (error) {
+    return handleAPIError(error);
+  }
+}
+
+export async function updateBasicInfoRequest(
+  basicInfo: BasicInfo,
+  firebaseToken: string,
+): Promise<APIResult<null>> {
+  try {
+    // Use PUT instead of POST
+    await put("/api/users/personal-information", basicInfo, createAuthHeader(firebaseToken));
+    return { success: true, data: null };
+  } catch (error) {
+    return handleAPIError(error);
+  }
+}
+
+export async function editProfessionalInfoRequest(
+  professionalInfo: ProfessionalInfo,
+  firebaseToken: string,
+): Promise<APIResult<null>> {
+  try {
+    await post(
+      "/api/users/professional-information",
+      professionalInfo,
+      createAuthHeader(firebaseToken),
+    );
     return { success: true, data: null };
   } catch (error) {
     return handleAPIError(error);

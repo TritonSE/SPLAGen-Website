@@ -66,7 +66,8 @@ main {
   background-color: white;
   border-radius: 8px;
   height: 90%;
-  overflow-y: hidden;
+  overflow-y: scroll;
+  scrollbar-width: none;
 }
 .longButton {
   width: 100%;
