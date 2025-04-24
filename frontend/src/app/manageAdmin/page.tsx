@@ -143,7 +143,7 @@ const ManageAdmin: React.FC = () => {
             position: "fixed",
             top: 0,
             right: 0,
-            width: "320px",
+            width: "25vw",
             height: "100vh",
             backgroundColor: "#fff",
             boxShadow: "-2px 0 10px rgba(0,0,0,0.1)",
