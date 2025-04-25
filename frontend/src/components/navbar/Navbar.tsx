@@ -81,28 +81,15 @@ export const Navbar: React.FC = () => {
   const { user, onboardingStep } = useContext(UserContext);
   const { t } = useTranslation();
 
-  const setNavStateByRole = useCallback(() => {
-    if (user) {
-      switch (user.role) {
-        case "member":
-          setNavState(NavStateType.member);
-          break;
-        case "admin":
-          setNavState(NavStateType.admin);
-          break;
-        case "superadmin":
-          setNavState(NavStateType.superadmin);
-          break;
-      }
-    }
-  }, [user, setNavState]);
-
-  // NavState that dependes on the path
   const pathname = usePathname();
 
+  // Determine Navigation based on route and or user role
   useEffect(() => {
     switch (pathname) {
       case "/onboardingForm":
+        setNavState(NavStateType.onboarding);
+        break;
+      case "/signup":
         setNavState(NavStateType.onboarding);
         break;
       case "/directory":
@@ -111,17 +98,23 @@ export const Navbar: React.FC = () => {
       case "/login":
         setNavState(NavStateType.blank);
         break;
-      case "/signup":
-        setNavState(NavStateType.onboarding);
-        break;
       default:
-        setNavStateByRole();
+        if (user) {
+          switch (user.role) {
+            case "member":
+              setNavState(NavStateType.member);
+              break;
+            case "admin":
+              setNavState(NavStateType.admin);
+              break;
+            case "superadmin":
+              setNavState(NavStateType.superadmin);
+              break;
+          }
+        }
         break;
     }
-  }, [pathname, setNavStateByRole, setNavState]);
-
-  // Set the navState based on user role
-  useEffect(setNavStateByRole, [user, setNavStateByRole]);
+  }, [pathname, user, setNavState]);
 
   const renderNavItems = useCallback(() => {
     switch (navState) {
