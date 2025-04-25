@@ -6,7 +6,6 @@ import { useCallback, useContext, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { NavCard } from "./NavCard";
-import cardStyle from "./NavCard.module.css";
 import styles from "./Navbar.module.css";
 import { VerticalStepper } from "./VerticalStepper";
 
@@ -158,17 +157,6 @@ export const Navbar: React.FC = () => {
         </span>
         {renderNavItems()}
       </div>
-
-      <button
-        className={cardStyle.card}
-        id={styles.logout}
-        onClick={() => {
-          alert("Are you sure you want to log out?");
-        }}
-      >
-        <Image src="/icons/logout_light.svg" alt="Logout" width={24} height={24} />
-        {t("log-out")}
-      </button>
     </section>
   );
 };
