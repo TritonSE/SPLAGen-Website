@@ -2,8 +2,7 @@
 import Link from "next/link";
 import React, { useContext, useState } from "react";
 
-import { EditBasicInfoModal, External, LanguageSwitcher } from "@/components";
-import PostCard from "@/components/PostCard";
+import { EditBasicInfoModal, External, LanguageSwitcher, PostCard } from "@/components";
 import { UserContext } from "@/contexts/userContext";
 
 export default function Dashboard() {
@@ -45,7 +44,6 @@ export default function Dashboard() {
 
           {/* Render a sample PostCard */}
           <PostCard
-            profileImage="https://via.placeholder.com/150"
             authorName="Alex Johnson"
             date="April 7, 2025"
             time="11:45 AM"

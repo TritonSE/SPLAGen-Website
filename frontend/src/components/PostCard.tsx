@@ -17,7 +17,7 @@ type PostCard = {
   onClick?: () => void;
 };
 
-const PostCard: React.FC<PostCard> = ({
+export const PostCard: React.FC<PostCard> = ({
   authorName,
   date,
   time,
@@ -49,5 +49,3 @@ const PostCard: React.FC<PostCard> = ({
     </div>
   );
 };
-
-export default PostCard;
