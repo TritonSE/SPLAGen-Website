@@ -7,25 +7,25 @@ import styles from "./FilterableTable.module.css";
 
 type RowData = Record<string, unknown>;
 
-type Column = {
+type Column<T = RowData> = {
   key: string;
   label: string;
-  render?: (row: RowData) => React.ReactNode;
+  render?: (row: T) => React.ReactNode;
 };
 
-type FilterableTableProps = {
-  data: RowData[];
-  columns: Column[];
+type FilterableTableProps<T = RowData> = {
+  data: T[];
+  columns: Column<T>[];
   filters: Record<string, string[]>;
   csvFilename?: string;
 };
 
-export const FilterableTable: React.FC<FilterableTableProps> = ({
+export const FilterableTable = <T extends RowData>({
   data,
   columns,
   filters,
   csvFilename = "data.csv",
-}) => {
+}: FilterableTableProps<T>) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeFilters, setActiveFilters] = useState<Record<string, string[]>>({});
   const [isFilterOpen, setIsFilterOpen] = useState(false);

@@ -112,7 +112,7 @@ const ManageCounselor: React.FC = () => {
     {
       key: "Location",
       label: "LOCATION",
-      render: (row: Record<string, Record<string, unknown>>) => (
+      render: (row: CounselorRow) => (
         <>
           <div>
             <Image
@@ -173,7 +173,7 @@ const ManageCounselor: React.FC = () => {
   return (
     <div>
       <h1 className={styles.title}>Manage Members</h1>
-      <FilterableTable
+      <FilterableTable<CounselorRow>
         data={dummyData}
         columns={columns}
         filters={filters}
