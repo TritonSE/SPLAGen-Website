@@ -20,7 +20,7 @@ const userSchema = new Schema(
     account: {
       inDirectory: {
         type: Schema.Types.Mixed, // Allows boolean or string
-        default: "pending",
+        default: false,
         validate: {
           validator: function (v: string | boolean) {
             return v === true || v === false || v === "pending";
@@ -133,6 +133,17 @@ const userSchema = new Schema(
         openToAppointments: { type: Boolean, default: false },
         openToRequests: { type: Boolean, default: false },
         remote: { type: Boolean, default: false },
+        authorizedCare: {
+          type: Schema.Types.Mixed, // Allows boolean or string
+          default: false,
+          validate: {
+            validator: function (v: string | boolean) {
+              return v === true || v === false || v === "unsure";
+            },
+            message: "Status must be true, false, or 'unsure'",
+          },
+          required: true,
+        },
       },
 
       comments: {
