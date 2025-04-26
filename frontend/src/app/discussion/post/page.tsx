@@ -15,27 +15,28 @@ const postSchema = z.object({
   title: z.string().min(3).max(50),
   message: z.string().min(5).max(500),
 });
-
 type PostFormData = z.infer<typeof postSchema>;
 
 const CreatePostPage: React.FC = () => {
   const router = useRouter();
-
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
-  } = useForm<PostFormData>({
-    resolver: zodResolver(postSchema),
-  });
+  } = useForm<PostFormData>({ resolver: zodResolver(postSchema) });
 
   const onSubmit = useCallback<SubmitHandler<PostFormData>>(
     async (data) => {
       try {
-        await createPost(data); // Ensure this function exists & is imported
-        reset();
-        router.push("/discussion");
+        const result = await createPost(data);
+
+        if (result.success && result.data?._id) {
+          reset();
+          router.push(`/discussion/${result.data._id}`);
+        } else {
+          console.error("Post creation failed: Unexpected result structure");
+        }
       } catch (error: unknown) {
         if (error instanceof Error) {
           console.error("Failed to submit post:", error.message);
@@ -106,7 +107,7 @@ const CreatePostPage: React.FC = () => {
               Cancel
             </button>
             <button className={styles.buttonPost} type="submit">
-              Post
+              Post Discussion
             </button>
           </div>
         </form>

@@ -103,13 +103,12 @@
 
 /* Post button styling */
 .buttonPost {
-  padding: 12px 24px;
+  padding: 0.15rem 1rem;
   align-items: center;
   border: 1px solid var(--color-primary2); /* Purple border */
   background-color: var(--color-primary2); /* Purple background */
   color: white;
   font-size: 1rem;
-  font-weight: bold;
   border-radius: 8px;
   cursor: pointer;
   transition:
@@ -124,12 +123,11 @@
 
 /* Cancel button styling */
 .buttonCancel {
-  padding: 12px 24px;
+  padding: 0.15rem 1rem;
   border: 1px solid var(--color-grey3);
-  background-color: var(--color-grey0);
+  background-color: var(--color-surface);
   color: var(--color-grey4);
   font-size: 1rem;
-  font-weight: bold;
   border-radius: 8px;
   cursor: pointer;
   transition:
