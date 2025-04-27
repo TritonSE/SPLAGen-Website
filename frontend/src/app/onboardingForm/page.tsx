@@ -1,7 +1,7 @@
 "use client";
 
 import { useStateMachine } from "little-state-machine";
-import { useCallback, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 
 import {
   Associate,
@@ -11,12 +11,14 @@ import {
   Result,
   Student,
 } from "@/components/onboardingForm";
+import { UserContext } from "@/contexts/userContext";
 import { onboardingState } from "@/state/stateTypes";
 import updateOnboardingForm from "@/state/updateOnboardingForm";
 
 export default function OnboardingForm() {
   const [step, setStep] = useState(1);
   const { state, actions } = useStateMachine({ actions: { updateOnboardingForm } });
+  const { setOnboardingStep } = useContext(UserContext);
 
   const handleNext = useCallback(
     (data: onboardingState["data"]) => {
@@ -45,6 +47,16 @@ export default function OnboardingForm() {
     });
     setStep(1);
   }, [actions, setStep]);
+
+  // Update the onboarding Progress stepper
+  useEffect(() => {
+    if (step === 1) {
+      setOnboardingStep(1);
+    }
+    if (step === 2) {
+      setOnboardingStep(2);
+    }
+  }, [step, setOnboardingStep]);
 
   // Special flow handlers for Student and Associate Member paths
   const handleStudentFlow = useCallback(() => {
