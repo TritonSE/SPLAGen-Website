@@ -17,7 +17,7 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  margin-bottom: 10px;
+  margin-bottom: 2rem;
 }
 
 /* Post container */
@@ -66,26 +66,10 @@
 }
 
 .title {
-  color: #3b3b62;
+  color: var(--color-primary2);
   font-size: 1.5rem;
   font-weight: bold;
   font-family: "DM-sans";
-}
-
-.backArrow {
-  color: #484848;
-  font-size: 1.2rem;
-  font-weight: normal;
-  cursor: pointer;
-  text-align: left;
-  padding: 0;
-  margin-bottom: 8px;
-  font-family: inherit;
-  transition: color 0.2s ease;
-}
-
-.backArrow:hover {
-  color: var(--color-primary2);
 }
 
 .pageTitle {
@@ -105,11 +89,11 @@
 .buttonPost {
   padding: 0.15rem 1rem;
   align-items: center;
-  border: 1px solid var(--color-primary2); /* Purple border */
-  background-color: var(--color-primary2); /* Purple background */
+  border: 1px solid var(--color-primary2);
+  background-color: var(--color-primary2);
   color: white;
   font-size: 1rem;
-  border-radius: 8px;
+  border-radius: 10px;
   cursor: pointer;
   transition:
     background-color 0.3s ease,
@@ -117,8 +101,8 @@
 }
 
 .buttonPost:hover {
-  background-color: var(--color-active); /* Slightly lighter purple */
-  border-color: var(--color-active); /* Lighter purple */
+  background-color: var(--color-active);
+  border-color: var(--color-active);
 }
 
 /* Cancel button styling */
@@ -128,7 +112,7 @@
   background-color: var(--color-surface);
   color: var(--color-grey4);
   font-size: 1rem;
-  border-radius: 8px;
+  border-radius: 10px;
   cursor: pointer;
   transition:
     background-color 0.3s ease,

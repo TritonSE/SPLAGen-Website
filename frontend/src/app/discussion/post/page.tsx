@@ -31,7 +31,7 @@ const CreatePostPage: React.FC = () => {
       try {
         const result = await createPost(data);
 
-        if (result.success && result.data?._id) {
+        if (result.success && result.data._id) {
           reset();
           router.push(`/discussion/${result.data._id}`);
         } else {
@@ -60,15 +60,6 @@ const CreatePostPage: React.FC = () => {
     <div className={styles.createPostPageContainer}>
       <div className={styles.titleBackDiv}>
         <h1 className={styles.title}>Discussion</h1>
-        <button
-          className={styles.backArrow}
-          onClick={() => {
-            router.push("/discussion");
-          }}
-          type="button"
-        >
-          ← Back
-        </button>
       </div>
       <div className={styles.postPageDiv}>
         <h2 className={styles.pageTitle}>Create New Post</h2>
