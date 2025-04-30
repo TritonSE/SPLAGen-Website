@@ -35,7 +35,7 @@ export const createDiscussion = async (
     const newDiscussion = new discussionPost({ userId, title, message, channel });
     await newDiscussion.save();
 
-    res.status(201).json({ message: "Discussion created successfully", discussion: newDiscussion });
+    res.status(201).json(newDiscussion);
   } catch (error) {
     next(error);
   }
@@ -83,7 +83,7 @@ export const editDiscussion = async (
       return;
     }
 
-    res.status(200).json({ message: "Discussion updated successfully", discussion });
+    res.status(200).json(discussion);
   } catch (error) {
     next(error);
   }
