@@ -3,14 +3,14 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import dynamic from "next/dynamic";
 import Image from "next/image";
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
 
 import ExitButton from "@/../public/icons/ExitButton.svg";
 import "./ProfessionalInfoModal.css";
-import { editProfessionalInfoRequest } from "@/api/users";
+import { editProfessionalInfoRequest, fetchCombinedProfInfo } from "@/api/users";
 import { PillButton } from "@/components";
 
 // Lazy load CountrySelector component to avoid hydration error
@@ -26,7 +26,7 @@ const countrySchema = (t: (key: string) => string) =>
     label: z.string().min(1),
   });
 
-const professionalInfoSchema = (t: (key: string) => string) =>
+export const professionalInfoSchema = (t: (key: string) => string) =>
   z.object({
     professionalTitle: z.string().min(1, t("professional-title-required")),
     country: countrySchema(t)
@@ -54,6 +54,7 @@ export const ProfessionalInfoModal = ({
     formState: { errors },
     control,
     watch,
+    reset,
     setValue,
     setError,
   } = useForm<ProfessionalInfoFormData>({
@@ -97,18 +98,40 @@ export const ProfessionalInfoModal = ({
   const onSubmit = useCallback<SubmitHandler<ProfessionalInfoFormData>>(
     async (data) => {
       const formattedData = {
-        ...data,
-        country: data.country.label,
+        newTitle: data.professionalTitle,
+        newPrefLanguages: data.languages as ("english" | "spanish" | "portuguese" | "other")[],
+        newOtherPrefLanguages: "", // or your actual value
+        newCountry: data.country.label, // or .value if that's what's intended
       };
 
-      const response = await editProfessionalInfoRequest(formattedData, "firebaseToken");
+      const response = await editProfessionalInfoRequest(formattedData, "temp_firebase_token");
       if (response.success) {
         onClose();
       }
-      // TODO: error handling if needed
     },
     [onClose],
   );
+
+  const fetchProfData = useCallback(async () => {
+    const data = await fetchCombinedProfInfo("temp_firebase_token");
+
+    if (data) {
+      reset({
+        professionalTitle: data.professionalTitle,
+        country: data.country,
+        languages: data.languages,
+        splagenDirectory: data.splagenDirectory,
+      });
+    } else {
+      console.error("Error fetching professional info data");
+    }
+  }, [reset]);
+
+  useEffect(() => {
+    fetchProfData().catch((err: unknown) => {
+      console.error("Error in fetchProfData:", err);
+    });
+  }, [fetchProfData]);
 
   const handleFormSubmit = useCallback(
     (e: React.FormEvent<HTMLFormElement>) => {

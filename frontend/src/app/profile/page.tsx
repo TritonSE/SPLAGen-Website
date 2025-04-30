@@ -4,9 +4,8 @@ import { useCallback, useEffect, useState } from "react";
 
 import styles from "./page.module.css";
 
-import { User, getWhoAmI } from "@/api/users";
+import { ProfessionalInfo, User, getProfInfo, getWhoAmI } from "@/api/users";
 import { Button, EditBasicInfoModal, ProfessionalInfoModal } from "@/components";
-import { ProfileDropdown } from "@/components/ProfileDropdown";
 import { ProfilePicture } from "@/components/ProfilePicture";
 
 // changes
@@ -21,11 +20,12 @@ import { ProfilePicture } from "@/components/ProfilePicture";
 
 type DisplayComponentProps = {
   user: User | null;
+  prof: ProfessionalInfo | null;
   openBasic: () => void; // setIsBasicModalOpen
   openPro: () => void; // setIsProModalOpen
 };
 
-const Profile = ({ user, openBasic, openPro }: DisplayComponentProps) => {
+const Profile = ({ user, prof, openBasic, openPro }: DisplayComponentProps) => {
   return (
     <div className="flex flex-col gap-5">
       <div className={styles.nameCard}>
@@ -33,7 +33,7 @@ const Profile = ({ user, openBasic, openPro }: DisplayComponentProps) => {
           <ProfilePicture size="small" />
           <div className={styles.nameAndTitle}>
             <span> {user?.personal.firstName ?? "User"} </span>
-            <span> {user?.account.membership ?? "Membership"} </span>
+            <span> {prof?.title ?? "Membership"} </span>
           </div>
         </div>
 
@@ -98,12 +98,12 @@ const Profile = ({ user, openBasic, openPro }: DisplayComponentProps) => {
             <ul className={styles.infoColumn}>
               <li>
                 <label> Professional Title </label> <br />
-                {user?.account.membership ?? "Membership"}
+                {prof?.title ? prof.title : "breh"}
               </li>
 
               <li>
                 <label> Preferred Language(s) </label> <br />
-                WIP
+                {prof?.prefLanguages ? prof.prefLanguages : "NO LANUGAE?"}
               </li>
             </ul>
 
@@ -111,7 +111,7 @@ const Profile = ({ user, openBasic, openPro }: DisplayComponentProps) => {
               <ul className={styles.infoColumn}>
                 <li>
                   <label> Country </label> <br />
-                  WIP
+                  {prof?.country ? prof.country : "NO COUNTRY?"}
                 </li>
 
                 <li>
@@ -144,6 +144,8 @@ const Directory = ({ user }: DisplayComponentProps) => {
 const ProfilePage: React.FC = () => {
   // User data
   const [jsonUserData, setJsonUserData] = useState<User | null>(null);
+  // Prof info data
+  const [jsonProfData, setProfInfo] = useState<ProfessionalInfo | null>(null);
 
   const fetchUserData = useCallback(async () => {
     const res = await getWhoAmI("temp_firebase_token");
@@ -152,11 +154,22 @@ const ProfilePage: React.FC = () => {
     }
   }, []);
 
+  const fetchProfData = useCallback(async () => {
+    const res = await getProfInfo("temp_firebase_token");
+    if (res.success) {
+      setProfInfo(res.data);
+    }
+  }, []);
+
   useEffect(() => {
     fetchUserData().catch((err: unknown) => {
-      console.error("Error in fetchData:", err);
+      console.error("Error in fetchData user:", err);
     });
-  }, [fetchUserData]);
+
+    fetchProfData().catch((err: unknown) => {
+      console.error("Error in fetchData prof:", err);
+    });
+  }, [fetchUserData, fetchProfData]);
 
   // info modal
   const [isBasicModalOpen, setIsBasicModalOpen] = useState(false);
@@ -169,7 +182,6 @@ const ProfilePage: React.FC = () => {
   const closeBasicModal = () => {
     setIsBasicModalOpen(false);
     void fetchUserData();
-    console.log("closedBasicModal");
   };
 
   const openProModal = () => {
@@ -178,7 +190,7 @@ const ProfilePage: React.FC = () => {
 
   const closeProModal = () => {
     setIsProfModalOpen(false);
-    void fetchUserData();
+    void fetchProfData();
   };
 
   // Profile and Directory
@@ -195,7 +207,7 @@ const ProfilePage: React.FC = () => {
       break;
   }
 
-  const membershipStatus = jsonUserData?.account.membership; // "student" | "geneticCounselor" |  "healthcareProvider" | "associate";
+  const membershipStatus = jsonProfData?.title;
 
   return (
     <div className={styles.profileContainer}>
@@ -207,14 +219,13 @@ const ProfilePage: React.FC = () => {
           console.log(jsonUserData);
         }}
       >
-        {" "}
-        CLick me{" "}
+        CLick me
       </button>
       <header>
         <h1> {state} </h1>
         <div className="flex items-center gap-2">
           <ProfilePicture />
-          <button> name </button>
+          <button> {jsonUserData?.personal.firstName} </button>
         </div>
       </header>
 
@@ -240,11 +251,12 @@ const ProfilePage: React.FC = () => {
       <EditBasicInfoModal isOpen={isBasicModalOpen} onClose={closeBasicModal} />
       <ProfessionalInfoModal isOpen={isProfModalOpen} onClose={closeProModal} />
 
-      {jsonUserData && (
-        <DisplayComponent user={jsonUserData} openBasic={openBasicModal} openPro={openProModal} />
-      )}
-
-      <ProfileDropdown />
+      <DisplayComponent
+        user={jsonUserData}
+        prof={jsonProfData}
+        openBasic={openBasicModal}
+        openPro={openProModal}
+      />
     </div>
   );
 };

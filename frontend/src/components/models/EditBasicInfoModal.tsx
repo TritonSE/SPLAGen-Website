@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { isValidPhoneNumber } from "react-phone-number-input";
@@ -10,7 +10,15 @@ import { z } from "zod";
 
 import ExitButton from "@/../public/icons/ExitButton.svg";
 import "./EditBasicInfoModal.css";
-import { User, editBasicInfoRequest, getWhoAmI } from "@/api/users";
+import { editBasicInfoRequest, getWhoAmI } from "@/api/users";
+
+/*
+changes: 
+- fixed validation
+- 
+
+*/
+
 const ExitButtonSrc: string = ExitButton as unknown as string;
 
 type FormData = {
@@ -20,10 +28,25 @@ type FormData = {
   phone: string;
 };
 
+type EditUserPersonalInformationRequestBody = {
+  newFirstName: string;
+  newLastName: string;
+  newEmail: string;
+  newPhone: string;
+};
+
+const noSpecialChars = /^[a-zA-Z\s'-]+$/;
+
 const schema = (t: (key: string) => string) =>
   z.object({
-    firstName: z.string().min(1, t("first-name-required")),
-    lastName: z.string().min(1, t("last-name-required")),
+    firstName: z
+      .string()
+      .min(1, t("first-name-required"))
+      .regex(noSpecialChars, t("invalid-first-name")),
+    lastName: z
+      .string()
+      .min(1, t("last-name-required"))
+      .regex(noSpecialChars, t("invalid-last-name")),
     email: z.string().min(1, t("email-required")).email(t("invalid-email")),
     phone: z.string().refine(isValidPhoneNumber, {
       message: t("invalid-phone-format"),
@@ -50,15 +73,6 @@ export const EditBasicInfoModal = ({
   // const { firebaseUser } = useContext(UserContext);
   // const { user, reloadUser } = useContext(UserContext);
 
-  const [jsonUserData, setJsonUserData] = useState<User | null>(null);
-
-  const fetchUserData = useCallback(async () => {
-    const res = await getWhoAmI("temp_firebase_token");
-    if (res.success) {
-      setJsonUserData(res.data);
-    }
-  }, []);
-
   const onSubmit = useCallback<SubmitHandler<FormData>>(
     async (data) => {
       // const firebaseToken = await firebaseUser?.getIdToken();
@@ -66,8 +80,14 @@ export const EditBasicInfoModal = ({
       //  //TODO Error handling?
       //   return;
       // }
+      const newData: EditUserPersonalInformationRequestBody = {
+        newFirstName: data.firstName,
+        newLastName: data.lastName,
+        newEmail: data.email,
+        newPhone: data.phone,
+      };
 
-      const response = await editBasicInfoRequest(data, "firebaseToken");
+      const response = await editBasicInfoRequest(newData, "firebaseToken");
 
       if (response.success) {
         onClose();
@@ -90,20 +110,28 @@ export const EditBasicInfoModal = ({
   // }, [reset]);
 
   // populate form with user context data
+
+  const fetchUserData = useCallback(async () => {
+    const res = await getWhoAmI("temp_firebase_token");
+    if (res.success) {
+      if (res.data) {
+        const jsonUserData = res.data;
+
+        reset({
+          firstName: jsonUserData?.personal.firstName ?? "",
+          lastName: jsonUserData?.personal.lastName ?? "",
+          email: jsonUserData?.personal.email ?? "",
+          phone: jsonUserData?.personal.phone ?? "",
+        });
+      }
+    }
+  }, [reset]);
+
   useEffect(() => {
     fetchUserData().catch((err: unknown) => {
       console.error("Error in fetchData:", err);
     });
-
-    if (jsonUserData) {
-      reset({
-        firstName: jsonUserData?.personal.firstName ?? "",
-        lastName: jsonUserData?.personal.lastName ?? "",
-        email: jsonUserData?.personal.email ?? "",
-        phone: jsonUserData?.personal.phone ?? "",
-      });
-    }
-  }, [jsonUserData, fetchUserData, reset]);
+  }, [fetchUserData]);
 
   const handleFormSubmit = useCallback(
     (e: React.FormEvent<HTMLFormElement>) => {

@@ -21,4 +21,3 @@ export { I18nClientReady } from "./I18nClientReady";
 export { ExpandableSection } from "./expandable";
 export { ProfessionalTitleSelector, type ProfessionalTitleOption } from "./TitleSelector";
 export { FilterableTable } from "./FilterableTable";
-export { ProfileDropdown } from "./ProfileDropdown";
