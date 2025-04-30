@@ -1,0 +1,93 @@
+.postcard-container {
+  display: flex;
+  flex-wrap: nowrap;
+  width: 100%;
+  border: 1px solid var(--color-grey1);
+  border-radius: 10px;
+  padding: 1.25rem 2rem;
+  align-items: center;
+  cursor: pointer;
+  background-color: var(--color-surface);
+}
+
+.postcard-left {
+  display: flex;
+  flex-grow: 1;
+  align-items: center;
+  justify-content: left;
+  gap: 1rem;
+  max-width: 200px;
+}
+
+.postcard-profile-img {
+  width: 3.2rem;
+  height: 3.2rem;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.postcard-author-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.postcard-author-name {
+  font-size: 1rem;
+  font-weight: 500;
+  color: black;
+}
+
+.postcard-timestamp {
+  font-size: 0.75rem;
+  color: #444;
+}
+
+.postcard-right {
+  display: flex;
+  flex-direction: column;
+  flex: 8;
+}
+
+.postcard-title {
+  font-size: 1.125rem;
+  font-weight: bold;
+  line-height: 1.5;
+  color: black;
+  letter-spacing: 0.02rem;
+}
+
+.postcard-audience {
+  font-size: 0.875rem;
+  line-height: 1.4;
+  color: black;
+}
+
+.postcard-message {
+  font-size: 0.75rem;
+  line-height: 1.6;
+  color: #6c6c6c;
+}
+
+.postcard-divider {
+  width: 1px;
+  height: 100%;
+  background-color: #ccc;
+  margin: 0 1.5rem;
+}
+
+@media screen and (max-width: 768px) {
+  .postcard-container {
+    flex-direction: column;
+    padding: 1rem;
+    overflow-wrap: break-word;
+  }
+
+  .postcard-divider {
+    display: none;
+  }
+
+  .postcard-right {
+    margin-top: 1rem;
+  }
+}
