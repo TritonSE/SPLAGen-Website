@@ -16,39 +16,66 @@ function capitalizeWords(str: string) {
 type AdminRow = {
   id: number;
   name: string;
+  email: string;
+  phone: string;
   Title: string;
   Membership: string;
+  Education: string;
   Location: {
+    Address: string;
+    Hospital: string;
     Country: string;
   };
   Languages: string[];
   Services: string[];
+  Joined: string;
 };
 
 const dummyAdmins: AdminRow[] = [
   {
     id: 1,
     name: "John Doe",
+    email: "johndoe@example.com",
+    phone: "(123) 456-7890",
     Title: "Medical Geneticist",
     Membership: "Student Member",
+    Education: "Bachelors",
     Location: {
+      Address: "79664 Eisenlohrstrasse 6, Wehr, Baden-Württemberg",
+      Hospital: "UC San Diego Health",
       Country: "Germany",
     },
     Languages: ["English", "Spanish"],
     Services: ["Pediatric Genetics", "Cancer Genetics"],
+    Joined: "01/12/2025",
   },
   {
     id: 2,
     name: "Jane Smith",
+    email: "janesmith@example.com",
+    phone: "(987) 654-3210",
     Title: "Medical Geneticist",
     Membership: "Health Professional",
+    Education: "Bachelors",
     Location: {
+      Address: "9500 Gilman Dr, La Jolla, CA 92093",
+      Hospital: "UC San Diego Health",
       Country: "United States",
     },
     Languages: ["English"],
     Services: ["Cancer Genetics"],
+    Joined: "02/15/2024",
   },
 ];
+
+const InfoItem = ({ icon, label, value }: { icon: string; label: string; value: string }) => (
+  <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.5rem" }}>
+    <img src={icon} alt={`${label} icon`} width={18} />
+    <div>
+      <span style={{ fontWeight: 500 }}>{label}:</span> {value}
+    </div>
+  </div>
+);
 
 const ManageAdmin: React.FC = () => {
   const [selectedAdmin, setSelectedAdmin] = useState<AdminRow | null>(null);
@@ -112,10 +139,10 @@ const ManageAdmin: React.FC = () => {
   ];
 
   const filters = {
-    title: ["Medical Geneticist", "Genetic Counselor"],
-    membership: ["SuperAdmin", "Admin"],
-    location: ["United States", "Venezuela", "Germany", "Brazil", "Spain", "Chile"],
-    services: [
+    Title: ["Medical Geneticist", "Genetic Counselor"],
+    Membership: ["SuperAdmin", "Admin"],
+    Location: ["United States", "Venezuela", "Germany", "Brazil", "Spain", "Chile"],
+    Services: [
       "Cancer Genetics",
       "Biochemical Genetics",
       "Prenatal Genetics",
@@ -130,11 +157,13 @@ const ManageAdmin: React.FC = () => {
   return (
     <div style={{ position: "relative" }}>
       <h1 className={styles.title}>Manage Admins</h1>
+
       <FilterableTable
         data={dummyAdmins}
         columns={columns}
         filters={filters}
         csvFilename="admins.csv"
+        additionalButton={<button className={styles["action-button"]}>Invite Admin</button>}
       />
 
       {selectedAdmin && (
@@ -143,11 +172,11 @@ const ManageAdmin: React.FC = () => {
             position: "fixed",
             top: 0,
             right: 0,
-            width: "25vw",
+            width: "28vw",
             height: "100vh",
             backgroundColor: "#fff",
-            boxShadow: "-2px 0 10px rgba(0,0,0,0.1)",
-            padding: "1.5rem",
+            boxShadow: "-2px 0 12px rgba(0,0,0,0.1)",
+            padding: "2rem",
             zIndex: 1000,
             overflowY: "auto",
           }}
@@ -168,25 +197,56 @@ const ManageAdmin: React.FC = () => {
           >
             ✕
           </button>
-          <h2>Admin Info</h2>
-          <p>
-            <strong>Name:</strong> {selectedAdmin.name}
-          </p>
-          <p>
-            <strong>Title:</strong> {selectedAdmin.Title}
-          </p>
-          <p>
-            <strong>Membership:</strong> {selectedAdmin.Membership}
-          </p>
-          <p>
-            <strong>Country:</strong> {selectedAdmin.Location.Country}
-          </p>
-          <p>
-            <strong>Languages:</strong> {selectedAdmin.Languages.join(", ")}
-          </p>
-          <p>
-            <strong>Services:</strong> {selectedAdmin.Services.join(", ")}
-          </p>
+
+          <div style={{ marginBottom: "2rem" }}>
+            <h2 style={{ fontSize: "1.2rem", marginBottom: "0.5rem" }}>{selectedAdmin.name}</h2>
+            <p style={{ color: "#666" }}>{selectedAdmin.Title}</p>
+          </div>
+
+          <div style={{ borderTop: "1px solid #eee", paddingTop: "1rem" }}>
+            <h3 style={{ fontSize: "1rem", marginBottom: "1rem" }}>Contact Information</h3>
+            <InfoItem icon="/icons/email.svg" label="Email" value={selectedAdmin.email} />
+            <InfoItem icon="/icons/phone.svg" label="Phone" value={selectedAdmin.phone} />
+          </div>
+
+          <div style={{ borderTop: "1px solid #eee", paddingTop: "1rem", marginTop: "1rem" }}>
+            <h3 style={{ fontSize: "1rem", marginBottom: "1rem" }}>About Me</h3>
+            <InfoItem
+              icon="/icons/membership.svg"
+              label="Membership"
+              value={selectedAdmin.Membership}
+            />
+            <InfoItem icon="/icons/calendar.svg" label="Admin Since" value={selectedAdmin.Joined} />
+            <InfoItem
+              icon="/icons/services.svg"
+              label="Service"
+              value={selectedAdmin.Services.join(", ")}
+            />
+            <InfoItem
+              icon="/icons/language.svg"
+              label="Language"
+              value={selectedAdmin.Languages.join(", ")}
+            />
+          </div>
+
+          <div style={{ borderTop: "1px solid #eee", paddingTop: "1rem", marginTop: "1rem" }}>
+            <h3 style={{ fontSize: "1rem", marginBottom: "1rem" }}>Location</h3>
+            <InfoItem
+              icon="/icons/location.svg"
+              label="Address"
+              value={selectedAdmin.Location.Address}
+            />
+            <InfoItem
+              icon="/icons/hospital.svg"
+              label="Hospital"
+              value={selectedAdmin.Location.Hospital}
+            />
+            <InfoItem
+              icon="/icons/country.svg"
+              label="Country"
+              value={selectedAdmin.Location.Country}
+            />
+          </div>
         </div>
       )}
     </div>

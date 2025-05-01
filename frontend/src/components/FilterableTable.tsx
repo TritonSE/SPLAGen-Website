@@ -18,6 +18,7 @@ type FilterableTableProps = {
   columns: Column[];
   filters: Record<string, string[]>;
   csvFilename?: string;
+  additionalButton?: React.ReactNode; // Optional prop for additional button
 };
 
 export const FilterableTable: React.FC<FilterableTableProps> = ({
@@ -25,6 +26,7 @@ export const FilterableTable: React.FC<FilterableTableProps> = ({
   columns,
   filters,
   csvFilename = "data.csv",
+  additionalButton, // Optional additional button
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeFilters, setActiveFilters] = useState<Record<string, string[]>>({});
@@ -135,6 +137,7 @@ export const FilterableTable: React.FC<FilterableTableProps> = ({
             className={styles["button-icon"]}
           />
         </button>
+        {additionalButton}
       </div>
 
       {/* Filter Panel */}
