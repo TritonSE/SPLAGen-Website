@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
 
 import { FilterableTable } from "@/components";
@@ -70,7 +71,7 @@ const dummyAdmins: AdminRow[] = [
 
 const InfoItem = ({ icon, label, value }: { icon: string; label: string; value: string }) => (
   <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.5rem" }}>
-    <img src={icon} alt={`${label} icon`} width={18} />
+    <Image src={icon} alt={`${label} icon`} width={18} height={18} />
     <div>
       <span style={{ fontWeight: 500 }}>{label}:</span> {value}
     </div>
@@ -80,61 +81,128 @@ const InfoItem = ({ icon, label, value }: { icon: string; label: string; value: 
 const ManageAdmin: React.FC = () => {
   const [selectedAdmin, setSelectedAdmin] = useState<AdminRow | null>(null);
 
+  const handleRowClick = (row: AdminRow) => {
+    setSelectedAdmin(row);
+  };
+
   const columns = [
     {
       key: "name",
       label: "NAME",
       render: (row: AdminRow) => (
-        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+        <div
+          onClick={() => {
+            handleRowClick(row);
+          }}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "0.5rem",
+            cursor: "pointer",
+            padding: "0.5rem 0",
+          }}
+        >
           <input
             type="checkbox"
-            checked={selectedAdmin?.id === row.id}
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
             onChange={() => {
-              setSelectedAdmin((prev) => (prev?.id === row.id ? null : row));
+              // TODO: Handle checkbox change
             }}
           />
           <span>{row.name}</span>
         </div>
       ),
     },
-    { key: "Title", label: "TITLE" },
-    { key: "Membership", label: "MEMBERSHIP" },
+    {
+      key: "Title",
+      label: "TITLE",
+      render: (row: AdminRow) => (
+        <div
+          onClick={() => {
+            handleRowClick(row);
+          }}
+          style={{ cursor: "pointer" }}
+        >
+          {row.Title}
+        </div>
+      ),
+    },
+    {
+      key: "Membership",
+      label: "MEMBERSHIP",
+      render: (row: AdminRow) => (
+        <div
+          onClick={() => {
+            handleRowClick(row);
+          }}
+          style={{ cursor: "pointer" }}
+        >
+          {row.Membership}
+        </div>
+      ),
+    },
     {
       key: "Location",
       label: "LOCATION",
-      render: (row: AdminRow) => <div>{row.Location.Country}</div>,
+      render: (row: AdminRow) => (
+        <div
+          onClick={() => {
+            handleRowClick(row);
+          }}
+        >
+          {row.Location.Country}
+        </div>
+      ),
     },
     {
       key: "languages",
       label: "LANGUAGE",
-      render: (row: AdminRow) =>
-        row.Languages.map((lang, i) => {
-          const langClass = lang.toLowerCase().replace(/\s+/g, "-");
-          return (
-            <span
-              key={i}
-              className={`${styles["service-tag"]} ${styles[langClass] || styles.default}`}
-            >
-              {capitalize(lang)}
-            </span>
-          );
-        }),
+      render: (row: AdminRow) => (
+        <div
+          onClick={() => {
+            handleRowClick(row);
+          }}
+          style={{ cursor: "pointer" }}
+        >
+          {row.Languages.map((lang, i) => {
+            const langClass = lang.toLowerCase().replace(/\s+/g, "-");
+            return (
+              <span
+                key={i}
+                className={`${styles["service-tag"]} ${styles[langClass] || styles.default}`}
+              >
+                {capitalize(lang)}
+              </span>
+            );
+          })}
+        </div>
+      ),
     },
     {
       key: "services",
       label: "SERVICE",
-      render: (row: AdminRow) =>
-        row.Services.map((s, i) => {
-          const serviceClass = s.toLowerCase().replace(/\s+/g, "-");
-          return (
-            <span
-              key={i}
-              className={`${styles["service-tag"]} ${styles[serviceClass] || styles.default}`}
-            >
-              {capitalizeWords(s)}
-            </span>
-          );
-        }),
+      render: (row: AdminRow) => (
+        <div
+          onClick={() => {
+            handleRowClick(row);
+          }}
+          style={{ cursor: "pointer" }}
+        >
+          {row.Services.map((s, i) => {
+            const serviceClass = s.toLowerCase().replace(/\s+/g, "-");
+            return (
+              <span
+                key={i}
+                className={`${styles["service-tag"]} ${styles[serviceClass] || styles.default}`}
+              >
+                {capitalizeWords(s)}
+              </span>
+            );
+          })}
+        </div>
+      ),
     },
   ];
 
