@@ -19,12 +19,17 @@ type SignUpProps = {
 
 const formSchema = (t: (key: string) => string) =>
   z.object({
-    firstName: z.string().min(1, t("first-name-required")),
-    lastName: z.string().min(1, t("last-name-required")),
-    email: z.string().email(t("invalid-email")),
+    firstName: z.string().min(1, t("first-name-required")).max(50, t("first-name-max-characters")),
+    lastName: z.string().min(1, t("last-name-required")).max(50, t("last-name-max-characters")),
+    email: z
+      .string()
+      .email(t("invalid-email"))
+      .min(1, t("email-required"))
+      .max(254, t("email-max-characters")),
     password: z
       .string()
       .min(8, t("password-8-characters"))
+      .max(128, t("password-max-characters"))
       .regex(/[A-Z]/, t("password-1-uppercase"))
       .regex(/[a-z]/, t("password-1-lowercase"))
       .regex(/\d/, t("password-1-number"))
