@@ -12,13 +12,6 @@ import ExitButton from "@/../public/icons/ExitButton.svg";
 import "./EditBasicInfoModal.css";
 import { editBasicInfoRequest, getWhoAmI } from "@/api/users";
 
-/*
-changes: 
-- fixed validation
-- 
-
-*/
-
 const ExitButtonSrc: string = ExitButton as unknown as string;
 
 type FormData = {

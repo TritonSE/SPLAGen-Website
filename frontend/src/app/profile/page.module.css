@@ -60,13 +60,17 @@
 
 .profileDetails {
   display: flex;
+  flex-wrap: wrap;
 }
 
 .infoColumn {
   display: flex;
+  flex: 1 1 50%;
+  word-wrap: break-word;
   flex-direction: column;
   flex-grow: 1;
   gap: 10px;
+  margin-bottom: 10px;
 }
 
 .infoColumn li label {

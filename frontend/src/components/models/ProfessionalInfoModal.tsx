@@ -100,8 +100,8 @@ export const ProfessionalInfoModal = ({
       const formattedData = {
         newTitle: data.professionalTitle,
         newPrefLanguages: data.languages as ("english" | "spanish" | "portuguese" | "other")[],
-        newOtherPrefLanguages: "", // or your actual value
-        newCountry: data.country.label, // or .value if that's what's intended
+        newOtherPrefLanguages: "", 
+        newCountry: data.country.label,
       };
 
       const response = await editProfessionalInfoRequest(formattedData, "temp_firebase_token");

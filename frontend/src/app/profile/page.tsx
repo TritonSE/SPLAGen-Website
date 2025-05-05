@@ -1,22 +1,14 @@
 "use client";
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import styles from "./page.module.css";
 
 import { ProfessionalInfo, User, getProfInfo, getWhoAmI } from "@/api/users";
 import { Button, EditBasicInfoModal, ProfessionalInfoModal } from "@/components";
+import { PreferredLanguages } from "@/components/PreferredLanguages";
 import { ProfilePicture } from "@/components/ProfilePicture";
-
-// changes
-// edited user contller to give account info
-// tweaked user frontend api to include account info
-
-// behavior:
-// Directory button dissapears if logged in user is a student.
-
-// TODO
-// - make user context update when we click submit
 
 type DisplayComponentProps = {
   user: User | null;
@@ -25,28 +17,34 @@ type DisplayComponentProps = {
   openPro: () => void; // setIsProModalOpen
 };
 
-const Profile = ({ user, prof, openBasic, openPro }: DisplayComponentProps) => {
+const ProfileSection = ({ user, prof, openBasic, openPro }: DisplayComponentProps) => {
+  const { t } = useTranslation(); // define the t function at the top of your component
+
   return (
     <div className="flex flex-col gap-5">
       <div className={styles.nameCard}>
         <div className="flex items-center gap-5">
           <ProfilePicture size="small" />
           <div className={styles.nameAndTitle}>
-            <span> {user?.personal.firstName ?? "User"} </span>
-            <span> {prof?.title ?? "Membership"} </span>
+            <span>
+              {" "}
+              {user?.personal.firstName ?? t("first-name")}{" "}
+              {user?.personal.lastName ?? t("user")}{" "}
+            </span>
+            <span> {prof?.title ?? t("membership")} </span>
           </div>
         </div>
 
         <div className="flex items-center gap-5">
-          <Button variant="primary" label="Change Photo" />
-          <Button variant="secondary" label="Remove Photo" />
+          <Button variant="primary" label={t("change-photo")} />
+          <Button variant="secondary" label={t("remove-photo")} />
         </div>
       </div>
 
       <div className={styles.infoContainer}>
         <div className={styles.infoCard}>
           <header>
-            <h2> Basic Info </h2>
+            <h2> {t("basic-info")} </h2>
             <button onClick={openBasic}>
               <Image src="/icons/line-md.svg" width={25} height={25} alt="Edit basic info icon" />
             </button>
@@ -55,26 +53,26 @@ const Profile = ({ user, prof, openBasic, openPro }: DisplayComponentProps) => {
           <section className={styles.profileDetails}>
             <ul className={styles.infoColumn}>
               <li>
-                <label> First Name </label> <br />
-                {user?.personal.firstName ?? "User"}
+                <label> {t("first-name")} </label> <br />
+                {user?.personal.firstName ?? t("user")}
               </li>
 
               <li>
-                <label> Email </label> <br />
-                {user?.personal.email ?? "Email"}
+                <label> {t("email")} </label> <br />
+                {user?.personal.email ?? t("email")}
               </li>
             </ul>
 
             <article className={styles.infoColumn}>
               <ul className={styles.infoColumn}>
                 <li>
-                  <label> Last Name </label> <br />
-                  {user?.personal.lastName ?? "User"}
+                  <label> {t("last-name")} </label> <br />
+                  {user?.personal.lastName ?? t("user")}
                 </li>
 
                 <li>
-                  <label> Phone </label> <br />
-                  {user?.personal.phone ?? "None"}
+                  <label> {t("phone")} </label> <br />
+                  {user?.personal.phone ?? t("none")}
                 </li>
               </ul>
             </article>
@@ -83,7 +81,7 @@ const Profile = ({ user, prof, openBasic, openPro }: DisplayComponentProps) => {
 
         <div className={styles.infoCard}>
           <header>
-            <h2> Professional Info </h2>
+            <h2> {t("professional-info")} </h2>
             <button onClick={openPro}>
               <Image
                 src="/icons/line-md.svg"
@@ -97,26 +95,27 @@ const Profile = ({ user, prof, openBasic, openPro }: DisplayComponentProps) => {
           <section className={styles.profileDetails}>
             <ul className={styles.infoColumn}>
               <li>
-                <label> Professional Title </label> <br />
-                {prof?.title ? prof.title : "breh"}
+                <label> {t("professional-title")} </label> <br />
+                {prof?.title ? prof.title : t("title")}
               </li>
 
               <li>
-                <label> Preferred Language(s) </label> <br />
-                {prof?.prefLanguages ? prof.prefLanguages : "NO LANUGAE?"}
+                <label> {t("preferred-language")} </label>
+                <br />
+                <PreferredLanguages languages={prof?.prefLanguages} />
               </li>
             </ul>
 
             <article className={styles.infoColumn}>
               <ul className={styles.infoColumn}>
                 <li>
-                  <label> Country </label> <br />
-                  {prof?.country ? prof.country : "NO COUNTRY?"}
+                  <label> {t("country")} </label> <br />
+                  {prof?.country ? prof.country : t("none")}
                 </li>
 
                 <li>
-                  <label> SPLAGen Directory </label> <br />
-                  {user?.account.inDirectory ? "Yes" : "No"}
+                  <label> {t("splagen-directory")} </label> <br />
+                  {user?.account.inDirectory ? t("yes") : t("no")}
                 </li>
               </ul>
             </article>
@@ -127,135 +126,129 @@ const Profile = ({ user, prof, openBasic, openPro }: DisplayComponentProps) => {
   );
 };
 
-// Sub component to render depending on what the user desires
-// only accessible if user's account type is not a student
+// Directory sub component
+const DirectorySection = ({ user }: DisplayComponentProps) => {
+  const { t } = useTranslation(); // define the t function at the top of your component
 
-const Directory = ({ user }: DisplayComponentProps) => {
   return (
     <div>
-      <b> Directory Information </b>
-      <span> {user?.personal.lastName ?? "None"} </span>
-
-      {/* <PillButton label="Edit 🖋️" onClick={}/> */}
+      <b> {t("directory-information")} </b>
+      <span> {user?.personal.lastName ?? t("directory-information")} </span>
     </div>
   );
 };
 
+// Main rendering component
 const ProfilePage: React.FC = () => {
-  // User data
-  const [jsonUserData, setJsonUserData] = useState<User | null>(null);
-  // Prof info data
-  const [jsonProfData, setProfInfo] = useState<ProfessionalInfo | null>(null);
+  const { t } = useTranslation(); // define the t function at the top of your component
 
-  const fetchUserData = useCallback(async () => {
-    const res = await getWhoAmI("temp_firebase_token");
-    if (res.success) {
-      setJsonUserData(res.data);
-    }
-  }, []);
+  // Basic and Professional info updated with use effect and frontend api calls.
+  const [basicUserData, setBasicUserData] = useState<User | null>(null);
+  const [professionalUserData, setProfUserData] = useState<ProfessionalInfo | null>(null);
 
-  const fetchProfData = useCallback(async () => {
-    const res = await getProfInfo("temp_firebase_token");
-    if (res.success) {
-      setProfInfo(res.data);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchUserData().catch((err: unknown) => {
-      console.error("Error in fetchData user:", err);
-    });
-
-    fetchProfData().catch((err: unknown) => {
-      console.error("Error in fetchData prof:", err);
-    });
-  }, [fetchUserData, fetchProfData]);
-
-  // info modal
+  // Basic and Personal Modal state tracking
   const [isBasicModalOpen, setIsBasicModalOpen] = useState(false);
   const [isProfModalOpen, setIsProfModalOpen] = useState(false);
 
-  const openBasicModal = () => {
+  // Profile and Directory form state
+  const [formState, setFormState] = useState<"Profile" | "Directory">("Profile");
+  let DisplayComponent = formState === "Profile" ? ProfileSection : DirectorySection;
+
+  // Fetch User data with frontend api call
+  const fetchPersonalUserData = useCallback(async () => {
+    const res = await getWhoAmI("temp_firebase_token");
+    if (res.success) {
+      setBasicUserData(res.data);
+    }
+  }, []);
+
+  // Fetch professional data
+  const fetchProfessionalUserData = useCallback(async () => {
+    const res = await getProfInfo("temp_firebase_token");
+    if (res.success) {
+      setProfUserData(res.data);
+    }
+  }, []);
+
+  // Use effect updates page's basic and personal user info
+  useEffect(() => {
+    fetchPersonalUserData().catch((err: unknown) => {
+      console.error("Error in fetchData user:", err);
+    });
+
+    fetchProfessionalUserData().catch((err: unknown) => {
+      console.error("Error in fetchData prof:", err);
+    });
+  }, [fetchPersonalUserData, fetchProfessionalUserData]);
+
+  // Modal State management
+  const handleOpenBasicModal = () => {
     setIsBasicModalOpen(true);
   };
 
-  const closeBasicModal = () => {
+  const handleCloseBasicModal = () => {
     setIsBasicModalOpen(false);
-    void fetchUserData();
+    void fetchPersonalUserData();
   };
 
-  const openProModal = () => {
+  const handleOpenProfessionalInfoModal = () => {
     setIsProfModalOpen(true);
   };
 
-  const closeProModal = () => {
+  const handleCloseProfessionalInfoModal = () => {
     setIsProfModalOpen(false);
-    void fetchProfData();
+    void fetchProfessionalUserData();
   };
 
-  // Profile and Directory
-  const [state, setState] = useState<"Profile" | "Directory">("Profile");
-  let DisplayComponent = state === "Profile" ? Profile : Directory;
-
-  switch (state) {
+  switch (formState) {
     case "Profile":
-      DisplayComponent = Profile;
+      DisplayComponent = ProfileSection;
       break;
 
     case "Directory":
-      DisplayComponent = Directory;
+      DisplayComponent = DirectorySection;
       break;
   }
 
-  const membershipStatus = jsonProfData?.title;
+  const membershipStatus = professionalUserData?.title;
 
   return (
     <div className={styles.profileContainer}>
-      <button
-        onClick={() => {
-          fetchUserData().catch((err: unknown) => {
-            console.error("Error in fetchData:", err);
-          });
-          console.log(jsonUserData);
-        }}
-      >
-        CLick me
-      </button>
       <header>
-        <h1> {state} </h1>
+        <h1> {formState} </h1>
         <div className="flex items-center gap-2">
           <ProfilePicture />
-          <button> {jsonUserData?.personal.firstName} </button>
+          <button> {basicUserData?.personal.firstName} </button>
         </div>
       </header>
 
       <div className={styles.switch}>
         <Button
-          variant={state === "Profile" ? "primary" : "secondary"}
-          label={"Profile"}
+          variant={formState === "Profile" ? "primary" : "secondary"}
+          label={t("profile")}
           onClick={() => {
-            setState("Profile");
+            setFormState("Profile");
           }}
         />
 
         <Button
-          variant={state === "Directory" ? "primary" : "secondary"}
-          label={"Directory"}
+          variant={formState === "Directory" ? "primary" : "secondary"}
+          label={t("directory")}
           onClick={() => {
-            setState("Directory");
+            setFormState("Directory");
           }}
           className={membershipStatus === "student" ? "hidden" : ""}
         />
       </div>
 
-      <EditBasicInfoModal isOpen={isBasicModalOpen} onClose={closeBasicModal} />
-      <ProfessionalInfoModal isOpen={isProfModalOpen} onClose={closeProModal} />
+      <EditBasicInfoModal isOpen={isBasicModalOpen} onClose={handleCloseBasicModal} />
+      <ProfessionalInfoModal isOpen={isProfModalOpen} onClose={handleCloseProfessionalInfoModal} />
 
       <DisplayComponent
-        user={jsonUserData}
-        prof={jsonProfData}
-        openBasic={openBasicModal}
-        openPro={openProModal}
+        user={basicUserData}
+        prof={professionalUserData}
+        openBasic={handleOpenBasicModal}
+        openPro={handleOpenProfessionalInfoModal}
       />
     </div>
   );
