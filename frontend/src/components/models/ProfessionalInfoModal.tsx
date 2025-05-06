@@ -100,7 +100,7 @@ export const ProfessionalInfoModal = ({
       const formattedData = {
         newTitle: data.professionalTitle,
         newPrefLanguages: data.languages as ("english" | "spanish" | "portuguese" | "other")[],
-        newOtherPrefLanguages: "", 
+        newOtherPrefLanguages: "",
         newCountry: data.country.label,
       };
 
