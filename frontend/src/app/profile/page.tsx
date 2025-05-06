@@ -29,7 +29,7 @@ const ProfileSection = ({ user, prof, openBasic, openPro }: DisplayComponentProp
             <span>
               {" "}
               {user?.personal.firstName ?? t("first-name")}{" "}
-              {user?.personal.lastName ?? t("user")}{" "}
+              {user?.personal.lastName ?? t("last-name")}{" "}
             </span>
             <span> {prof?.title ?? t("membership")} </span>
           </div>
