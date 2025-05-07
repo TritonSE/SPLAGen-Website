@@ -15,6 +15,16 @@ export const Result = ({ onReset }: ResultProps) => {
     <div>
       <h2 className="text-xl font-bold">Form Submission Result</h2>
       <p>
+        <strong>First Name:</strong> {state.onboardingForm.firstName}
+      </p>
+      <p>
+        <strong>Last Name:</strong> {state.onboardingForm.lastName}
+      </p>
+      <p>
+        <strong>Email:</strong> {state.onboardingForm.email}
+      </p>
+
+      <p>
         <strong>Professional Title:</strong> {state.onboardingForm.professionalTitle.value}
       </p>
       <p>
