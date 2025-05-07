@@ -1,165 +1,170 @@
 .container {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 60%;
-    max-height: 80vh; /* Limit height to 80% of viewport height */
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    border-radius: 10px;
-    background: var(--color-surface);
-    padding: 1rem;
-    overflow-y: auto; /* Enable vertical scrolling */
-    scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none; /* IE and Edge */
-    margin-left: 9rem;
-  }
-  
-  /* Hide scrollbar for Chrome, Safari and Opera */
-  .container::-webkit-scrollbar {
-    display: none;
-  }
-  
-  .form {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  
-  .form > div {
-    width: 100%;
-    margin-bottom: 0.5rem;
-  }
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 60%;
+  max-height: 80vh; /* Limit height to 80% of viewport height */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  border-radius: 10px;
+  background: var(--color-surface);
+  padding: 1rem;
+  overflow-y: auto; /* Enable vertical scrolling */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  margin-left: 9rem;
+}
 
-  .sectionTitle {
-    color: #000;
-    font-size: 32px;
-    font-style: normal;
-    font-weight: 500;
-    line-height: normal;
-    margin-top: 1rem;
-    margin-bottom: 1rem;
-  }
-  
-  .sectionText {
-    color: #000;
-    font-size: 20px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
-    margin-bottom: 1rem;
-  }
+/* Hide scrollbar for Chrome, Safari and Opera */
+.container::-webkit-scrollbar {
+  display: none;
+}
 
-  .buttonGroup {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-  }
-  
-  .sectionSubtext {
-    color: #000;
-    margin-top: -0.5rem;
-    margin-bottom: 1rem;
-    font-size: 15px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
-  }
-  
-  .subtitle {
-    color: var(--color-text1);
-    font-size: 21px;
-    font-weight: 400;
-    margin-top: 0.5rem;
-  }
-  
-  .label {
-    color: var(--color-text1);
-    font-size: 20px;
-    margin-top: 1rem;
-    margin-bottom: 0.5rem;
-    display: block;
-    color: #000;
-    font-style: normal;
-    line-height: normal;
-  }
-  
-  .optionalText {
-    color: var(--color-grey4);
-    font-size: 16px;
-    font-weight: 400;
-    line-height: 150%;
-    letter-spacing: 0.32px;
-  }
-  
-  .input {
-    display: flex;
-    height: 2.2rem;
-    padding: 0.5rem 1.5rem;
-    align-items: center;
-    width: 100%;
-    border-radius: 5px;
-    border: 1px solid rgba(0, 0, 0, 0.4);
-    background: var(--color-surface);
-    margin-top: 0.5rem;
-  }
-  
-  .radioGroup {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-  }
-  
-  .radioItem {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-  }
-  
-  .radioInput {
-    margin-right: 0.5rem;
-  }
-  
-  .radioLabel {
-    font-size: 16px;
-    font-weight: 400;
-    color: #000;
-  }
-  
-  .addressField {
-    margin-bottom: 0.8rem;
-  }
-  
-  .addressGridContainer {
-    margin-top: 0.8rem;
-  }
-  
-  .addressGrid {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 0.8rem;
-  }
-  
-  .buttonContainer {
-    display: flex;
-    width: 100%;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 2rem;
-  }
-  
-  .backButton {
-    color: #000;
-    text-align: center;
-    font-size: 20px;
-    line-height: 24px;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    display: flex;
-  }
+.form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.form > div {
+  width: 100%;
+  margin-bottom: 0.5rem;
+}
+
+.sectionTitle {
+  color: #000;
+  font-size: 32px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.sectionText {
+  color: #000;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  margin-bottom: 1rem;
+}
+
+.errorText {
+  margin-top: 0.5rem;
+  color: red;
+}
+
+.buttonGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.sectionSubtext {
+  color: #000;
+  margin-top: -0.5rem;
+  margin-bottom: 1rem;
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+}
+
+.subtitle {
+  color: var(--color-text1);
+  font-size: 21px;
+  font-weight: 400;
+  margin-top: 0.5rem;
+}
+
+.label {
+  color: var(--color-text1);
+  font-size: 20px;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  display: block;
+  color: #000;
+  font-style: normal;
+  line-height: normal;
+}
+
+.optionalText {
+  color: var(--color-grey4);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 150%;
+  letter-spacing: 0.32px;
+}
+
+.input {
+  display: flex;
+  height: 2.2rem;
+  padding: 0.5rem 1.5rem;
+  align-items: center;
+  width: 100%;
+  border-radius: 5px;
+  border: 1px solid rgba(0, 0, 0, 0.4);
+  background: var(--color-surface);
+  margin-top: 0.5rem;
+}
+
+.radioGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.radioItem {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.radioInput {
+  margin-right: 0.5rem;
+}
+
+.radioLabel {
+  font-size: 16px;
+  font-weight: 400;
+  color: #000;
+}
+
+.addressField {
+  margin-bottom: 0.8rem;
+}
+
+.addressGridContainer {
+  margin-top: 0.8rem;
+}
+
+.addressGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0.8rem;
+}
+
+.buttonContainer {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 2rem;
+}
+
+.backButton {
+  color: #000;
+  text-align: center;
+  font-size: 20px;
+  line-height: 24px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+}

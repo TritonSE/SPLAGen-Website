@@ -1,11 +1,13 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Radio } from "@tritonse/tse-constellation";
 import { useStateMachine } from "little-state-machine";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import { useCallback, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
+import { z } from "zod";
 
 import styles from "./DirectoryBasics.module.css";
 
@@ -16,57 +18,76 @@ import { directoryState } from "@/state/stateTypes";
 import updateDirectoryForm from "@/state/updateDirectoryForm";
 
 const CountrySelector = dynamic(() => import("@/components").then((mod) => mod.CountrySelector), {
-    ssr: false,
+  ssr: false,
 });
 
+const formSchema = z.object({
+  educationType: z.string().min(1, "Please select an education type"),
+  educationInstitution: z.string().min(1, "Institution name is required"),
+  workClinic: z.string().min(1, "Work clinic name is required"),
+  clinicWebsite: z.string().url("Please enter a valid website URL"),
+  addressLine1: z.string().min(1, "Address is required"),
+  addressLine2: z.string().optional(),
+  city: z.string().min(1, "City is required"),
+  state: z.string().min(1, "State/territory is required"),
+  postcode: z.string().min(1, "Postcode is required"),
+  clinicCountry: z.any().optional(),
+});
+
+type FormSchema = z.infer<typeof formSchema>;
+
 type DirectoryBasicsProps = {
-    onNext: (data: directoryState["data"]) => void;
+  onNext: (data: directoryState["data"]) => void;
 };
 
 export const DirectoryBasics = ({ onNext }: DirectoryBasicsProps) => {
-    const { state, actions } = useStateMachine({ actions: { updateDirectoryForm } });
+  const { state, actions } = useStateMachine({ actions: { updateDirectoryForm } });
 
-    const [selectedCountry, setSelectedCountry] = useState<CountryOption | null>(null);
+  const [selectedCountry, setSelectedCountry] = useState<CountryOption | null>(null);
 
-    const [educationType, setEducationType] = useState<string>(
-        state.directoryForm?.educationType || ""
-    );
+  const [, setEducationType] = useState<string>(state.directoryForm?.educationType || "");
 
-    const { handleSubmit, control, register } = useForm<directoryState["data"]>({
-        defaultValues: state.directoryForm,
-    });
+  const {
+    handleSubmit,
+    control,
+    register,
+    formState: { errors },
+  } = useForm<FormSchema>({
+    defaultValues: state.directoryForm as FormSchema,
+    resolver: zodResolver(formSchema),
+  });
 
-    const onSubmit = useCallback(
-        (data: directoryState["data"]) => {
-            actions.updateDirectoryForm(data);
-            onNext(data);
-        },
+  const onSubmit = useCallback(
+    (data: FormSchema) => {
+      actions.updateDirectoryForm(data as directoryState["data"]);
+      onNext(data as directoryState["data"]);
+    },
     [actions, onNext],
-    );
+  );
 
-    const handleFormSubmit = useCallback(
-        (e: React.FormEvent) => {
-            e.preventDefault();
-            void handleSubmit(onSubmit)();
-        },
+  const handleFormSubmit = useCallback(
+    (e: React.FormEvent) => {
+      e.preventDefault();
+      void handleSubmit(onSubmit)();
+    },
     [handleSubmit, onSubmit],
-    );
+  );
 
-    const handleContinue = useCallback(() => {
-        void handleSubmit(onSubmit)();
-    }, [handleSubmit, onSubmit]);
+  const handleContinue = useCallback(() => {
+    void handleSubmit(onSubmit)();
+  }, [handleSubmit, onSubmit]);
 
   return (
     <div className={styles.container}>
-        <form onSubmit={handleFormSubmit} className={styles.form}>
-            <div>
-            <h4>Page 1 of 3</h4>
-            <h3 className={styles.sectionTitle}>Education</h3>
-            <p className={styles.sectionText}>
-                What type of education have you received to practice in your profession?
-            </p>
+      <form onSubmit={handleFormSubmit} className={styles.form}>
+        <div>
+          <h4>Page 1 of 3</h4>
+          <h3 className={styles.sectionTitle}>Education</h3>
+          <p className={styles.sectionText}>
+            What type of education have you received to practice in your profession?
+          </p>
 
-        <div className={styles.buttonGroup}>
+          <div className={styles.buttonGroup}>
             <Controller
               name="educationType"
               control={control}
@@ -112,6 +133,9 @@ export const DirectoryBasics = ({ onNext }: DirectoryBasicsProps) => {
                 </>
               )}
             />
+            {errors.educationType && (
+              <p className={styles.errorText}>{errors.educationType.message}</p>
+            )}
           </div>
 
           <div>
@@ -121,9 +145,12 @@ export const DirectoryBasics = ({ onNext }: DirectoryBasicsProps) => {
             <input
               type="text"
               {...register("educationInstitution")}
-              className={styles.input}
+              className={`${styles.input} ${errors.educationInstitution ? styles.inputError : ""}`}
               placeholder="Enter name of institution, e.g. University of California, San Diego"
             />
+            {errors.educationInstitution && (
+              <p className={styles.errorText}>{errors.educationInstitution.message}</p>
+            )}
           </div>
         </div>
 
@@ -131,16 +158,18 @@ export const DirectoryBasics = ({ onNext }: DirectoryBasicsProps) => {
           <h3 className={styles.sectionTitle}>Clinic</h3>
           <p className={styles.sectionText}>Name of work clinic</p>
           <p className={styles.sectionSubtext}>
-            If you work in multiple locations, please specify only your main work location. We can only include one location per person.
+            If you work in multiple locations, please specify only your main work location. We can
+            only include one location per person.
           </p>
 
           <div>
             <input
               type="text"
               {...register("workClinic")}
-              className={styles.input}
+              className={`${styles.input} ${errors.workClinic ? styles.inputError : ""}`}
               placeholder="Enter name of work institution"
             />
+            {errors.workClinic && <p className={styles.errorText}>{errors.workClinic.message}</p>}
           </div>
 
           <div>
@@ -148,14 +177,17 @@ export const DirectoryBasics = ({ onNext }: DirectoryBasicsProps) => {
             <input
               type="text"
               {...register("clinicWebsite")}
-              className={styles.input}
+              className={`${styles.input} ${errors.clinicWebsite ? styles.inputError : ""}`}
               placeholder="Enter website link"
             />
+            {errors.clinicWebsite && (
+              <p className={styles.errorText}>{errors.clinicWebsite.message}</p>
+            )}
           </div>
 
           <div>
             <label className={styles.label}>Address of clinic</label>
-            
+
             <div className={styles.addressField}>
               <label className={styles.label}>
                 Country
@@ -182,9 +214,12 @@ export const DirectoryBasics = ({ onNext }: DirectoryBasicsProps) => {
               <input
                 type="text"
                 {...register("addressLine1")}
-                className={styles.input}
+                className={`${styles.input} ${errors.addressLine1 ? styles.inputError : ""}`}
                 placeholder="Address line"
               />
+              {errors.addressLine1 && (
+                <p className={styles.errorText}>{errors.addressLine1.message}</p>
+              )}
             </div>
 
             <div className={styles.addressField}>
@@ -198,24 +233,33 @@ export const DirectoryBasics = ({ onNext }: DirectoryBasicsProps) => {
 
             <div className={styles.addressGridContainer}>
               <div className={styles.addressGrid}>
-                <input
-                  type="text"
-                  {...register("city")}
-                  className={styles.input}
-                  placeholder="City"
-                />
-                <input
-                  type="text"
-                  {...register("state")}
-                  className={styles.input}
-                  placeholder="State/territory"
-                />
-                <input
-                  type="text"
-                  {...register("postcode")}
-                  className={styles.input}
-                  placeholder="Postcode"
-                />
+                <div>
+                  <input
+                    type="text"
+                    {...register("city")}
+                    className={`${styles.input} ${errors.city ? styles.inputError : ""}`}
+                    placeholder="City"
+                  />
+                  {errors.city && <p className={styles.errorText}>{errors.city.message}</p>}
+                </div>
+                <div>
+                  <input
+                    type="text"
+                    {...register("state")}
+                    className={`${styles.input} ${errors.state ? styles.inputError : ""}`}
+                    placeholder="State/territory"
+                  />
+                  {errors.state && <p className={styles.errorText}>{errors.state.message}</p>}
+                </div>
+                <div>
+                  <input
+                    type="text"
+                    {...register("postcode")}
+                    className={`${styles.input} ${errors.postcode ? styles.inputError : ""}`}
+                    placeholder="Postcode"
+                  />
+                  {errors.postcode && <p className={styles.errorText}>{errors.postcode.message}</p>}
+                </div>
               </div>
             </div>
           </div>

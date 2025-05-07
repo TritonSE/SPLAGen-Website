@@ -45,7 +45,7 @@ export default function DirectoryForm() {
       {currentStep === 1 ? (
         <DirectoryBasics onNext={handleNext} />
       ) : (
-        <Result onReset={handleReset}/>
+        <Result onReset={handleReset} />
       )}
     </div>
   );

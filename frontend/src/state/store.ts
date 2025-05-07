@@ -24,7 +24,7 @@ const initialState: GlobalState = {
     educationInstitution: "",
     workClinic: "",
     clinicWebsite: "",
-    clinicCountry: { value: "", label: ""},
+    clinicCountry: { value: "", label: "" },
     addressLine1: "",
     addressLine2: "",
     city: "",
