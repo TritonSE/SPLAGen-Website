@@ -26,4 +26,5 @@ jobs:
       run: |
         npm ci
         npm run lint-check
+        npm install --include=optional sharp
         npm run build
