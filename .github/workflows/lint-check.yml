@@ -17,7 +17,7 @@ jobs:
         npm ci
         npm run lint-check
   frontend:
-    name: Frontend lint and style check
+    name: Frontend lint and style and build check
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
