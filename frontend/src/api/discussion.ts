@@ -1,4 +1,5 @@
 import { APIResult, handleAPIError, post } from "./requests";
+import { createAuthHeader } from "./users";
 
 type Discussion = {
   _id: string;
@@ -11,12 +12,19 @@ type Discussion = {
   __v: number;
 };
 
-export const createPost = async (postData: {
-  title: string;
-  message: string;
-}): Promise<APIResult<Discussion>> => {
+export const createPost = async (
+  postData: {
+    title: string;
+    message: string;
+  },
+  firebaseToken: string,
+): Promise<APIResult<Discussion>> => {
   try {
-    const response: Response = await post("/api/discussions", postData);
+    const response: Response = await post(
+      "/api/discussions",
+      postData,
+      createAuthHeader(firebaseToken),
+    );
     const data = (await response.json()) as Discussion;
 
     return { success: true, data };

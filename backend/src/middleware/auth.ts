@@ -43,6 +43,17 @@ export const requireSignedIn = async (
   res: Response,
   next: NextFunction,
 ) => {
+  // Extract the Firebase token from the "Authorization" header
+  const authHeader = req.headers.authorization;
+
+  // Check if the header starts with "Bearer " and if the token is non-empty
+  const token = authHeader?.split("Bearer ")[1];
+
+  if (!token) {
+    res.status(403).send("Authorization token is missing or invalid.");
+    return;
+  }
+
   if (SECURITY_BYPASS_ENABLED) {
     req.firebaseUid = "unique-firebase-id-001";
     const user = await UserModel.findOne({ firebaseId: req.firebaseUid });
@@ -59,17 +70,6 @@ export const requireSignedIn = async (
     req.userEmail = user.personal?.email;
 
     next();
-    return;
-  }
-
-  // Extract the Firebase token from the "Authorization" header
-  const authHeader = req.headers.authorization;
-
-  // Check if the header starts with "Bearer " and if the token is non-empty
-  const token = authHeader?.split("Bearer ")[1];
-
-  if (!token) {
-    res.status(403).send("Authorization token is missing or invalid.");
     return;
   }
 

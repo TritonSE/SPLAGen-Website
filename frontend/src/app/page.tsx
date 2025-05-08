@@ -44,6 +44,7 @@ export default function Dashboard() {
             </p>
           )}
           <EditBasicInfoModal isOpen={isModalOpen} onClose={handleCloseModal} />
+          {/* <ProfessionalInfoModal isOpen={isModalOpen} onClose={handleCloseModal} /> */}
 
           {/* Render a sample PostCard */}
           <PostCard
