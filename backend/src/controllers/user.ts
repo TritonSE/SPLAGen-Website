@@ -1,9 +1,9 @@
-import { NextFunction, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 
 import { AuthenticatedRequest } from "../middleware/auth";
 import UserModel from "../models/user";
 import { firebaseAdminAuth } from "../util/firebase";
-import { deleteUserFromFirebase, deleteUserFromMongoDB } from "../util/user";
+import { deleteUserFromFirebase, deleteUserFromMongoDB, getUserFromMongoDB } from "../util/user";
 
 import {
   CreateUserRequestBody,
@@ -14,12 +14,12 @@ import {
 } from "./types/userTypes";
 
 export const createUser = async (
-  req: AuthenticatedRequest<unknown, unknown, CreateUserRequestBody>,
+  req: Request<unknown, unknown, CreateUserRequestBody>,
   res: Response,
   next: NextFunction,
 ) => {
   try {
-    const { account, personal, professional, education, clinic, display, password } = req.body;
+    const { account, personal, professional, education, associate, password } = req.body;
 
     // Create user in Firebase
     const userRecord = await firebaseAdminAuth.createUser({
@@ -30,12 +30,12 @@ export const createUser = async (
     // Create new user in MongoDB
     const newUser = await UserModel.create({
       firebaseId: userRecord.uid,
-      account,
+      role: "member",
+      account: { ...account, inDirectory: false },
       personal,
       professional,
       education,
-      clinic,
-      display,
+      associate,
     });
 
     res.status(201).json(newUser);
@@ -91,7 +91,6 @@ export const getWhoAmI = async (req: AuthenticatedRequest, res: Response, next: 
       firebaseId: user.firebaseId,
       role: user.role,
       personal: user.personal,
-      professional: user.professional,
     });
     return;
   } catch (error) {
@@ -144,7 +143,7 @@ export const getUser = async (
 ) => {
   try {
     const { firebaseId } = req.params;
-    const user = await UserModel.findOne({ firebaseId });
+    const user = await getUserFromMongoDB(firebaseId);
 
     if (!user) {
       res.status(404).json({ error: "User not found" });

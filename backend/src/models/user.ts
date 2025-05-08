@@ -12,6 +12,7 @@ export enum UserMembership {
   HEALTHCARE_PROVIDER = "healthcareProvider",
   ASSOCIATE = "associate",
 }
+
 const userSchema = new Schema(
   {
     firebaseId: { type: String, required: true },
@@ -19,7 +20,7 @@ const userSchema = new Schema(
     account: {
       inDirectory: {
         type: Schema.Types.Mixed, // Allows boolean or string
-        default: "pending",
+        default: false,
         validate: {
           validator: function (v: string | boolean) {
             return v === true || v === false || v === "pending";
@@ -60,6 +61,30 @@ const userSchema = new Schema(
       gradDate: { type: String },
     },
 
+    associate: {
+      title: { type: String },
+      specialization: [
+        {
+          type: String,
+          enum: [
+            "rare disease advocacy",
+            "research",
+            "public health",
+            "bioethics",
+            "law",
+            "biology",
+            "medical writer",
+            "medical science liason",
+            "laboratory scientist",
+            "professor",
+            "bioinformatics",
+            "biotech sales and marketing",
+          ],
+        },
+      ],
+      organization: { type: String },
+    },
+
     clinic: {
       name: { type: String },
       url: { type: String },
@@ -67,6 +92,9 @@ const userSchema = new Schema(
         country: { type: String },
         address: { type: String },
         suite: { type: String },
+        city: { type: String },
+        state: { type: String },
+        zipPostCode: { type: String },
       },
     },
 
@@ -105,6 +133,17 @@ const userSchema = new Schema(
         openToAppointments: { type: Boolean, default: false },
         openToRequests: { type: Boolean, default: false },
         remote: { type: Boolean, default: false },
+        authorizedCare: {
+          type: Schema.Types.Mixed, // Allows boolean or string
+          default: false,
+          validate: {
+            validator: function (v: string | boolean) {
+              return v === true || v === false || v === "unsure";
+            },
+            message: "Status must be true, false, or 'unsure'",
+          },
+          required: true,
+        },
       },
 
       comments: {
@@ -117,6 +156,6 @@ const userSchema = new Schema(
   { timestamps: true },
 );
 
-type User = InferSchemaType<typeof userSchema>;
+export type User = InferSchemaType<typeof userSchema>;
 
 export default model<User>("User", userSchema);

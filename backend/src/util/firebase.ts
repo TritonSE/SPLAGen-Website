@@ -1,17 +1,9 @@
-import admin from "firebase-admin";
+import admin, { AppOptions } from "firebase-admin";
 
-// Import the firebaseConfig from config.ts
-import { firebaseConfig } from "../config";
+import env from "./validateEnv";
 
-// Initialize Firebase if it hasn't been initialized already
 if (!admin.apps.length) {
-  admin.initializeApp({
-    credential: admin.credential.cert({
-      projectId: firebaseConfig.project_id,
-      clientEmail: firebaseConfig.client_email,
-      privateKey: firebaseConfig.private_key,
-    }),
-  });
+  admin.initializeApp(env.BACKEND_FIREBASE_SETTINGS as AppOptions);
 }
 
 const firebaseAdminAuth = admin.auth();

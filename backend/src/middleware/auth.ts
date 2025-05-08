@@ -1,10 +1,12 @@
 import { NextFunction, Request, Response } from "express";
-import admin from "firebase-admin"; // Import Firebase Admin SDK
 import { Types } from "mongoose";
 
 import UserModel, { UserRole } from "../models/user";
+import { firebaseAdminAuth } from "../util/firebase";
+import env from "../util/validateEnv";
 
 const DEFAULT_ERROR = 403;
+const SECURITY_BYPASS_ENABLED = env.SECURITY_BYPASS;
 
 // Define this custom type for a request to include the "firebaseUid"
 export type AuthenticatedRequest<P = unknown, ResBody = unknown, ReqBody = unknown> = Request<
@@ -22,11 +24,16 @@ export type AuthenticatedRequest<P = unknown, ResBody = unknown, ReqBody = unkno
 const verifyFirebaseToken = async (token: string) => {
   try {
     // Verify Firebase token using Firebase Admin SDK
-    const decodedToken = await admin.auth().verifyIdToken(token);
+    const decodedToken = await firebaseAdminAuth.verifyIdToken(token);
     return decodedToken; // returns decoded user data, including UID
   } catch (error) {
-    console.error("Error verifying Firebase token:", error);
-    throw new Error("Token is invalid");
+    if (!(error instanceof Error)) {
+      console.error("Unknown error verifying Firebase token:", error);
+      throw new Error(`Token verification failed for token: ${token}. Unknown error occurred.`);
+    } else {
+      console.error("Error verifying Firebase token:", error);
+      throw new Error(`Token verification failed for token: ${token}. Error details: ${error}`);
+    }
   }
 };
 
@@ -38,12 +45,33 @@ export const requireSignedIn = async (
 ) => {
   // Extract the Firebase token from the "Authorization" header
   const authHeader = req.headers.authorization;
-  if (!authHeader?.startsWith("Bearer ")) {
+
+  // Check if the header starts with "Bearer " and if the token is non-empty
+  const token = authHeader?.split("Bearer ")[1];
+
+  if (!token) {
     res.status(403).send("Authorization token is missing or invalid.");
     return;
   }
 
-  const token = authHeader.split("Bearer ")[1];
+  if (SECURITY_BYPASS_ENABLED) {
+    req.firebaseUid = "unique-firebase-id-001";
+    const user = await UserModel.findOne({ firebaseId: req.firebaseUid });
+
+    if (!user) {
+      res.status(401).send("User not found.");
+      return;
+    }
+
+    console.warn("[SECURITY BYPASS] Skipping authentication for development mode.");
+
+    req.role = user.role;
+    req.mongoID = user._id;
+    req.userEmail = user.personal?.email;
+
+    next();
+    return;
+  }
 
   try {
     // Verify the Firebase ID token
@@ -87,16 +115,13 @@ export const requireAdminOrSuperAdmin = async (
     const user = await UserModel.findOne({ firebaseId: firebaseUid });
 
     if (!user || ![UserRole.ADMIN, UserRole.SUPERADMIN].includes(user.role as UserRole)) {
-      //return res.status(DEFAULT_ERROR).send("User is not an admin or super admin");
-      next(new Error("User is not an admin or super admin"));
+      res.status(DEFAULT_ERROR).send("User is not an admin or super admin");
       return;
     }
 
     next();
-    return;
   } catch (error) {
     next(error);
-    return;
   }
 };
 
@@ -111,7 +136,8 @@ export const requireSuperAdmin = async (
     const user = await UserModel.findOne({ firebaseId: firebaseUid });
 
     if (!user || user.role !== UserRole.SUPERADMIN) {
-      return res.status(DEFAULT_ERROR).send("User is not a super admin");
+      res.status(DEFAULT_ERROR).send("User is not a super admin");
+      return;
     }
 
     next();
