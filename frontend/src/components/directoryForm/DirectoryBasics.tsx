@@ -25,7 +25,7 @@ const formSchema = z.object({
   educationType: z.string().min(1, "Please select an education type"),
   educationInstitution: z.string().min(1, "Institution name is required"),
   workClinic: z.string().min(1, "Work clinic name is required"),
-  clinicWebsite: z.string().url("Please enter a valid website URL"),
+  clinicWebsite: z.string().url("Please enter a valid website URL, like: https://www.example.com"),
   addressLine1: z.string().min(1, "Address is required"),
   addressLine2: z.string().optional(),
   city: z.string().min(1, "City is required"),
@@ -44,8 +44,6 @@ export const DirectoryBasics = ({ onNext }: DirectoryBasicsProps) => {
   const { state, actions } = useStateMachine({ actions: { updateDirectoryForm } });
 
   const [selectedCountry, setSelectedCountry] = useState<CountryOption | null>(null);
-
-  const [, setEducationType] = useState<string>(state.directoryForm?.educationType || "");
 
   const {
     handleSubmit,
@@ -73,10 +71,6 @@ export const DirectoryBasics = ({ onNext }: DirectoryBasicsProps) => {
     [handleSubmit, onSubmit],
   );
 
-  const handleContinue = useCallback(() => {
-    void handleSubmit(onSubmit)();
-  }, [handleSubmit, onSubmit]);
-
   return (
     <div className={styles.container}>
       <form onSubmit={handleFormSubmit} className={styles.form}>
@@ -100,7 +94,6 @@ export const DirectoryBasics = ({ onNext }: DirectoryBasicsProps) => {
                     checked={field.value === "masters"}
                     onChange={() => {
                       field.onChange("masters");
-                      setEducationType("masters");
                     }}
                   />
                   <Radio
@@ -109,7 +102,6 @@ export const DirectoryBasics = ({ onNext }: DirectoryBasicsProps) => {
                     checked={field.value === "diploma"}
                     onChange={() => {
                       field.onChange("diploma");
-                      setEducationType("diploma");
                     }}
                   />
                   <Radio
@@ -118,7 +110,6 @@ export const DirectoryBasics = ({ onNext }: DirectoryBasicsProps) => {
                     checked={field.value === "fellowship"}
                     onChange={() => {
                       field.onChange("fellowship");
-                      setEducationType("fellowship");
                     }}
                   />
                   <Radio
@@ -127,15 +118,14 @@ export const DirectoryBasics = ({ onNext }: DirectoryBasicsProps) => {
                     checked={field.value === "other"}
                     onChange={() => {
                       field.onChange("other");
-                      setEducationType("other");
                     }}
                   />
                 </>
               )}
             />
-            {errors.educationType && (
-              <p className={styles.errorText}>{errors.educationType.message}</p>
-            )}
+            <p className={styles.errorText}>
+              {errors.educationType ? errors.educationType.message : "\u00A0"}
+            </p>
           </div>
 
           <div>
@@ -148,9 +138,9 @@ export const DirectoryBasics = ({ onNext }: DirectoryBasicsProps) => {
               className={`${styles.input} ${errors.educationInstitution ? styles.inputError : ""}`}
               placeholder="Enter name of institution, e.g. University of California, San Diego"
             />
-            {errors.educationInstitution && (
-              <p className={styles.errorText}>{errors.educationInstitution.message}</p>
-            )}
+            <p className={styles.errorText}>
+              {errors.educationInstitution ? errors.educationInstitution.message : "\u00A0"}
+            </p>
           </div>
         </div>
 
@@ -169,7 +159,9 @@ export const DirectoryBasics = ({ onNext }: DirectoryBasicsProps) => {
               className={`${styles.input} ${errors.workClinic ? styles.inputError : ""}`}
               placeholder="Enter name of work institution"
             />
-            {errors.workClinic && <p className={styles.errorText}>{errors.workClinic.message}</p>}
+            <p className={styles.errorText}>
+              {errors.workClinic ? errors.workClinic.message : "\u00A0"}
+            </p>
           </div>
 
           <div>
@@ -180,9 +172,9 @@ export const DirectoryBasics = ({ onNext }: DirectoryBasicsProps) => {
               className={`${styles.input} ${errors.clinicWebsite ? styles.inputError : ""}`}
               placeholder="Enter website link"
             />
-            {errors.clinicWebsite && (
-              <p className={styles.errorText}>{errors.clinicWebsite.message}</p>
-            )}
+            <p className={styles.errorText}>
+              {errors.clinicWebsite ? errors.clinicWebsite.message : "\u00A0"}
+            </p>
           </div>
 
           <div>
@@ -217,9 +209,9 @@ export const DirectoryBasics = ({ onNext }: DirectoryBasicsProps) => {
                 className={`${styles.input} ${errors.addressLine1 ? styles.inputError : ""}`}
                 placeholder="Address line"
               />
-              {errors.addressLine1 && (
-                <p className={styles.errorText}>{errors.addressLine1.message}</p>
-              )}
+              <p className={styles.errorText}>
+                {errors.addressLine1 ? errors.addressLine1.message : "\u00A0"}
+              </p>
             </div>
 
             <div className={styles.addressField}>
@@ -240,7 +232,7 @@ export const DirectoryBasics = ({ onNext }: DirectoryBasicsProps) => {
                     className={`${styles.input} ${errors.city ? styles.inputError : ""}`}
                     placeholder="City"
                   />
-                  {errors.city && <p className={styles.errorText}>{errors.city.message}</p>}
+                  <p className={styles.errorText}>{errors.city ? errors.city.message : "\u00A0"}</p>
                 </div>
                 <div>
                   <input
@@ -249,7 +241,9 @@ export const DirectoryBasics = ({ onNext }: DirectoryBasicsProps) => {
                     className={`${styles.input} ${errors.state ? styles.inputError : ""}`}
                     placeholder="State/territory"
                   />
-                  {errors.state && <p className={styles.errorText}>{errors.state.message}</p>}
+                  <p className={styles.errorText}>
+                    {errors.state ? errors.state.message : "\u00A0"}
+                  </p>
                 </div>
                 <div>
                   <input
@@ -258,7 +252,9 @@ export const DirectoryBasics = ({ onNext }: DirectoryBasicsProps) => {
                     className={`${styles.input} ${errors.postcode ? styles.inputError : ""}`}
                     placeholder="Postcode"
                   />
-                  {errors.postcode && <p className={styles.errorText}>{errors.postcode.message}</p>}
+                  <p className={styles.errorText}>
+                    {errors.postcode ? errors.postcode.message : "\u00A0"}
+                  </p>
                 </div>
               </div>
             </div>
@@ -271,7 +267,7 @@ export const DirectoryBasics = ({ onNext }: DirectoryBasicsProps) => {
             Back
           </button>
 
-          <Button type="submit" onClick={handleContinue} label="Continue" />
+          <Button type="submit" label="Continue" />
         </div>
       </form>
     </div>

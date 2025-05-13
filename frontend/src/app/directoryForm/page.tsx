@@ -1,7 +1,7 @@
 "use client";
 
 import { useStateMachine } from "little-state-machine";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 
 import { DirectoryBasics, Result } from "@/components/directoryForm";
 import { directoryState } from "@/state/stateTypes";
@@ -35,10 +35,6 @@ export default function DirectoryForm() {
     });
     setCurrentStep(1);
   }, [actions, setCurrentStep]);
-
-  useEffect(() => {
-    setCurrentStep?.(currentStep);
-  }, [currentStep, setCurrentStep]);
 
   return (
     <div className="w-full h-full">
