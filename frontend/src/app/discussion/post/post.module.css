@@ -109,6 +109,7 @@
 .buttonCancel {
   padding: 0.15rem 1rem;
   border: 1px solid var(--color-grey3);
+  border-color: var(--color-grey3);
   background-color: var(--color-surface);
   color: var(--color-grey4);
   font-size: 1rem;
