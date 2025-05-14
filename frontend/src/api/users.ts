@@ -1,8 +1,10 @@
-import { User as FirebaseUser } from "firebase/auth";
+import { User as FirebaseUser, getAuth, signInWithEmailAndPassword } from "firebase/auth";
 
 import { APIResult, get, handleAPIError, post, put } from "./requests";
 
-import { initFirebase, loginUser } from "@/firebase/firebase";
+import type { UserCredential } from "firebase/auth";
+
+import { initFirebase } from "@/firebase/firebase";
 
 // Define CreateUserRequestBody type based on backend requirements
 export type CreateUserRequestBody = {
@@ -197,6 +199,23 @@ export const signUpUser = async (userData: CreateUserRequestBody): Promise<APIRe
 };
 
 /**
+ * Logs in a user with email and password using Firebase authentication
+ * @param email User email
+ * @param password User password
+ * @returns Promise with Firebase user instance
+ */
+export const loginUser = async (email: string, password: string) => {
+  const auth = getAuth();
+  try {
+    const userCredential: UserCredential = await signInWithEmailAndPassword(auth, email, password);
+    return userCredential.user;
+  } catch (error) {
+    console.error("Firebase login error:", error);
+    throw new Error("Failed to login user");
+  }
+};
+
+/**
  * Logs in a user with email and password using Firebase
  * @param email User email
  * @param password User password
@@ -207,8 +226,17 @@ export const loginUserWithEmailPassword = async (
   password: string,
 ): Promise<APIResult<{ token: string }>> => {
   try {
+    // Type-safe implementation
     const firebaseUser = await loginUser(email, password);
+    if (!firebaseUser) {
+      throw new Error("Authentication failed");
+    }
+
     const token = await firebaseUser.getIdToken();
+    if (!token) {
+      throw new Error("Failed to get authentication token");
+    }
+
     return { success: true, data: { token } };
   } catch (error) {
     return handleAPIError(error);
