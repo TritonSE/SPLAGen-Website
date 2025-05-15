@@ -27,3 +27,18 @@ export type onboardingState = {
     graduationDate: string;
   };
 };
+
+export type directoryState = {
+  data: {
+    educationType: string;
+    educationInstitution: string;
+    workClinic: string;
+    clinicWebsite: string;
+    clinicCountry: CountryOption;
+    addressLine1: string;
+    addressLine2: string;
+    city: string;
+    state: string;
+    postcode: string;
+  };
+};

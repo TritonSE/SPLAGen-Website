@@ -29,7 +29,16 @@ declare module "little-state-machine" {
       graduationDate: string;
     };
     directoryForm: {
-      field: string;
+      educationType: string;
+      educationInstitution: string;
+      workClinic: string;
+      clinicWebsite: string;
+      clinicCountry: CountryOption;
+      addressLine1: string;
+      addressLine2: string;
+      city: string;
+      state: string;
+      postcode: string;
     };
   }
 }
