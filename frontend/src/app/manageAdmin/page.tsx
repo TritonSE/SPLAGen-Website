@@ -39,7 +39,7 @@ const dummyAdmins: AdminRow[] = [
     email: "johndoe@example.com",
     phone: "(123) 456-7890",
     Title: "Medical Geneticist",
-    Membership: "Student Member",
+    Membership: "Admin",
     Education: "Bachelors",
     Location: {
       Address: "79664 Eisenlohrstrasse 6, Wehr, Baden-Württemberg",
@@ -56,7 +56,7 @@ const dummyAdmins: AdminRow[] = [
     email: "janesmith@example.com",
     phone: "(987) 654-3210",
     Title: "Medical Geneticist",
-    Membership: "Health Professional",
+    Membership: "Admin",
     Education: "Bachelors",
     Location: {
       Address: "9500 Gilman Dr, La Jolla, CA 92093",

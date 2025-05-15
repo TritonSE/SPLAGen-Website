@@ -172,7 +172,7 @@ export const FilterableTable: React.FC<FilterableTableProps> = ({
               toggleFilterPanel();
             }}
           >
-            Apply
+            Apply Filters
           </button>
         </div>
       </div>

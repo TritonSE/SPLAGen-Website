@@ -120,6 +120,16 @@
   color: white;
 }
 
+.filter-actions button:last-child {
+  background-color: var(--color-primary2);
+  color: white;
+  border: none;
+}
+
+.filter-actions button:last-child:hover {
+  background-color: #2b1d53;
+}
+
 /* General styling for Filter and Download buttons */
 
 .action-button {

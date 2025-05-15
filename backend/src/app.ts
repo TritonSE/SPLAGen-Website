@@ -9,12 +9,12 @@ import { isHttpError } from "http-errors";
 import mongoose from "mongoose";
 
 import { mongoURI } from "./config";
+import adminRoutes from "./routes/admin";
 import announcementRoutes from "./routes/announcement";
 import directoryRoutes from "./routes/directory";
 import discussionRoutes from "./routes/discussion";
 import replyRoutes from "./routes/reply";
 import userRoutes from "./routes/user";
-import adminRoutes from "./routes/admin"; 
 
 // Load environment variables
 dotenv.config();
