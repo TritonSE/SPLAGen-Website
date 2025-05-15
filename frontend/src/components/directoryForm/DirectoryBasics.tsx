@@ -135,7 +135,7 @@ export const DirectoryBasics = ({ onNext }: DirectoryBasicsProps) => {
             <input
               type="text"
               {...register("educationInstitution")}
-              className={`${styles.input} ${errors.educationInstitution ? styles.inputError : ""}`}
+              className={styles.input}
               placeholder="Enter name of institution, e.g. University of California, San Diego"
             />
             <p className={styles.errorText}>
@@ -156,7 +156,7 @@ export const DirectoryBasics = ({ onNext }: DirectoryBasicsProps) => {
             <input
               type="text"
               {...register("workClinic")}
-              className={`${styles.input} ${errors.workClinic ? styles.inputError : ""}`}
+              className={styles.input}
               placeholder="Enter name of work institution"
             />
             <p className={styles.errorText}>
@@ -169,7 +169,7 @@ export const DirectoryBasics = ({ onNext }: DirectoryBasicsProps) => {
             <input
               type="text"
               {...register("clinicWebsite")}
-              className={`${styles.input} ${errors.clinicWebsite ? styles.inputError : ""}`}
+              className={styles.input}
               placeholder="Enter website link"
             />
             <p className={styles.errorText}>
@@ -206,12 +206,12 @@ export const DirectoryBasics = ({ onNext }: DirectoryBasicsProps) => {
               <input
                 type="text"
                 {...register("addressLine1")}
-                className={`${styles.input} ${errors.addressLine1 ? styles.inputError : ""}`}
+                className={styles.input}
                 placeholder="Address line"
               />
-              <p className={styles.errorText}>
-                {errors.addressLine1 ? errors.addressLine1.message : "\u00A0"}
-              </p>
+              {errors.addressLine1 && (
+                <p className={styles.errorText}>{errors.addressLine1.message}</p>
+              )}
             </div>
 
             <div className={styles.addressField}>
@@ -229,7 +229,7 @@ export const DirectoryBasics = ({ onNext }: DirectoryBasicsProps) => {
                   <input
                     type="text"
                     {...register("city")}
-                    className={`${styles.input} ${errors.city ? styles.inputError : ""}`}
+                    className={styles.input}
                     placeholder="City"
                   />
                   <p className={styles.errorText}>{errors.city ? errors.city.message : "\u00A0"}</p>
@@ -238,7 +238,7 @@ export const DirectoryBasics = ({ onNext }: DirectoryBasicsProps) => {
                   <input
                     type="text"
                     {...register("state")}
-                    className={`${styles.input} ${errors.state ? styles.inputError : ""}`}
+                    className={styles.input}
                     placeholder="State/territory"
                   />
                   <p className={styles.errorText}>
@@ -249,7 +249,7 @@ export const DirectoryBasics = ({ onNext }: DirectoryBasicsProps) => {
                   <input
                     type="text"
                     {...register("postcode")}
-                    className={`${styles.input} ${errors.postcode ? styles.inputError : ""}`}
+                    className={styles.input}
                     placeholder="Postcode"
                   />
                   <p className={styles.errorText}>
