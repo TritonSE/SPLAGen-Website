@@ -5,6 +5,12 @@ declare module "little-state-machine" {
   // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
   interface GlobalState {
     onboardingForm: {
+      // Signup
+      firstName: string;
+      lastName: string;
+      email: string;
+      password: string;
+      // Basic
       professionalTitle: ProfessionalTitleOption;
       country: CountryOption;
       languages: string[]; // check all we need

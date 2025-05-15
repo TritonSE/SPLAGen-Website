@@ -2,6 +2,12 @@ import { CountryOption, ProfessionalTitleOption } from "@/components";
 
 export type onboardingState = {
   data: {
+    // Signup
+    firstName: string;
+    lastName: string;
+    email: string;
+    password: string;
+    // Basic
     professionalTitle: ProfessionalTitleOption;
     country: CountryOption;
     languages: string[];
