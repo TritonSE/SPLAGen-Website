@@ -107,7 +107,7 @@ const ManageAdmin: React.FC = () => {
       key: "name",
       label: "NAME",
       render: (row: AdminRow) => (
-        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem"}}>
           <input
             type="checkbox"
             onClick={(e) => e.stopPropagation()}
@@ -283,20 +283,20 @@ const ManageAdmin: React.FC = () => {
           >
             <ProfilePicture size="medium" letter={selectedAdmin.name} />
             <div>
-              <h2 style={{ fontSize: "1.2rem", marginBottom: "0.25rem" }}>{selectedAdmin.name}</h2>
+              <h2 style={{ fontSize: "1.2rem", marginBottom: "0.25rem" , fontWeight: "bold" }}>{selectedAdmin.name}</h2>
               <p style={{ color: "#666" }}>{selectedAdmin.Title}</p>
             </div>
           </div>
 
 
-          <div style={{ borderTop: "1px solid #eee", paddingTop: "1rem" }}>
-            <h3 style={{ fontSize: "1rem", marginBottom: "1rem" }}>Contact Information</h3>
+          <div style={{ borderTop: "1px solid #eee", paddingTop: "1rem"}}>
+            <h3 style={{ fontSize: "1rem", marginBottom: "1rem", fontWeight: "bold" }}>Contact Information</h3>
             <InfoItem icon="/icons/email.svg" label="Email" value={selectedAdmin.email} />
             <InfoItem icon="/icons/phone.svg" label="Phone" value={selectedAdmin.phone} />
           </div>
 
           <div style={{ borderTop: "1px solid #eee", paddingTop: "1rem", marginTop: "1rem" }}>
-            <h3 style={{ fontSize: "1rem", marginBottom: "1rem" }}>About Me</h3>
+            <h3 style={{ fontSize: "1rem", marginBottom: "1rem" , fontWeight: "bold" }}>About Me</h3>
             <InfoItem
               icon="/icons/membership.svg"
               label="Membership"
@@ -316,7 +316,7 @@ const ManageAdmin: React.FC = () => {
           </div>
 
           <div style={{ borderTop: "1px solid #eee", paddingTop: "1rem", marginTop: "1rem" }}>
-            <h3 style={{ fontSize: "1rem", marginBottom: "1rem" }}>Location</h3>
+            <h3 style={{ fontSize: "1rem", marginBottom: "1rem", fontWeight: "bold"  }}>Location</h3>
             <InfoItem
               icon="/icons/location.svg"
               label="Address"
