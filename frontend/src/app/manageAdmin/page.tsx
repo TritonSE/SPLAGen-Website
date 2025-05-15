@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 
 import { FilterableTable } from "@/components";
 import styles from "@/components/FilterableTable.module.css";
@@ -81,9 +81,9 @@ const InfoItem = ({ icon, label, value }: { icon: string; label: string; value: 
 const ManageAdmin: React.FC = () => {
   const [selectedAdmin, setSelectedAdmin] = useState<AdminRow | null>(null);
 
-  const handleRowClick = (row: AdminRow) => {
-    setSelectedAdmin(row);
-  };
+const handleRowClick = useCallback((row: AdminRow) => {
+  setSelectedAdmin(row);
+}, []);
 
   const columns = [
   {
