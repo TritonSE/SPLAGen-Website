@@ -91,6 +91,7 @@ export const getWhoAmI = async (req: AuthenticatedRequest, res: Response, next: 
       firebaseId: user.firebaseId,
       role: user.role,
       personal: user.personal,
+      account: user.account,
     });
     return;
   } catch (error) {
