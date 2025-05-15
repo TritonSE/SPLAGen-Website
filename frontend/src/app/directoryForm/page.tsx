@@ -17,7 +17,7 @@ export default function DirectoryForm() {
       // Move to the next step (Result page)
       setCurrentStep(2);
     },
-    [actions],
+    [actions, setCurrentStep],
   );
 
   const handleReset = useCallback(() => {
