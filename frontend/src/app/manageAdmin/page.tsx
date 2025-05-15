@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useCallback, useState } from "react";
 
 import { FilterableTable } from "@/components";
+import { ProfilePicture } from "@/components/ProfilePicture";
 import styles from "@/components/FilterableTable.module.css";
 
 function capitalize(str: string) {
@@ -272,10 +273,21 @@ const ManageAdmin: React.FC = () => {
 
 
           {/* Admin Info */}
-          <div style={{ marginBottom: "2rem" }}>
-            <h2 style={{ fontSize: "1.2rem", marginBottom: "0.5rem" }}>{selectedAdmin.name}</h2>
-            <p style={{ color: "#666" }}>{selectedAdmin.Title}</p>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "1rem",
+              marginBottom: "2rem",
+            }}
+          >
+            <ProfilePicture size="medium" letter={selectedAdmin.name} />
+            <div>
+              <h2 style={{ fontSize: "1.2rem", marginBottom: "0.25rem" }}>{selectedAdmin.name}</h2>
+              <p style={{ color: "#666" }}>{selectedAdmin.Title}</p>
+            </div>
           </div>
+
 
           <div style={{ borderTop: "1px solid #eee", paddingTop: "1rem" }}>
             <h3 style={{ fontSize: "1rem", marginBottom: "1rem" }}>Contact Information</h3>
