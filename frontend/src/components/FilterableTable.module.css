@@ -8,6 +8,7 @@
   display: flex;
   margin-top: 3vh;
   margin-bottom: 3vh;
+  justify-content: space-between;
 }
 
 .search-bar {
@@ -161,6 +162,8 @@
 .action-button:hover .button-icon {
   filter: brightness(0) invert(1);
 }
+
+
 
 /*Counselor Table*/
 

@@ -199,7 +199,18 @@ const ManageAdmin: React.FC = () => {
         columns={columns}
         filters={filters}
         csvFilename="admins.csv"
-        additionalButton={<button className={styles["action-button"]}>Invite Admin</button>}
+        additionalButton={
+          <button className={styles["action-button"]}>
+            Invite Admin
+            <Image
+              src="/icons/plus.svg"
+              alt="Plus icon"
+              width={16}
+              height={16}
+              className={styles["button-icon"]}
+            />
+          </button>
+        }
         onRowClick={handleRowClick}
       />
 

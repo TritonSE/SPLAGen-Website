@@ -1,35 +1,35 @@
 "use client";
 
 import Image from "next/image";
-import React, { useCallback, useMemo, useState } from "react";
+import React, { JSX, useCallback, useMemo, useState } from "react";
 
 import styles from "./FilterableTable.module.css";
 
 type RowData = Record<string, unknown>;
 
-type Column = {
+type Column<T extends RowData = RowData> = {
   key: string;
   label: string;
-  render?: (row: RowData) => React.ReactNode;
+  render?: (row: T) => React.ReactNode;
 };
 
-type FilterableTableProps = {
-  data: RowData[];
-  columns: Column[];
+type FilterableTableProps<T extends RowData = RowData> = {
+  data: T[];
+  columns: Column<T>[];
   filters: Record<string, string[]>;
   csvFilename?: string;
-  additionalButton?: React.ReactNode; 
-  onRowClick?: (row: RowData) => void;
+  additionalButton?: React.ReactNode;
+  onRowClick?: (row: T) => void;
 };
 
-export const FilterableTable: React.FC<FilterableTableProps> = ({
+export const FilterableTable = <T extends RowData>({
   data,
   columns,
   filters,
   csvFilename = "data.csv",
-  additionalButton, 
+  additionalButton,
   onRowClick,
-}) => {
+}: FilterableTableProps<T>): JSX.Element => {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeFilters, setActiveFilters] = useState<Record<string, string[]>>({});
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -77,13 +77,13 @@ export const FilterableTable: React.FC<FilterableTableProps> = ({
     if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
       return String(value);
     }
-    return ""; // Prevents [object Object] output
+    return "";
   };
 
   const downloadCSV = (): void => {
     const header = columns.map((col) => col.label).join(",");
     const rows = filteredData.map((row) =>
-      columns.map((col) => `"${safeStringifyCell(row[col.key])}"`).join(","),
+      columns.map((col) => `"${safeStringifyCell(row[col.key])}"`).join(",")
     );
 
     const csv = [header, ...rows].join("\n");
@@ -100,15 +100,29 @@ export const FilterableTable: React.FC<FilterableTableProps> = ({
     <div>
       {/* Controls */}
       <div className={styles.controls}>
-        <input
-          type="text"
-          placeholder="Search Members"
-          value={searchTerm}
-          onChange={(e) => {
-            setSearchTerm(e.target.value);
-          }}
-          className={styles["search-bar"]}
-        />
+        <div style={{ position: "relative", width: "30rem", marginRight: "auto" }}>
+          <Image
+            src="/icons/search.svg"
+            alt="Search icon"
+            width={16}
+            height={16}
+            style={{
+              position: "absolute",
+              top: "50%",
+              left: "0.75rem",
+              transform: "translateY(-50%)",
+              pointerEvents: "none",
+            }}
+          />
+          <input
+            type="text"
+            placeholder="Search Members"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className={styles["search-bar"]}
+            style={{ paddingLeft: "2.2rem" }}
+          />
+        </div>
         <button
           onClick={() => {
             toggleFilterPanel();
@@ -194,9 +208,9 @@ export const FilterableTable: React.FC<FilterableTableProps> = ({
               <tr
                 key={idx}
                 onClick={() => {
-                  if (onRowClick) onRowClick(row); 
+                  if (onRowClick) onRowClick(row);
                 }}
-                style={{ cursor: onRowClick ? "pointer" : "default" }} 
+                style={{ cursor: onRowClick ? "pointer" : "default" }}
               >
                 {columns.map((col) => (
                   <td key={col.key}>
@@ -206,7 +220,6 @@ export const FilterableTable: React.FC<FilterableTableProps> = ({
               </tr>
             ))}
           </tbody>
-
         </table>
       </div>
     </div>
