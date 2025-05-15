@@ -83,7 +83,7 @@ export const FilterableTable = <T extends RowData>({
   const downloadCSV = (): void => {
     const header = columns.map((col) => col.label).join(",");
     const rows = filteredData.map((row) =>
-      columns.map((col) => `"${safeStringifyCell(row[col.key])}"`).join(",")
+      columns.map((col) => `"${safeStringifyCell(row[col.key])}"`).join(","),
     );
 
     const csv = [header, ...rows].join("\n");
@@ -118,7 +118,9 @@ export const FilterableTable = <T extends RowData>({
             type="text"
             placeholder="Search Members"
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+            }}
             className={styles["search-bar"]}
             style={{ paddingLeft: "2.2rem" }}
           />

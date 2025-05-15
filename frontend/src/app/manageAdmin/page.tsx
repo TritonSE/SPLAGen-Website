@@ -4,8 +4,8 @@ import Image from "next/image";
 import { useCallback, useState } from "react";
 
 import { FilterableTable } from "@/components";
-import { ProfilePicture } from "@/components/ProfilePicture";
 import styles from "@/components/FilterableTable.module.css";
+import { ProfilePicture } from "@/components/ProfilePicture";
 
 function capitalize(str: string) {
   return str.charAt(0).toUpperCase() + str.slice(1);
@@ -89,13 +89,19 @@ const ManageAdmin: React.FC = () => {
 
   const handlePrev = () => {
     if (selectedIndex !== null) {
-      setSelectedIndex((prev) => (prev! === 0 ? dummyAdmins.length - 1 : prev! - 1));
+      setSelectedIndex((prev) => {
+        if (prev === null) return prev;
+        return prev === 0 ? dummyAdmins.length - 1 : prev - 1;
+      });
     }
   };
 
   const handleNext = () => {
     if (selectedIndex !== null) {
-      setSelectedIndex((prev) => (prev! === dummyAdmins.length - 1 ? 0 : prev! + 1));
+      setSelectedIndex((prev) => {
+        if (prev === null) return prev;
+        return prev === dummyAdmins.length - 1 ? 0 : prev + 1;
+      });
     }
   };
 
@@ -107,10 +113,12 @@ const ManageAdmin: React.FC = () => {
       key: "name",
       label: "NAME",
       render: (row: AdminRow) => (
-        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem"}}>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
           <input
             type="checkbox"
-            onClick={(e) => e.stopPropagation()}
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
             onChange={() => {
               // TODO: Handle checkbox change
             }}
@@ -282,7 +290,6 @@ const ManageAdmin: React.FC = () => {
             </button>
           </div>
 
-
           {/* Admin Info */}
           <div
             style={{
@@ -294,20 +301,23 @@ const ManageAdmin: React.FC = () => {
           >
             <ProfilePicture size="medium" letter={selectedAdmin.name} />
             <div>
-              <h2 style={{ fontSize: "1.2rem", marginBottom: "0.25rem" , fontWeight: "bold" }}>{selectedAdmin.name}</h2>
+              <h2 style={{ fontSize: "1.2rem", marginBottom: "0.25rem", fontWeight: "bold" }}>
+                {selectedAdmin.name}
+              </h2>
               <p style={{ color: "#666" }}>{selectedAdmin.Title}</p>
             </div>
           </div>
 
-
-          <div style={{ borderTop: "1px solid #eee", paddingTop: "1rem"}}>
-            <h3 style={{ fontSize: "1rem", marginBottom: "1rem", fontWeight: "bold" }}>Contact Information</h3>
+          <div style={{ borderTop: "1px solid #eee", paddingTop: "1rem" }}>
+            <h3 style={{ fontSize: "1rem", marginBottom: "1rem", fontWeight: "bold" }}>
+              Contact Information
+            </h3>
             <InfoItem icon="/icons/email.svg" label="Email" value={selectedAdmin.email} />
             <InfoItem icon="/icons/phone.svg" label="Phone" value={selectedAdmin.phone} />
           </div>
 
           <div style={{ borderTop: "1px solid #eee", paddingTop: "1rem", marginTop: "1rem" }}>
-            <h3 style={{ fontSize: "1rem", marginBottom: "1rem" , fontWeight: "bold" }}>About Me</h3>
+            <h3 style={{ fontSize: "1rem", marginBottom: "1rem", fontWeight: "bold" }}>About Me</h3>
             <InfoItem
               icon="/icons/membership.svg"
               label="Membership"
@@ -327,7 +337,7 @@ const ManageAdmin: React.FC = () => {
           </div>
 
           <div style={{ borderTop: "1px solid #eee", paddingTop: "1rem", marginTop: "1rem" }}>
-            <h3 style={{ fontSize: "1rem", marginBottom: "1rem", fontWeight: "bold"  }}>Location</h3>
+            <h3 style={{ fontSize: "1rem", marginBottom: "1rem", fontWeight: "bold" }}>Location</h3>
             <InfoItem
               icon="/icons/location.svg"
               label="Address"
