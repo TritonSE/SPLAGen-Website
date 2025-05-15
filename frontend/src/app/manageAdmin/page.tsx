@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState, useCallback } from "react";
+import { useCallback, useState } from "react";
 
 import { FilterableTable } from "@/components";
 import styles from "@/components/FilterableTable.module.css";
@@ -79,56 +79,59 @@ const InfoItem = ({ icon, label, value }: { icon: string; label: string; value: 
 );
 
 const ManageAdmin: React.FC = () => {
-  const [selectedAdmin, setSelectedAdmin] = useState<AdminRow | null>(null);
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
-const handleRowClick = useCallback((row: AdminRow) => {
-  setSelectedAdmin(row);
-}, []);
+  const handleRowClick = useCallback((row: AdminRow) => {
+    const index = dummyAdmins.findIndex((r) => r.id === row.id);
+    if (index !== -1) setSelectedIndex(index);
+  }, []);
+
+  const handlePrev = () => {
+    if (selectedIndex !== null) {
+      setSelectedIndex((prev) => (prev! === 0 ? dummyAdmins.length - 1 : prev! - 1));
+    }
+  };
+
+  const handleNext = () => {
+    if (selectedIndex !== null) {
+      setSelectedIndex((prev) => (prev! === dummyAdmins.length - 1 ? 0 : prev! + 1));
+    }
+  };
+
+
+  const selectedAdmin = selectedIndex !== null ? dummyAdmins[selectedIndex] : null;
 
   const columns = [
-  {
-    key: "name",
-    label: "NAME",
-    render: (row: AdminRow) => (
-      <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-        <input
-          type="checkbox"
-          onClick={(e) => e.stopPropagation()}
-          onChange={() => {
-            // TODO: Handle checkbox change
-          }}
-        />
-        <span>{row.name}</span>
-      </div>
-    ),
-  },
-
+    {
+      key: "name",
+      label: "NAME",
+      render: (row: AdminRow) => (
+        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+          <input
+            type="checkbox"
+            onClick={(e) => e.stopPropagation()}
+            onChange={() => {
+              // TODO: Handle checkbox change
+            }}
+          />
+          <span>{row.name}</span>
+        </div>
+      ),
+    },
     {
       key: "Title",
       label: "TITLE",
-      render: (row: AdminRow) => (
-        <div>
-          {row.Title}
-        </div>
-      ),
+      render: (row: AdminRow) => <div>{row.Title}</div>,
     },
     {
       key: "Membership",
       label: "MEMBERSHIP",
-      render: (row: AdminRow) => (
-        <div>
-          {row.Membership}
-        </div>
-      ),
+      render: (row: AdminRow) => <div>{row.Membership}</div>,
     },
     {
       key: "Location",
       label: "LOCATION",
-      render: (row: AdminRow) => (
-        <div>
-          {row.Location.Country}
-        </div>
-      ),
+      render: (row: AdminRow) => <div>{row.Location.Country}</div>,
     },
     {
       key: "languages",
@@ -214,9 +217,10 @@ const handleRowClick = useCallback((row: AdminRow) => {
             overflowY: "auto",
           }}
         >
+          {/* Close Button */}
           <button
             onClick={() => {
-              setSelectedAdmin(null);
+              setSelectedIndex(null);
             }}
             style={{
               position: "absolute",
@@ -225,11 +229,49 @@ const handleRowClick = useCallback((row: AdminRow) => {
               background: "transparent",
               border: "none",
               fontSize: "1.2rem",
+              cursor: "pointer",
             }}
           >
             ✕
           </button>
 
+          {/* Row Navigation */}
+          <div
+            style={{
+              position: "absolute",
+              top: "10px",
+              left: "10px",
+              display: "flex",
+              gap: "0.5rem",
+              zIndex: 1001,
+            }}
+          >
+            <button
+              onClick={handlePrev}
+              style={{
+                fontSize: "1.2rem",
+                background: "transparent",
+                border: "none",
+                cursor: "pointer",
+              }}
+            >
+              &lt;
+            </button>
+            <button
+              onClick={handleNext}
+              style={{
+                fontSize: "1.2rem",
+                background: "transparent",
+                border: "none",
+                cursor: "pointer",
+              }}
+            >
+              &gt;
+            </button>
+          </div>
+
+
+          {/* Admin Info */}
           <div style={{ marginBottom: "2rem" }}>
             <h2 style={{ fontSize: "1.2rem", marginBottom: "0.5rem" }}>{selectedAdmin.name}</h2>
             <p style={{ color: "#666" }}>{selectedAdmin.Title}</p>
