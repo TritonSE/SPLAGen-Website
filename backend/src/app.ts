@@ -14,6 +14,7 @@ import directoryRoutes from "./routes/directory";
 import discussionRoutes from "./routes/discussion";
 import replyRoutes from "./routes/reply";
 import userRoutes from "./routes/user";
+import adminRoutes from "./routes/admin"; 
 
 // Load environment variables
 dotenv.config();
@@ -54,6 +55,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/discussions", discussionRoutes);
 app.use("/api/replies", replyRoutes);
 app.use("/api/directory", directoryRoutes);
+app.use("/api/admin", adminRoutes);
 
 app.get("/", (req: Request, res: Response) => {
   res.send("Express + TypeScript Server");
