@@ -18,7 +18,8 @@ type FilterableTableProps = {
   columns: Column[];
   filters: Record<string, string[]>;
   csvFilename?: string;
-  additionalButton?: React.ReactNode; // Optional prop for additional button
+  additionalButton?: React.ReactNode; 
+  onRowClick?: (row: RowData) => void;
 };
 
 export const FilterableTable: React.FC<FilterableTableProps> = ({
@@ -26,7 +27,8 @@ export const FilterableTable: React.FC<FilterableTableProps> = ({
   columns,
   filters,
   csvFilename = "data.csv",
-  additionalButton, // Optional additional button
+  additionalButton, 
+  onRowClick,
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeFilters, setActiveFilters] = useState<Record<string, string[]>>({});
@@ -189,7 +191,13 @@ export const FilterableTable: React.FC<FilterableTableProps> = ({
           </thead>
           <tbody>
             {filteredData.map((row, idx) => (
-              <tr key={idx}>
+              <tr
+                key={idx}
+                onClick={() => {
+                  if (onRowClick) onRowClick(row); 
+                }}
+                style={{ cursor: onRowClick ? "pointer" : "default" }} 
+              >
                 {columns.map((col) => (
                   <td key={col.key}>
                     {col.render ? col.render(row) : safeStringifyCell(row[col.key])}
@@ -198,6 +206,7 @@ export const FilterableTable: React.FC<FilterableTableProps> = ({
               </tr>
             ))}
           </tbody>
+
         </table>
       </div>
     </div>

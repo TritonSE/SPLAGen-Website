@@ -86,45 +86,28 @@ const ManageAdmin: React.FC = () => {
   };
 
   const columns = [
-    {
-      key: "name",
-      label: "NAME",
-      render: (row: AdminRow) => (
-        <div
-          onClick={() => {
-            handleRowClick(row);
+  {
+    key: "name",
+    label: "NAME",
+    render: (row: AdminRow) => (
+      <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+        <input
+          type="checkbox"
+          onClick={(e) => e.stopPropagation()}
+          onChange={() => {
+            // TODO: Handle checkbox change
           }}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "0.5rem",
-            cursor: "pointer",
-            padding: "0.5rem 0",
-          }}
-        >
-          <input
-            type="checkbox"
-            onClick={(e) => {
-              e.stopPropagation();
-            }}
-            onChange={() => {
-              // TODO: Handle checkbox change
-            }}
-          />
-          <span>{row.name}</span>
-        </div>
-      ),
-    },
+        />
+        <span>{row.name}</span>
+      </div>
+    ),
+  },
+
     {
       key: "Title",
       label: "TITLE",
       render: (row: AdminRow) => (
-        <div
-          onClick={() => {
-            handleRowClick(row);
-          }}
-          style={{ cursor: "pointer" }}
-        >
+        <div>
           {row.Title}
         </div>
       ),
@@ -133,12 +116,7 @@ const ManageAdmin: React.FC = () => {
       key: "Membership",
       label: "MEMBERSHIP",
       render: (row: AdminRow) => (
-        <div
-          onClick={() => {
-            handleRowClick(row);
-          }}
-          style={{ cursor: "pointer" }}
-        >
+        <div>
           {row.Membership}
         </div>
       ),
@@ -147,11 +125,7 @@ const ManageAdmin: React.FC = () => {
       key: "Location",
       label: "LOCATION",
       render: (row: AdminRow) => (
-        <div
-          onClick={() => {
-            handleRowClick(row);
-          }}
-        >
+        <div>
           {row.Location.Country}
         </div>
       ),
@@ -160,12 +134,7 @@ const ManageAdmin: React.FC = () => {
       key: "languages",
       label: "LANGUAGE",
       render: (row: AdminRow) => (
-        <div
-          onClick={() => {
-            handleRowClick(row);
-          }}
-          style={{ cursor: "pointer" }}
-        >
+        <div>
           {row.Languages.map((lang, i) => {
             const langClass = lang.toLowerCase().replace(/\s+/g, "-");
             return (
@@ -184,12 +153,7 @@ const ManageAdmin: React.FC = () => {
       key: "services",
       label: "SERVICE",
       render: (row: AdminRow) => (
-        <div
-          onClick={() => {
-            handleRowClick(row);
-          }}
-          style={{ cursor: "pointer" }}
-        >
+        <div>
           {row.Services.map((s, i) => {
             const serviceClass = s.toLowerCase().replace(/\s+/g, "-");
             return (
@@ -232,6 +196,7 @@ const ManageAdmin: React.FC = () => {
         filters={filters}
         csvFilename="admins.csv"
         additionalButton={<button className={styles["action-button"]}>Invite Admin</button>}
+        onRowClick={handleRowClick}
       />
 
       {selectedAdmin && (
@@ -260,7 +225,6 @@ const ManageAdmin: React.FC = () => {
               background: "transparent",
               border: "none",
               fontSize: "1.2rem",
-              cursor: "pointer",
             }}
           >
             ✕
