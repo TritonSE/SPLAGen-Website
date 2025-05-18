@@ -27,7 +27,7 @@ export default function Dashboard() {
         <Link href="/discussion/post"> Go to post</Link>
       </p>
       <p>
-        <Link href="/discussion/landingPage"> Go to Landing Page</Link>
+        <Link href="/discussion"> Go to Landing Page</Link>
       </p>
       <p>
         <Link href="flowPopupDemo"> Go to flow popup demo </Link>

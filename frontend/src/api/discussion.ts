@@ -33,10 +33,27 @@ export const getPost = async (): Promise<APIResult<Discussion[]>> => {
       return handleAPIError("Failed to fetch posts");
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const data: Discussion[] = await response.json();
+    const json: unknown = await response.json();
 
-    return { success: true, data };
+    if (typeof window !== "undefined") {
+      console.info("Fetched posts JSON:", json);
+    }
+
+    if (Array.isArray(json)) {
+      return { success: true, data: json as Discussion[] };
+    } else if (
+      typeof json === "object" &&
+      json !== null &&
+      "posts" in json &&
+      Array.isArray((json as { posts: unknown }).posts)
+    ) {
+      return {
+        success: true,
+        data: (json as { posts: Discussion[] }).posts,
+      };
+    } else {
+      return handleAPIError("Unexpected response format from API.");
+    }
   } catch (error) {
     return handleAPIError(error);
   }
