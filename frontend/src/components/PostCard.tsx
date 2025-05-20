@@ -33,7 +33,7 @@ export const PostCard: React.FC<PostCard> = ({
         <div className={styles["postcard-author-info"]}>
           <div className={styles["postcard-author-name"]}>{authorName}</div>
           <div className={styles["postcard-timestamp"]}>
-            {date}
+            {new Date(date).toISOString().slice(0, 10)}
             {time ? `, ${time}` : ""}
           </div>
         </div>

@@ -57,6 +57,7 @@
   line-height: 1.5;
   color: black;
   letter-spacing: 0.02rem;
+  text-overflow: ellipsis;
 }
 
 .postcard-audience {

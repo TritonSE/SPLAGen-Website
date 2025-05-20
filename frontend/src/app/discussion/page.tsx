@@ -316,7 +316,8 @@ export default function LandingPage() {
       )}
 
       {/* If no posts */}
-      {posts.length === 0 && <div>{t("No posts yet.")}</div>}
+      {posts.length === 0 && <div>No posts yet.</div>}
+
       <div ref={sentinelRef} className={styles.sentinel} />
     </div>
   );
