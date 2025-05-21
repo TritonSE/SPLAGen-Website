@@ -227,11 +227,14 @@ const ProfilePage: React.FC = () => {
       </div>
 
       <EditBasicInfoModal isOpen={isBasicModalOpen} onClose={handleCloseBasicModal} />
-      <ProfessionalInfoModal
-        isOpen={isProfModalOpen}
-        onClose={handleCloseProfessionalInfoModal}
-        populationInfo={userData ?? null}
-      />
+
+      {userData && (
+        <ProfessionalInfoModal
+          isOpen={isProfModalOpen}
+          onClose={handleCloseProfessionalInfoModal}
+          populationInfo={userData}
+        />
+      )}
 
       <DisplayComponent
         user={userData}
