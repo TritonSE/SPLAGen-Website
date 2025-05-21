@@ -52,7 +52,9 @@
 }
 
 .errorText {
-  margin-top: 0.25rem;
+  font-size: 0.8rem;
+  margin-bottom: 0.2rem;
+  height: 0.8rem;
   color: var(--color-error);
 }
 
@@ -106,7 +108,6 @@
   border-radius: 5px;
   border: 1px solid rgba(0, 0, 0, 0.4);
   background: var(--color-surface);
-  margin-top: 0.5rem;
 }
 
 .radioGroup {
@@ -134,10 +135,6 @@
 
 .addressField {
   margin-bottom: 0.8rem;
-}
-
-.addressGridContainer {
-  margin-top: 0.8rem;
 }
 
 .addressGrid {
