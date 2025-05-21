@@ -36,6 +36,12 @@ const initialState: GlobalState = {
     city: "",
     state: "",
     postcode: "",
+    canMakeAppointments: "",
+    canRequestTests: "",
+    offersTelehealth: "",
+    specialtyServices: [],
+    careLanguages: [],
+    authorizedForLanguages: "",
   },
 };
 
