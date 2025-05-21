@@ -220,7 +220,6 @@ export const fetchCombinedProfInfo = async (
 
   const profData = profRes.data;
   const userData = whoamiRes.data;
-  console.log(profData);
   return {
     professionalTitle: profData.title,
     country: {
@@ -239,7 +238,6 @@ export const getUser = async (
   try {
     const response = await get(`/api/users/${firebaseUid}`, createAuthHeader(firebaseToken));
     const data = (await response.json()) as User;
-    console.log(data);
     return { success: true, data };
   } catch (error) {
     return handleAPIError(error);
