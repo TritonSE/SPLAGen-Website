@@ -27,9 +27,10 @@ const ProfessionalTitleSelector = dynamic(
 
 type BasicsProps = {
   onNext: (data: onboardingState["data"]) => void;
+  onBack: () => void;
 };
 
-export const Basics = ({ onNext }: BasicsProps) => {
+export const Basics = ({ onNext, onBack }: BasicsProps) => {
   const { state, actions } = useStateMachine({ actions: { updateOnboardingForm } });
 
   const [selectedCountry, setSelectedCountry] = useState<CountryOption | null>(null);
@@ -176,7 +177,7 @@ export const Basics = ({ onNext }: BasicsProps) => {
         </div>
 
         <div className={styles.buttonContainer}>
-          <button type="button" className={styles.backButton}>
+          <button type="button" onClick={onBack} className={styles.backButton}>
             <Image src="/icons/ic_caretleft.svg" alt="Back Icon" width={24} height={24} />
             Back
           </button>
