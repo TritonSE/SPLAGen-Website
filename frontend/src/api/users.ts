@@ -1,29 +1,123 @@
 import { APIResult, get, handleAPIError, put } from "./requests";
+
 // import { User as FirebaseUser } from "firebase/auth";
 
 // Need to define user type based on user model
+// export type User = {
+//   _id: string;
+//   firebaseId: string;
+//   role: "member" | "admin" | "superadmin";
+//   personal: {
+//     firstName: string;
+//     lastName: string;
+//     email: string;
+//     phone?: string;
+//   };
+//   account: {
+//     inDirectory: boolean | string;
+//     profilePicture: string;
+//     membership: "student" | "geneticCounselor" | "healthcareProvider" | "associate";
+//   };
+// };
+
 export type User = {
-  _id: string;
   firebaseId: string;
-  role: "member" | "admin" | "superadmin";
+  role: "superadmin" | "admin" | "member";
+  account: {
+    inDirectory: true | false | "pending";
+    profilePicture: string;
+    membership: "student" | "geneticCounselor" | "healthcareProvider" | "associate";
+  };
   personal: {
     firstName: string;
     lastName: string;
     email: string;
     phone?: string;
   };
-  account: {
-    inDirectory: boolean | string;
-    profilePicture: string;
-    membership: "student" | "geneticCounselor" | "healthcareProvider" | "associate";
+  professional: {
+    title?: string;
+    prefLanguages?: ("english" | "spanish" | "portuguese" | "other")[];
+    otherPrefLanguages?: string;
+    country?: string;
+  };
+  education: {
+    degree?: "masters" | "diploma" | "fellowship" | "md" | "phd" | "other";
+    program?: string;
+    otherDegree?: string;
+    institution?: string;
+    email?: string;
+    gradDate?: string;
+  };
+  associate: {
+    title?: string;
+    specialization?: (
+      | "rare disease advocacy"
+      | "research"
+      | "public health"
+      | "bioethics"
+      | "law"
+      | "biology"
+      | "medical writer"
+      | "medical science liason"
+      | "laboratory scientist"
+      | "professor"
+      | "bioinformatics"
+      | "biotech sales and marketing"
+    )[];
+    organization?: string;
+  };
+  clinic: {
+    name?: string;
+    url?: string;
+    location?: {
+      country?: string;
+      address?: string;
+      suite?: string;
+      city?: string;
+      state?: string;
+      zipPostCode?: string;
+    };
+  };
+  display: {
+    workEmail?: string;
+    workPhone?: string;
+    services?: (
+      | "pediatrics"
+      | "cardiovascular"
+      | "neurogenetics"
+      | "rareDiseases"
+      | "cancer"
+      | "biochemical"
+      | "prenatal"
+      | "adult"
+      | "psychiatric"
+      | "reproductive"
+      | "ophthalmic"
+      | "research"
+      | "pharmacogenomics"
+      | "metabolic"
+      | "other"
+    )[];
+    languages?: ("english" | "spanish" | "portuguese" | "other")[];
+    license?: string[];
+    options: {
+      openToAppointments: boolean;
+      openToRequests: boolean;
+      remote: boolean;
+      authorizedCare: true | false | "unsure";
+    };
+    comments?: {
+      noLicense?: string;
+      additional?: string;
+    };
   };
 };
 
 export type BasicInfo = {
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
+  newFirstName: string;
+  newLastName: string;
+  newEmail: string;
+  newPhone: string;
 };
 
 export type ProfessionalInfo = {
@@ -31,6 +125,13 @@ export type ProfessionalInfo = {
   prefLanguages: ("english" | "spanish" | "portuguese" | "other")[];
   otherPrefLanguages: string;
   country: string;
+};
+
+export type EditProfessionalInfo = {
+  newTitle: string;
+  newPrefLanguages: ("english" | "spanish" | "portuguese" | "other")[];
+  newOtherPrefLanguages: string;
+  newCountry: string;
 };
 
 export const createAuthHeader = (firebaseToken: string) => ({
@@ -75,7 +176,6 @@ export const getProfInfo = async (firebaseToken: string): Promise<APIResult<Prof
       createAuthHeader(firebaseToken),
     );
     const data = (await response.json()) as ProfessionalInfo;
-    console.log(data);
 
     return { success: true, data };
   } catch (error) {
@@ -84,13 +184,10 @@ export const getProfInfo = async (firebaseToken: string): Promise<APIResult<Prof
 };
 
 export async function editProfessionalInfoRequest(
-  professionalInfo: ProfessionalInfo,
+  professionalInfo: EditProfessionalInfo,
   firebaseToken: string,
 ): Promise<APIResult<null>> {
   try {
-    console.log(" tried to put this info: ");
-    console.log(professionalInfo);
-
     await put(
       "/api/users/general/professional-information",
       professionalInfo,
@@ -123,14 +220,28 @@ export const fetchCombinedProfInfo = async (
 
   const profData = profRes.data;
   const userData = whoamiRes.data;
-
+  console.log(profData);
   return {
     professionalTitle: profData.title,
     country: {
-      value: profData.country,
-      label: profData.country, // adjust if you want custom label logic
+      value: profData.country ?? undefined,
+      label: profData.country ?? undefined, // adjust if you want custom label logic
     },
     languages: profData.prefLanguages,
     splagenDirectory: Boolean(userData.account.inDirectory),
   };
+};
+
+export const getUser = async (
+  firebaseUid: string,
+  firebaseToken: string,
+): Promise<APIResult<User>> => {
+  try {
+    const response = await get(`/api/users/${firebaseUid}`, createAuthHeader(firebaseToken));
+    const data = (await response.json()) as User;
+    console.log(data);
+    return { success: true, data };
+  } catch (error) {
+    return handleAPIError(error);
+  }
 };

@@ -5,19 +5,18 @@ import { useTranslation } from "react-i18next";
 
 import styles from "./page.module.css";
 
-import { ProfessionalInfo, User, getProfInfo, getWhoAmI } from "@/api/users";
+import { User, getWhoAmI } from "@/api/users";
 import { Button, EditBasicInfoModal, ProfessionalInfoModal } from "@/components";
 import { PreferredLanguages } from "@/components/PreferredLanguages";
 import { ProfilePicture } from "@/components/ProfilePicture";
 
 type DisplayComponentProps = {
   user: User | null;
-  prof: ProfessionalInfo | null;
   openBasic: () => void; // setIsBasicModalOpen
   openPro: () => void; // setIsProModalOpen
 };
 
-const ProfileSection = ({ user, prof, openBasic, openPro }: DisplayComponentProps) => {
+const ProfileSection = ({ user, openBasic, openPro }: DisplayComponentProps) => {
   const { t } = useTranslation(); // define the t function at the top of your component
 
   return (
@@ -27,11 +26,10 @@ const ProfileSection = ({ user, prof, openBasic, openPro }: DisplayComponentProp
           <ProfilePicture size="small" />
           <div className={styles.nameAndTitle}>
             <span>
-              {" "}
-              {user?.personal.firstName ?? t("first-name")}{" "}
-              {user?.personal.lastName ?? t("last-name")}{" "}
+              {user?.personal.firstName ?? t("none")}
+              {user?.personal.lastName ?? t("none")}
             </span>
-            <span> {prof?.title ?? t("membership")} </span>
+            <span> {user?.account.membership ?? t("none")} </span>
           </div>
         </div>
 
@@ -54,12 +52,12 @@ const ProfileSection = ({ user, prof, openBasic, openPro }: DisplayComponentProp
             <ul className={styles.infoColumn}>
               <li>
                 <label> {t("first-name")} </label> <br />
-                {user?.personal.firstName ?? t("user")}
+                {user?.personal.firstName ?? t("none")}
               </li>
 
               <li>
                 <label> {t("email")} </label> <br />
-                {user?.personal.email ?? t("email")}
+                {user?.personal.email ?? t("none")}
               </li>
             </ul>
 
@@ -67,7 +65,7 @@ const ProfileSection = ({ user, prof, openBasic, openPro }: DisplayComponentProp
               <ul className={styles.infoColumn}>
                 <li>
                   <label> {t("last-name")} </label> <br />
-                  {user?.personal.lastName ?? t("user")}
+                  {user?.personal.lastName ?? t("none")}
                 </li>
 
                 <li>
@@ -96,13 +94,13 @@ const ProfileSection = ({ user, prof, openBasic, openPro }: DisplayComponentProp
             <ul className={styles.infoColumn}>
               <li>
                 <label> {t("professional-title")} </label> <br />
-                {prof?.title ? prof.title : t("title")}
+                {user?.professional.title ?? t("none")}
               </li>
 
               <li>
                 <label> {t("preferred-language")} </label>
                 <br />
-                <PreferredLanguages languages={prof?.prefLanguages} />
+                <PreferredLanguages languages={user?.professional.prefLanguages ?? []} />
               </li>
             </ul>
 
@@ -110,7 +108,7 @@ const ProfileSection = ({ user, prof, openBasic, openPro }: DisplayComponentProp
               <ul className={styles.infoColumn}>
                 <li>
                   <label> {t("country")} </label> <br />
-                  {prof?.country ? prof.country : t("none")}
+                  {user?.professional.country ?? t("none")}
                 </li>
 
                 <li>
@@ -143,8 +141,7 @@ const ProfilePage: React.FC = () => {
   const { t } = useTranslation(); // define the t function at the top of your component
 
   // Basic and Professional info updated with use effect and frontend api calls.
-  const [basicUserData, setBasicUserData] = useState<User | null>(null);
-  const [professionalUserData, setProfUserData] = useState<ProfessionalInfo | null>(null);
+  const [userData, setUserData] = useState<User | null>(null);
 
   // Basic and Personal Modal state tracking
   const [isBasicModalOpen, setIsBasicModalOpen] = useState(false);
@@ -155,31 +152,19 @@ const ProfilePage: React.FC = () => {
   let DisplayComponent = formState === "Profile" ? ProfileSection : DirectorySection;
 
   // Fetch User data with frontend api call
-  const fetchPersonalUserData = useCallback(async () => {
+  const fetchUserData = useCallback(async () => {
     const res = await getWhoAmI("temp_firebase_token");
     if (res.success) {
-      setBasicUserData(res.data);
-    }
-  }, []);
-
-  // Fetch professional data
-  const fetchProfessionalUserData = useCallback(async () => {
-    const res = await getProfInfo("temp_firebase_token");
-    if (res.success) {
-      setProfUserData(res.data);
+      setUserData(res.data);
     }
   }, []);
 
   // Use effect updates page's basic and personal user info
   useEffect(() => {
-    fetchPersonalUserData().catch((err: unknown) => {
-      console.error("Error in fetchData user:", err);
+    fetchUserData().catch((err: unknown) => {
+      console.error("Error in fetching user data: ", err);
     });
-
-    fetchProfessionalUserData().catch((err: unknown) => {
-      console.error("Error in fetchData prof:", err);
-    });
-  }, [fetchPersonalUserData, fetchProfessionalUserData]);
+  }, [fetchUserData]);
 
   // Modal State management
   const handleOpenBasicModal = () => {
@@ -188,7 +173,7 @@ const ProfilePage: React.FC = () => {
 
   const handleCloseBasicModal = () => {
     setIsBasicModalOpen(false);
-    void fetchPersonalUserData();
+    void fetchUserData();
   };
 
   const handleOpenProfessionalInfoModal = () => {
@@ -197,7 +182,7 @@ const ProfilePage: React.FC = () => {
 
   const handleCloseProfessionalInfoModal = () => {
     setIsProfModalOpen(false);
-    void fetchProfessionalUserData();
+    void fetchUserData();
   };
 
   switch (formState) {
@@ -210,7 +195,7 @@ const ProfilePage: React.FC = () => {
       break;
   }
 
-  const membershipStatus = professionalUserData?.title;
+  const membershipStatus = userData?.account.membership;
 
   return (
     <div className={styles.profileContainer}>
@@ -218,7 +203,7 @@ const ProfilePage: React.FC = () => {
         <h1> {formState} </h1>
         <div className="flex items-center gap-2">
           <ProfilePicture />
-          <button> {basicUserData?.personal.firstName} </button>
+          <button> {userData?.personal.firstName} </button>
         </div>
       </header>
 
@@ -242,11 +227,14 @@ const ProfilePage: React.FC = () => {
       </div>
 
       <EditBasicInfoModal isOpen={isBasicModalOpen} onClose={handleCloseBasicModal} />
-      <ProfessionalInfoModal isOpen={isProfModalOpen} onClose={handleCloseProfessionalInfoModal} />
+      <ProfessionalInfoModal
+        isOpen={isProfModalOpen}
+        onClose={handleCloseProfessionalInfoModal}
+        populationInfo={userData ?? null}
+      />
 
       <DisplayComponent
-        user={basicUserData}
-        prof={professionalUserData}
+        user={userData}
         openBasic={handleOpenBasicModal}
         openPro={handleOpenProfessionalInfoModal}
       />

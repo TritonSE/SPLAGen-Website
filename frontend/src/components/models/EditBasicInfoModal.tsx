@@ -13,6 +13,7 @@ import "./EditBasicInfoModal.css";
 import { editBasicInfoRequest, getWhoAmI } from "@/api/users";
 
 const ExitButtonSrc: string = ExitButton as unknown as string;
+const firebaseToken = "temp_firebase_token";
 
 type FormData = {
   firstName: string;
@@ -73,6 +74,7 @@ export const EditBasicInfoModal = ({
       //  //TODO Error handling?
       //   return;
       // }
+
       const newData: EditUserPersonalInformationRequestBody = {
         newFirstName: data.firstName,
         newLastName: data.lastName,
@@ -80,7 +82,7 @@ export const EditBasicInfoModal = ({
         newPhone: data.phone,
       };
 
-      const response = await editBasicInfoRequest(newData, "firebaseToken");
+      const response = await editBasicInfoRequest(newData, firebaseToken);
 
       if (response.success) {
         onClose();
@@ -105,7 +107,7 @@ export const EditBasicInfoModal = ({
   // populate form with user context data
 
   const fetchUserData = useCallback(async () => {
-    const res = await getWhoAmI("temp_firebase_token");
+    const res = await getWhoAmI(firebaseToken);
     if (res.success) {
       if (res.data) {
         const jsonUserData = res.data;
@@ -145,7 +147,10 @@ export const EditBasicInfoModal = ({
         </div>
         <form onSubmit={handleFormSubmit} className="modal-body">
           <div className="inputField">
-            <label>{t("first-name")}*</label>
+            <label>
+              {t("first-name")}
+              <span className="red-text">*</span>
+            </label>
             <input {...register("firstName")} placeholder={t("first-name")} />
             <p className="error">
               {errors.firstName?.message && typeof errors.firstName.message === "string"
@@ -155,7 +160,10 @@ export const EditBasicInfoModal = ({
           </div>
 
           <div className="inputField">
-            <label>{t("last-name")}*</label>
+            <label>
+              {t("last-name")}
+              <span className="red-text">*</span>
+            </label>
             <input {...register("lastName")} placeholder={t("last-name")} />
             <p className="error">
               {errors.lastName?.message && typeof errors.lastName.message === "string"
@@ -165,7 +173,10 @@ export const EditBasicInfoModal = ({
           </div>
 
           <div className="inputField">
-            <label>{t("email")}*</label>
+            <label>
+              {t("email")}
+              <span className="red-text">*</span>
+            </label>
             <input type="email" {...register("email")} placeholder={t("email")} />
             <p className="error">
               {errors.email?.message && typeof errors.email.message === "string"
@@ -175,7 +186,10 @@ export const EditBasicInfoModal = ({
           </div>
 
           <div className="inputField">
-            <label>{t("phone")}*</label>
+            <label>
+              {t("phone")}
+              <span className="red-text">*</span>
+            </label>
             <input type="tel" {...register("phone")} placeholder="+1 (123) 456 7890" />
             <p className="error">
               {errors.phone?.message && typeof errors.phone.message === "string"

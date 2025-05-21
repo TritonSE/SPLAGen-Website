@@ -6,17 +6,34 @@ import Image from "next/image";
 import React, { useCallback, useEffect } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
+import countryList from "react-select-country-list";
 import { z } from "zod";
 
 import ExitButton from "@/../public/icons/ExitButton.svg";
 import "./ProfessionalInfoModal.css";
-import { editProfessionalInfoRequest, fetchCombinedProfInfo } from "@/api/users";
+import { User, editProfessionalInfoRequest } from "@/api/users";
 import { PillButton } from "@/components";
+
+type professionalInfoProps = {
+  isOpen: boolean;
+  onClose: () => void;
+  populationInfo: User;
+};
+const CountryOptions = countryList().getData();
+
+const firebaseToken = "temp_firebase_token";
+const languages = ["english", "spanish", "portuguese", "other"];
 
 // Lazy load CountrySelector component to avoid hydration error
 const CountrySelector = dynamic(() => import("@/components").then((mod) => mod.CountrySelector), {
   ssr: false,
 });
+
+// takes in a label or value and maps it to the CountryObject of type accepted by the form
+const getCountryOption = (value?: string | null) => {
+  if (!value) value = "US"; // default to United States
+  return CountryOptions.find((c) => c.value === value || c.label === value);
+};
 
 const ExitButtonSrc: string = ExitButton as unknown as string;
 
@@ -29,24 +46,18 @@ const countrySchema = (t: (key: string) => string) =>
 export const professionalInfoSchema = (t: (key: string) => string) =>
   z.object({
     professionalTitle: z.string().min(1, t("professional-title-required")),
-    country: countrySchema(t)
-      .nullable()
-      .refine((val) => val !== null, { message: t("required-country-selection") }),
+    country: countrySchema(t).optional(),
     languages: z.array(z.string()).nonempty(t("one-language-required")),
     splagenDirectory: z.boolean(),
   });
 
 type ProfessionalInfoFormData = z.infer<ReturnType<typeof professionalInfoSchema>>;
 
-const languages = ["english", "spanish", "portuguese", "other"];
-
 export const ProfessionalInfoModal = ({
   isOpen,
   onClose,
-}: {
-  isOpen: boolean;
-  onClose: () => void;
-}) => {
+  populationInfo,
+}: professionalInfoProps) => {
   const { t } = useTranslation();
   const {
     register,
@@ -60,10 +71,10 @@ export const ProfessionalInfoModal = ({
   } = useForm<ProfessionalInfoFormData>({
     resolver: zodResolver(professionalInfoSchema(t)),
     defaultValues: {
-      professionalTitle: "",
-      country: undefined,
-      languages: ["english"],
-      splagenDirectory: false,
+      professionalTitle: populationInfo?.professional.title,
+      country: getCountryOption(populationInfo?.professional.country),
+      languages: populationInfo?.professional.prefLanguages,
+      splagenDirectory: populationInfo?.account.inDirectory === true,
     },
   });
 
@@ -95,16 +106,18 @@ export const ProfessionalInfoModal = ({
     [selectedLanguages, setValue, setError, t],
   );
 
+  // Sends form data to backend
   const onSubmit = useCallback<SubmitHandler<ProfessionalInfoFormData>>(
     async (data) => {
+      // backend expectsto have 'new' in the beginning of keys
       const formattedData = {
         newTitle: data.professionalTitle,
         newPrefLanguages: data.languages as ("english" | "spanish" | "portuguese" | "other")[],
         newOtherPrefLanguages: "",
-        newCountry: data.country.label,
+        newCountry: data.country?.label ?? "",
       };
 
-      const response = await editProfessionalInfoRequest(formattedData, "temp_firebase_token");
+      const response = await editProfessionalInfoRequest(formattedData, firebaseToken);
       if (response.success) {
         onClose();
       }
@@ -112,26 +125,17 @@ export const ProfessionalInfoModal = ({
     [onClose],
   );
 
-  const fetchProfData = useCallback(async () => {
-    const data = await fetchCombinedProfInfo("temp_firebase_token");
-
-    if (data) {
-      reset({
-        professionalTitle: data.professionalTitle,
-        country: data.country,
-        languages: data.languages,
-        splagenDirectory: data.splagenDirectory,
-      });
-    } else {
-      console.error("Error fetching professional info data");
-    }
-  }, [reset]);
-
+  // Populates form inputs when modal is opened
   useEffect(() => {
-    fetchProfData().catch((err: unknown) => {
-      console.error("Error in fetchProfData:", err);
-    });
-  }, [fetchProfData]);
+    if (isOpen && populationInfo) {
+      reset({
+        professionalTitle: populationInfo.professional.title,
+        country: getCountryOption(populationInfo.professional.country),
+        languages: populationInfo.professional.prefLanguages,
+        splagenDirectory: populationInfo.account.inDirectory === true,
+      });
+    }
+  }, [isOpen, populationInfo, reset]);
 
   const handleFormSubmit = useCallback(
     (e: React.FormEvent<HTMLFormElement>) => {
@@ -153,7 +157,10 @@ export const ProfessionalInfoModal = ({
         <form className="prof-info-form" onSubmit={handleFormSubmit}>
           {/* Professional Title */}
           <div className="prof-info-field">
-            <label htmlFor="professionalTitle">{t("professional-title")}*</label>
+            <label htmlFor="professionalTitle">
+              {t("professional-title")}
+              <span className="red-text">*</span>
+            </label>
             <input
               type="text"
               id="professionalTitle"
@@ -165,13 +172,13 @@ export const ProfessionalInfoModal = ({
 
           {/* Country */}
           <div className="prof-info-field">
-            <label>{t("country")}*</label>
+            <label>{t("country")}</label>
             <Controller
               control={control}
               name="country"
               render={({ field }) => (
                 <CountrySelector
-                  value={field.value}
+                  value={field.value ?? null}
                   onChange={field.onChange}
                   placeholder={t("country-ellipsis")}
                 />
@@ -182,7 +189,10 @@ export const ProfessionalInfoModal = ({
 
           {/* Languages */}
           <div className="prof-info-field">
-            <label htmlFor="languages">{t("preferred-language")}*</label>
+            <label htmlFor="languages">
+              {t("preferred-language")}
+              <span className="red-text">*</span>
+            </label>
             <div className="language-options">
               {languages.map((language) => (
                 <PillButton
@@ -204,7 +214,10 @@ export const ProfessionalInfoModal = ({
 
           {/* SPLAGen Directory */}
           <div className="prof-info-field no-error-message-field">
-            <label>{t("splagen-directory")}*</label>
+            <label>
+              {t("splagen-directory")}
+              <span className="red-text">*</span>
+            </label>
             <p>{watch("splagenDirectory") ? t("yes") : t("no")}</p>
           </div>
           <button type="submit" id="prof-info-submit" className="button">
