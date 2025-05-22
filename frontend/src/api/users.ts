@@ -21,6 +21,7 @@ import { APIResult, get, handleAPIError, put } from "./requests";
 // };
 
 export type User = {
+  _id: string;
   firebaseId: string;
   role: "superadmin" | "admin" | "member";
   account: {
@@ -113,7 +114,7 @@ export type User = {
   };
 };
 
-export type BasicInfo = {
+export type EditBasicInfo = {
   newFirstName: string;
   newLastName: string;
   newEmail: string;
@@ -152,7 +153,7 @@ export const getWhoAmI = async (firebaseToken: string): Promise<APIResult<User>>
 };
 
 export async function editBasicInfoRequest(
-  basicInfo: BasicInfo,
+  basicInfo: EditBasicInfo,
   firebaseToken: string,
 ): Promise<APIResult<null>> {
   try {
@@ -167,21 +168,6 @@ export async function editBasicInfoRequest(
     return handleAPIError(error);
   }
 }
-
-// get professional info
-export const getProfInfo = async (firebaseToken: string): Promise<APIResult<ProfessionalInfo>> => {
-  try {
-    const response = await get(
-      "/api/users/general/professional-information",
-      createAuthHeader(firebaseToken),
-    );
-    const data = (await response.json()) as ProfessionalInfo;
-
-    return { success: true, data };
-  } catch (error) {
-    return handleAPIError(error);
-  }
-};
 
 export async function editProfessionalInfoRequest(
   professionalInfo: EditProfessionalInfo,
@@ -198,39 +184,6 @@ export async function editProfessionalInfoRequest(
     return handleAPIError(error);
   }
 }
-
-type ModalProfInfoType = {
-  professionalTitle: string;
-  country: { value: string; label: string };
-  languages: string[];
-  splagenDirectory: boolean;
-};
-
-export const fetchCombinedProfInfo = async (
-  firebaseToken: string,
-): Promise<ModalProfInfoType | null> => {
-  const [profRes, whoamiRes] = await Promise.all([
-    getProfInfo(firebaseToken),
-    getWhoAmI(firebaseToken),
-  ]);
-
-  if (!profRes.success || !whoamiRes.success || !profRes.data || !whoamiRes.data) {
-    return null; // handle error appropriately
-  }
-
-  const profData = profRes.data;
-  const userData = whoamiRes.data;
-  return {
-    professionalTitle: profData.title,
-    country: {
-      value: profData.country ?? undefined,
-      label: profData.country ?? undefined, // adjust if you want custom label logic
-    },
-    languages: profData.prefLanguages,
-    splagenDirectory: Boolean(userData.account.inDirectory),
-  };
-};
-
 export const getUser = async (
   firebaseUid: string,
   firebaseToken: string,

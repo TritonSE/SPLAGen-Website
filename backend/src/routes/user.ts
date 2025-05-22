@@ -38,11 +38,6 @@ router.put(
 );
 
 // Professional information routes
-router.get(
-  "/general/professional-information",
-  requireSignedIn,
-  UserController.getProfessionalInformation,
-);
 router.put(
   "/general/professional-information",
   requireSignedIn,

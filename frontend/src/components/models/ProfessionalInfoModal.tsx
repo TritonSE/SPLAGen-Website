@@ -31,7 +31,7 @@ const CountrySelector = dynamic(() => import("@/components").then((mod) => mod.C
 
 // takes in a label or value and maps it to the CountryObject of type accepted by the form
 const getCountryOption = (value?: string | null) => {
-  if (!value) value = "US"; // default to United States
+  value ??= "US"; // default to United States
   return CountryOptions.find((c) => c.value === value || c.label === value);
 };
 

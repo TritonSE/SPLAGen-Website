@@ -19,6 +19,21 @@ type DisplayComponentProps = {
 const ProfileSection = ({ user, openBasic, openPro }: DisplayComponentProps) => {
   const { t } = useTranslation(); // define the t function at the top of your component
 
+  const formatMembership = (
+    membership: "student" | "geneticCounselor" | "healthcareProvider" | "associate" | undefined,
+  ): string => {
+    const membershipMap: Record<string, string> = {
+      student: "Student",
+      geneticCounselor: "Genetic Counselor",
+      healthcareProvider: "Healthcare Provider",
+      associate: "Associate",
+    };
+
+    return membership ? (membershipMap[membership] ?? "None") : "None";
+  };
+
+  const formattedMembership = formatMembership(user?.account.membership);
+
   return (
     <div className="flex flex-col gap-5">
       <div className={styles.nameCard}>
@@ -26,10 +41,9 @@ const ProfileSection = ({ user, openBasic, openPro }: DisplayComponentProps) => 
           <ProfilePicture size="small" />
           <div className={styles.nameAndTitle}>
             <span>
-              {user?.personal.firstName ?? t("none")}
-              {user?.personal.lastName ?? t("none")}
+              {user?.personal.firstName ?? t("none")} {user?.personal.lastName ?? t("none")}
             </span>
-            <span> {user?.account.membership ?? t("none")} </span>
+            <span> {formattedMembership ?? t("none")} </span>
           </div>
         </div>
 
@@ -157,7 +171,7 @@ const ProfilePage: React.FC = () => {
     if (res.success) {
       setUserData(res.data);
     }
-  }, []);
+  }, [setUserData]);
 
   // Use effect updates page's basic and personal user info
   useEffect(() => {

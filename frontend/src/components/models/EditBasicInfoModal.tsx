@@ -10,7 +10,7 @@ import { z } from "zod";
 
 import ExitButton from "@/../public/icons/ExitButton.svg";
 import "./EditBasicInfoModal.css";
-import { editBasicInfoRequest, getWhoAmI } from "@/api/users";
+import { EditBasicInfo, editBasicInfoRequest, getWhoAmI } from "@/api/users";
 
 const ExitButtonSrc: string = ExitButton as unknown as string;
 const firebaseToken = "temp_firebase_token";
@@ -20,13 +20,6 @@ type FormData = {
   lastName: string;
   email: string;
   phone: string;
-};
-
-type EditUserPersonalInformationRequestBody = {
-  newFirstName: string;
-  newLastName: string;
-  newEmail: string;
-  newPhone: string;
 };
 
 const noSpecialChars = /^[a-zA-Z\s'-]+$/;
@@ -75,7 +68,7 @@ export const EditBasicInfoModal = ({
       //   return;
       // }
 
-      const newData: EditUserPersonalInformationRequestBody = {
+      const newData: EditBasicInfo = {
         newFirstName: data.firstName,
         newLastName: data.lastName,
         newEmail: data.email,
@@ -91,20 +84,6 @@ export const EditBasicInfoModal = ({
     },
     [onClose],
   );
-
-  //TODO: populate the form with backend data
-  // useEffect(() => {
-  //   // Simulating an API call
-  //   setTimeout(() => {
-  //     const fetchedData = {
-  //       name: "Jane Doe",
-  //       email: "janedoe@example.com",
-  //     };
-  //     reset(fetchedData); // Populates the form with fetched data
-  //   }, 1000);
-  // }, [reset]);
-
-  // populate form with user context data
 
   const fetchUserData = useCallback(async () => {
     const res = await getWhoAmI(firebaseToken);
