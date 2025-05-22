@@ -16,7 +16,7 @@ export default function RootLayout({
   const pathname = usePathname();
 
   const isOnboardingFlow = useMemo(() => {
-    return ["/signup", "/login", "/directory"].includes(pathname);
+    return ["/signup", "/login", "/onboardingForm", "/directoryForm"].includes(pathname);
   }, [pathname]);
 
   return (
