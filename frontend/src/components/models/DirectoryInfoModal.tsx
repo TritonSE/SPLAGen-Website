@@ -29,9 +29,9 @@ const directoryInfoSchema = (t: (key: string) => string) =>
     institution: z.string().min(3, t("institution-3-characters")),
     clinic: z.string().optional(),
     website: z.string().url(t("invalid-website-url")).optional(),
-    country: countrySchema(t)
-      .nullable()
-      .refine((val) => val !== null, { message: t("required-country-selection") }),
+    country: countrySchema(t).refine((val) => val !== null, {
+      message: t("required-country-selection"),
+    }),
     addressLine: z.string().min(3, t("address-3-characters")).optional(),
     apartment: z.string().optional(),
     city: z.string().min(2, t("city-2-characters")).optional(),

@@ -18,29 +18,28 @@ const router = express.Router();
 router.get("/whoami", requireSignedIn, UserController.getWhoAmI);
 router.post("/", UserValidator.createUser, UserController.createUser);
 router.delete(
-  "/:id",
+  "/:firebaseId",
   requireSignedIn,
   requireAdminOrSuperAdmin,
   UserValidator.deleteUser,
   UserController.deleteUser,
 );
 router.get("/", requireSignedIn, UserController.getAllUsers);
-router.get("/:id", requireSignedIn, UserValidator.getUser, UserController.getUser);
+router.get("/:firebaseId", requireSignedIn, UserValidator.getUser, UserController.getUser);
 router.post("/authenticate", requireSignedIn, UserController.authenticateUser);
 
 // Personal information routes
-router.get("/personal-information", requireSignedIn, UserController.getPersonalInformation);
+router.get("/general/personal-information", requireSignedIn, UserController.getPersonalInformation);
 router.put(
-  "/personal-information",
+  "/general/personal-information",
   requireSignedIn,
   UserValidator.editPersonalInformation,
   UserController.editPersonalInformation,
 );
 
 // Professional information routes
-router.get("/professional-information", requireSignedIn, UserController.getProfessionalInformation);
 router.put(
-  "/professional-information",
+  "/general/professional-information",
   requireSignedIn,
   UserValidator.editProfessionalInformation,
   UserController.editProfessionalInformation,

@@ -87,11 +87,7 @@ export const getWhoAmI = async (req: AuthenticatedRequest, res: Response, next: 
       return;
     }
 
-    res.status(200).json({
-      firebaseId: user.firebaseId,
-      role: user.role,
-      personal: user.personal,
-    });
+    res.status(200).json(user);
     return;
   } catch (error) {
     next(error);
