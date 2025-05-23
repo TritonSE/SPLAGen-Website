@@ -12,6 +12,7 @@ import { VerticalStepper } from "./VerticalStepper";
 import logo from "@/../public/images/Logo_SPLAGen1.png";
 import { UserContext } from "@/contexts/userContext";
 
+
 // Props for each navigation card on sidebar
 type CardProps = {
   iconDark: string;
