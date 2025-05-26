@@ -1,4 +1,6 @@
-type Counselor = {
+import { APIResult, handleAPIError, post } from "./requests";
+
+export type Counselor = {
   name: string;
   title: string;
   address: string;
@@ -10,17 +12,14 @@ type Counselor = {
   profileUrl: string;
 };
 
-export const getPublicDirectory = async (): Promise<Counselor[]> => {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/directory/public`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
+export async function getPublicDirectory(): Promise<APIResult<Counselor[]>> {
+  try {
+    const res = await post("/api/directory/public", undefined);
 
-  if (!res.ok) {
-    throw new Error(`Failed to fetch public directory: ${res.statusText}`);
+    const data = (await res.json()) as Counselor[];
+
+    return { success: true, data };
+  } catch (error) {
+    return handleAPIError(error);
   }
-
-  return res.json();
-};
+}

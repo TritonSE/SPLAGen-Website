@@ -3,84 +3,81 @@
 import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
 import React, { useEffect, useState } from "react";
 
+import type { Counselor } from "@/api/directory";
+import type { APIResult } from "@/api/requests";
+
 import { getPublicDirectory } from "@/api/directory";
+import env from "@/util/validateEnv";
 
-const containerStyle = {
-  width: "100%",
-  height: "100vh",
+type MarkerData = { lat: number; lng: number; name: string };
+type GeoLocation = { lat: number; lng: number };
+
+type GeocodeApiResponse = {
+  results: {
+    geometry?: { location: GeoLocation };
+  }[];
+  status: string;
 };
 
-const center = {
-  lat: 37.7749,
-  lng: -122.4194,
-};
+const containerStyle = { width: "100%", height: "100vh" } as const;
+const center = { lat: 23.0, lng: -90.0 } as const;
+const worldHemisphereZoom = 3;
 
-/*
-const mockCounselors = [
-  {
-    id: 1,
-    name: "Test1",
-    clinic: {
-      location: {
-        address: "123 Main St, San Francisco, CA",
-      },
-    },
-  },
-  {
-    id: 2,
-    name: "Test2",
-    clinic: {
-      location: {
-        address: "456 Market St, San Francisco, CA",
-      },
-    },
-  },
-];
-*/
-
-const geocodeAddress = async (address: string): Promise<{ lat: number; lng: number }> => {
-  const response = await fetch(
-    `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`,
+const geocodeAddress = async (address: string): Promise<GeoLocation> => {
+  const resp = await fetch(
+    `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
+      address,
+    )}&key=${env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`,
   );
-  const data = await response.json();
-  const location = data.results[0]?.geometry?.location;
-  return location || { lat: 0, lng: 0 };
+  const data: GeocodeApiResponse = (await resp.json()) as GeocodeApiResponse;
+  const loc = data.results?.[0]?.geometry?.location;
+  return loc ?? { lat: 0, lng: 0 };
 };
 
 export default function DirectoryMapPage() {
   const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
-    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!,
+    googleMapsApiKey: env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,
   });
 
-  const [markers, setMarkers] = useState<{ lat: number; lng: number; name: string }[]>([]);
+  const [markers, setMarkers] = useState<MarkerData[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
-  // Inside useEffect:
   useEffect(() => {
     const loadMarkers = async () => {
+      const result: APIResult<Counselor[]> = await getPublicDirectory();
+
+      if (!result.success) {
+        setError(result.error);
+        return;
+      }
       try {
-        const counselors = await getPublicDirectory();
-        const results = await Promise.all(
-          counselors.map(async (c) => {
+        const geocoded = await Promise.all(
+          result.data.map(async (c) => {
             const loc = await geocodeAddress(c.address);
-            return { ...loc, name: c.name };
+            return { ...loc, name: c.name } as MarkerData;
           }),
         );
-        setMarkers(results);
-      } catch (err) {
-        console.error("Failed to fetch counselors:", err);
+        setMarkers(geocoded);
+      } catch (e) {
+        setError(`Geocoding failed: ${(e as Error).message}`);
       }
     };
-    loadMarkers();
+
+    void loadMarkers();
   }, []);
 
+  if (error) {
+    return <p className="text-red-600 p-4">Error loading map: {error}</p>;
+  }
+
   return isLoaded ? (
-    <GoogleMap mapContainerStyle={containerStyle} center={center} zoom={10}>
-      {markers.map((marker, index) => (
-        <Marker key={index} position={{ lat: marker.lat, lng: marker.lng }} label={marker.name} />
+    <GoogleMap mapContainerStyle={containerStyle} center={center} zoom={worldHemisphereZoom}>
+      {markers.map((m, i) => (
+        <Marker key={i} position={{ lat: m.lat, lng: m.lng }} label={m.name} />
       ))}
     </GoogleMap>
   ) : (
-    <></>
+    <p className="p-4">Loading map…</p>
   );
 }

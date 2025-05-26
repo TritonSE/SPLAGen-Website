@@ -14,9 +14,11 @@ export default cleanEnv(
   {
     NEXT_PUBLIC_BACKEND_URL: process.env.NEXT_PUBLIC_BACKEND_URL,
     NEXT_PUBLIC_FIREBASE_SETTINGS: process.env.NEXT_PUBLIC_FIREBASE_SETTINGS,
+    NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,
   },
   {
     NEXT_PUBLIC_BACKEND_URL: str(), // URL of our backend
     NEXT_PUBLIC_FIREBASE_SETTINGS: json(), // Firebase settings for frontend, stored as a JSON string
+    NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: str(),
   },
 );
