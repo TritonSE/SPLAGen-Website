@@ -99,6 +99,15 @@
   "splagen-directory": "Directorio SPLAGen",
   "yes": "Sí",
   "no": "No",
-
+  "sort-by": "Ordenar por",
+  "newest-first": "Más recientes primero",
+  "oldest-first": "Más antiguos primero",
+  "author-a-z": "Autor A-Z",
+  "author-z-a": "Autor Z-A",
+  "create-discussion": "Crear discusión +",
+  "today": "Hoy",
+  "this-week": "Esta semana",
+  "earlier": "Anteriormente",
+  "search-general": "Buscar general",
   "temp": "Temporary"
 }

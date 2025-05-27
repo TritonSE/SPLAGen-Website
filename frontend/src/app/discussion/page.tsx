@@ -11,7 +11,6 @@ import styles from "./landingPage.module.css";
 
 import { Discussion, getPost } from "@/api/discussion";
 import { PostCard } from "@/components/PostCard";
-
 type Post = {
   id: string;
   title: string;
@@ -30,13 +29,8 @@ const SearchSchema = z.object({
 type SearchFormInputs = z.infer<typeof SearchSchema>;
 
 export default function LandingPage() {
-  const POSTS_PER_LOAD = 5;
-
-  const [visibleCount, setVisibleCount] = useState(POSTS_PER_LOAD);
-
   const { t } = useTranslation();
   const formRef = useRef<HTMLFormElement>(null);
-  const sentinelRef = useRef<HTMLDivElement | null>(null);
 
   const [originalPosts, setOriginalPosts] = useState<Post[]>([]);
   const [posts, setPosts] = useState<Post[]>([]);
@@ -55,23 +49,22 @@ export default function LandingPage() {
     title: discussion.title,
     content: discussion.message,
     date: discussion.createdAt,
-    author: discussion.userId,
+    author: discussion.username,
     audience: discussion.audience,
     time: discussion.time,
   });
 
+  // pass through string only instead
+  const firebaseToken = "dummy-token";
+
   useEffect(() => {
     const fetchPosts = async () => {
-      const result = await getPost();
+      const result = await getPost(firebaseToken);
 
       if (result.success) {
-        if (Array.isArray(result.data)) {
-          const fetchedPosts = result.data.map(mapDiscussionToPost);
-          setOriginalPosts(fetchedPosts);
-          setPosts(fetchedPosts);
-        } else {
-          console.error("Expected an array but got:", result.data);
-        }
+        const fetchedPosts = result.data.map(mapDiscussionToPost);
+        setOriginalPosts(fetchedPosts);
+        setPosts(fetchedPosts);
       } else {
         console.error("Failed to load posts", result.error);
       }
@@ -80,31 +73,6 @@ export default function LandingPage() {
     void fetchPosts();
   }, []);
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && visibleCount < posts.length) {
-          setVisibleCount((prev) => prev + POSTS_PER_LOAD);
-        }
-      },
-      {
-        root: null,
-        rootMargin: "100px",
-        threshold: 1.0,
-      },
-    );
-
-    if (sentinelRef.current) {
-      observer.observe(sentinelRef.current);
-    }
-
-    return () => {
-      if (sentinelRef.current) {
-        observer.unobserve(sentinelRef.current);
-      }
-    };
-  }, [visibleCount, posts.length]);
-
   const onSubmit: SubmitHandler<SearchFormInputs> = (data) => {
     const searchQuery = data.query?.toLowerCase() ?? "";
     const filtered = originalPosts.filter(
@@ -112,7 +80,6 @@ export default function LandingPage() {
         post.title.toLowerCase().includes(searchQuery) ||
         post.content.toLowerCase().includes(searchQuery),
     );
-    setVisibleCount(POSTS_PER_LOAD);
 
     switch (data.sort) {
       case "date-desc":
@@ -151,18 +118,18 @@ export default function LandingPage() {
   );
 
   // Step 2: Take only the top N visible posts
-  const visiblePosts = sortedPosts.slice(0, visibleCount);
+  const visiblePosts = sortedPosts;
 
   // Step 3: Create time boundaries
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
   const startOfWeek = new Date(today);
-  startOfWeek.setDate(today.getDate() - today.getDay()); // Sunday
+  startOfWeek.setDate(today.getDate() - today.getDay());
   startOfWeek.setHours(0, 0, 0, 0);
 
   const endOfWeek = new Date(today);
-  endOfWeek.setDate(today.getDate() + (6 - today.getDay())); // Saturday
+  endOfWeek.setDate(today.getDate() + (6 - today.getDay()));
   endOfWeek.setHours(23, 59, 59, 999);
 
   // Step 4: Group the visible posts
@@ -246,79 +213,76 @@ export default function LandingPage() {
         </Link>
       </form>
 
-      {/* Today's Posts */}
-      {todayPosts.length > 0 && (
-        <div className={styles.todaySection}>
-          <div className={styles.sectionHeader}>
-            <h2>{t("Today")}</h2>
-          </div>
+      <div className={styles.scrollContainer}>
+        {/* Today's Posts */}
+        {todayPosts.length > 0 && (
+          <div className={styles.todaySection}>
+            <div className={styles.sectionHeader}>
+              <h2>{t("Today")}</h2>
+            </div>
 
-          <div className={styles.postList}>
-            {todayPosts
+            <div className={styles.postList}>
+              {todayPosts
+                .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+                .map((post) => (
+                  <div key={post.id} className={styles.postWrapper}>
+                    <PostCard
+                      authorName={post.author}
+                      date={post.date}
+                      time={post.time}
+                      title={post.title}
+                      message={post.content}
+                      audience={post.audience}
+                    />
+                  </div>
+                ))}
+            </div>
+          </div>
+        )}
+
+        {/* This Week's Posts */}
+        {thisWeekPosts.length > 0 && (
+          <div className={styles.thisWeekSection}>
+            <h2>{t("This Week")}</h2>
+            {thisWeekPosts
               .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-              .slice(0, visibleCount)
               .map((post) => (
-                <div key={post.id} className={styles.postWrapper}>
-                  <PostCard
-                    authorName={post.author}
-                    date={post.date}
-                    time={post.time}
-                    title={post.title}
-                    message={post.content}
-                    audience={post.audience}
-                  />
-                </div>
+                <PostCard
+                  key={post.id}
+                  authorName={post.author}
+                  date={post.date}
+                  time={post.time}
+                  title={post.title}
+                  message={post.content}
+                  audience={post.audience}
+                />
               ))}
           </div>
-        </div>
-      )}
+        )}
 
-      {/* This Week's Posts */}
-      {thisWeekPosts.length > 0 && (
-        <div className={styles.thisWeekSection}>
-          <h2>{t("This Week")}</h2>
-          {thisWeekPosts
-            .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-            .slice(0, visibleCount)
-            .map((post) => (
-              <PostCard
-                key={post.id}
-                authorName={post.author}
-                date={post.date}
-                time={post.time}
-                title={post.title}
-                message={post.content}
-                audience={post.audience}
-              />
-            ))}
-        </div>
-      )}
+        {/* Earlier Posts */}
+        {earlierPosts.length > 0 && (
+          <div className={styles.earlierSection}>
+            <h2>{t("Earlier")}</h2>
+            {earlierPosts
+              .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+              .map((post) => (
+                <PostCard
+                  key={post.id}
+                  authorName={post.author}
+                  date={post.date}
+                  time={post.time}
+                  title={post.title}
+                  message={post.content}
+                  audience={post.audience}
+                />
+              ))}
+          </div>
+        )}
 
-      {/* Earlier Posts */}
-      {earlierPosts.length > 0 && (
-        <div className={styles.earlierSection}>
-          <h2>{t("Earlier")}</h2>
-          {earlierPosts
-            .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-            .slice(0, visibleCount)
-            .map((post) => (
-              <PostCard
-                key={post.id}
-                authorName={post.author}
-                date={post.date}
-                time={post.time}
-                title={post.title}
-                message={post.content}
-                audience={post.audience}
-              />
-            ))}
-        </div>
-      )}
-
-      {/* If no posts */}
-      {posts.length === 0 && <div>No posts yet.</div>}
-
-      <div ref={sentinelRef} className={styles.sentinel} />
+        {/* If no posts */}
+        {posts.length === 0 && <div>No posts yet.</div>}
+      </div>
     </div>
   );
 }

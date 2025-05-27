@@ -131,6 +131,11 @@
   color: white;
 }
 
+.scrollContainer {
+  height: 80vh; /* or any suitable height */
+  overflow-y: auto;
+  padding-right: 1rem; /* Optional for scrollbar space */
+}
 .todaySection h2 {
   font-size: 1rem;
   margin-bottom: 0.1rem;

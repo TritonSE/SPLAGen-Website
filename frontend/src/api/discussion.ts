@@ -2,11 +2,12 @@ import { APIResult, get, handleAPIError, post } from "./requests";
 
 // Assuming the structure of a Discussion item
 export type Discussion = {
+  username: string;
   _id: string;
   title: string;
   message: string;
-  createdAt: string; // Date string, could be parsed into a Date object later
-  userId: string; // The author's user ID
+  createdAt: string;
+  userId: string;
   audience?: string;
   time?: string;
 };
@@ -25,9 +26,11 @@ export const createPost = async (postData: {
   }
 };
 
-export const getPost = async (): Promise<APIResult<Discussion[]>> => {
+export const getPost = async (token: string): Promise<APIResult<Discussion[]>> => {
   try {
-    const response: Response = await get("/api/discussions");
+    const response: Response = await get("/api/discussions", {
+      Authorization: `Bearer ${token}`,
+    });
 
     if (!response.ok) {
       return handleAPIError("Failed to fetch posts");

@@ -29,7 +29,7 @@ export const PostCard: React.FC<PostCard> = ({
   return (
     <div className={styles["postcard-container"]} onClick={onClick}>
       <div className={styles["postcard-left"]}>
-        <ProfilePicture size="small" letter={authorName[0]} />
+        <ProfilePicture size="small" letter={authorName?.[0] ?? "?"} />
         <div className={styles["postcard-author-info"]}>
           <div className={styles["postcard-author-name"]}>{authorName}</div>
           <div className={styles["postcard-timestamp"]}>

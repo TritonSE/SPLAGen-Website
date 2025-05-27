@@ -1,7 +1,7 @@
 import { NextFunction, Response } from "express";
 import { Types } from "mongoose";
 
-import { getUserNameById } from "../helpers/userHelpers"; // Make sure this import exists
+import { getUserNameById } from "../helpers/userHelpers";
 import { AuthenticatedRequest } from "../middleware/auth";
 import discussionPost from "../models/discussionPost";
 import Reply from "../models/reply";
@@ -33,7 +33,15 @@ export const createDiscussion = async (
     const { title, message, channel } = req.body;
     const userId = req.mongoID;
 
-    const newDiscussion = new discussionPost({ userId, title, message, channel });
+    const userName = await getUserNameById(userId?.toString() ?? "");
+
+    const newDiscussion = new discussionPost({
+      userId,
+      username: userName,
+      title,
+      message,
+      channel,
+    });
     await newDiscussion.save();
 
     res.status(201).json(newDiscussion);

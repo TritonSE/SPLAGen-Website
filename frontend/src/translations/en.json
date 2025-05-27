@@ -99,6 +99,18 @@
   "splagen-directory": "SPLAGen Directory",
   "yes": "Yes",
   "no": "No",
+  "Loading...": "Loading...",
+  "Discussion": "Discussion",
+  "Search General": "Search General",
+  "Sort By": "Sort By",
+  "Newest First": "Newest First",
+  "Oldest First": "Oldest First",
+  "Author A-Z": "Author A-Z",
+  "Author Z-A": "Author Z-A",
+  "Create Discussion +": "Create Discussion +",
+  "Today": "Today",
+  "This Week": "This Week",
+  "Earlier": "Earlier",
 
   "temp": "Temporary"
 }
