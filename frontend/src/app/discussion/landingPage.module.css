@@ -51,8 +51,6 @@
   border-radius: 0.5rem;
   border: 0.0625rem solid var(--color-grey3);
   border-color: var(--color-grey3);
-  color: var(--color-surface);
-
   font-size: 1rem;
   outline: none;
 }

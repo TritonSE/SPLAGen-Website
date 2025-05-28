@@ -2,7 +2,7 @@ import { APIResult, get, handleAPIError, post } from "./requests";
 
 // Assuming the structure of a Discussion item
 export type Discussion = {
-  username: string;
+  userName: string;
   _id: string;
   title: string;
   message: string;

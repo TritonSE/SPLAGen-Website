@@ -1,11 +1,8 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
-import { SubmitHandler, useForm } from "react-hook-form";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { z } from "zod";
 
 import styles from "./landingPage.module.css";
 
@@ -21,35 +18,21 @@ type Post = {
   time?: string;
 };
 
-const SearchSchema = z.object({
-  query: z.string().optional(),
-  sort: z.string().optional(),
-});
-
-type SearchFormInputs = z.infer<typeof SearchSchema>;
-
 export default function LandingPage() {
   const { t } = useTranslation();
-  const formRef = useRef<HTMLFormElement>(null);
 
   const [originalPosts, setOriginalPosts] = useState<Post[]>([]);
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
-
-  const { register, handleSubmit } = useForm<SearchFormInputs>({
-    resolver: zodResolver(SearchSchema),
-    defaultValues: {
-      query: "",
-      sort: "",
-    },
-  });
+  const [query, setQuery] = useState("");
+  const [sort, setSort] = useState("");
 
   const mapDiscussionToPost = (discussion: Discussion): Post => ({
     id: discussion._id,
     title: discussion.title,
     content: discussion.message,
     date: discussion.createdAt,
-    author: discussion.username,
+    author: discussion.userName,
     audience: discussion.audience,
     time: discussion.time,
   });
@@ -73,36 +56,67 @@ export default function LandingPage() {
     void fetchPosts();
   }, []);
 
-  const onSubmit: SubmitHandler<SearchFormInputs> = (data) => {
-    const searchQuery = data.query?.toLowerCase() ?? "";
-    const filtered = originalPosts.filter(
-      (post) =>
-        post.title.toLowerCase().includes(searchQuery) ||
-        post.content.toLowerCase().includes(searchQuery),
-    );
+  // const onSubmit: SubmitHandler<SearchFormInputs> = (data) => {
+  //   const searchQuery = data.query?.toLowerCase() ?? "";
+  //   const filtered = originalPosts.filter(
+  //     (post) =>
+  //       post.title.toLowerCase().includes(searchQuery) ||
+  //       post.content.toLowerCase().includes(searchQuery),
+  //   );
 
-    switch (data.sort) {
-      case "date-desc":
-        filtered.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-        break;
-      case "date-asc":
-        filtered.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-        break;
-      case "author-asc":
-        filtered.sort((a, b) => a.author.localeCompare(b.author));
-        break;
-      case "author-desc":
-        filtered.sort((a, b) => b.author.localeCompare(a.author));
-        break;
-      case undefined: {
-        throw new Error("Not implemented yet: undefined case");
-      }
-      default:
-        break;
+  //   switch (data.sort) {
+  //     case "date-desc":
+  //       filtered.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  //       break;
+  //     case "date-asc":
+  //       filtered.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  //       break;
+  //     case "author-asc":
+  //       filtered.sort((a, b) => a.author.localeCompare(b.author));
+  //       break;
+  //     case "author-desc":
+  //       filtered.sort((a, b) => b.author.localeCompare(a.author));
+  //       break;
+  //     case undefined: {
+  //       throw new Error("Not implemented yet: undefined case");
+  //     }
+  //     default:
+  //       break;
+  //   }
+
+  //   setPosts(filtered);
+  // };
+
+  useEffect(() => {
+    let result = [...originalPosts];
+    // Filter
+    if (query) {
+      result = originalPosts.filter(
+        (post) =>
+          post.title.toLowerCase().includes(query) ||
+          post.content.toLowerCase().includes(query) ||
+          post.author.toLowerCase().includes(query),
+      );
     }
 
-    setPosts(filtered);
-  };
+    // Sort
+    result.sort((a, b) => {
+      switch (sort) {
+        case "date-desc":
+          return new Date(b.date).getTime() - new Date(a.date).getTime();
+        case "date-asc":
+          return new Date(a.date).getTime() - new Date(b.date).getTime();
+        case "author-asc":
+          return a.author.localeCompare(b.author);
+        case "author-desc":
+          return b.author.localeCompare(a.author);
+        default:
+          return 0; // No sorting
+      }
+    });
+    console.log("Sorted posts:", result);
+    setPosts(result);
+  }, [query, sort, originalPosts, setPosts]);
 
   if (loading) return <div>{t("Loading...")}</div>;
 
@@ -155,31 +169,29 @@ export default function LandingPage() {
       <div className={styles.header}>
         <h1 className={styles.title}>{t("Discussion")}</h1>
       </div>
-
-      <form
-        ref={formRef}
-        onSubmit={(e) => void handleSubmit(onSubmit)(e)}
-        className={styles.searchForm}
-      >
+      <div className={styles.searchForm}>
         {/* Wrap the search input and 'Sort By' dropdown */}
         <div className={styles.searchAllSortContainer}>
           <input
             type="text"
-            {...register("query")}
             placeholder={t("Search General")}
             className={styles.searchInput}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-                formRef.current?.requestSubmit();
-              }
+            value={query}
+            onChange={(e) => {
+              setQuery(e.target.value);
             }}
           />
 
           <div className={styles.selectWrapper}>
             <div className={styles.selectWrapper}>
               <div className={styles.sortContainer}>
-                <select className={styles.sortSelect} {...register("sort")}>
+                <select
+                  className={styles.sortSelect}
+                  onChange={(e) => {
+                    setSort(e.target.value);
+                  }}
+                  value={sort}
+                >
                   <option value="">{t("Sort By")}</option>
                   <option value="date-desc">{t("Newest First")}</option>
                   <option value="date-asc">{t("Oldest First")}</option>
@@ -211,8 +223,7 @@ export default function LandingPage() {
         <Link href="/discussion/post" className={styles.newPostButton}>
           {t("Create Discussion +")}
         </Link>
-      </form>
-
+      </div>
       <div className={styles.scrollContainer}>
         {/* Today's Posts */}
         {todayPosts.length > 0 && (

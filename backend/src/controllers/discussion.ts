@@ -33,15 +33,7 @@ export const createDiscussion = async (
     const { title, message, channel } = req.body;
     const userId = req.mongoID;
 
-    const userName = await getUserNameById(userId?.toString() ?? "");
-
-    const newDiscussion = new discussionPost({
-      userId,
-      username: userName,
-      title,
-      message,
-      channel,
-    });
+    const newDiscussion = new discussionPost({ userId, title, message, channel });
     await newDiscussion.save();
 
     res.status(201).json(newDiscussion);
