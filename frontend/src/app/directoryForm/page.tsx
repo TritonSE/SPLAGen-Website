@@ -37,12 +37,12 @@ export default function DirectoryForm() {
       state: "",
       postcode: "",
       // Services page fields
-      canMakeAppointments: "",
-      canRequestTests: "",
-      offersTelehealth: "",
+      canMakeAppointments: undefined,
+      canRequestTests: undefined,
+      offersTelehealth: undefined,
       specialtyServices: [],
       careLanguages: [],
-      authorizedForLanguages: "",
+      authorizedForLanguages: undefined,
     });
     setCurrentStep(1);
   }, [actions, setCurrentStep]);
@@ -57,6 +57,7 @@ export default function DirectoryForm() {
       case 3:
         return <Result onReset={handleReset} />;
       default:
+        setCurrentStep(1);
         return <DirectoryBasics onNext={handleNext} />;
     }
   };

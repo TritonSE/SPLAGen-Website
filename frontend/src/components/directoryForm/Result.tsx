@@ -45,22 +45,22 @@ export const Result = ({ onReset }: ResultProps) => {
         <strong>postcode:</strong> {state.directoryForm.postcode}
       </p>
       <p>
-        <strong>appointments:</strong> {state.directoryForm.canMakeAppointments}
+        <strong>appointments:</strong> {String(state.directoryForm.canMakeAppointments)}
       </p>
       <p>
-        <strong>tests:</strong> {state.directoryForm.canRequestTests}
+        <strong>tests:</strong> {String(state.directoryForm.canRequestTests)}
       </p>
       <p>
-        <strong>telehealth:</strong> {state.directoryForm.offersTelehealth}
+        <strong>telehealth:</strong> {String(state.directoryForm.offersTelehealth)}
       </p>
       <p>
-        <strong>services:</strong> {state.directoryForm.specialtyServices}
+        <strong>services:</strong> {state.directoryForm.specialtyServices.join(", ")}
       </p>
       <p>
-        <strong>languages:</strong> {state.directoryForm.careLanguages}
+        <strong>languages:</strong> {state.directoryForm.careLanguages.join(", ")}
       </p>
       <p>
-        <strong>authorizedLanguages:</strong> {state.directoryForm.authorizedForLanguages}
+        <strong>authorizedLanguages:</strong> {String(state.directoryForm.authorizedForLanguages)}
       </p>
 
       <button onClick={onReset}>Back</button>

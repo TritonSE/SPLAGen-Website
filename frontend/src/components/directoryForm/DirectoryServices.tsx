@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unnecessary-boolean-literal-compare */
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -32,15 +33,27 @@ const specialtyOptions = [
   "Other",
 ];
 
-const languageOptions = ["Spanish", "Portuguese", "Other"];
+const languageOptions = ["English", "Spanish", "Portuguese", "Other"];
 
 const formSchema = z.object({
-  canMakeAppointments: z.string().min(1, "Please select an option"),
-  canRequestTests: z.string().min(1, "Please select an option"),
-  offersTelehealth: z.string().min(1, "Please select an option"),
+  canMakeAppointments: z
+    .boolean({ required_error: "Required" })
+    .or(z.undefined())
+    .refine((val) => val !== undefined, { message: "Required" }),
+  canRequestTests: z
+    .boolean({ required_error: "Required" })
+    .or(z.undefined())
+    .refine((val) => val !== undefined, { message: "Required" }),
+  offersTelehealth: z
+    .boolean({ required_error: "Required" })
+    .or(z.undefined())
+    .refine((val) => val !== undefined, { message: "Required" }),
   specialtyServices: z.array(z.string()).min(1, "Please select at least one specialty service"),
-  careLanguages: z.array(z.string()),
-  authorizedForLanguages: z.string().min(1, "Please select an option"),
+  careLanguages: z.array(z.string()).min(1, "Required"),
+  authorizedForLanguages: z
+    .union([z.boolean(), z.literal("unsure")])
+    .or(z.undefined())
+    .refine((val) => val !== undefined, { message: "Required" }),
 });
 
 type FormSchema = z.infer<typeof formSchema>;
@@ -136,17 +149,17 @@ export const DirectoryServices = ({ onNext, onBack }: DirectoryServicesProps) =>
                     <Radio
                       id="appointments-yes"
                       label="Yes"
-                      checked={field.value === "yes"}
+                      checked={field.value === true}
                       onChange={() => {
-                        field.onChange("yes");
+                        field.onChange(true);
                       }}
                     />
                     <Radio
                       id="appointments-no"
                       label="No"
-                      checked={field.value === "no"}
+                      checked={field.value === false}
                       onChange={() => {
-                        field.onChange("no");
+                        field.onChange(false);
                       }}
                     />
                   </>
@@ -171,17 +184,17 @@ export const DirectoryServices = ({ onNext, onBack }: DirectoryServicesProps) =>
                     <Radio
                       id="tests-yes"
                       label="Yes"
-                      checked={field.value === "yes"}
+                      checked={field.value === true}
                       onChange={() => {
-                        field.onChange("yes");
+                        field.onChange(true);
                       }}
                     />
                     <Radio
                       id="tests-no"
                       label="No"
-                      checked={field.value === "no"}
+                      checked={field.value === false}
                       onChange={() => {
-                        field.onChange("no");
+                        field.onChange(false);
                       }}
                     />
                   </>
@@ -206,17 +219,17 @@ export const DirectoryServices = ({ onNext, onBack }: DirectoryServicesProps) =>
                     <Radio
                       id="telehealth-yes"
                       label="Yes"
-                      checked={field.value === "yes"}
+                      checked={field.value === true}
                       onChange={() => {
-                        field.onChange("yes");
+                        field.onChange(true);
                       }}
                     />
                     <Radio
                       id="telehealth-no"
                       label="No"
-                      checked={field.value === "no"}
+                      checked={field.value === false}
                       onChange={() => {
-                        field.onChange("no");
+                        field.onChange(false);
                       }}
                     />
                   </>
@@ -287,6 +300,9 @@ export const DirectoryServices = ({ onNext, onBack }: DirectoryServicesProps) =>
                 </div>
               )}
             />
+            <p className={styles.errorText}>
+              {errors.careLanguages ? errors.careLanguages.message : "\u00A0"}
+            </p>
           </div>
 
           <div className={styles.questionSection}>
@@ -303,17 +319,17 @@ export const DirectoryServices = ({ onNext, onBack }: DirectoryServicesProps) =>
                     <Radio
                       id="authorized-yes"
                       label="Yes"
-                      checked={field.value === "yes"}
+                      checked={field.value === true}
                       onChange={() => {
-                        field.onChange("yes");
+                        field.onChange(true);
                       }}
                     />
                     <Radio
                       id="authorized-no"
                       label="No"
-                      checked={field.value === "no"}
+                      checked={field.value === false}
                       onChange={() => {
-                        field.onChange("no");
+                        field.onChange(false);
                       }}
                     />
                     <Radio
@@ -346,5 +362,3 @@ export const DirectoryServices = ({ onNext, onBack }: DirectoryServicesProps) =>
     </div>
   );
 };
-
-export default DirectoryServices;

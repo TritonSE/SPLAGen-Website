@@ -39,12 +39,12 @@ declare module "little-state-machine" {
       city: string;
       state: string;
       postcode: string;
-      canMakeAppointments: string;
-      canRequestTests: string;
-      offersTelehealth: string;
+      canMakeAppointments: boolean | undefined;
+      canRequestTests: boolean | undefined;
+      offersTelehealth: boolean | undefined;
       specialtyServices: string[];
       careLanguages: string[];
-      authorizedForLanguages: string;
+      authorizedForLanguages: boolean | string | undefined;
     };
   }
 }
