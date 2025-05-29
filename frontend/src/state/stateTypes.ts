@@ -40,5 +40,11 @@ export type directoryState = {
     city: string;
     state: string;
     postcode: string;
+    canMakeAppointments: boolean | undefined;
+    canRequestTests: boolean | undefined;
+    offersTelehealth: boolean | undefined;
+    specialtyServices: string[];
+    careLanguages: string[];
+    authorizedForLanguages: boolean | string | undefined;
   };
 };

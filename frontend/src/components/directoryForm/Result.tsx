@@ -44,6 +44,25 @@ export const Result = ({ onReset }: ResultProps) => {
       <p>
         <strong>postcode:</strong> {state.directoryForm.postcode}
       </p>
+      <p>
+        <strong>appointments:</strong> {String(state.directoryForm.canMakeAppointments)}
+      </p>
+      <p>
+        <strong>tests:</strong> {String(state.directoryForm.canRequestTests)}
+      </p>
+      <p>
+        <strong>telehealth:</strong> {String(state.directoryForm.offersTelehealth)}
+      </p>
+      <p>
+        <strong>services:</strong> {state.directoryForm.specialtyServices.join(", ")}
+      </p>
+      <p>
+        <strong>languages:</strong> {state.directoryForm.careLanguages.join(", ")}
+      </p>
+      <p>
+        <strong>authorizedLanguages:</strong> {String(state.directoryForm.authorizedForLanguages)}
+      </p>
+
       <button onClick={onReset}>Back</button>
     </div>
   );
