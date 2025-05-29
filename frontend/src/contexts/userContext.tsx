@@ -3,7 +3,7 @@
 import { User as FirebaseUser, onAuthStateChanged } from "firebase/auth";
 import { ReactNode, createContext, useCallback, useEffect, useState } from "react";
 
-import { User, getWhoAmI, logoutUser } from "@/api/users";
+import { User, getWhoAmI } from "@/api/users";
 import { OnboardingStep } from "@/components/navbar/VerticalStepper";
 import { initFirebase } from "@/firebase/firebase";
 
@@ -13,7 +13,6 @@ type IUserContext = {
   user: User | null;
   loadingUser: boolean;
   reloadUser: () => unknown;
-  logout: () => Promise<void>;
   onboardingStep: OnboardingStep;
   setOnboardingStep: (step: OnboardingStep) => void;
 };
@@ -27,10 +26,6 @@ export const UserContext = createContext<IUserContext>({
   user: null,
   loadingUser: true,
   reloadUser: () => undefined,
-  logout: async () => {
-    // Empty implementation for the default context
-    await Promise.resolve();
-  },
   onboardingStep: 0,
   setOnboardingStep: () => undefined,
 });
@@ -105,30 +100,10 @@ export const UserContextProvider = ({ children }: { children: ReactNode }) => {
         });
     }
   }, [firebaseUser, initialLoading, setUser, setLoadingUser]);
-  /**
-   * Handles user logout by calling Firebase signOut
-   */
-  const logout = useCallback(async () => {
-    try {
-      const result = await logoutUser();
-
-      if (result.success) {
-        setUser(null);
-        // Redirect to login page after logout
-        window.location.href = "/login";
-      } else {
-        console.error("Error during logout:", result.error);
-      }
-    } catch (error) {
-      console.error("Error during logout:", error);
-    }
-  }, []);
 
   // Update user data when Firebase authentication state changes
   useEffect(() => {
-    if (!initialLoading) {
-      reloadUser();
-    }
+    reloadUser();
   }, [initialLoading, firebaseUser, reloadUser]);
   return (
     <UserContext.Provider
@@ -137,7 +112,6 @@ export const UserContextProvider = ({ children }: { children: ReactNode }) => {
         user,
         loadingUser,
         reloadUser,
-        logout,
         onboardingStep,
         setOnboardingStep: setOnboardingStepHandler,
       }}

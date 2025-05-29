@@ -1,4 +1,4 @@
-import { User as FirebaseUser, getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 
 import { APIResult, get, handleAPIError, post, put } from "./requests";
 
@@ -136,36 +136,30 @@ export type User = {
   updatedAt: string;
 };
 
-export type UserWithFirebase = {
-  firebaseUser: FirebaseUser;
-  backendUser: User;
+export type EditBasicInfo = {
+  newFirstName: string;
+  newLastName: string;
+  newEmail: string;
+  newPhone: string;
 };
 
-export type BasicInfo = {
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
+export type ProfessionalInfo = {
+  title: string;
+  prefLanguages: ("english" | "spanish" | "portuguese" | "other")[];
+  otherPrefLanguages: string;
+  country: string;
+};
+
+export type EditProfessionalInfo = {
+  newTitle: string;
+  newPrefLanguages: ("english" | "spanish" | "portuguese" | "other")[];
+  newOtherPrefLanguages: string;
+  newCountry: string;
 };
 
 export const createAuthHeader = (firebaseToken: string) => ({
   Authorization: `Bearer ${firebaseToken}`,
 });
-
-/**
- * Authenticates a user with the backend after Firebase authentication
- * @param firebaseToken The Firebase authentication token
- * @returns API result with user data
- */
-export const authenticateUser = async (firebaseToken: string): Promise<APIResult<User>> => {
-  try {
-    const response = await post("/api/users/authenticate", {}, createAuthHeader(firebaseToken));
-    const data = (await response.json()) as User;
-    return { success: true, data };
-  } catch (error) {
-    return handleAPIError(error);
-  }
-};
 
 /**
  * Get current user information from the backend
@@ -199,23 +193,6 @@ export const signUpUser = async (userData: CreateUserRequestBody): Promise<APIRe
 };
 
 /**
- * Logs in a user with email and password using Firebase authentication
- * @param email User email
- * @param password User password
- * @returns Promise with Firebase user instance
- */
-export const loginUser = async (email: string, password: string) => {
-  const auth = getAuth();
-  try {
-    const userCredential: UserCredential = await signInWithEmailAndPassword(auth, email, password);
-    return userCredential.user;
-  } catch (error) {
-    console.error("Firebase login error:", error);
-    throw new Error("Failed to login user");
-  }
-};
-
-/**
  * Logs in a user with email and password using Firebase
  * @param email User email
  * @param password User password
@@ -225,9 +202,12 @@ export const loginUserWithEmailPassword = async (
   email: string,
   password: string,
 ): Promise<APIResult<{ token: string }>> => {
+  const auth = getAuth();
   try {
     // Type-safe implementation
-    const firebaseUser = await loginUser(email, password);
+    const userCredential: UserCredential = await signInWithEmailAndPassword(auth, email, password);
+    const firebaseUser = userCredential.user;
+
     if (!firebaseUser) {
       throw new Error("Authentication failed");
     }
@@ -239,6 +219,7 @@ export const loginUserWithEmailPassword = async (
 
     return { success: true, data: { token } };
   } catch (error) {
+    console.error("Firebase login error:", error);
     return handleAPIError(error);
   }
 };
@@ -258,20 +239,46 @@ export const logoutUser = async (): Promise<APIResult<null>> => {
 };
 
 export async function editBasicInfoRequest(
-  basicInfo: BasicInfo,
+  basicInfo: EditBasicInfo,
   firebaseToken: string,
 ): Promise<APIResult<null>> {
   try {
-    const body = {
-      newFirstName: basicInfo.firstName,
-      newLastName: basicInfo.lastName,
-      newEmail: basicInfo.email,
-      newPhone: basicInfo.phone,
-    };
-
-    await put("/api/users/personal-information", body, createAuthHeader(firebaseToken));
+    //TODO: API result return type needs be updated when route written
+    await put(
+      "/api/users/general/personal-information",
+      basicInfo,
+      createAuthHeader(firebaseToken),
+    );
     return { success: true, data: null };
   } catch (error) {
     return handleAPIError(error);
   }
 }
+
+export async function editProfessionalInfoRequest(
+  professionalInfo: EditProfessionalInfo,
+  firebaseToken: string,
+): Promise<APIResult<null>> {
+  try {
+    await put(
+      "/api/users/general/professional-information",
+      professionalInfo,
+      createAuthHeader(firebaseToken),
+    );
+    return { success: true, data: null };
+  } catch (error) {
+    return handleAPIError(error);
+  }
+}
+export const getUser = async (
+  firebaseUid: string,
+  firebaseToken: string,
+): Promise<APIResult<User>> => {
+  try {
+    const response = await get(`/api/users/${firebaseUid}`, createAuthHeader(firebaseToken));
+    const data = (await response.json()) as User;
+    return { success: true, data };
+  } catch (error) {
+    return handleAPIError(error);
+  }
+};

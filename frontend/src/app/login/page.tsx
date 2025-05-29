@@ -8,6 +8,7 @@ import { z } from "zod";
 
 import styles from "./login.module.css";
 
+import { getWhoAmI, loginUserWithEmailPassword } from "@/api/users";
 import { Checkmark } from "@/components";
 
 // Define the schema for form validation using Zod
@@ -74,9 +75,6 @@ const Login: React.FC = () => {
           localStorage.setItem("rememberMe", "false");
         }
 
-        // Handle login with Firebase
-        const { loginUserWithEmailPassword, authenticateUser } = await import("@/api/users");
-
         // First authenticate with Firebase
         const loginResult = await loginUserWithEmailPassword(data.email, data.password);
         if (!loginResult.success) {
@@ -84,7 +82,7 @@ const Login: React.FC = () => {
         }
 
         // Then authenticate with the backend to get user details
-        const authResult = await authenticateUser(loginResult.data.token);
+        const authResult = await getWhoAmI(loginResult.data.token);
         if (!authResult.success) {
           throw new Error(authResult.error);
         }

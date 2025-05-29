@@ -1,4 +1,4 @@
-import { initializeApp } from "firebase/app";
+import { FirebaseOptions, initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 
 import env from "@/util/validateEnv";
@@ -12,10 +12,8 @@ export const initFirebase = () => {
     throw new Error("Cannot get firebase settings");
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  const firebaseConfig = env.NEXT_PUBLIC_FIREBASE_SETTINGS;
+  const firebaseConfig = env.NEXT_PUBLIC_FIREBASE_SETTINGS as FirebaseOptions;
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
 

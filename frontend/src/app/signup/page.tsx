@@ -162,12 +162,12 @@ export default function OnboardingForm() {
               setStep(2);
             }
           }}
+          onReset={handleReset}
+          onStatusChange={handleRegistrationStatusChange}
         />
       )}
 
-      {step === 5 && (
-        <Result onReset={handleReset} onStatusChange={handleRegistrationStatusChange} />
-      )}
+      {step === 5 && <Result onReset={handleReset} />}
     </div>
   );
 }

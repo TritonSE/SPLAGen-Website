@@ -9,7 +9,7 @@ const initialState: GlobalState = {
     password: "",
     // Basic
     professionalTitle: { value: "", label: "" },
-    country: { value: "", label: "" }, // how to make display default
+    country: { value: "", label: "" },
     languages: [],
     membership: "",
     // Associate
@@ -26,7 +26,16 @@ const initialState: GlobalState = {
     graduationDate: "",
   },
   directoryForm: {
-    field: "",
+    educationType: "",
+    educationInstitution: "",
+    workClinic: "",
+    clinicWebsite: "",
+    clinicCountry: { value: "", label: "" },
+    addressLine1: "",
+    addressLine2: "",
+    city: "",
+    state: "",
+    postcode: "",
   },
 };
 
