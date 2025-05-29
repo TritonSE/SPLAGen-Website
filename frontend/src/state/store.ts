@@ -42,6 +42,12 @@ const initialState: GlobalState = {
     specialtyServices: [],
     careLanguages: [],
     authorizedForLanguages: undefined,
+    email: "",
+    phone: "",
+    licenseType: undefined,
+    licenseNumber: "",
+    noLicenseReason: "",
+    additionalComments: "",
   },
 };
 

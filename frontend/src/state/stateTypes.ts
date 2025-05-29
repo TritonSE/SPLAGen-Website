@@ -46,5 +46,11 @@ export type directoryState = {
     specialtyServices: string[];
     careLanguages: string[];
     authorizedForLanguages: boolean | string | undefined;
+    email: string;
+    phone: string;
+    licenseType: "has_license" | "no_license" | undefined;
+    licenseNumber: string;
+    noLicenseReason: string;
+    additionalComments: string;
   };
 };

@@ -3,7 +3,12 @@
 import { useStateMachine } from "little-state-machine";
 import { useCallback, useState } from "react";
 
-import { DirectoryBasics, DirectoryServices, Result } from "@/components/directoryForm";
+import {
+  DirectoryBasics,
+  DirectoryContact,
+  DirectoryServices,
+  Result,
+} from "@/components/directoryForm";
 import { directoryState } from "@/state/stateTypes";
 import updateDirectoryForm from "@/state/updateDirectoryForm";
 
@@ -43,6 +48,13 @@ export default function DirectoryForm() {
       specialtyServices: [],
       careLanguages: [],
       authorizedForLanguages: undefined,
+      // Contact page fields
+      email: "",
+      phone: "",
+      licenseType: undefined,
+      licenseNumber: "",
+      noLicenseReason: "",
+      additionalComments: "",
     });
     setCurrentStep(1);
   }, [actions, setCurrentStep]);
@@ -55,6 +67,8 @@ export default function DirectoryForm() {
       case 2:
         return <DirectoryServices onNext={handleNext} onBack={handleBack} />;
       case 3:
+        return <DirectoryContact onNext={handleNext} onBack={handleBack} />;
+      case 4:
         return <Result onReset={handleReset} />;
       default:
         setCurrentStep(1);
