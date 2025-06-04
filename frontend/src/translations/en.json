@@ -71,6 +71,7 @@
   "state": "State",
   "postcode": "Postcode",
   "save": "Save",
+  "basic-info": "Basic Info",
   "edit-basic-info": "Edit Basic Information",
   "phone": "Phone",
   "confirm": "Confirm",
@@ -99,10 +100,18 @@
   "portuguese": "Portuguese",
   "other": "Other",
   "edit-professional-info": "Edit Professional Information",
-  "preferred-language": "Preferred Language(s)",
-  "splagen-directory": "SPLAGen Directory",
+  "user": "User",
+  "none": "None",
   "yes": "Yes",
   "no": "No",
+  "change-photo": "Change Photo",
+  "remove-photo": "Remove Photo",
+  "professional-info": "Professional Info",
+  "preferred-language": "Preferred Language(s)",
+  "splagen-directory": "SPLAGen Directory",
+  "directory-info": "Directory Information",
+  "title": "Title",
+  "profile": "Profile",
 
   "temp": "Temporary"
 }

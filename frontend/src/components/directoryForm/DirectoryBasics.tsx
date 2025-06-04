@@ -25,13 +25,13 @@ const formSchema = z.object({
   educationType: z.string().min(1, "Please select an education type"),
   educationInstitution: z.string().min(1, "Institution name is required"),
   workClinic: z.string().min(1, "Work clinic name is required"),
-  clinicWebsite: z.string().url("Please enter a valid website URL, like: https://www.example.com"),
+  clinicWebsite: z.string().url("Please enter a valid website URL"),
   addressLine1: z.string().min(1, "Address is required"),
   addressLine2: z.string().optional(),
   city: z.string().min(1, "City is required"),
   state: z.string().min(1, "State/territory is required"),
   postcode: z.string().min(1, "Postcode is required"),
-  clinicCountry: z.any().optional(),
+  clinicCountry: z.custom<CountryOption>().optional(),
 });
 
 type FormSchema = z.infer<typeof formSchema>;
@@ -57,7 +57,7 @@ export const DirectoryBasics = ({ onNext }: DirectoryBasicsProps) => {
 
   const onSubmit = useCallback(
     (data: FormSchema) => {
-      actions.updateDirectoryForm(data as directoryState["data"]);
+      actions.updateDirectoryForm(data);
       onNext(data as directoryState["data"]);
     },
     [actions, onNext],
@@ -85,7 +85,7 @@ export const DirectoryBasics = ({ onNext }: DirectoryBasicsProps) => {
             <Controller
               name="educationType"
               control={control}
-              defaultValue={state.directoryForm?.educationType || ""}
+              defaultValue={state.directoryForm?.educationType ?? ""}
               render={({ field }) => (
                 <>
                   <Radio
@@ -170,7 +170,7 @@ export const DirectoryBasics = ({ onNext }: DirectoryBasicsProps) => {
               type="text"
               {...register("clinicWebsite")}
               className={styles.input}
-              placeholder="Enter website link"
+              placeholder="Enter website link: https://www.example.com"
             />
             <p className={styles.errorText}>
               {errors.clinicWebsite ? errors.clinicWebsite.message : "\u00A0"}
@@ -188,7 +188,7 @@ export const DirectoryBasics = ({ onNext }: DirectoryBasicsProps) => {
               <Controller
                 name="clinicCountry"
                 control={control}
-                defaultValue={state.directoryForm?.clinicCountry || ""}
+                defaultValue={state.directoryForm?.clinicCountry}
                 render={({ field }) => (
                   <CountrySelector
                     value={selectedCountry ?? state.directoryForm?.clinicCountry}
@@ -202,16 +202,16 @@ export const DirectoryBasics = ({ onNext }: DirectoryBasicsProps) => {
               />
             </div>
 
-            <div className={styles.addressField}>
+            <div>
               <input
                 type="text"
                 {...register("addressLine1")}
                 className={styles.input}
                 placeholder="Address line"
               />
-              {errors.addressLine1 && (
-                <p className={styles.errorText}>{errors.addressLine1.message}</p>
-              )}
+              <p className={styles.errorText}>
+                {errors.addressLine1 ? errors.addressLine1.message : "\u00A0"}
+              </p>
             </div>
 
             <div className={styles.addressField}>

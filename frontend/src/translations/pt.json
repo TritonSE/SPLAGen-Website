@@ -71,6 +71,7 @@
   "state": "Estado",
   "postcode": "Código Postal",
   "save": "Salvar",
+  "basic-info": "Informações Básicas",
   "edit-basic-info": "Editar informações básicas",
   "phone": "Telefone",
   "confirm": "Confirmar",
@@ -103,6 +104,13 @@
   "splagen-directory": "Diretório SPLAGen",
   "yes": "Sim",
   "no": "Não",
-
+  "user": "Usuário",
+  "none": "Nenhum",
+  "profile": "Perfil",
+  "change-photo": "Alterar Foto",
+  "remove-photo": "Remover Foto",
+  "professional-info": "Informações Profissionais",
+  "directory-info": "Informações do Diretório",
+  "title": "Título",
   "temp": "Temporário"
 }
