@@ -32,6 +32,9 @@ export default function Dashboard() {
       <p>
         <Link href="/profile"> Go to profile flow </Link>
       </p>
+      <p>
+        <Link href="/profile"> Go to Edit Directory Info Modal Demo </Link>
+      </p>
 
       <div className="grid grid-rows-[20px_1fr_20px] items-center min-h-screen">
         <main className="flex flex-col gap-8 row-start-2 items-center">

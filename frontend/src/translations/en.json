@@ -112,6 +112,16 @@
   "directory-info": "Directory Information",
   "title": "Title",
   "profile": "Profile",
-
+  "professional-email-of-contact": "Professional Email of Contact",
+  "edit-directory-display-info": "Edit Directory Display Info",
+  "work-email-of-contact": "Work Email",
+  "work-email-placeholder": "e.g username@email.com",
+  "work-phone-of-contact": "Work Phone",
+  "work-phone-placeholder": "temporaryy",
+  "genetic-services-offered": "Genetic Services Offered",
+  "language-for-patient-care": "Languages Used for Patient Care",
+  "license-number": "License Number",
+  "offer-remote-services": "Do You Offer Remote Services?",
+  "request-genetic-tests": "Can Patients Request Genetic Tests?",
   "temp": "Temporary"
 }
