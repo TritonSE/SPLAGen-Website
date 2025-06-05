@@ -111,7 +111,7 @@ export default function LandingPage() {
         case "author-desc":
           return b.author.localeCompare(a.author);
         default:
-          return 0; // No sorting
+          return 0;
       }
     });
     console.log("Sorted posts:", result);
@@ -126,13 +126,7 @@ export default function LandingPage() {
     return normalizedDate;
   };
 
-  // Step 1: Sort all posts by date (descending)
-  const sortedPosts = [...posts].sort(
-    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
-  );
-
-  // Step 2: Take only the top N visible posts
-  const visiblePosts = sortedPosts;
+  const visiblePosts = posts;
 
   // Step 3: Create time boundaries
   const today = new Date();
@@ -184,7 +178,7 @@ export default function LandingPage() {
 
           <div className={styles.selectWrapper}>
             <div className={styles.selectWrapper}>
-              <div className={styles.sortContainer}>
+              <div className={`${styles.sortContainer} ${sort ? styles.activeSort : ""}`}>
                 <select
                   className={styles.sortSelect}
                   onChange={(e) => {
@@ -199,22 +193,24 @@ export default function LandingPage() {
                   <option value="author-desc">{t("Author Z-A")}</option>
                 </select>
 
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  className={styles.sortIcon}
-                >
-                  <path
-                    d="M8 20V10M8 20L5 17M8 20L11 17M16 4V14M16 4L19 7M16 4L13 7"
-                    stroke="#909090"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
+                <div className="sortIconWrapper">
+                  <svg
+                    className="sortIcon"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                  >
+                    <path
+                      d="M8 20V10M8 20L5 17M8 20L11 17M16 4V14M16 4L19 7M16 4L13 7"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </div>
               </div>
             </div>
           </div>
