@@ -3,7 +3,7 @@
 import { useStateMachine } from "little-state-machine";
 import { useCallback, useState } from "react";
 
-import { DirectoryBasics, Result } from "@/components/directoryForm";
+import { DirectoryBasics, DirectoryServices, Result } from "@/components/directoryForm";
 import { directoryState } from "@/state/stateTypes";
 import updateDirectoryForm from "@/state/updateDirectoryForm";
 
@@ -14,11 +14,15 @@ export default function DirectoryForm() {
   const handleNext = useCallback(
     (data: directoryState["data"]) => {
       actions.updateDirectoryForm(data);
-      // Move to the next step (Result page)
-      setCurrentStep(2);
+      // Move to the next step
+      setCurrentStep((prev) => prev + 1);
     },
     [actions, setCurrentStep],
   );
+
+  const handleBack = useCallback(() => {
+    setCurrentStep((prev) => prev - 1);
+  }, [setCurrentStep]);
 
   const handleReset = useCallback(() => {
     actions.updateDirectoryForm({
@@ -32,17 +36,31 @@ export default function DirectoryForm() {
       city: "",
       state: "",
       postcode: "",
+      // Services page fields
+      canMakeAppointments: undefined,
+      canRequestTests: undefined,
+      offersTelehealth: undefined,
+      specialtyServices: [],
+      careLanguages: [],
+      authorizedForLanguages: undefined,
     });
     setCurrentStep(1);
   }, [actions, setCurrentStep]);
 
-  return (
-    <div className="w-full h-full">
-      {currentStep === 1 ? (
-        <DirectoryBasics onNext={handleNext} />
-      ) : (
-        <Result onReset={handleReset} />
-      )}
-    </div>
-  );
+  // Render the current step
+  const renderStep = () => {
+    switch (currentStep) {
+      case 1:
+        return <DirectoryBasics onNext={handleNext} />;
+      case 2:
+        return <DirectoryServices onNext={handleNext} onBack={handleBack} />;
+      case 3:
+        return <Result onReset={handleReset} />;
+      default:
+        setCurrentStep(1);
+        return <DirectoryBasics onNext={handleNext} />;
+    }
+  };
+
+  return <div className="w-full h-full">{renderStep()}</div>;
 }
