@@ -11,6 +11,7 @@ import { z } from "zod";
 import styles from "./DirectoryContact.module.css";
 
 import { Button } from "@/components";
+import { PhoneInput } from "@/components/PhoneInput";
 import { directoryState } from "@/state/stateTypes";
 import updateDirectoryForm from "@/state/updateDirectoryForm";
 
@@ -38,7 +39,7 @@ const formSchema = z
     },
     {
       message: "This field is required",
-      path: ["licenseNumber"], // This will be overridden in the component
+      path: ["licenseNumber"],
     },
   );
 
@@ -101,11 +102,18 @@ export const DirectoryContact = ({ onNext, onBack }: DirectoryContactProps) => {
 
           <div className={styles.questionSection}>
             <p className={styles.sectionText}>Telephone number for patients to contact you</p>
-            <input
-              type="tel"
-              {...register("phone")}
-              className={styles.textInput}
-              placeholder="Enter your phone number"
+            <Controller
+              name="phone"
+              control={control}
+              render={({ field }) => (
+                <PhoneInput
+                  placeholder="Enter your phone number"
+                  value={field.value}
+                  onChange={field.onChange}
+                  defaultCountry="US"
+                  international
+                />
+              )}
             />
             <p className={styles.errorText}>{errors.phone ? errors.phone.message : "\u00A0"}</p>
           </div>
