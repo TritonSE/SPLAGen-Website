@@ -71,9 +71,9 @@ export const ProfessionalInfoModal = ({
   } = useForm<ProfessionalInfoFormData>({
     resolver: zodResolver(professionalInfoSchema(t)),
     defaultValues: {
-      professionalTitle: populationInfo?.professional.title,
-      country: getCountryOption(populationInfo?.professional.country),
-      languages: populationInfo?.professional.prefLanguages,
+      professionalTitle: populationInfo?.professional?.title,
+      country: getCountryOption(populationInfo?.professional?.country),
+      languages: populationInfo?.professional?.prefLanguages,
       splagenDirectory: populationInfo?.account.inDirectory === true,
     },
   });
