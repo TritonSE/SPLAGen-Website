@@ -129,9 +129,9 @@ export const ProfessionalInfoModal = ({
   useEffect(() => {
     if (isOpen && populationInfo) {
       reset({
-        professionalTitle: populationInfo.professional.title,
-        country: getCountryOption(populationInfo.professional.country),
-        languages: populationInfo.professional.prefLanguages,
+        professionalTitle: populationInfo.professional?.title,
+        country: getCountryOption(populationInfo.professional?.country),
+        languages: populationInfo.professional?.prefLanguages,
         splagenDirectory: populationInfo.account.inDirectory === true,
       });
     }
