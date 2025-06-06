@@ -88,3 +88,11 @@
     flex-direction: column;
   }
 }
+
+.funnyButton {
+  border: 1px solid black;
+}
+
+.services {
+  background-color: red;
+}

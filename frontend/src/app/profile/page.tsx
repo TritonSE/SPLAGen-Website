@@ -9,11 +9,13 @@ import { User, getWhoAmI } from "@/api/users";
 import { Button, EditBasicInfoModal, ProfessionalInfoModal } from "@/components";
 import { PreferredLanguages } from "@/components/PreferredLanguages";
 import { ProfilePicture } from "@/components/ProfilePicture";
+import { EditDirectoryModal } from "@/components/modals/EditDirectoryModal";
 
 type DisplayComponentProps = {
   user: User | null;
   openBasic: () => void; // setIsBasicModalOpen
   openPro: () => void; // setIsProModalOpen
+  openDir: () => void; //setIsDirModalOpen
 };
 
 const ProfileSection = ({ user, openBasic, openPro }: DisplayComponentProps) => {
@@ -139,20 +141,25 @@ const ProfileSection = ({ user, openBasic, openPro }: DisplayComponentProps) => 
 };
 
 // Directory sub component
-const DirectorySection = ({ user }: DisplayComponentProps) => {
+const DirectorySection = ({ user, openDir }: DisplayComponentProps) => {
   const { t } = useTranslation(); // define the t function at the top of your component
 
   return (
     <div>
+      <button onClick={openDir} className={styles.funnyButton}>
+        {" "}
+        Open EditBasicInfoModal{" "}
+      </button>
+
+      <br></br>
       <b> {t("directory-information")} </b>
       <span> {user?.personal.lastName ?? t("directory-information")} </span>
     </div>
   );
 };
 
-// Main rendering component
 const ProfilePage: React.FC = () => {
-  const { t } = useTranslation(); // define the t function at the top of your component
+  const { t } = useTranslation();
 
   // Basic and Professional info updated with use effect and frontend api calls.
   const [userData, setUserData] = useState<User | null>(null);
@@ -160,6 +167,7 @@ const ProfilePage: React.FC = () => {
   // Basic and Personal Modal state tracking
   const [isBasicModalOpen, setIsBasicModalOpen] = useState(false);
   const [isProfModalOpen, setIsProfModalOpen] = useState(false);
+  const [isDirModalOpen, setIsDirModalOpen] = useState(false);
 
   // Profile and Directory form state
   const [formState, setFormState] = useState<"Profile" | "Directory">("Profile");
@@ -173,7 +181,7 @@ const ProfilePage: React.FC = () => {
     }
   }, [setUserData]);
 
-  // Use effect updates page's basic and personal user info
+  // Use effect fetches user data
   useEffect(() => {
     fetchUserData().catch((err: unknown) => {
       console.error("Error in fetching user data: ", err);
@@ -181,6 +189,15 @@ const ProfilePage: React.FC = () => {
   }, [fetchUserData]);
 
   // Modal State management
+  const handleOpenDirectoryInfoModal = () => {
+    setIsDirModalOpen(true);
+  };
+
+  const handleCloseDirectoryModal = () => {
+    setIsDirModalOpen(false);
+    void fetchUserData();
+  };
+
   const handleOpenBasicModal = () => {
     setIsBasicModalOpen(true);
   };
@@ -250,10 +267,19 @@ const ProfilePage: React.FC = () => {
         />
       )}
 
+      {userData && (
+        <EditDirectoryModal
+          isOpen={isDirModalOpen}
+          onClose={handleCloseDirectoryModal}
+          populationInfo={userData}
+        />
+      )}
+
       <DisplayComponent
         user={userData}
         openBasic={handleOpenBasicModal}
         openPro={handleOpenProfessionalInfoModal}
+        openDir={handleOpenDirectoryInfoModal}
       />
     </div>
   );
