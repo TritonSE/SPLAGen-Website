@@ -108,13 +108,13 @@ const ProfileSection = ({ user, openBasic, openPro }: DisplayComponentProps) => 
             <ul className={styles.infoColumn}>
               <li>
                 <label> {t("professional-title")} </label> <br />
-                {user?.professional.title ?? t("none")}
+                {user?.professional?.title ?? t("none")}
               </li>
 
               <li>
                 <label> {t("preferred-language")} </label>
                 <br />
-                <PreferredLanguages languages={user?.professional.prefLanguages ?? []} />
+                <PreferredLanguages languages={user?.professional?.prefLanguages ?? []} />
               </li>
             </ul>
 
@@ -122,7 +122,7 @@ const ProfileSection = ({ user, openBasic, openPro }: DisplayComponentProps) => 
               <ul className={styles.infoColumn}>
                 <li>
                   <label> {t("country")} </label> <br />
-                  {user?.professional.country ?? t("none")}
+                  {user?.professional?.country ?? t("none")}
                 </li>
 
                 <li>
