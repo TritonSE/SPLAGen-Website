@@ -27,7 +27,7 @@ export type CreateUserRequestBody = {
     gradDate?: string;
   };
 
-  associate: {
+  associate?: {
     title?: string;
     specialization?: [
       {
