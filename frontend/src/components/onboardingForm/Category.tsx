@@ -45,11 +45,33 @@ export const Category: React.FC<CategoryProps> = ({ onNext, onBack, onReset, onS
       setError(null);
       onStatusChange("submitting");
 
-      const membership = state.onboardingForm.membership.toLowerCase() as
+      // Normalize membership
+      const membership = state.onboardingForm.membership.toLowerCase().replace(" ", "") as
         | "student"
         | "geneticCounselor"
         | "healthcareProvider"
         | "associate";
+
+      // Normalize languages
+      const normalizedLanguages = (state.onboardingForm.languages || [])
+        .map((code) => {
+          switch (code.toLowerCase()) {
+            case "en":
+              return "english";
+            case "es":
+              return "spanish";
+            case "pt":
+              return "portuguese";
+            case "oth":
+              return "other";
+            default:
+              return undefined;
+          }
+        })
+        .filter(Boolean) as ("english" | "spanish" | "portuguese" | "other")[];
+
+      console.log("Registering user with data:", state.onboardingForm);
+      console.log("Membership type:", membership);
 
       const userData: CreateUserRequestBody = {
         password: state.onboardingForm.password,
@@ -65,24 +87,26 @@ export const Category: React.FC<CategoryProps> = ({ onNext, onBack, onReset, onS
         userData.professional = {
           title: state.onboardingForm.professionalTitle.value,
           country: state.onboardingForm.country?.value,
-          prefLanguages: state.onboardingForm.languages as (
-            | "english"
-            | "spanish"
-            | "portuguese"
-            | "other"
-          )[],
+          prefLanguages: normalizedLanguages,
         };
       }
 
       if (membership === "student" && state.onboardingForm.schoolName) {
+        // Normalize degree
+        const degreeMap: Record<
+          string,
+          "other" | "masters" | "diploma" | "fellowship" | "md" | "phd"
+        > = {
+          ms: "masters",
+          phd: "phd",
+          md: "md",
+        };
+
+        const normalizedDegree =
+          degreeMap[state.onboardingForm.degree?.toLowerCase() || ""] || "other";
+
         userData.education = {
-          degree: state.onboardingForm.degree as
-            | "masters"
-            | "diploma"
-            | "fellowship"
-            | "md"
-            | "phd"
-            | "other",
+          degree: normalizedDegree,
           institution: state.onboardingForm.schoolName,
           email: state.onboardingForm.universityEmail,
           program: state.onboardingForm.programName,
@@ -91,12 +115,35 @@ export const Category: React.FC<CategoryProps> = ({ onNext, onBack, onReset, onS
       }
 
       if (membership === "associate" && state.onboardingForm.organizationName) {
+        // Normalize specializations
+        const specializationEnumMap = {
+          "rare disease advocacy": "rare disease advocacy",
+          research: "research",
+          "public health": "public health",
+          bioethics: "bioethics",
+          law: "law",
+          biology: "biology",
+          "medical writer": "medical writer",
+          "medical science liaison": "medical science liason",
+          "laboratory scientist": "laboratory scientist",
+          professor: "professor",
+          bioinformatics: "bioinformatics",
+          "biotech sales and marketing": "biotech sales and marketing",
+        };
+
+        const specialization = (state.onboardingForm.specializations || [])
+          .map((s) => s.toLowerCase())
+          .map((s) => specializationEnumMap[s as keyof typeof specializationEnumMap])
+          .filter((val): val is string => Boolean(val));
+
         userData.associate = {
           title: state.onboardingForm.jobTitle,
-          specialization: state.onboardingForm.specializations,
+          specialization: specialization.length > 0 ? specialization : undefined,
           organization: state.onboardingForm.organizationName,
         };
       }
+
+      console.log("Final user data to register:", userData);
 
       const result = await signUpUser(userData);
 
