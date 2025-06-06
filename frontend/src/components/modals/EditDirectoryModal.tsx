@@ -1,6 +1,5 @@
 "use client";
-// TODO
-// -
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
 import React, { useCallback, useEffect, useMemo } from "react";
@@ -10,11 +9,17 @@ import { isValidPhoneNumber } from "react-phone-number-input";
 import { z } from "zod";
 
 import styles from "./EditDirectoryModal.module.css";
+import {
+  ValidService,
+  languages,
+  serviceKeyToLabelMap,
+  serviceLabelToKeyMap,
+} from "./displayInfoConstants";
 
 import ExitButton from "@/../public/icons/ExitButton.svg";
 import "./ProfessionalInfoModal.css";
 import { User, editDirectoryDisplayInfoRequest } from "@/api/users";
-import { PillButton } from "@/components";
+import { PhoneInput, PillButton } from "@/components";
 import { Radio } from "@/components/Radio";
 
 type ModalProps = {
@@ -24,50 +29,6 @@ type ModalProps = {
 };
 
 const firebaseToken = "temp_firebase_token";
-const languages = ["english", "spanish", "portuguese", "other"];
-
-type ValidService =
-  | "other"
-  | "pediatrics"
-  | "cardiovascular"
-  | "neurogenetics"
-  | "rareDiseases"
-  | "cancer"
-  | "biochemical"
-  | "prenatal"
-  | "adult"
-  | "psychiatric"
-  | "reproductive"
-  | "ophthalmic"
-  | "research"
-  | "pharmacogenomics"
-  | "metabolic";
-
-const serviceLabelToKeyMap: Record<string, ValidService> = {
-  "Pediatric Genetics": "pediatrics",
-  "Cardiovascular Genetics": "cardiovascular",
-  Neurogenetics: "neurogenetics",
-  "Rare Diseases": "rareDiseases",
-  "Cancer Genetics": "cancer",
-  "Biochemical Genetics": "biochemical",
-  "Prenatal Genetics": "prenatal",
-  "Adult Genetics": "adult",
-  "Psychiatric Genetics": "psychiatric",
-  "Assisted Reproductive Technologies and Preimplantation Genetic Testing": "reproductive",
-  "Ophthalmic Genetics": "ophthalmic",
-  Research: "research",
-  Pharmacogenomics: "pharmacogenomics",
-  "Metabolic Genetics": "metabolic",
-  Other: "other",
-} as const;
-
-export const serviceKeyToLabelMap: Record<
-  (typeof serviceLabelToKeyMap)[keyof typeof serviceLabelToKeyMap],
-  keyof typeof serviceLabelToKeyMap
-> = Object.entries(serviceLabelToKeyMap).reduce<Record<string, string>>((acc, [label, key]) => {
-  acc[key] = label;
-  return acc;
-}, {});
 
 const ExitButtonSrc: string = ExitButton as unknown as string;
 
@@ -112,32 +73,7 @@ export const EditDirectoryModal = ({ isOpen, onClose, populationInfo }: ModalPro
 
   // Keeps track of which languages are pressed
   const watchedLanguages = watch("languages");
-  const selectedLanguages = React.useMemo(
-    () => watchedLanguages || ["english"],
-    [watchedLanguages],
-  );
-
-  const toggleLanguage = useCallback(
-    (language: string) => {
-      const updatedLanguages = selectedLanguages.includes(language)
-        ? selectedLanguages.filter((lang) => lang !== language)
-        : [...selectedLanguages, language];
-
-      // Default to English if no language is selected
-      if (updatedLanguages.length === 0) {
-        setError("languages", {
-          type: "manual",
-          message: t("one-language-required-default-english"),
-        });
-      }
-
-      setValue(
-        "languages",
-        updatedLanguages.length ? (updatedLanguages as [string, ...string[]]) : ["english"],
-      );
-    },
-    [selectedLanguages, setValue, setError, t],
-  );
+  const selectedLanguages = useMemo(() => watchedLanguages || ["english"], [watchedLanguages]);
 
   const watchedServiceKeys = watch("services");
   const selectedServiceLabels = useMemo(
@@ -148,30 +84,28 @@ export const EditDirectoryModal = ({ isOpen, onClose, populationInfo }: ModalPro
     [watchedServiceKeys],
   );
 
-  const toggleService = useCallback(
-    (serviceLabel: string) => {
-      const serviceKey = serviceLabelToKeyMap[serviceLabel];
-      if (!serviceKey) return;
+  const toggleSelection = useCallback(
+    <T extends string>(
+      fieldName: "languages" | "services",
+      selected: T[],
+      value: T,
+      fallback: [T, ...T[]], // <- Non-empty tuple type here
+      errorMessageKey: string,
+    ) => {
+      const updated = selected.includes(value)
+        ? selected.filter((v) => v !== value)
+        : [...selected, value];
 
-      const currentKeys = watchedServiceKeys || [];
-
-      const updatedKeys = currentKeys.includes(serviceKey)
-        ? currentKeys.filter((key) => key !== serviceKey)
-        : [...currentKeys, serviceKey];
-
-      if (updatedKeys.length === 0) {
-        setError("services", {
+      if (updated.length === 0) {
+        setError(fieldName, {
           type: "manual",
-          message: t("one-service-required-default-other"),
+          message: t(errorMessageKey),
         });
       }
 
-      setValue(
-        "services",
-        updatedKeys.length ? (updatedKeys as [ValidService, ...ValidService[]]) : ["other"],
-      );
+      setValue(fieldName, updated.length ? (updated as [T, ...T[]]) : fallback);
     },
-    [watchedServiceKeys, setValue, setError, t],
+    [setValue, setError, t],
   );
 
   const offersRemote = watch("remoteOption") ? "yes" : "no";
@@ -222,6 +156,22 @@ export const EditDirectoryModal = ({ isOpen, onClose, populationInfo }: ModalPro
     [handleSubmit, onSubmit],
   );
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        onClose();
+      }
+    };
+
+    if (isOpen) {
+      window.addEventListener("keydown", handleKeyDown);
+    }
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   return (
@@ -254,11 +204,19 @@ export const EditDirectoryModal = ({ isOpen, onClose, populationInfo }: ModalPro
               <span className={styles.red}>*</span>
             </label>
             {/* <PhoneInput /> */}
-            <input
-              type="text"
-              id="workPhone"
-              placeholder={t("work-phone-placeholder")}
-              {...register("workPhone")}
+
+            <Controller
+              name="workPhone"
+              control={control}
+              render={({ field }) => (
+                <PhoneInput
+                  placeholder={t("work-phone-placeholder")}
+                  value={field.value?.replace(/\s+/g, "") || ""}
+                  onChange={field.onChange}
+                  defaultCountry="US"
+                  international
+                />
+              )}
             />
             <p className={styles.errorMessage}>{errors.workPhone?.message ?? "\u00A0"}</p>
           </div>
@@ -276,7 +234,13 @@ export const EditDirectoryModal = ({ isOpen, onClose, populationInfo }: ModalPro
                   key={key}
                   isActive={selectedServiceLabels.includes(label)}
                   onClick={() => {
-                    toggleService(key);
+                    toggleSelection(
+                      "services",
+                      watchedServiceKeys || [],
+                      key,
+                      ["other"], // fallback is a non-empty tuple here
+                      "one-service-required-default-other",
+                    );
                   }}
                   className="mx-1 my-1"
                 />
@@ -297,7 +261,13 @@ export const EditDirectoryModal = ({ isOpen, onClose, populationInfo }: ModalPro
                   key={language}
                   isActive={selectedLanguages.includes(language)}
                   onClick={() => {
-                    toggleLanguage(language);
+                    toggleSelection(
+                      "languages",
+                      selectedLanguages,
+                      language,
+                      ["english"], // fallback is a non-empty tuple here
+                      "one-language-required-default-english",
+                    );
                   }}
                   className="mx-1 my-1" // spacing
                 />
@@ -369,7 +339,7 @@ export const EditDirectoryModal = ({ isOpen, onClose, populationInfo }: ModalPro
                     label="Yes"
                     checked={patientsCanRequestTests === "yes"}
                     onChange={() => {
-                      setValue("remoteOption", true);
+                      setValue("requestOption", true);
                     }}
                   />
                   <Radio
@@ -379,7 +349,7 @@ export const EditDirectoryModal = ({ isOpen, onClose, populationInfo }: ModalPro
                     label="No"
                     checked={patientsCanRequestTests === "no"}
                     onChange={() => {
-                      setValue("remoteOption", false);
+                      setValue("requestOption", false);
                     }}
                   />
                 </div>

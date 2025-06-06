@@ -216,7 +216,6 @@ export async function editDirectoryDisplayInfoRequest(
   firebaseToken: string,
 ): Promise<APIResult<null>> {
   try {
-    console.log("at least u tried1");
     await put("/api/users/directory/display-info", directoryInfo, createAuthHeader(firebaseToken));
     return { success: true, data: null };
   } catch (error) {
