@@ -62,6 +62,7 @@ export const getMultipleAnnouncements = async (
     }
 
     const announcements = await Announcement.find(query);
+    console.log("🔍 Found announcements:", announcements);
 
     res.status(200).json({ announcements });
   } catch (error) {
