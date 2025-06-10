@@ -2,6 +2,12 @@ import { CountryOption, ProfessionalTitleOption } from "@/components";
 
 export type onboardingState = {
   data: {
+    // Signup
+    firstName: string;
+    lastName: string;
+    email: string;
+    password: string;
+    // Basic
     professionalTitle: ProfessionalTitleOption;
     country: CountryOption;
     languages: string[];
@@ -19,5 +25,26 @@ export type onboardingState = {
     universityEmail: string;
     programName: string;
     graduationDate: string;
+  };
+};
+
+export type directoryState = {
+  data: {
+    educationType: string;
+    educationInstitution: string;
+    workClinic: string;
+    clinicWebsite: string;
+    clinicCountry: CountryOption;
+    addressLine1: string;
+    addressLine2: string;
+    city: string;
+    state: string;
+    postcode: string;
+    canMakeAppointments: boolean;
+    canRequestTests: boolean;
+    offersTelehealth: boolean;
+    specialtyServices: string[];
+    careLanguages: string[];
+    authorizedForLanguages: boolean | string;
   };
 };
