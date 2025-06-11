@@ -1,4 +1,4 @@
-import { APIResult, handleAPIError, post } from "./requests";
+import { APIResult, get, handleAPIError } from "./requests";
 
 export type Counselor = {
   name: string;
@@ -14,9 +14,14 @@ export type Counselor = {
 
 export async function getPublicDirectory(): Promise<APIResult<Counselor[]>> {
   try {
-    const res = await post("/api/directory/public", undefined);
+    const res = await get("/api/directory/public", undefined);
 
-    const data = (await res.json()) as Counselor[];
+    const raw = (await res.json()) as Counselor[];
+
+    const data = raw.map((c) => ({
+      ...c,
+      languages: Array.from(new Set(c.languages)),
+    }));
 
     return { success: true, data };
   } catch (error) {

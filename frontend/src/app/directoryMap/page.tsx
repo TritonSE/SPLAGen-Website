@@ -32,7 +32,9 @@ const geocodeAddress = async (address: string): Promise<GeoLocation> => {
   return data.results?.[0]?.geometry?.location ?? { lat: 0, lng: 0 };
 };
 
-const formatSpecialties = (specs: string[]) => (specs.length ? specs.join(", ") : "—");
+const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
+const formatList = (arr: string[]) =>
+  arr.length ? Array.from(new Set(arr)).map(capitalize).join(", ") : "—";
 
 export default function DirectoryMapPage() {
   const { isLoaded } = useJsApiLoader({
@@ -97,19 +99,48 @@ export default function DirectoryMapPage() {
             onCloseClick={() => {
               setSelected(null);
             }}
+            options={{ pixelOffset: new google.maps.Size(0, -30), disableAutoPan: false }}
           >
-            <div className="space-y-1">
-              <h2 className="font-semibold">
-                {selected.counselor.name}{" "}
-                <span className="text-gray-500">({selected.counselor.title})</span>
-              </h2>
+            {/* Header row: name + custom close button */}
+            <div className="flex items-start justify-between space-x-2 font-semibold">
+              <span>
+                {selected.counselor.name}
+                <span className="text-gray-500 font-normal"> ({selected.counselor.title})</span>
+              </span>
 
+              {/* inline “x” */}
+              <button
+                aria-label="Close"
+                onClick={() => {
+                  setSelected(null);
+                }}
+                className="text-lg leading-none hover:text-red-600"
+              >
+                ×
+              </button>
+            </div>
+
+            {/* Details */}
+            <div className="mt-1 space-y-1 text-sm">
               <p>📍 {selected.counselor.address}</p>
               <p>🏢 {selected.counselor.organization}</p>
+              {selected.counselor.profileUrl && (
+                <p>
+                  🔗{" "}
+                  <a
+                    href={selected.counselor.profileUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline text-blue-600"
+                  >
+                    Clinic website
+                  </a>
+                </p>
+              )}
               <p>🌐 {selected.counselor.email}</p>
               <p>☎️ {selected.counselor.phone ?? "—"}</p>
-              <p>📚 {formatSpecialties(selected.counselor.specialties)}</p>
-              <p>🗣 {selected.counselor.languages.join(", ")}</p>
+              <p>📚 {formatList(selected.counselor.specialties)}</p>
+              <p>🗣 {formatList(selected.counselor.languages)}</p>
             </div>
           </InfoWindow>
         )}
@@ -120,7 +151,7 @@ export default function DirectoryMapPage() {
         {markers.map(({ counselor, location }, i) => (
           <div
             key={i}
-            className="mb-4 cursor-pointer"
+            className="mb-4 cursor-pointer space-y-1"
             onClick={() => {
               setSelected({ counselor, location });
               google.maps.event.trigger(window, "resize");
@@ -129,7 +160,23 @@ export default function DirectoryMapPage() {
             <h3 className="font-medium">{counselor.name}</h3>
             <p className="text-sm">📍 {counselor.address}</p>
             <p className="text-sm">🏢 {counselor.organization}</p>
-            <p className="text-sm">📚 {formatSpecialties(counselor.specialties)}</p>
+            {counselor.profileUrl && (
+              <p className="text-sm">
+                🔗{" "}
+                <a
+                  href={counselor.profileUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline text-blue-600"
+                >
+                  Clinic website
+                </a>
+              </p>
+            )}
+            <p className="text-sm">🌐 {counselor.email}</p>
+            <p className="text-sm">☎️ {counselor.phone ?? "—"}</p>
+            <p className="text-sm">📚 {formatList(counselor.specialties)}</p>
+            <p className="text-sm">🗣 {formatList(counselor.languages)}</p>
             <hr className="my-2" />
           </div>
         ))}
