@@ -61,7 +61,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     const fetchPosts = async () => {
-      const result = await getPost();
+      const result = await getPost("temporary-firebase-token");
 
       if (result.success) {
         if (Array.isArray(result.data)) {
