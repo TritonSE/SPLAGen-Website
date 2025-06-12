@@ -1,4 +1,5 @@
 import { APIResult, get, handleAPIError, post } from "./requests";
+import { createAuthHeader } from "./users";
 
 export type Announcement = {
   _id: string;
@@ -10,12 +11,19 @@ export type Announcement = {
   updatedAt?: string;
 };
 
-export const createPost = async (postData: {
-  title: string;
-  message: string;
-}): Promise<APIResult<Announcement>> => {
+export const createPost = async (
+  postData: {
+    title: string;
+    message: string;
+  },
+  firebaseToken: string,
+): Promise<APIResult<Announcement>> => {
   try {
-    const response: Response = await post("/api/announcements", postData);
+    const response: Response = await post(
+      "/api/announcements",
+      postData,
+      createAuthHeader(firebaseToken),
+    );
     const data = (await response.json()) as Announcement;
 
     return { success: true, data };
@@ -24,9 +32,9 @@ export const createPost = async (postData: {
   }
 };
 
-export const getPost = async (): Promise<APIResult<Announcement[]>> => {
+export const getPost = async (firebaseToken: string): Promise<APIResult<Announcement[]>> => {
   try {
-    const response: Response = await get("/api/announcements");
+    const response: Response = await get("/api/announcements", createAuthHeader(firebaseToken));
 
     if (!response.ok) {
       return handleAPIError("Failed to fetch posts");
