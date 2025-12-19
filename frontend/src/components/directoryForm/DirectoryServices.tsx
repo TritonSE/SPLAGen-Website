@@ -36,24 +36,12 @@ const specialtyOptions = [
 const languageOptions = ["English", "Spanish", "Portuguese", "Other"];
 
 const formSchema = z.object({
-  canMakeAppointments: z
-    .boolean({ required_error: "Required" })
-    .or(z.undefined())
-    .refine((val) => val !== undefined, { message: "Required" }),
-  canRequestTests: z
-    .boolean({ required_error: "Required" })
-    .or(z.undefined())
-    .refine((val) => val !== undefined, { message: "Required" }),
-  offersTelehealth: z
-    .boolean({ required_error: "Required" })
-    .or(z.undefined())
-    .refine((val) => val !== undefined, { message: "Required" }),
+  canMakeAppointments: z.boolean({ required_error: "Required" }),
+  canRequestTests: z.boolean({ required_error: "Required" }),
+  offersTelehealth: z.boolean({ required_error: "Required" }),
   specialtyServices: z.array(z.string()).min(1, "Please select at least one specialty service"),
   careLanguages: z.array(z.string()).min(1, "Required"),
-  authorizedForLanguages: z
-    .union([z.boolean(), z.literal("unsure")])
-    .or(z.undefined())
-    .refine((val) => val !== undefined, { message: "Required" }),
+  authorizedForLanguages: z.union([z.boolean(), z.literal("unsure")]),
 });
 
 type FormSchema = z.infer<typeof formSchema>;

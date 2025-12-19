@@ -9,6 +9,7 @@ export type onboardingState = {
     password: string;
     // Basic
     professionalTitle: ProfessionalTitleOption;
+    professionalTitleOther: string;
     country: CountryOption;
     languages: string[];
     membership: string;
@@ -40,12 +41,12 @@ export type directoryState = {
     city: string;
     state: string;
     postcode: string;
-    canMakeAppointments: boolean | undefined;
-    canRequestTests: boolean | undefined;
-    offersTelehealth: boolean | undefined;
+    canMakeAppointments: boolean;
+    canRequestTests: boolean;
+    offersTelehealth: boolean;
     specialtyServices: string[];
     careLanguages: string[];
-    authorizedForLanguages: boolean | string | undefined;
+    authorizedForLanguages: boolean | string;
     email: string;
     phone: string;
     licenseType: "has_license" | "no_license" | undefined;

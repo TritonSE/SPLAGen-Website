@@ -8,6 +8,7 @@ import { z } from "zod";
 
 import styles from "./login.module.css";
 
+import { getWhoAmI, loginUserWithEmailPassword } from "@/api/users";
 import { Checkmark } from "@/components";
 
 // Define the schema for form validation using Zod
@@ -23,6 +24,7 @@ type FormFields = z.infer<typeof schema>;
 // Initialize react-hook-form
 const Login: React.FC = () => {
   const [rememberMe, setRememberMe] = useState(false);
+  const [registrationSuccess, setRegistrationSuccess] = useState(false);
   const { t } = useTranslation();
 
   const {
@@ -52,18 +54,19 @@ const Login: React.FC = () => {
       setRememberMe(true);
       setValue("rememberMe", true);
     }
+
+    // Check if user was redirected from successful registration
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get("registered") === "true") {
+      setRegistrationSuccess(true);
+    }
   }, [setValue, setRememberMe]);
 
   // Form submission handler
   const onSubmit: SubmitHandler<FormFields> = useCallback(
     async (data) => {
       try {
-        await new Promise((resolve) => {
-          setTimeout(resolve, 1000);
-        });
-
-        // Simulate API call with a 1-second delay...
-        // Note how only email is saved...not the password.
+        // Save email to localStorage if rememberMe is checked
         if (data.rememberMe) {
           localStorage.setItem("rememberedEmail", data.email);
           localStorage.setItem("rememberMe", "true");
@@ -71,8 +74,22 @@ const Login: React.FC = () => {
           localStorage.removeItem("rememberedEmail");
           localStorage.setItem("rememberMe", "false");
         }
-      } catch (error) {
-        console.error(error);
+
+        // First authenticate with Firebase
+        const loginResult = await loginUserWithEmailPassword(data.email, data.password);
+        if (!loginResult.success) {
+          throw new Error(loginResult.error);
+        }
+
+        // Then authenticate with the backend to get user details
+        const authResult = await getWhoAmI(loginResult.data.token);
+        if (!authResult.success) {
+          throw new Error(authResult.error);
+        }
+
+        // Redirect to dashboard on successful login
+        window.location.href = "/";
+      } catch {
         setError("root", {
           message: t("login-no-account"),
         });
@@ -101,6 +118,12 @@ const Login: React.FC = () => {
   return (
     <div className={styles.loginPageContainer}>
       <div className={styles.loginPageDiv}>
+        {registrationSuccess && (
+          <div className="mb-4 p-4 bg-green-100 text-green-700 rounded-md">
+            <p className="font-bold">{t("registration-success")}</p>
+            <p>{t("please-login")}</p>
+          </div>
+        )}
         <div className={styles.decorationText}>
           <h1>
             <strong> {t("log-in")} </strong>

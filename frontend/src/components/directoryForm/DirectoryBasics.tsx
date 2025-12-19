@@ -31,7 +31,10 @@ const formSchema = z.object({
   city: z.string().min(1, "City is required"),
   state: z.string().min(1, "State/territory is required"),
   postcode: z.string().min(1, "Postcode is required"),
-  clinicCountry: z.any().optional(),
+  clinicCountry: z.object({
+    value: z.string().min(1),
+    label: z.string().min(1),
+  }),
 });
 
 type FormSchema = z.infer<typeof formSchema>;
@@ -181,10 +184,7 @@ export const DirectoryBasics = ({ onNext }: DirectoryBasicsProps) => {
             <label className={styles.label}>Address of clinic</label>
 
             <div className={styles.addressField}>
-              <label className={styles.label}>
-                Country
-                <span className={styles.optionalText}> (optional)</span>
-              </label>
+              <label className={styles.label}>Country</label>
               <Controller
                 name="clinicCountry"
                 control={control}
@@ -200,6 +200,9 @@ export const DirectoryBasics = ({ onNext }: DirectoryBasicsProps) => {
                   />
                 )}
               />
+              {errors.clinicCountry && (
+                <p className={styles.errorText}>{errors.clinicCountry.message}</p>
+              )}
             </div>
 
             <div className={styles.addressField}>

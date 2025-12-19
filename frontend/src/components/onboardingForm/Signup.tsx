@@ -17,6 +17,13 @@ type SignUpProps = {
   onNext: (data: onboardingState["data"]) => void;
 };
 
+type BasicFormData = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+};
+
 const formSchema = (t: (key: string) => string) =>
   z.object({
     firstName: z.string().min(1, t("first-name-required")).max(50, t("first-name-max-characters")),
@@ -44,18 +51,24 @@ export const SignUp = ({ onNext }: SignUpProps) => {
     register,
     handleSubmit,
     formState: { errors, isValid },
-  } = useForm({
+  } = useForm<BasicFormData>({
     resolver: zodResolver(formSchema(t)),
     defaultValues: state.onboardingForm,
     mode: "onChange",
   });
 
   const onSubmit = useCallback(
-    (data: onboardingState["data"]) => {
-      actions.updateOnboardingForm(data);
-      onNext(data);
+    (data: BasicFormData) => {
+      actions.updateOnboardingForm({
+        ...state.onboardingForm,
+        ...data,
+      });
+      onNext({
+        ...state.onboardingForm,
+        ...data,
+      });
     },
-    [actions, onNext],
+    [actions, onNext, state.onboardingForm],
   );
 
   const handleFormSubmit = useCallback(

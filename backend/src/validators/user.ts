@@ -50,7 +50,7 @@ export const editProfessionalInformation = [
   body("newOtherPrefLanguages")
     .isString()
     .withMessage("Other preferred languages must be a string"),
-  body("newCountry").isString().withMessage("Country must be a string"),
+  body("newCountry").optional().isString().withMessage("Country must be a string"),
   validateRequest,
 ];
 

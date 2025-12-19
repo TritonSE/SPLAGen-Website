@@ -2,22 +2,24 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import React, { useCallback } from "react";
+import React, { useCallback, useContext } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
 
 import styles from "./post.module.css";
 
 import { createPost } from "@/api/discussion";
+import { UserContext } from "@/contexts/userContext";
 
 // Schema
 const postSchema = z.object({
-  title: z.string().min(3).max(50),
-  message: z.string().min(5).max(500),
+  title: z.string().min(1).max(50),
+  message: z.string().min(1).max(500),
 });
 type PostFormData = z.infer<typeof postSchema>;
 
 const CreatePostPage: React.FC = () => {
+  const { firebaseUser } = useContext(UserContext);
   const router = useRouter();
   const {
     register,
@@ -28,8 +30,10 @@ const CreatePostPage: React.FC = () => {
 
   const onSubmit = useCallback<SubmitHandler<PostFormData>>(
     async (data) => {
+      if (!firebaseUser) return;
       try {
-        const result = await createPost(data);
+        const token = await firebaseUser.getIdToken();
+        const result = await createPost(data, token);
 
         if (result.success && result.data._id) {
           reset();
@@ -45,7 +49,7 @@ const CreatePostPage: React.FC = () => {
         }
       }
     },
-    [reset, router],
+    [reset, router, firebaseUser],
   );
 
   const handleFormSubmit = useCallback(
@@ -65,24 +69,28 @@ const CreatePostPage: React.FC = () => {
         <h2 className={styles.pageTitle}>Create New Post</h2>
         <form onSubmit={handleFormSubmit} className={styles.createPostForm}>
           <div className={styles.formGroup}>
-            <label htmlFor="post-title">Post Title</label>
+            <label className={styles.fieldLabel} htmlFor="post-title">
+              Subject
+            </label>
             <input
               id="post-title"
               type="text"
               className={styles.inputField}
               {...register("title")}
-              placeholder="Title"
+              placeholder="Enter subject"
             />
             <p className="error-message">{errors.title?.message ?? "\u00A0"}</p>
           </div>
 
           <div className={styles.formGroup}>
-            <label htmlFor="post-message">Message</label>
+            <label className={styles.fieldLabel} htmlFor="post-message">
+              Message
+            </label>
             <textarea
               id="post-message"
               className={styles.textAreaField}
               {...register("message")}
-              placeholder="Your message"
+              placeholder="Enter message"
             />
             <p className="error-message">{errors.message?.message ?? "\u00A0"}</p>
           </div>

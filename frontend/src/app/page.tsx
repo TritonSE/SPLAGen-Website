@@ -27,10 +27,13 @@ export default function Dashboard() {
         <Link href="/discussion/post"> Go to post</Link>
       </p>
       <p>
+        <Link href="/discussion"> Go to Landing Page</Link>
+      </p>
+      <p>
         <Link href="flowPopupDemo"> Go to flow popup demo </Link>
       </p>
       <p>
-        <Link href="/profile"> Go to flow profile page WIP demo </Link>
+        <Link href="/profile"> Go to profile flow </Link>
       </p>
 
       <div className="grid grid-rows-[20px_1fr_20px] items-center min-h-screen">
@@ -44,9 +47,11 @@ export default function Dashboard() {
             </p>
           )}
           <EditBasicInfoModal isOpen={isModalOpen} onClose={handleCloseModal} />
+          {/* <ProfessionalInfoModal isOpen={isModalOpen} onClose={handleCloseModal} /> */}
 
           {/* Render a sample PostCard */}
           <PostCard
+            id="test"
             authorName="Alex Johnson"
             date="April 7, 2025"
             time="11:45 AM"
