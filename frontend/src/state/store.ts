@@ -9,7 +9,7 @@ const initialState: GlobalState = {
     password: "",
     // Basic
     professionalTitle: { value: "", label: "" },
-    professionalTitleOther: '',
+    professionalTitleOther: "",
     country: { value: "", label: "" },
     languages: [],
     membership: "",
