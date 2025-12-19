@@ -51,6 +51,7 @@ export default function Dashboard() {
 
           {/* Render a sample PostCard */}
           <PostCard
+            id="test"
             authorName="Alex Johnson"
             date="April 7, 2025"
             time="11:45 AM"
