@@ -7,7 +7,7 @@ import { useTranslation } from "react-i18next";
 
 import styles from "./Category.module.css";
 
-import { CreateUserRequestBody, signUpUser } from "@/api/users";
+import { CreateUserRequestBody, MembershipType, signUpUser } from "@/api/users";
 import { Button } from "@/components/Button";
 import { onboardingState } from "@/state/stateTypes";
 
@@ -45,12 +45,13 @@ export const Category: React.FC<CategoryProps> = ({ onNext, onBack, onReset, onS
       setError(null);
       onStatusChange("submitting");
 
-      // Normalize membership
-      const membership = state.onboardingForm.membership.toLowerCase().replace(" ", "") as
-        | "student"
-        | "geneticCounselor"
-        | "healthcareProvider"
-        | "associate";
+      // Normalize membership to expected type
+      const membership = {
+        Student: "student",
+        "Healthcare Professional": "healthcareProvider",
+        "Genetic Counselor": "geneticCounselor",
+        "Associate Member": "associate",
+      }[state.onboardingForm.membership] as MembershipType;
 
       // Normalize languages
       const normalizedLanguages = (state.onboardingForm.languages || [])
@@ -70,9 +71,6 @@ export const Category: React.FC<CategoryProps> = ({ onNext, onBack, onReset, onS
         })
         .filter(Boolean) as ("english" | "spanish" | "portuguese" | "other")[];
 
-      console.log("Registering user with data:", state.onboardingForm);
-      console.log("Membership type:", membership);
-
       const userData: CreateUserRequestBody = {
         password: state.onboardingForm.password,
         account: { membership },
@@ -83,13 +81,15 @@ export const Category: React.FC<CategoryProps> = ({ onNext, onBack, onReset, onS
         },
       };
 
-      if (state.onboardingForm.professionalTitle?.value) {
-        userData.professional = {
-          title: state.onboardingForm.professionalTitle.value,
-          country: state.onboardingForm.country?.value,
-          prefLanguages: normalizedLanguages,
-        };
-      }
+      const professionalTitleToUse =
+        state.onboardingForm.professionalTitle?.value === "other"
+          ? state.onboardingForm.professionalTitleOther
+          : state.onboardingForm.professionalTitle?.value;
+      userData.professional = {
+        title: professionalTitleToUse,
+        country: state.onboardingForm.country?.value,
+        prefLanguages: normalizedLanguages,
+      };
 
       if (membership === "student" && state.onboardingForm.schoolName) {
         // Normalize degree

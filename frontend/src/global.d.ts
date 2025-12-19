@@ -12,6 +12,7 @@ declare module "little-state-machine" {
       password: string;
       // Basic
       professionalTitle: ProfessionalTitleOption;
+      professionalTitleOther: string;
       country: CountryOption;
       languages: string[]; // check all we need
       membership: string;

@@ -54,6 +54,7 @@ export default function OnboardingForm() {
       email: "",
       password: "",
       professionalTitle: { value: "", label: "" },
+      professionalTitleOther: "",
       country: { value: "", label: "" },
       languages: [],
     });

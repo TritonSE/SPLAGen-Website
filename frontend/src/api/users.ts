@@ -6,11 +6,13 @@ import type { UserCredential } from "firebase/auth";
 
 import { initFirebase } from "@/firebase/firebase";
 
+export type MembershipType = "student" | "geneticCounselor" | "healthcareProvider" | "associate";
+
 // Define CreateUserRequestBody type based on backend requirements
 export type CreateUserRequestBody = {
   password: string;
   account: {
-    membership: "student" | "geneticCounselor" | "healthcareProvider" | "associate";
+    membership: MembershipType;
   };
   personal: {
     firstName: string;
@@ -47,7 +49,7 @@ export type User = {
   account: {
     inDirectory: boolean | "pending";
     profilePicture?: string;
-    membership: "student" | "geneticCounselor" | "healthcareProvider" | "associate";
+    membership: MembershipType;
   };
   personal: {
     firstName: string;
@@ -219,7 +221,6 @@ export const loginUserWithEmailPassword = async (
 
     return { success: true, data: { token } };
   } catch (error) {
-    console.error("Firebase login error:", error);
     return handleAPIError(error);
   }
 };

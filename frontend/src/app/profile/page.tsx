@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 
 import styles from "./page.module.css";
 
-import { User, getWhoAmI } from "@/api/users";
+import { MembershipType, User, getWhoAmI } from "@/api/users";
 import { Button, EditBasicInfoModal, ProfessionalInfoModal } from "@/components";
 import { PreferredLanguages } from "@/components/PreferredLanguages";
 import { ProfilePicture } from "@/components/ProfilePicture";
@@ -19,9 +19,7 @@ type DisplayComponentProps = {
 const ProfileSection = ({ user, openBasic, openPro }: DisplayComponentProps) => {
   const { t } = useTranslation(); // define the t function at the top of your component
 
-  const formatMembership = (
-    membership: "student" | "geneticCounselor" | "healthcareProvider" | "associate" | undefined,
-  ): string => {
+  const formatMembership = (membership: MembershipType | undefined): string => {
     const membershipMap: Record<string, string> = {
       student: "Student",
       geneticCounselor: "Genetic Counselor",

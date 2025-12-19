@@ -89,8 +89,7 @@ const Login: React.FC = () => {
 
         // Redirect to dashboard on successful login
         window.location.href = "/";
-      } catch (error) {
-        console.error(error);
+      } catch {
         setError("root", {
           message: t("login-no-account"),
         });
