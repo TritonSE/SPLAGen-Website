@@ -1,6 +1,7 @@
 import { NextFunction, Response } from "express";
 import { Types } from "mongoose";
 
+import { getUserNameById } from "../helpers/userHelpers";
 import { AuthenticatedRequest } from "../middleware/auth";
 import discussionPost from "../models/discussionPost";
 import Reply from "../models/reply";
@@ -35,7 +36,7 @@ export const createDiscussion = async (
     const newDiscussion = new discussionPost({ userId, title, message, channel });
     await newDiscussion.save();
 
-    res.status(201).json({ message: "Discussion created successfully", discussion: newDiscussion });
+    res.status(201).json(newDiscussion);
   } catch (error) {
     next(error);
   }
@@ -83,7 +84,7 @@ export const editDiscussion = async (
       return;
     }
 
-    res.status(200).json({ message: "Discussion updated successfully", discussion });
+    res.status(200).json(discussion);
   } catch (error) {
     next(error);
   }
@@ -165,8 +166,19 @@ export const getMultipleDiscussions = async (
   next: NextFunction,
 ) => {
   try {
-    const discussions = await discussionPost.find();
-    res.status(200).json({ discussions });
+    const discussions = await discussionPost.find().sort({ createdAt: -1 });
+
+    const discussionsWithNames = await Promise.all(
+      discussions.map(async (discussion) => {
+        const userName = await getUserNameById(discussion.userId.toString());
+        return {
+          ...discussion.toObject(),
+          userName,
+        };
+      }),
+    );
+
+    res.status(200).json(discussionsWithNames);
   } catch (error) {
     next(error);
   }

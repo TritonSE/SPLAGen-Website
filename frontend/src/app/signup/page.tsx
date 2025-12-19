@@ -1,151 +1,174 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import React, { useCallback } from "react";
-import { useForm } from "react-hook-form";
+import { useStateMachine } from "little-state-machine";
+import { useRouter } from "next/navigation";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { z } from "zod";
 
-import style from "./SignUp.module.css";
+import {
+  Associate,
+  Basics,
+  Category,
+  Questionnaire,
+  Result,
+  SignUp,
+  Student,
+} from "@/components/onboardingForm";
+import { UserContext } from "@/contexts/userContext";
+import { onboardingState } from "@/state/stateTypes";
+import updateOnboardingForm from "@/state/updateOnboardingForm";
 
-const formSchema = (t: (key: string) => string) =>
-  z.object({
-    firstName: z.string().min(1, t("first-name-required")),
-    lastName: z.string().min(1, t("last-name-required")),
-    email: z.string().email(t("invalid-email")),
-    password: z
-      .string()
-      .min(8, t("password-8-characters"))
-      .regex(/[A-Z]/, t("password-1-uppercase"))
-      .regex(/[a-z]/, t("password-1-lowercase"))
-      .regex(/\d/, t("password-1-number"))
-      .regex(/[!@#$%^&*(),.?":{}|<>]/, t("password-1-special")),
-  });
-
-type FormData = z.infer<ReturnType<typeof formSchema>>;
-
-const SignUpPage = () => {
+export default function OnboardingForm() {
+  const [step, setStep] = useState(0);
+  const [registrationStatus, setRegistrationStatus] = useState<
+    "idle" | "submitting" | "success" | "error"
+  >("idle");
+  const { state, actions } = useStateMachine({ actions: { updateOnboardingForm } });
+  const { setOnboardingStep } = useContext(UserContext);
+  const router = useRouter();
   const { t } = useTranslation();
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isValid },
-  } = useForm<FormData>({
-    resolver: zodResolver(formSchema(t)),
-    mode: "onChange",
-  });
 
-  const onSubmit = useCallback((data: FormData) => {
-    console.log("Signed Up!", data);
-    alert("Signed Up!");
-  }, []);
+  const handleNext = useCallback(
+    (data: onboardingState["data"]) => {
+      actions.updateOnboardingForm(data);
 
-  const handleFormSubmit = useCallback(
-    (event: React.FormEvent<HTMLFormElement>) => {
-      event.preventDefault();
-      void handleSubmit(onSubmit)();
+      setStep((prevStep) => {
+        if (prevStep === 3) {
+          return prevStep + 2;
+        } else {
+          return prevStep + 1;
+        }
+      });
     },
-    [handleSubmit, onSubmit],
+    [actions, setStep],
   );
+
+  const handleBack = useCallback(() => {
+    setStep((prev) => Math.max(0, prev - 1));
+  }, [setStep]);
+
+  const handleReset = useCallback(() => {
+    actions.updateOnboardingForm({
+      firstName: "",
+      lastName: "",
+      email: "",
+      password: "",
+      professionalTitle: { value: "", label: "" },
+      professionalTitleOther: "",
+      country: { value: "", label: "" },
+      languages: [],
+    });
+    setStep(0);
+  }, [actions, setStep]);
+
+  // Update the onboarding Progress stepper
+  useEffect(() => {
+    if (step === 0) {
+      setOnboardingStep(0);
+    } else if (step === 1) {
+      setOnboardingStep(1);
+    } else if (step === 2) {
+      setOnboardingStep(2);
+    }
+  }, [step, setOnboardingStep]);
+
+  // Special flow handlers for Student and Associate Member paths
+  const handleStudentFlow = useCallback(() => {
+    setStep(2.1); // Use decimal to represent the student sub-step
+  }, [setStep]);
+
+  const handleAssociateFlow = useCallback(() => {
+    setStep(2.2);
+  }, [setStep]);
+
+  const continueFromIntermediateStep = useCallback(() => {
+    setStep(3); // Go to Step3A after either intermediate step
+  }, [setStep]);
+
+  // Handle registration status changes
+  const handleRegistrationStatusChange = useCallback(
+    (status: "idle" | "submitting" | "success" | "error") => {
+      setRegistrationStatus(status);
+
+      // If registration is successful, redirect after a short delay
+      if (status === "success") {
+        setTimeout(() => {
+          router.push("/login?registered=true");
+        }, 2000);
+      }
+    },
+    [router, setRegistrationStatus],
+  );
+
+  // Show feedback message for registration
+  const renderRegistrationMessage = () => {
+    if (registrationStatus === "submitting") {
+      return (
+        <div className="absolute inset-0 bg-white bg-opacity-90 flex items-center justify-center z-10">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto mb-4"></div>
+            <p className="text-xl font-medium">{t("processing-registration")}</p>
+          </div>
+        </div>
+      );
+    }
+    return null;
+  };
 
   return (
-    <div className={style.signup}>
-      <div>
-        <h1 className={` text-2xl font-bold text-left text-primary mb-2 ${style.signupTitle}`}>
-          {t("get-started")}
-        </h1>
-        <p className={`text-left text-gray-600 mb-6  ${style.signupWelcome}`}>
-          {t("welcome-to-splagen")}
-        </p>
-        <form onSubmit={handleFormSubmit} className="w-full">
-          <div className={style.signupNames}>
-            {/* First Name Input */}
-            <div className="">
-              <label className="block text-sm font-medium mb-1 text-black" htmlFor="firstName">
-                {t("first-name")}
-              </label>
-              <input
-                {...register("firstName")}
-                className="p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 placeholder-disabled"
-                placeholder={t("enter-first-name")}
-                id="firstName"
-              />
-              <p className="text-red-500 text-xs mt-1">
-                {errors.firstName ? errors.firstName.message : "\u00A0"}
-              </p>
-            </div>
+    <div className="relative w-full h-full">
+      {renderRegistrationMessage()}
 
-            {/* Last Name Input */}
-            <div className="">
-              <label className="block text-sm font-medium mb-1 text-black" htmlFor="lastName">
-                {t("last-name")}
-              </label>
-              <input
-                {...register("lastName")}
-                className="p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 placeholder-disabled"
-                placeholder={t("enter-last-name")}
-                id="lastName"
-              />
+      {step === 0 && <SignUp onNext={handleNext} />}
+      {step === 1 && <Basics onBack={handleBack} onNext={handleNext} />}
 
-              <p className="text-red-500 text-xs mt-1">
-                {errors.lastName ? errors.lastName.message : "\u00A0"}
-              </p>
-            </div>
-          </div>
+      {step === 2 && (
+        <Questionnaire
+          onNext={handleNext}
+          onBack={handleBack}
+          onStudentFlow={handleStudentFlow}
+          onAssociateFlow={handleAssociateFlow}
+        />
+      )}
 
-          {/* Email Input */}
-          <div>
-            <label className="block text-sm font-medium mb-1 text-black" htmlFor="email">
-              {t("enter-email")}
-            </label>
-            <input
-              type="email"
-              {...register("email")}
-              className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 placeholder-disabled"
-              placeholder={t("enter-email")}
-              autoComplete="email"
-              id="email"
-            />
-            <p className="text-red-500 text-xs mt-1">
-              {errors.email ? errors.email.message : "\u00A0"}
-            </p>
-          </div>
+      {step === 2.1 && (
+        <Student
+          onNext={continueFromIntermediateStep}
+          onBack={() => {
+            setStep(2);
+          }}
+        />
+      )}
 
-          {/* Create a Password */}
-          <div className="mb-4 w-full">
-            <label className="block text-sm font-medium mb-1 text-black" htmlFor="password">
-              {t("create-password")}
-            </label>
-            <input
-              type="password"
-              {...register("password")}
-              className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 placeholder-disabled"
-              placeholder={t("create-password")}
-              id="password"
-            />
+      {step === 2.2 && (
+        <Associate
+          onNext={continueFromIntermediateStep}
+          onBack={() => {
+            setStep(2);
+          }}
+        />
+      )}
 
-            <p className="text-red-500 text-xs mt-1">
-              {errors.password ? errors.password.message : "\u00A0"}
-            </p>
-          </div>
+      {step === 3 && (
+        <Category
+          onNext={handleNext}
+          onBack={() => {
+            // If we're coming from an intermediate step, go back to Step2
+            const membership = state.onboardingForm.membership;
+            if (membership === "Student") {
+              setStep(2.1);
+            } else if (membership === "Associate Member") {
+              setStep(2.2);
+            } else {
+              setStep(2);
+            }
+          }}
+          onReset={handleReset}
+          onStatusChange={handleRegistrationStatusChange}
+        />
+      )}
 
-          <div className="flex justify-end w-full">
-            <button
-              type="submit"
-              disabled={!isValid}
-              className={`w-30 py-2 px-4 rounded-lg font-bold text-white mt-4 hover:bg-[#BCBCCF] ${
-                isValid
-                  ? "bg-primary hover:bg-primary-dark"
-                  : "bg-disabled cursor-not-allowed pointer-events-none"
-              }`}
-            >
-              {t("continue")}
-            </button>
-          </div>
-        </form>
-      </div>
+      {step === 5 && <Result onReset={handleReset} />}
     </div>
   );
-};
-
-export default SignUpPage;
+}

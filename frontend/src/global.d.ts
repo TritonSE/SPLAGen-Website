@@ -5,7 +5,14 @@ declare module "little-state-machine" {
   // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
   interface GlobalState {
     onboardingForm: {
+      // Signup
+      firstName: string;
+      lastName: string;
+      email: string;
+      password: string;
+      // Basic
       professionalTitle: ProfessionalTitleOption;
+      professionalTitleOther: string;
       country: CountryOption;
       languages: string[]; // check all we need
       membership: string;
@@ -23,7 +30,22 @@ declare module "little-state-machine" {
       graduationDate: string;
     };
     directoryForm: {
-      field: string;
+      educationType: string;
+      educationInstitution: string;
+      workClinic: string;
+      clinicWebsite: string;
+      clinicCountry: CountryOption;
+      addressLine1: string;
+      addressLine2: string;
+      city: string;
+      state: string;
+      postcode: string;
+      canMakeAppointments: boolean;
+      canRequestTests: boolean;
+      offersTelehealth: boolean;
+      specialtyServices: string[];
+      careLanguages: string[];
+      authorizedForLanguages: boolean | string;
     };
   }
 }
