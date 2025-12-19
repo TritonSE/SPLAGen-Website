@@ -1,29 +1,18 @@
 /* Page container */
 .createPostPageContainer {
+  padding: 2rem;
+  max-width: 100%;
+  margin: 0 auto;
   display: flex;
-  width: 100%;
+  flex-direction: column;
+  gap: 2rem;
   height: 100%;
-  justify-content: center;
-  align-items: center;
-  overflow-y: auto;
-  scrollbar-width: thin;
-  flex-direction: column;
-  -ms-overflow-style: none;
-}
-
-.titleBackDiv {
-  width: 100%;
-  max-width: 800px;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  margin-bottom: 2rem;
 }
 
 /* Post container */
 .postPageDiv {
   width: 100%;
-  max-width: 800px;
+  max-width: 1200px;
   height: clamp(350px, auto, 427px);
   display: flex;
   flex-direction: column;
@@ -49,15 +38,19 @@
 
 .inputField {
   width: 100%;
-  padding: 5px;
+  padding: 8px 16px;
   border: 1px solid #ccc;
   border-radius: 5px;
   font-size: 1rem;
 }
 
+.inputField::placeholder {
+  font-size: 1rem;
+}
+
 .textAreaField {
   width: 100%;
-  padding: 5px;
+  padding: 8px 16px;
   border: 1px solid #ccc;
   border-radius: 5px;
   font-size: 1rem;
@@ -67,15 +60,19 @@
 
 .title {
   color: var(--color-primary2);
-  font-size: 1.5rem;
+  font-size: 2rem;
   font-weight: bold;
   font-family: "DM-sans";
 }
 
+.fieldLabel {
+  font-size: 1.5rem;
+}
+
 .pageTitle {
   color: var(--color-primary2);
-  font-size: 1.3rem;
-  font-weight: normal;
+  font-size: 1.25rem;
+  font-weight: 600;
   font-family: "DM-sans";
 }
 /* Button container */

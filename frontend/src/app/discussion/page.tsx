@@ -1,13 +1,15 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import styles from "./landingPage.module.css";
 
 import { Discussion, getPost } from "@/api/discussion";
 import { PostCard } from "@/components/PostCard";
+import { UserContext } from "@/contexts/userContext";
 type Post = {
   id: string;
   title: string;
@@ -27,6 +29,8 @@ export default function LandingPage() {
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState("");
 
+  const { firebaseUser } = useContext(UserContext);
+
   const mapDiscussionToPost = (discussion: Discussion): Post => ({
     id: discussion._id,
     title: discussion.title,
@@ -37,11 +41,10 @@ export default function LandingPage() {
     time: discussion.time,
   });
 
-  // pass through string only instead
-  const firebaseToken = "dummy-token";
-
   useEffect(() => {
+    if (!firebaseUser) return;
     const fetchPosts = async () => {
+      const firebaseToken = await firebaseUser.getIdToken();
       const result = await getPost(firebaseToken);
 
       if (result.success) {
@@ -54,7 +57,7 @@ export default function LandingPage() {
       setLoading(false);
     };
     void fetchPosts();
-  }, []);
+  }, [firebaseUser]);
 
   // const onSubmit: SubmitHandler<SearchFormInputs> = (data) => {
   //   const searchQuery = data.query?.toLowerCase() ?? "";
@@ -217,7 +220,8 @@ export default function LandingPage() {
         </div>
 
         <Link href="/discussion/post" className={styles.newPostButton}>
-          {t("Create Discussion +")}
+          {t("create-discussion")}
+          <Image src="/icons/plus.svg" alt="Plus icon" width={24} height={24} />
         </Link>
       </div>
       <div className={styles.scrollContainer}>
@@ -234,6 +238,7 @@ export default function LandingPage() {
                 .map((post) => (
                   <div key={post.id} className={styles.postWrapper}>
                     <PostCard
+                      id={post.id}
                       authorName={post.author}
                       date={post.date}
                       time={post.time}
@@ -255,6 +260,7 @@ export default function LandingPage() {
               .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
               .map((post) => (
                 <PostCard
+                  id={post.id}
                   key={post.id}
                   authorName={post.author}
                   date={post.date}
@@ -275,6 +281,7 @@ export default function LandingPage() {
               .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
               .map((post) => (
                 <PostCard
+                  id={post.id}
                   key={post.id}
                   authorName={post.author}
                   date={post.date}

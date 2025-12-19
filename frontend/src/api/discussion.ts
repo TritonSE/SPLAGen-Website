@@ -36,35 +36,14 @@ export const createPost = async (
 
 export const getPost = async (token: string): Promise<APIResult<Discussion[]>> => {
   try {
-    const response: Response = await get("/api/discussions", {
-      Authorization: `Bearer ${token}`,
-    });
+    const response: Response = await get("/api/discussions", createAuthHeader(token));
 
     if (!response.ok) {
       return handleAPIError("Failed to fetch posts");
     }
 
-    const json: unknown = await response.json();
-
-    if (typeof window !== "undefined") {
-      console.info("Fetched posts JSON:", json);
-    }
-
-    if (Array.isArray(json)) {
-      return { success: true, data: json as Discussion[] };
-    } else if (
-      typeof json === "object" &&
-      json !== null &&
-      "posts" in json &&
-      Array.isArray((json as { posts: unknown }).posts)
-    ) {
-      return {
-        success: true,
-        data: (json as { posts: Discussion[] }).posts,
-      };
-    } else {
-      return handleAPIError("Unexpected response format from API.");
-    }
+    const json = (await response.json()) as Discussion[];
+    return { success: true, data: json };
   } catch (error) {
     return handleAPIError(error);
   }

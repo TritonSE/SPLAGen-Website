@@ -7,6 +7,7 @@ import styles from "./PostCard.module.css";
 import { ProfilePicture } from "@/components/ProfilePicture";
 
 type PostCard = {
+  id: string;
   profileImage?: string;
   authorName: string;
   date: string;
@@ -18,6 +19,7 @@ type PostCard = {
 };
 
 export const PostCard: React.FC<PostCard> = ({
+  id,
   authorName,
   date,
   time,
@@ -27,25 +29,27 @@ export const PostCard: React.FC<PostCard> = ({
   onClick,
 }) => {
   return (
-    <div className={styles["postcard-container"]} onClick={onClick}>
-      <div className={styles["postcard-left"]}>
-        <ProfilePicture size="small" letter={authorName?.[0] ?? "?"} />
-        <div className={styles["postcard-author-info"]}>
-          <div className={styles["postcard-author-name"]}>{authorName}</div>
-          <div className={styles["postcard-timestamp"]}>
-            {new Date(date).toISOString().slice(0, 10)}
-            {time ? `, ${time}` : ""}
+    <a href={`/discussion/${id}`}>
+      <div className={styles["postcard-container"]} onClick={onClick}>
+        <div className={styles["postcard-left"]}>
+          <ProfilePicture size="small" letter={authorName?.[0] ?? "?"} />
+          <div className={styles["postcard-author-info"]}>
+            <div className={styles["postcard-author-name"]}>{authorName}</div>
+            <div className={styles["postcard-timestamp"]}>
+              {new Date(date).toISOString().slice(0, 10)}
+              {time ? `, ${time}` : ""}
+            </div>
           </div>
         </div>
-      </div>
 
-      <div className={styles["postcard-divider"]} />
+        <div className={styles["postcard-divider"]} />
 
-      <div className={styles["postcard-right"]}>
-        <div className={styles["postcard-title"]}>{title}</div>
-        {audience && <div className={styles["postcard-audience"]}>{audience}</div>}
-        <div className={styles["postcard-message"]}>{message}</div>
+        <div className={styles["postcard-right"]}>
+          <div className={styles["postcard-title"]}>{title}</div>
+          {audience && <div className={styles["postcard-audience"]}>{audience}</div>}
+          <div className={styles["postcard-message"]}>{message}</div>
+        </div>
       </div>
-    </div>
+    </a>
   );
 };
