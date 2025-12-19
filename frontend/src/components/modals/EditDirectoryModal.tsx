@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
-import React, { useCallback, useEffect, useMemo } from "react";
+import React, { useCallback, useContext, useEffect, useMemo } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { isValidPhoneNumber } from "react-phone-number-input";
@@ -21,14 +21,13 @@ import "./ProfessionalInfoModal.css";
 import { User, editDirectoryDisplayInfoRequest } from "@/api/users";
 import { PhoneInput, PillButton } from "@/components";
 import { Radio } from "@/components/Radio";
+import { UserContext } from "@/contexts/userContext";
 
 type ModalProps = {
   isOpen: boolean;
   onClose: () => void;
   populationInfo: User;
 };
-
-const firebaseToken = "temp_firebase_token";
 
 const ExitButtonSrc: string = ExitButton as unknown as string;
 
@@ -61,15 +60,16 @@ export const EditDirectoryModal = ({ isOpen, onClose, populationInfo }: ModalPro
   } = useForm<DisplayInfoModalType>({
     resolver: zodResolver(DisplayInfoSchema(t)),
     defaultValues: {
-      workEmail: populationInfo.display.workEmail,
-      workPhone: populationInfo.display.workPhone,
-      services: populationInfo.display.services,
-      languages: populationInfo.display.languages,
-      license: populationInfo.display.license?.[0] ?? "",
-      remoteOption: populationInfo.display.options.remote,
-      requestOption: populationInfo.display.options.openToRequests,
+      workEmail: populationInfo.display?.workEmail,
+      workPhone: populationInfo.display?.workPhone,
+      services: populationInfo.display?.services,
+      languages: populationInfo.display?.languages,
+      license: populationInfo.display?.license?.[0] ?? "",
+      remoteOption: populationInfo.display?.options?.remote,
+      requestOption: populationInfo.display?.options?.openToRequests,
     },
   });
+  const { firebaseUser } = useContext(UserContext);
 
   // Keeps track of which languages are pressed
   const watchedLanguages = watch("languages");
@@ -114,6 +114,7 @@ export const EditDirectoryModal = ({ isOpen, onClose, populationInfo }: ModalPro
   // Sends form data to backend
   const onSubmit = useCallback<SubmitHandler<DisplayInfoModalType>>(
     async (data) => {
+      if (!firebaseUser) return;
       // backend expects to have 'new' in the beginning of keys
       const formattedData = {
         newWorkEmail: data.workEmail,
@@ -125,25 +126,26 @@ export const EditDirectoryModal = ({ isOpen, onClose, populationInfo }: ModalPro
         newRequestOption: data.requestOption,
       };
 
+      const firebaseToken = await firebaseUser.getIdToken();
       const response = await editDirectoryDisplayInfoRequest(formattedData, firebaseToken);
       if (response.success) {
         onClose();
       }
     },
-    [onClose],
+    [onClose, firebaseUser],
   );
 
   // Populates form inputs when modal is opened
   useEffect(() => {
     if (isOpen && populationInfo) {
       reset({
-        workEmail: populationInfo.display.workEmail,
-        workPhone: populationInfo.display.workPhone,
-        services: populationInfo.display.services,
-        languages: populationInfo.display.languages,
-        license: populationInfo.display.license?.[0] ?? "",
-        remoteOption: populationInfo.display.options.remote,
-        requestOption: populationInfo.display.options.openToRequests,
+        workEmail: populationInfo.display?.workEmail,
+        workPhone: populationInfo.display?.workPhone,
+        services: populationInfo.display?.services,
+        languages: populationInfo.display?.languages,
+        license: populationInfo.display?.license?.[0] ?? "",
+        remoteOption: populationInfo.display?.options?.remote,
+        requestOption: populationInfo.display?.options?.openToRequests,
       });
     }
   }, [isOpen, populationInfo, reset]);

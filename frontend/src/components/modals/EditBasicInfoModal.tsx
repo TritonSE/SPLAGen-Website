@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useContext, useEffect } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { isValidPhoneNumber } from "react-phone-number-input";
@@ -11,9 +11,9 @@ import { z } from "zod";
 import ExitButton from "@/../public/icons/ExitButton.svg";
 import "./EditBasicInfoModal.css";
 import { EditBasicInfo, editBasicInfoRequest, getWhoAmI } from "@/api/users";
+import { UserContext } from "@/contexts/userContext";
 
 const ExitButtonSrc: string = ExitButton as unknown as string;
-const firebaseToken = "temp_firebase_token";
 
 type FormData = {
   firstName: string;
@@ -57,16 +57,13 @@ export const EditBasicInfoModal = ({
     resolver: zodResolver(schema(t)),
   });
 
-  // const { firebaseUser } = useContext(UserContext);
+  const { firebaseUser } = useContext(UserContext);
   // const { user, reloadUser } = useContext(UserContext);
 
   const onSubmit = useCallback<SubmitHandler<FormData>>(
     async (data) => {
-      // const firebaseToken = await firebaseUser?.getIdToken();
-      // if (!firebaseToken || editingItemId === null) {
-      //  //TODO Error handling?
-      //   return;
-      // }
+      if (!firebaseUser) return;
+      const firebaseToken = await firebaseUser.getIdToken();
 
       const newData: EditBasicInfo = {
         newFirstName: data.firstName,
@@ -82,10 +79,12 @@ export const EditBasicInfoModal = ({
       }
       //TODO: else error handling? PAP's notifications?
     },
-    [onClose],
+    [onClose, firebaseUser],
   );
 
   const fetchUserData = useCallback(async () => {
+    if (!firebaseUser) return;
+    const firebaseToken = await firebaseUser.getIdToken();
     const res = await getWhoAmI(firebaseToken);
     if (res.success) {
       if (res.data) {
@@ -99,13 +98,13 @@ export const EditBasicInfoModal = ({
         });
       }
     }
-  }, [reset]);
+  }, [reset, firebaseUser]);
 
   useEffect(() => {
     fetchUserData().catch((err: unknown) => {
       console.error("Error in fetchData:", err);
     });
-  }, [fetchUserData]);
+  }, [fetchUserData, firebaseUser]);
 
   const handleFormSubmit = useCallback(
     (e: React.FormEvent<HTMLFormElement>) => {

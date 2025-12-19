@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import styles from "./page.module.css";
@@ -10,6 +10,7 @@ import { Button, EditBasicInfoModal, ProfessionalInfoModal } from "@/components"
 import { PreferredLanguages } from "@/components/PreferredLanguages";
 import { ProfilePicture } from "@/components/ProfilePicture";
 import { EditDirectoryModal } from "@/components/modals/EditDirectoryModal";
+import { UserContext } from "@/contexts/userContext";
 
 type DisplayComponentProps = {
   user: User | null;
@@ -171,13 +172,17 @@ const ProfilePage: React.FC = () => {
   const [formState, setFormState] = useState<"Profile" | "Directory">("Profile");
   let DisplayComponent = formState === "Profile" ? ProfileSection : DirectorySection;
 
+  const { firebaseUser } = useContext(UserContext);
+
   // Fetch User data with frontend api call
   const fetchUserData = useCallback(async () => {
-    const res = await getWhoAmI("temp_firebase_token");
+    if (!firebaseUser) return;
+    const firebaseToken = await firebaseUser.getIdToken();
+    const res = await getWhoAmI(firebaseToken);
     if (res.success) {
       setUserData(res.data);
     }
-  }, [setUserData]);
+  }, [setUserData, firebaseUser]);
 
   // Use effect fetches user data
   useEffect(() => {

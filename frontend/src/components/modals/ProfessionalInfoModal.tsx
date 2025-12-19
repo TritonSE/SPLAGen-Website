@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import dynamic from "next/dynamic";
 import Image from "next/image";
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useContext, useEffect } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import countryList from "react-select-country-list";
@@ -13,6 +13,7 @@ import ExitButton from "@/../public/icons/ExitButton.svg";
 import "./ProfessionalInfoModal.css";
 import { User, editProfessionalInfoRequest } from "@/api/users";
 import { PillButton } from "@/components";
+import { UserContext } from "@/contexts/userContext";
 
 type professionalInfoProps = {
   isOpen: boolean;
@@ -21,7 +22,6 @@ type professionalInfoProps = {
 };
 const CountryOptions = countryList().getData();
 
-const firebaseToken = "temp_firebase_token";
 const languages = ["english", "spanish", "portuguese", "other"];
 
 // Lazy load CountrySelector component to avoid hydration error
@@ -77,6 +77,7 @@ export const ProfessionalInfoModal = ({
       splagenDirectory: populationInfo?.account.inDirectory === true,
     },
   });
+  const { firebaseUser } = useContext(UserContext);
 
   const watchedLanguages = watch("languages");
   const selectedLanguages = React.useMemo(
@@ -109,6 +110,7 @@ export const ProfessionalInfoModal = ({
   // Sends form data to backend
   const onSubmit = useCallback<SubmitHandler<ProfessionalInfoFormData>>(
     async (data) => {
+      if (!firebaseUser) return;
       // backend expectsto have 'new' in the beginning of keys
       const formattedData = {
         newTitle: data.professionalTitle,
@@ -117,12 +119,13 @@ export const ProfessionalInfoModal = ({
         newCountry: data.country?.label ?? "",
       };
 
+      const firebaseToken = await firebaseUser.getIdToken();
       const response = await editProfessionalInfoRequest(formattedData, firebaseToken);
       if (response.success) {
         onClose();
       }
     },
-    [onClose],
+    [onClose, firebaseUser],
   );
 
   // Populates form inputs when modal is opened
