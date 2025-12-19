@@ -43,6 +43,12 @@ const initialState: GlobalState = {
     specialtyServices: [],
     careLanguages: [],
     authorizedForLanguages: false,
+    email: "",
+    phone: "",
+    licenseType: "no_license",
+    licenseNumber: "",
+    noLicenseReason: "",
+    additionalComments: "",
   },
 };
 

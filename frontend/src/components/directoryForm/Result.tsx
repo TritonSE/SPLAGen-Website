@@ -14,6 +14,8 @@ export const Result = ({ onReset }: ResultProps) => {
   return (
     <div>
       <h2 className="text-xl font-bold">Form Submission Result</h2>
+
+      {/* Basic Information */}
       <p>
         <strong>educationType:</strong> {state.directoryForm.educationType}
       </p>
@@ -44,6 +46,8 @@ export const Result = ({ onReset }: ResultProps) => {
       <p>
         <strong>postcode:</strong> {state.directoryForm.postcode}
       </p>
+
+      {/* Services Information */}
       <p>
         <strong>appointments:</strong> {String(state.directoryForm.canMakeAppointments)}
       </p>
@@ -61,6 +65,26 @@ export const Result = ({ onReset }: ResultProps) => {
       </p>
       <p>
         <strong>authorizedLanguages:</strong> {String(state.directoryForm.authorizedForLanguages)}
+      </p>
+
+      {/* Contact Information */}
+      <p>
+        <strong>email:</strong> {state.directoryForm.email}
+      </p>
+      <p>
+        <strong>phone:</strong> {state.directoryForm.phone}
+      </p>
+      <p>
+        <strong>licenseType:</strong> {state.directoryForm.licenseType}
+      </p>
+      <p>
+        <strong>licenseNumber:</strong> {state.directoryForm.licenseNumber}
+      </p>
+      <p>
+        <strong>noLicenseReason:</strong> {state.directoryForm.noLicenseReason}
+      </p>
+      <p>
+        <strong>additionalComments:</strong> {state.directoryForm.additionalComments}
       </p>
 
       <button onClick={onReset}>Back</button>
