@@ -27,6 +27,9 @@ export default function Dashboard() {
         <Link href="/discussion/post"> Go to post</Link>
       </p>
       <p>
+        <Link href="/discussion"> Go to Landing Page</Link>
+      </p>
+      <p>
         <Link href="flowPopupDemo"> Go to flow popup demo </Link>
       </p>
       <p>
@@ -48,6 +51,7 @@ export default function Dashboard() {
 
           {/* Render a sample PostCard */}
           <PostCard
+            id="test"
             authorName="Alex Johnson"
             date="April 7, 2025"
             time="11:45 AM"

@@ -35,7 +35,7 @@ void mongoose
   });
 
 const app: Express = express();
-const port = process.env.PORT ?? 3001;
+const port = process.env.PORT ?? "3001";
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -85,6 +85,5 @@ app.use((error: unknown, req: Request, res: Response, next: NextFunction) => {
 
 // Start the server
 app.listen(port, () => {
-  //eslint-disable-next-line @typescript-eslint/restrict-template-expressions
   console.log(`[server]: Server is running at http://localhost:${port}`);
 });
