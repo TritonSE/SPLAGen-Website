@@ -77,10 +77,10 @@ export const requireSignedIn = async (
     // Verify the Firebase ID token
     const decodedToken = await verifyFirebaseToken(token);
 
-    if (decodedToken.email === undefined || !decodedToken.email_verified) {
-      res.status(403).json({ error: "Please verify your email first!" });
-      return;
-    }
+    // if (decodedToken.email === undefined || !decodedToken.email_verified) {
+    //   res.status(403).json({ error: "Please verify your email first!" });
+    //   return;
+    // }
 
     // Fetch the user from MongoDB using the firebaseUid
     const user = await UserModel.findOne({ firebaseId: decodedToken.uid });
@@ -135,7 +135,7 @@ export const requireSuperAdmin = async (
     const { firebaseUid } = req;
     const user = await UserModel.findOne({ firebaseId: firebaseUid });
 
-    if (!user || user.role !== UserRole.SUPERADMIN) {
+    if (!user || (user.role as UserRole) !== UserRole.SUPERADMIN) {
       res.status(DEFAULT_ERROR).send("User is not a super admin");
       return;
     }

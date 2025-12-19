@@ -9,6 +9,7 @@ export type onboardingState = {
     password: string;
     // Basic
     professionalTitle: ProfessionalTitleOption;
+    professionalTitleOther: string;
     country: CountryOption;
     languages: string[];
     membership: string;
