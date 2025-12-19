@@ -26,6 +26,7 @@ void mongoose
     console.log("Connected to Database.");
   })
   .catch((error: unknown) => {
+    console.log("DB connectivity error");
     if (error instanceof Error) {
       console.log(error.message);
     } else {

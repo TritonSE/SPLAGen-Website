@@ -27,9 +27,10 @@ const ProfessionalTitleSelector = dynamic(
 
 type BasicsProps = {
   onNext: (data: onboardingState["data"]) => void;
+  onBack: () => void;
 };
 
-export const Basics = ({ onNext }: BasicsProps) => {
+export const Basics = ({ onNext, onBack }: BasicsProps) => {
   const { state, actions } = useStateMachine({ actions: { updateOnboardingForm } });
 
   const [selectedCountry, setSelectedCountry] = useState<CountryOption | null>(null);
@@ -37,7 +38,7 @@ export const Basics = ({ onNext }: BasicsProps) => {
   const [selectedProfessionalTitle, setSelectedProfessionalTitle] =
     useState<ProfessionalTitleOption | null>(null);
 
-  const { handleSubmit, control } = useForm<onboardingState["data"]>({
+  const { register, handleSubmit, control } = useForm<onboardingState["data"]>({
     defaultValues: state.onboardingForm,
   });
 
@@ -89,6 +90,24 @@ export const Basics = ({ onNext }: BasicsProps) => {
             )}
           />
         </div>
+
+        {selectedProfessionalTitle?.value === "other" && (
+          <div>
+            <label className={styles.label}>Please Specify</label>
+            <Controller
+              name="professionalTitleOther"
+              control={control}
+              defaultValue={state.onboardingForm?.professionalTitleOther || ""}
+              render={() => (
+                <input
+                  {...register("professionalTitleOther")}
+                  className={styles.input}
+                  placeholder="Please specify"
+                />
+              )}
+            />
+          </div>
+        )}
 
         <div>
           <label className={styles.label}>
@@ -150,6 +169,12 @@ export const Basics = ({ onNext }: BasicsProps) => {
             review the different types below by clicking on the &quot;+&quot; icon.
           </p>
 
+          <h4 className={styles.membershipLabel}>Genetic Counselor</h4>
+          <ExpandableSection
+            title="Genetic Counselor Membership"
+            content="Full membership should be extended to any individual who holds a master's degree from an accredited genetic counseling training program. Full members can attend all meetings open to members, vote, serve as officers, committee chairs and on the Board of Directors."
+          />
+
           <h4 className={styles.membershipLabel}>Healthcare Provider</h4>
           <ExpandableSection
             title="Healthcare Provider Membership"
@@ -162,12 +187,6 @@ export const Basics = ({ onNext }: BasicsProps) => {
             content="Associate membership will be granted to all applicants interested in supporting the mission of Splagen and who are not eligible for full or student membership. Interested individuals can submit an application and, upon approval by officials, associated membership can be granted or denied. Associate members have all the privileges of full members, but are not eligible for a position on the Board of Directors and can only vote, hold positions as committee chairs and leadership positions related to their specialty and professional background."
           />
 
-          <h4 className={styles.membershipLabel}>Genetic Counselor</h4>
-          <ExpandableSection
-            title="Genetic Counselor Membership"
-            content="Full membership should be extended to any individual who holds a master's degree from an accredited genetic counseling training program. Full members can attend all meetings open to members, vote, serve as officers, committee chairs and on the Board of Directors."
-          />
-
           <h4 className={styles.membershipLabel}>Student</h4>
           <ExpandableSection
             title="Student Membership"
@@ -176,7 +195,7 @@ export const Basics = ({ onNext }: BasicsProps) => {
         </div>
 
         <div className={styles.buttonContainer}>
-          <button type="button" className={styles.backButton}>
+          <button type="button" onClick={onBack} className={styles.backButton}>
             <Image src="/icons/ic_caretleft.svg" alt="Back Icon" width={24} height={24} />
             Back
           </button>

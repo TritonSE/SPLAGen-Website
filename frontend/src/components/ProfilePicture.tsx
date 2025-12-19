@@ -11,6 +11,7 @@ type ProfilePictureProps = {
   letter?: string;
 };
 
+//TODO: conditionally render the profile picture if there is a profile picture
 export const ProfilePicture: React.FC<ProfilePictureProps> = ({ size = "small", letter }) => {
   const { user } = useContext(UserContext);
 

@@ -17,7 +17,7 @@ jobs:
         npm ci
         npm run lint-check
   frontend:
-    name: Frontend lint and style check
+    name: Frontend lint and style and build check
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -26,3 +26,8 @@ jobs:
       run: |
         npm ci
         npm run lint-check
+        npm install --include=optional sharp
+        npm run build
+      env:
+          NEXT_PUBLIC_BACKEND_URL: ${{ secrets.NEXT_PUBLIC_BACKEND_URL }}
+          NEXT_PUBLIC_FIREBASE_SETTINGS: ${{ secrets.NEXT_PUBLIC_FIREBASE_SETTINGS }}

@@ -18,37 +18,52 @@ const router = express.Router();
 router.get("/whoami", requireSignedIn, UserController.getWhoAmI);
 router.post("/", UserValidator.createUser, UserController.createUser);
 router.delete(
-  "/:id",
+  "/:firebaseId",
   requireSignedIn,
   requireAdminOrSuperAdmin,
   UserValidator.deleteUser,
   UserController.deleteUser,
 );
 router.get("/", requireSignedIn, UserController.getAllUsers);
-router.get("/:id", requireSignedIn, UserValidator.getUser, UserController.getUser);
+router.get("/:firebaseId", requireSignedIn, UserValidator.getUser, UserController.getUser);
 
-router.get("/personal-information", requireSignedIn, UserController.getPersonalInformation);
-router.post("/personal-information", requireSignedIn, UserController.editPersonalInformation);
-
-router.get("/professional-information", requireSignedIn, UserController.getProfessionalInformation);
-router.post(
-  "/professional-information",
+// Personal information routes
+router.get("/general/personal-information", requireSignedIn, UserController.getPersonalInformation);
+router.put(
+  "/general/personal-information",
   requireSignedIn,
+  UserValidator.editPersonalInformation,
+  UserController.editPersonalInformation,
+);
+
+// Professional information routes
+router.put(
+  "/general/professional-information",
+  requireSignedIn,
+  UserValidator.editProfessionalInformation,
   UserController.editProfessionalInformation,
 );
 
+// Directory personal information routes
 router.get(
   "/directory/personal-information",
   requireSignedIn,
   UserController.getDirectoryPersonalInformation,
 );
-router.post(
+router.put(
   "/directory/personal-information",
   requireSignedIn,
+  UserValidator.editDirectoryPersonalInformation,
   UserController.editDirectoryPersonalInformation,
 );
 
+// Directory display info routes
 router.get("/directory/display-info", requireSignedIn, UserController.getDirectoryDisplayInfo);
-router.post("/directory/display-info", requireSignedIn, UserController.editDirectoryDisplayInfo);
+router.put(
+  "/directory/display-info",
+  requireSignedIn,
+  UserValidator.editDirectoryDisplayInfo,
+  UserController.editDirectoryDisplayInfo,
+);
 
 export default router;

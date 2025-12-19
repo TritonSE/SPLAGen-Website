@@ -1,0 +1,141 @@
+/* Page container */
+.createPostPageContainer {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  justify-content: center;
+  align-items: center;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  flex-direction: column;
+  -ms-overflow-style: none;
+}
+
+.titleBackDiv {
+  width: 100%;
+  max-width: 800px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+}
+
+/* Post container */
+.postPageDiv {
+  width: 100%;
+  max-width: 800px;
+  height: clamp(350px, auto, 427px);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+/* Form elements */
+.createPostForm {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.inputField {
+  width: 100%;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1rem;
+}
+
+.textAreaField {
+  width: 100%;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1rem;
+  resize: vertical;
+  min-height: 150px;
+}
+
+.title {
+  color: var(--color-primary2);
+  font-size: 1.5rem;
+  font-weight: bold;
+  font-family: "DM-sans";
+}
+
+.pageTitle {
+  color: var(--color-primary2);
+  font-size: 1.3rem;
+  font-weight: normal;
+  font-family: "DM-sans";
+}
+/* Button container */
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+/* Post button styling */
+.buttonPost {
+  padding: 0.15rem 1rem;
+  align-items: center;
+  border: 1px solid var(--color-primary2);
+  background-color: var(--color-primary2);
+  color: white;
+  font-size: 1rem;
+  border-radius: 10px;
+  cursor: pointer;
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease;
+}
+
+.buttonPost:hover {
+  background-color: var(--color-active);
+  border-color: var(--color-active);
+}
+
+/* Cancel button styling */
+.buttonCancel {
+  padding: 0.15rem 1rem;
+  border: 1px solid var(--color-grey3);
+  background-color: var(--color-surface);
+  color: var(--color-grey4);
+  font-size: 1rem;
+  border-radius: 10px;
+  cursor: pointer;
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease;
+}
+
+.buttonCancel:hover {
+  background-color: var(--color-grey2);
+  border-color: var(--color-grey3);
+  color: var(--color-grey4);
+}
+
+/* Media query adjustments for small screens */
+@media (max-height: 700px) {
+  .decorationText h1 {
+    font-size: 1.3rem;
+  }
+  .decorationText h3 {
+    font-size: 1rem;
+  }
+}
+
+/* Optional: Hide the default scrollbar in Webkit browsers */
+.createPostPageContainer::-webkit-scrollbar {
+  display: none;
+}
