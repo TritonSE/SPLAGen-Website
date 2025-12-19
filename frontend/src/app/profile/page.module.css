@@ -1,0 +1,90 @@
+.profileContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.profileContainer header {
+  display: flex;
+  justify-content: space-between;
+}
+
+.profileContainer h1 {
+  font-size: 2rem;
+  font-weight: bolder;
+}
+
+.nameCard {
+  display: flex;
+  justify-content: space-between;
+  padding: 20px 20px 20px 20px;
+  border-radius: 10px;
+  background-color: white;
+}
+.nameAndTitle {
+  display: flex;
+  flex-direction: column;
+}
+
+.nameAndTitle span:nth-child(1) {
+  font-weight: bolder;
+}
+
+.switch {
+  display: flex;
+  gap: 20px;
+}
+
+.infoContainer {
+  display: flex;
+  gap: 20px;
+}
+
+.infoCard {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  border-radius: 10px;
+  padding: 20px 20px 20px 20px;
+  background-color: white;
+}
+
+.infoCard header {
+  display: flex;
+  justify-content: space-between;
+  margin: 10px 0px 40px 0px;
+}
+.infoCard header h2 {
+  font-weight: bold;
+}
+
+.profileDetails {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.infoColumn {
+  display: flex;
+  flex: 1 1 50%;
+  word-wrap: break-word;
+  flex-direction: column;
+  flex-grow: 1;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.infoColumn li label {
+  color: var(--color-grey4);
+}
+
+@media (max-width: 820px) {
+  .nameCard {
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .infoContainer {
+    flex-direction: column;
+  }
+}

@@ -85,9 +85,6 @@ export const Navbar: React.FC = () => {
   // Determine Navigation based on route and or user role
   useEffect(() => {
     switch (pathname) {
-      case "/onboardingForm":
-        setNavState(NavStateType.onboarding);
-        break;
       case "/signup":
         setNavState(NavStateType.onboarding);
         break;

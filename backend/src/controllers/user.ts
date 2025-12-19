@@ -47,36 +47,6 @@ export const createUser = async (
   }
 };
 
-export const authenticateUser = async (
-  req: AuthenticatedRequest,
-  res: Response,
-  next: NextFunction,
-) => {
-  try {
-    const { firebaseUid } = req;
-
-    // Fetch user from MongoDB using firebaseUid (firebaseUid should already be added by requireSignedIn)
-    const user = await UserModel.findOne({ firebaseId: firebaseUid });
-
-    if (!user) {
-      res.status(404).json({ error: "User not found" });
-      return;
-    }
-
-    res.status(200).json({
-      firebaseId: firebaseUid,
-      role: user.role,
-      personal: user.personal,
-      email: user.personal?.email,
-    });
-    return;
-  } catch (error) {
-    console.error("Error during user authentication:", error);
-    next(error);
-    return;
-  }
-};
-
 export const getWhoAmI = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
     const { firebaseUid } = req;
@@ -87,11 +57,7 @@ export const getWhoAmI = async (req: AuthenticatedRequest, res: Response, next: 
       return;
     }
 
-    res.status(200).json({
-      firebaseId: user.firebaseId,
-      role: user.role,
-      personal: user.personal,
-    });
+    res.status(200).json(user);
     return;
   } catch (error) {
     next(error);

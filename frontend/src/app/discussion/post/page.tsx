@@ -12,8 +12,8 @@ import { createPost } from "@/api/discussion";
 
 // Schema
 const postSchema = z.object({
-  title: z.string().min(3).max(50),
-  message: z.string().min(5).max(500),
+  title: z.string().min(1).max(50),
+  message: z.string().min(1).max(500),
 });
 type PostFormData = z.infer<typeof postSchema>;
 
@@ -29,7 +29,8 @@ const CreatePostPage: React.FC = () => {
   const onSubmit = useCallback<SubmitHandler<PostFormData>>(
     async (data) => {
       try {
-        const result = await createPost(data);
+        //TODO: Replace with actual Firebase token
+        const result = await createPost(data, "temporary-firebase-token");
 
         if (result.success && result.data._id) {
           reset();
