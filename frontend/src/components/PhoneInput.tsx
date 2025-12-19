@@ -190,7 +190,7 @@ type PhoneInputProps = Omit<React.ComponentProps<"input">, "onChange" | "value" 
  * PhoneInput component that combines country select and number input
  * Uses react-phone-number-input under the hood with custom UI components
  */
-const PhoneInput: React.ForwardRefExoticComponent<PhoneInputProps> = React.forwardRef<
+export const PhoneInput: React.ForwardRefExoticComponent<PhoneInputProps> = React.forwardRef<
   React.ComponentRef<typeof RPNInput.default>,
   PhoneInputProps
 >(({ className, onChange, ...props }, ref) => {
@@ -217,8 +217,6 @@ const PhoneInput: React.ForwardRefExoticComponent<PhoneInputProps> = React.forwa
   );
 });
 PhoneInput.displayName = "PhoneInput";
-
-export { PhoneInput };
 
 /*
 This code uses a modified version of the Shadcn-phone-input

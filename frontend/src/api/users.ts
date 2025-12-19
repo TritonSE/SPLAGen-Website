@@ -159,6 +159,32 @@ export type EditProfessionalInfo = {
   newCountry: string;
 };
 
+export type EditDirectoryDisplayInformationRequestBody = {
+  newWorkEmail: string;
+  newWorkPhone: string;
+  newServices: (
+    | "pediatrics"
+    | "cardiovascular"
+    | "neurogenetics"
+    | "rareDiseases"
+    | "cancer"
+    | "biochemical"
+    | "prenatal"
+    | "adult"
+    | "psychiatric"
+    | "reproductive"
+    | "ophthalmic"
+    | "research"
+    | "pharmacogenomics"
+    | "metabolic"
+    | "other"
+  )[];
+  newLanguages: ("english" | "spanish" | "portuguese" | "other")[];
+  newLicense: string[];
+  newRemoteOption: boolean;
+  newRequestOption: boolean;
+};
+
 export const createAuthHeader = (firebaseToken: string) => ({
   Authorization: `Bearer ${firebaseToken}`,
 });
@@ -271,6 +297,19 @@ export async function editProfessionalInfoRequest(
     return handleAPIError(error);
   }
 }
+
+export async function editDirectoryDisplayInfoRequest(
+  directoryInfo: EditDirectoryDisplayInformationRequestBody,
+  firebaseToken: string,
+): Promise<APIResult<null>> {
+  try {
+    await put("/api/users/directory/display-info", directoryInfo, createAuthHeader(firebaseToken));
+    return { success: true, data: null };
+  } catch (error) {
+    return handleAPIError(error);
+  }
+}
+
 export const getUser = async (
   firebaseUid: string,
   firebaseToken: string,
