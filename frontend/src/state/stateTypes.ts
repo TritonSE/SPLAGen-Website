@@ -49,7 +49,7 @@ export type directoryState = {
     authorizedForLanguages: boolean | string;
     email: string;
     phone: string;
-    licenseType: "has_license" | "no_license" | undefined;
+    licenseType: "has_license" | "no_license";
     licenseNumber: string;
     noLicenseReason: string;
     additionalComments: string;
