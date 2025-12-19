@@ -1,33 +1,18 @@
-import { APIResult, get, handleAPIError, put } from "./requests";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 
-// import { User as FirebaseUser } from "firebase/auth";
+import { APIResult, get, handleAPIError, post, put } from "./requests";
 
-// Need to define user type based on user model
-// export type User = {
-//   _id: string;
-//   firebaseId: string;
-//   role: "member" | "admin" | "superadmin";
-//   personal: {
-//     firstName: string;
-//     lastName: string;
-//     email: string;
-//     phone?: string;
-//   };
-//   account: {
-//     inDirectory: boolean | string;
-//     profilePicture: string;
-//     membership: "student" | "geneticCounselor" | "healthcareProvider" | "associate";
-//   };
-// };
+import type { UserCredential } from "firebase/auth";
 
-export type User = {
-  _id: string;
-  firebaseId: string;
-  role: "superadmin" | "admin" | "member";
+import { initFirebase } from "@/firebase/firebase";
+
+export type MembershipType = "student" | "geneticCounselor" | "healthcareProvider" | "associate";
+
+// Define CreateUserRequestBody type based on backend requirements
+export type CreateUserRequestBody = {
+  password: string;
   account: {
-    inDirectory: true | false | "pending";
-    profilePicture: string;
-    membership: "student" | "geneticCounselor" | "healthcareProvider" | "associate";
+    membership: MembershipType;
   };
   personal: {
     firstName: string;
@@ -35,13 +20,13 @@ export type User = {
     email: string;
     phone?: string;
   };
-  professional: {
+  professional?: {
     title?: string;
     prefLanguages?: ("english" | "spanish" | "portuguese" | "other")[];
     otherPrefLanguages?: string;
     country?: string;
   };
-  education: {
+  education?: {
     degree?: "masters" | "diploma" | "fellowship" | "md" | "phd" | "other";
     program?: string;
     otherDegree?: string;
@@ -49,7 +34,44 @@ export type User = {
     email?: string;
     gradDate?: string;
   };
-  associate: {
+  associate?: {
+    title?: string;
+    specialization?: string[];
+    organization?: string;
+  };
+};
+
+// Need to define user type based on user model
+export type User = {
+  _id: string;
+  firebaseId: string;
+  role: "member" | "admin" | "superadmin";
+  account: {
+    inDirectory: boolean | "pending";
+    profilePicture?: string;
+    membership: MembershipType;
+  };
+  personal: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone?: string;
+  };
+  professional?: {
+    title?: string;
+    prefLanguages?: ("english" | "spanish" | "portuguese" | "other")[];
+    otherPrefLanguages?: string;
+    country?: string;
+  };
+  education?: {
+    degree?: "masters" | "diploma" | "fellowship" | "md" | "phd" | "other";
+    program?: string;
+    otherDegree?: string;
+    institution?: string;
+    email?: string;
+    gradDate?: string;
+  };
+  associate?: {
     title?: string;
     specialization?: (
       | "rare disease advocacy"
@@ -67,7 +89,7 @@ export type User = {
     )[];
     organization?: string;
   };
-  clinic: {
+  clinic?: {
     name?: string;
     url?: string;
     location?: {
@@ -79,7 +101,7 @@ export type User = {
       zipPostCode?: string;
     };
   };
-  display: {
+  display?: {
     workEmail?: string;
     workPhone?: string;
     services?: (
@@ -101,17 +123,19 @@ export type User = {
     )[];
     languages?: ("english" | "spanish" | "portuguese" | "other")[];
     license?: string[];
-    options: {
-      openToAppointments: boolean;
-      openToRequests: boolean;
-      remote: boolean;
-      authorizedCare: true | false | "unsure";
+    options?: {
+      openToAppointments?: boolean;
+      openToRequests?: boolean;
+      remote?: boolean;
+      authorizedCare?: boolean | "unsure";
     };
     comments?: {
       noLicense?: string;
       additional?: string;
     };
   };
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type EditBasicInfo = {
@@ -165,14 +189,77 @@ export const createAuthHeader = (firebaseToken: string) => ({
   Authorization: `Bearer ${firebaseToken}`,
 });
 
-// getWhoAmI with sample data
-// Replace with actual code once database is in use
+/**
+ * Get current user information from the backend
+ * @param firebaseToken The Firebase authentication token
+ * @returns API result with user data
+ */
 export const getWhoAmI = async (firebaseToken: string): Promise<APIResult<User>> => {
   try {
     const response = await get("/api/users/whoami", createAuthHeader(firebaseToken));
     const data = (await response.json()) as User;
 
     return { success: true, data };
+  } catch (error) {
+    return handleAPIError(error);
+  }
+};
+
+/**
+ * Signs up a new user with email and password using Firebase and the backend
+ * @param userData User data to be registered
+ * @returns API result with the created user data
+ */
+export const signUpUser = async (userData: CreateUserRequestBody): Promise<APIResult<User>> => {
+  try {
+    const response = await post("/api/users", userData);
+    const data = (await response.json()) as User;
+    return { success: true, data };
+  } catch (error) {
+    return handleAPIError(error);
+  }
+};
+
+/**
+ * Logs in a user with email and password using Firebase
+ * @param email User email
+ * @param password User password
+ * @returns API result with the authenticated user's Firebase token
+ */
+export const loginUserWithEmailPassword = async (
+  email: string,
+  password: string,
+): Promise<APIResult<{ token: string }>> => {
+  const auth = getAuth();
+  try {
+    // Type-safe implementation
+    const userCredential: UserCredential = await signInWithEmailAndPassword(auth, email, password);
+    const firebaseUser = userCredential.user;
+
+    if (!firebaseUser) {
+      throw new Error("Authentication failed");
+    }
+
+    const token = await firebaseUser.getIdToken();
+    if (!token) {
+      throw new Error("Failed to get authentication token");
+    }
+
+    return { success: true, data: { token } };
+  } catch (error) {
+    return handleAPIError(error);
+  }
+};
+
+/**
+ * Logs out the current user from Firebase
+ * @returns API result indicating success
+ */
+export const logoutUser = async (): Promise<APIResult<null>> => {
+  try {
+    const { auth } = initFirebase();
+    await auth.signOut();
+    return { success: true, data: null };
   } catch (error) {
     return handleAPIError(error);
   }

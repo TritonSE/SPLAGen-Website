@@ -9,6 +9,7 @@ const initialState: GlobalState = {
     password: "",
     // Basic
     professionalTitle: { value: "", label: "" },
+    professionalTitleOther: "",
     country: { value: "", label: "" },
     languages: [],
     membership: "",
@@ -42,6 +43,12 @@ const initialState: GlobalState = {
     specialtyServices: [],
     careLanguages: [],
     authorizedForLanguages: false,
+    email: "",
+    phone: "",
+    licenseType: "no_license",
+    licenseNumber: "",
+    noLicenseReason: "",
+    additionalComments: "",
   },
 };
 

@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 
 import styles from "./page.module.css";
 
-import { User, getWhoAmI } from "@/api/users";
+import { MembershipType, User, getWhoAmI } from "@/api/users";
 import { Button, EditBasicInfoModal, ProfessionalInfoModal } from "@/components";
 import { PreferredLanguages } from "@/components/PreferredLanguages";
 import { ProfilePicture } from "@/components/ProfilePicture";
@@ -21,9 +21,7 @@ type DisplayComponentProps = {
 const ProfileSection = ({ user, openBasic, openPro }: DisplayComponentProps) => {
   const { t } = useTranslation(); // define the t function at the top of your component
 
-  const formatMembership = (
-    membership: "student" | "geneticCounselor" | "healthcareProvider" | "associate" | undefined,
-  ): string => {
+  const formatMembership = (membership: MembershipType | undefined): string => {
     const membershipMap: Record<string, string> = {
       student: "Student",
       geneticCounselor: "Genetic Counselor",
@@ -110,13 +108,13 @@ const ProfileSection = ({ user, openBasic, openPro }: DisplayComponentProps) => 
             <ul className={styles.infoColumn}>
               <li>
                 <label> {t("professional-title")} </label> <br />
-                {user?.professional.title ?? t("none")}
+                {user?.professional?.title ?? t("none")}
               </li>
 
               <li>
                 <label> {t("preferred-language")} </label>
                 <br />
-                <PreferredLanguages languages={user?.professional.prefLanguages ?? []} />
+                <PreferredLanguages languages={user?.professional?.prefLanguages ?? []} />
               </li>
             </ul>
 
@@ -124,7 +122,7 @@ const ProfileSection = ({ user, openBasic, openPro }: DisplayComponentProps) => 
               <ul className={styles.infoColumn}>
                 <li>
                   <label> {t("country")} </label> <br />
-                  {user?.professional.country ?? t("none")}
+                  {user?.professional?.country ?? t("none")}
                 </li>
 
                 <li>

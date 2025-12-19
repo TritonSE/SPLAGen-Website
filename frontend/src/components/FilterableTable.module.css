@@ -8,6 +8,7 @@
   display: flex;
   margin-top: 3vh;
   margin-bottom: 3vh;
+  justify-content: space-between;
 }
 
 .search-bar {
@@ -118,6 +119,16 @@
 .filter-actions button:hover {
   background-color: #2b1d53;
   color: white;
+}
+
+.filter-actions button:last-child {
+  background-color: var(--color-primary2);
+  color: white;
+  border: none;
+}
+
+.filter-actions button:last-child:hover {
+  background-color: #2b1d53;
 }
 
 /* General styling for Filter and Download buttons */

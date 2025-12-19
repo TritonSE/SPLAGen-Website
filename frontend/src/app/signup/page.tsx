@@ -1,7 +1,9 @@
 "use client";
 
 import { useStateMachine } from "little-state-machine";
+import { useRouter } from "next/navigation";
 import { useCallback, useContext, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import {
   Associate,
@@ -18,8 +20,13 @@ import updateOnboardingForm from "@/state/updateOnboardingForm";
 
 export default function OnboardingForm() {
   const [step, setStep] = useState(0);
+  const [registrationStatus, setRegistrationStatus] = useState<
+    "idle" | "submitting" | "success" | "error"
+  >("idle");
   const { state, actions } = useStateMachine({ actions: { updateOnboardingForm } });
   const { setOnboardingStep } = useContext(UserContext);
+  const router = useRouter();
+  const { t } = useTranslation();
 
   const handleNext = useCallback(
     (data: onboardingState["data"]) => {
@@ -47,6 +54,7 @@ export default function OnboardingForm() {
       email: "",
       password: "",
       professionalTitle: { value: "", label: "" },
+      professionalTitleOther: "",
       country: { value: "", label: "" },
       languages: [],
     });
@@ -77,8 +85,40 @@ export default function OnboardingForm() {
     setStep(3); // Go to Step3A after either intermediate step
   }, [setStep]);
 
+  // Handle registration status changes
+  const handleRegistrationStatusChange = useCallback(
+    (status: "idle" | "submitting" | "success" | "error") => {
+      setRegistrationStatus(status);
+
+      // If registration is successful, redirect after a short delay
+      if (status === "success") {
+        setTimeout(() => {
+          router.push("/login?registered=true");
+        }, 2000);
+      }
+    },
+    [router, setRegistrationStatus],
+  );
+
+  // Show feedback message for registration
+  const renderRegistrationMessage = () => {
+    if (registrationStatus === "submitting") {
+      return (
+        <div className="absolute inset-0 bg-white bg-opacity-90 flex items-center justify-center z-10">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto mb-4"></div>
+            <p className="text-xl font-medium">{t("processing-registration")}</p>
+          </div>
+        </div>
+      );
+    }
+    return null;
+  };
+
   return (
-    <div className=" relative w-full h-full">
+    <div className="relative w-full h-full">
+      {renderRegistrationMessage()}
+
       {step === 0 && <SignUp onNext={handleNext} />}
       {step === 1 && <Basics onBack={handleBack} onNext={handleNext} />}
 
@@ -123,6 +163,8 @@ export default function OnboardingForm() {
               setStep(2);
             }
           }}
+          onReset={handleReset}
+          onStatusChange={handleRegistrationStatusChange}
         />
       )}
 

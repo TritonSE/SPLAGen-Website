@@ -12,6 +12,11 @@
   "directory": "Diretório",
   "log-out": "Sair",
   "log-in": "Entrar",
+  "start-over": "Recomeçar",
+  "processing-registration": "Processando seu registro...",
+  "registration-success": "Registro bem-sucedido!",
+  "confirm-and-register": "Confirmar e Registrar",
+  "please-login": "Por favor, faça login com suas credenciais.",
   "welcome-back": "Bem-vindo de volta!",
   "email": "Email",
   "password": "Senha",
@@ -122,5 +127,15 @@
   "license-number": "Número da licença",
   "offer-remote-services": "Você oferece serviços remotos?",
   "request-genetic-tests": "Os pacientes podem solicitar testes genéticos?",
-  "temp": "Temporário"
+  "temp": "Temporário",
+  "sort-by": "Ordenar por",
+  "newest-first": "Mais recentes primeiro",
+  "oldest-first": "Mais antigos primeiro",
+  "author-a-z": "Autor A-Z",
+  "author-z-a": "Autor Z-A",
+  "create-discussion": "Criar discussão +",
+  "today": "Hoje",
+  "this-week": "Esta semana",
+  "earlier": "Anteriormente",
+  "search-general": "Busca geral"
 }

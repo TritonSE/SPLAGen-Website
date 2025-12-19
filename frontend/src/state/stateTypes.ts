@@ -9,6 +9,7 @@ export type onboardingState = {
     password: string;
     // Basic
     professionalTitle: ProfessionalTitleOption;
+    professionalTitleOther: string;
     country: CountryOption;
     languages: string[];
     membership: string;
@@ -46,5 +47,11 @@ export type directoryState = {
     specialtyServices: string[];
     careLanguages: string[];
     authorizedForLanguages: boolean | string;
+    email: string;
+    phone: string;
+    licenseType: "has_license" | "no_license";
+    licenseNumber: string;
+    noLicenseReason: string;
+    additionalComments: string;
   };
 };

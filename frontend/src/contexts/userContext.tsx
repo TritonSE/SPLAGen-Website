@@ -1,15 +1,15 @@
 "use client";
 
-// import { User as FirebaseUser, onAuthStateChanged } from "firebase/auth";
+import { User as FirebaseUser, onAuthStateChanged } from "firebase/auth";
 import { ReactNode, createContext, useCallback, useEffect, useState } from "react";
 
 import { User, getWhoAmI } from "@/api/users";
 import { OnboardingStep } from "@/components/navbar/VerticalStepper";
-// import { initFirebase } from "@/firebase/firebase";
+import { initFirebase } from "@/firebase/firebase";
 
-//TODO: uncommet firebase code when ready
+// User context interface
 type IUserContext = {
-  //   firebaseUser: FirebaseUser | null;
+  firebaseUser: FirebaseUser | null;
   user: User | null;
   loadingUser: boolean;
   reloadUser: () => unknown;
@@ -22,7 +22,7 @@ type IUserContext = {
  * automatically fetching them when the page loads.
  */
 export const UserContext = createContext<IUserContext>({
-  //   firebaseUser: null,
+  firebaseUser: null,
   user: null,
   loadingUser: true,
   reloadUser: () => undefined,
@@ -35,12 +35,11 @@ export const UserContext = createContext<IUserContext>({
  * with its current user & loading state variables.
  */
 export const UserContextProvider = ({ children }: { children: ReactNode }) => {
-  //   const [firebaseUser, setFirebaseUser] = useState<FirebaseUser | null>(null);
-  //   const [initialLoading, setInitialLoading] = useState(true);
+  const [firebaseUser, setFirebaseUser] = useState<FirebaseUser | null>(null);
+  const [initialLoading, setInitialLoading] = useState(true);
   const [user, setUser] = useState<User | null>(null);
   const [loadingUser, setLoadingUser] = useState(true);
   const [onboardingStep, setOnboardingStep] = useState<OnboardingStep>(0);
-
   const setOnboardingStepHandler = useCallback(
     (step: OnboardingStep) => {
       setOnboardingStep(step);
@@ -48,72 +47,68 @@ export const UserContextProvider = ({ children }: { children: ReactNode }) => {
     [setOnboardingStep],
   );
 
-  //   const { auth } = initFirebase();
+  // Initialize Firebase
+  const { auth } = initFirebase();
 
   /**
    * Callback triggered by Firebase when the user logs in/out, or on page load
    */
-  //   onAuthStateChanged(auth, (firebaseUser) => {
-  //     setFirebaseUser(firebaseUser);
-  //     setInitialLoading(false);
-  //   });
-
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentFirebaseUser) => {
+      setFirebaseUser(currentFirebaseUser);
+      setInitialLoading(false);
+    }); // Clean up subscription on unmount
+    return () => {
+      unsubscribe();
+    };
+  }, [auth]);
   const reloadUser = useCallback(() => {
-    // if (initialLoading) {
-    //   return;
-    // }
+    if (initialLoading) {
+      return;
+    }
+
     setLoadingUser(true);
     setUser(null);
 
-    // TODO: Delete this after firebase is set up and uncomment the chunk below
-    getWhoAmI("temp_firebase_token") // Make the API call
-      .then((res) => {
-        if (res.success) {
-          setUser(res.data); // Set user if API call is successful
-        } else {
-          setUser(null); // Set user to null if the API call fails
-        }
-        setLoadingUser(false); // Set loading state to false when done
-      })
-      .catch((error: unknown) => {
-        console.error("Error fetching user:", error);
-        setUser(null); // Set user to null in case of error
-        setLoadingUser(false); // Stop loading in case of error
-      });
+    if (firebaseUser === null) {
+      // No firebase user, so we're not logged in
+      setLoadingUser(false);
+    } else {
+      // We have a firebase user, get their token and authenticate with the backend
+      firebaseUser
+        .getIdToken(true) // Force token refresh
+        .then((token) =>
+          getWhoAmI(token)
+            .then((res) => {
+              if (res.success) {
+                setUser(res.data); // Set user if API call is successful
+              } else {
+                setUser(null); // Set user to null if the API call fails
+              }
+              setLoadingUser(false);
+            })
+            .catch((error: unknown) => {
+              console.error("Error fetching user:", error);
+              setUser(null);
+              setLoadingUser(false);
+            }),
+        )
+        .catch((error: unknown) => {
+          console.error("Error getting Firebase token:", error);
+          setUser(null);
+          setLoadingUser(false);
+        });
+    }
+  }, [firebaseUser, initialLoading, setUser, setLoadingUser]);
 
-    // if (firebaseUser === null) {
-    //   setLoadingUser(false);
-    // } else {
-    //   firebaseUser.getIdToken().then((token) =>
-    //     getWhoAmI("temp_firebase_token") // Make the API call
-    //       .then((res) => {
-    //         if (res.success) {
-    //           setUser(res.data); // Set user if API call is successful
-    //         } else {
-    //           setUser(null); // Set user to null if the API call fails
-    //         }
-    //         setLoadingUser(false); // Set loading state to false when done
-    //       })
-    //       .catch((error: unknown) => {
-    //         console.error("Error fetching user:", error);
-    //         setUser(null); // Set user to null in case of error
-    //         setLoadingUser(false); // Stop loading in case of error
-    //       }),
-    //   );
-    // }
-  }, [setUser, setLoadingUser]);
-
+  // Update user data when Firebase authentication state changes
   useEffect(() => {
     reloadUser();
-  }, [reloadUser]);
-
-  //TODO: switch to this useeffect when firebase is set up
-  // useEffect(reloadUser, [initialLoading, firebaseUser]);
-
+  }, [initialLoading, firebaseUser, reloadUser]);
   return (
     <UserContext.Provider
       value={{
-        // firebaseUser,
+        firebaseUser,
         user,
         loadingUser,
         reloadUser,

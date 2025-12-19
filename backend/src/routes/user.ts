@@ -26,7 +26,6 @@ router.delete(
 );
 router.get("/", requireSignedIn, UserController.getAllUsers);
 router.get("/:firebaseId", requireSignedIn, UserValidator.getUser, UserController.getUser);
-router.post("/authenticate", requireSignedIn, UserController.authenticateUser);
 
 // Personal information routes
 router.get("/general/personal-information", requireSignedIn, UserController.getPersonalInformation);

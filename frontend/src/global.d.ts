@@ -12,6 +12,7 @@ declare module "little-state-machine" {
       password: string;
       // Basic
       professionalTitle: ProfessionalTitleOption;
+      professionalTitleOther: string;
       country: CountryOption;
       languages: string[]; // check all we need
       membership: string;
@@ -45,6 +46,12 @@ declare module "little-state-machine" {
       specialtyServices: string[];
       careLanguages: string[];
       authorizedForLanguages: boolean | string;
+      email: string;
+      phone: string;
+      licenseType: "has_license" | "no_license";
+      licenseNumber: string;
+      noLicenseReason: string;
+      additionalComments: string;
     };
   }
 }
