@@ -19,10 +19,7 @@ const formSchema = z
   .object({
     email: z.string().min(1, "Required").email("Please enter a valid email address"),
     phone: z.string().min(1, "Required"),
-    licenseType: z
-      .enum(["has_license", "no_license"], { required_error: "Required" })
-      .or(z.undefined())
-      .refine((val) => val !== undefined, { message: "Required" }),
+    licenseType: z.enum(["has_license", "no_license"], { required_error: "Required" }),
     licenseNumber: z.string().optional(),
     noLicenseReason: z.string().optional(),
     additionalComments: z.string().optional(),

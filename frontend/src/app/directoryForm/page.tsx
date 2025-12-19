@@ -51,7 +51,7 @@ export default function DirectoryForm() {
       // Contact page fields
       email: "",
       phone: "",
-      licenseType: undefined,
+      licenseType: "no_license",
       licenseNumber: "",
       noLicenseReason: "",
       additionalComments: "",

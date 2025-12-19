@@ -45,7 +45,7 @@ const initialState: GlobalState = {
     authorizedForLanguages: false,
     email: "",
     phone: "",
-    licenseType: undefined,
+    licenseType: "no_license",
     licenseNumber: "",
     noLicenseReason: "",
     additionalComments: "",
