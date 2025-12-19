@@ -108,7 +108,7 @@ const ManageAdmin: React.FC = () => {
     const index = dummyAdmins.findIndex((r) => r.id === row.id);
     if (index !== -1) setSelectedIndex(index);
   }, []);
-  /*Moving the popup*/ 
+  /*Moving the popup*/
   const handlePrev = () => {
     if (selectedIndex !== null) {
       setSelectedIndex((prev) => {
@@ -126,7 +126,6 @@ const ManageAdmin: React.FC = () => {
       });
     }
   };
-
 
   const selectedAdmin = selectedIndex !== null ? dummyAdmins[selectedIndex] : null;
 

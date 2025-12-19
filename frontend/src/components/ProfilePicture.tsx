@@ -1,24 +1,26 @@
-import { useContext } from "react";
+import { useContext, useMemo } from "react";
 
 import styles from "./ProfilePicture.module.css";
 
 import { UserContext } from "@/contexts/userContext";
 
-// component can be small, medium, or large
-// takes in a string, can be letter of first name or first name.
 type ProfilePictureProps = {
   size?: "small" | "medium" | "large";
   letter?: string;
 };
 
+// Renders fallback letter or first initial from user's first name
 export const ProfilePicture: React.FC<ProfilePictureProps> = ({ size = "small", letter }) => {
   const { user } = useContext(UserContext);
 
-  const loggedInLetter = user?.personal.firstName[0];
+  const displayLetter = useMemo(() => {
+    if (letter?.length) return letter[0].toUpperCase();
+    return user?.personal?.firstName?.[0]?.toUpperCase() ?? "?";
+  }, [letter, user?.personal?.firstName]);
 
   return (
     <div className={`${styles.profilepic} ${styles[size]}`}>
-      <span>{letter ? letter[0] : loggedInLetter}</span>
+      <span>{displayLetter}</span>
     </div>
   );
 };

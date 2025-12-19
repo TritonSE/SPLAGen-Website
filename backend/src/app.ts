@@ -26,6 +26,7 @@ void mongoose
     console.log("Connected to Database.");
   })
   .catch((error: unknown) => {
+    console.log("DB connectivity error");
     if (error instanceof Error) {
       console.log(error.message);
     } else {
@@ -34,7 +35,7 @@ void mongoose
   });
 
 const app: Express = express();
-const port = process.env.PORT ?? 3001;
+const port = process.env.PORT ?? "3001";
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -84,6 +85,5 @@ app.use((error: unknown, req: Request, res: Response, next: NextFunction) => {
 
 // Start the server
 app.listen(port, () => {
-  //eslint-disable-next-line @typescript-eslint/restrict-template-expressions
   console.log(`[server]: Server is running at http://localhost:${port}`);
 });
