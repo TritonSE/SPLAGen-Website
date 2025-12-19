@@ -68,13 +68,13 @@ const dummyAdmins: AdminRow[] = [
     Services: ["Cancer Genetics"],
     Joined: "02/15/2024",
   },
-    {
+  {
     id: 3,
     name: "Water Test",
     email: "water.edu",
     phone: "(000) 000-0000",
     Title: "Genetic Counselor",
-    Membership: "Associate Member", 
+    Membership: "Associate Member",
     Education: "Masters",
     Location: {
       Address: "123 Campus Way",
@@ -101,8 +101,6 @@ const ManageAdmin: React.FC = () => {
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [invitedName, setInvitedName] = useState<string | null>(null);
   const [showSuccessToast, setShowSuccessToast] = useState(false);
-
-
 
   const handleRowClick = useCallback((row: AdminRow) => {
     const index = dummyAdmins.findIndex((r) => r.id === row.id);
@@ -229,8 +227,12 @@ const ManageAdmin: React.FC = () => {
         filters={filters}
         csvFilename="admins.csv"
         additionalButton={
-          <button className={styles["action-button"]}
-          onClick={() => setIsInviteModalOpen(true)}>
+          <button
+            className={styles["action-button"]}
+            onClick={() => {
+              setIsInviteModalOpen(true);
+            }}
+          >
             Invite Admin
             <Image
               src="/icons/plus.svg"
@@ -245,81 +247,172 @@ const ManageAdmin: React.FC = () => {
       />
       {/* Invite Modal */}
       {isInviteModalOpen && (
-        <div style={{
-          position: "fixed", top: 0, left: 0, width: "100vw", height: "100vh",
-          background: "rgba(0,0,0,0.4)", display: "flex", justifyContent: "center", alignItems: "center",
-          zIndex: 1000
-        }}>
-          <div style={{
-            background: "#fff", padding: "2rem", borderRadius: "10px", width: "500px", maxHeight: "80vh", overflowY: "auto"
-          }}>
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100vw",
+            height: "100vh",
+            background: "rgba(0,0,0,0.4)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 1000,
+          }}
+        >
+          <div
+            style={{
+              background: "#fff",
+              padding: "2rem",
+              borderRadius: "10px",
+              width: "500px",
+              maxHeight: "80vh",
+              overflowY: "auto",
+            }}
+          >
             <h2 style={{ marginBottom: "1rem" }}>Invite Admins</h2>
             <input
               placeholder="Search Counselors"
-              style={{ width: "100%", padding: "0.5rem", marginBottom: "1rem", borderRadius: "6px", border: "1px solid #ccc" }}
+              style={{
+                width: "100%",
+                padding: "0.5rem",
+                marginBottom: "1rem",
+                borderRadius: "6px",
+                border: "1px solid #ccc",
+              }}
             />
-            {dummyAdmins.filter(a => a.Membership !== "Admin").map((person) => (
-              <div key={person.id} style={{
-                display: "flex", justifyContent: "space-between", alignItems: "center",
-                marginBottom: "1rem", borderBottom: "1px solid #eee", paddingBottom: "0.5rem"
-              }}>
-                <div>
-                  <strong>{person.name}</strong>
-                  <div style={{ fontSize: "0.85rem", color: "#555" }}>{person.email}</div>
+            {dummyAdmins
+              .filter((a) => a.Membership !== "Admin")
+              .map((person) => (
+                <div
+                  key={person.id}
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    marginBottom: "1rem",
+                    borderBottom: "1px solid #eee",
+                    paddingBottom: "0.5rem",
+                  }}
+                >
+                  <div>
+                    <strong>{person.name}</strong>
+                    <div style={{ fontSize: "0.85rem", color: "#555" }}>{person.email}</div>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setIsInviteModalOpen(false);
+                      setInvitedName(person.name);
+                    }}
+                    style={{
+                      background: "#2B1D53",
+                      color: "#fff",
+                      borderRadius: "5px",
+                      padding: "0.5rem 1rem",
+                      border: "none",
+                    }}
+                  >
+                    Invite
+                  </button>
                 </div>
-                <button onClick={() => {
-                  setIsInviteModalOpen(false);
-                  setInvitedName(person.name);
-                }} style={{
-                  background: "#2B1D53", color: "#fff", borderRadius: "5px", padding: "0.5rem 1rem", border: "none"
-                }}>
-                  Invite
-                </button>
-              </div>
-            ))}
-            <button onClick={() => setIsInviteModalOpen(false)} style={{
-              background: "#ccc", padding: "0.4rem 1rem", borderRadius: "5px", marginTop: "1rem"
-            }}>Cancel</button>
+              ))}
+            <button
+              onClick={() => {
+                setIsInviteModalOpen(false);
+              }}
+              style={{
+                background: "#ccc",
+                padding: "0.4rem 1rem",
+                borderRadius: "5px",
+                marginTop: "1rem",
+              }}
+            >
+              Cancel
+            </button>
           </div>
         </div>
       )}
 
       {/* Confirmation Modal */}
       {invitedName && (
-        <div style={{
-          position: "fixed", top: 0, left: 0, width: "100vw", height: "100vh",
-          background: "rgba(0,0,0,0.5)", display: "flex", justifyContent: "center", alignItems: "center",
-          zIndex: 1001
-        }}>
-          <div style={{
-            background: "#fff", padding: "2rem", borderRadius: "10px", width: "400px", textAlign: "center"
-          }}>
-            <p>Invite <strong>{invitedName}</strong> to be an admin?</p>
-            <p style={{ fontSize: "0.85rem", marginBottom: "1rem" }}>
-              They’ll have access to manage counselors, create announcements, and moderate discussions.
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100vw",
+            height: "100vh",
+            background: "rgba(0,0,0,0.5)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 1001,
+          }}
+        >
+          <div
+            style={{
+              background: "#fff",
+              padding: "2rem",
+              borderRadius: "10px",
+              width: "400px",
+              textAlign: "center",
+            }}
+          >
+            <p>
+              Invite <strong>{invitedName}</strong> to be an admin?
             </p>
-            <button onClick={() => setInvitedName(null)} style={{ marginRight: "1rem" }}>Cancel</button>
-            <button onClick={() => {
-              setInvitedName(null);
-              setShowSuccessToast(true);
-              setTimeout(() => setShowSuccessToast(false), 3000);
-            }} style={{
-              backgroundColor: "#2B1D53", color: "#fff", padding: "0.5rem 1rem", borderRadius: "5px", border: "none"
-            }}>Send Invite</button>
+            <p style={{ fontSize: "0.85rem", marginBottom: "1rem" }}>
+              They’ll have access to manage counselors, create announcements, and moderate
+              discussions.
+            </p>
+            <button
+              onClick={() => {
+                setInvitedName(null);
+              }}
+              style={{ marginRight: "1rem" }}
+            >
+              Cancel
+            </button>
+            <button
+              onClick={() => {
+                setInvitedName(null);
+                setShowSuccessToast(true);
+                setTimeout(() => {
+                  setShowSuccessToast(false);
+                }, 3000);
+              }}
+              style={{
+                backgroundColor: "#2B1D53",
+                color: "#fff",
+                padding: "0.5rem 1rem",
+                borderRadius: "5px",
+                border: "none",
+              }}
+            >
+              Send Invite
+            </button>
           </div>
         </div>
       )}
 
       {/* Success Toast */}
       {showSuccessToast && (
-        <div style={{
-          position: "fixed", top: "1rem", right: "1rem", backgroundColor: "#38a169",
-          color: "#fff", padding: "1rem", borderRadius: "8px", zIndex: 9999
-        }}>
+        <div
+          style={{
+            position: "fixed",
+            top: "1rem",
+            right: "1rem",
+            backgroundColor: "#38a169",
+            color: "#fff",
+            padding: "1rem",
+            borderRadius: "8px",
+            zIndex: 9999,
+          }}
+        >
           ✅ Admin has been invited!
         </div>
       )}
-
 
       {selectedAdmin && (
         <div
