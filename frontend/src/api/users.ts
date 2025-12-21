@@ -1,4 +1,4 @@
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { getAuth, sendPasswordResetEmail, signInWithEmailAndPassword } from "firebase/auth";
 
 import { APIResult, get, handleAPIError, post, put } from "./requests";
 
@@ -246,6 +246,17 @@ export const loginUserWithEmailPassword = async (
     }
 
     return { success: true, data: { token } };
+  } catch (error) {
+    return handleAPIError(error);
+  }
+};
+
+export const resetUserPassword = async (email: string): Promise<APIResult<null>> => {
+  const auth = getAuth();
+  try {
+    await sendPasswordResetEmail(auth, email);
+
+    return { success: true, data: null };
   } catch (error) {
     return handleAPIError(error);
   }

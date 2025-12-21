@@ -2,6 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useStateMachine } from "little-state-machine";
+import Link from "next/link";
 import React, { useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
@@ -148,6 +149,10 @@ export const SignUp = ({ onNext }: SignUpProps) => {
               {errors.password ? errors.password.message : "\u00A0"}
             </p>
           </div>
+          <span>
+            <span style={{ color: "black" }}> {t("have-account")} </span>
+            <Link href="/login"> {t("log-in")} </Link>
+          </span>
 
           <div className={style.buttonContainer}>
             <Button type="submit" disabled={!isValid} label={t("continue")} />

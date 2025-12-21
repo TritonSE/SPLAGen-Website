@@ -1,4 +1,5 @@
 "use client";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
@@ -181,7 +182,6 @@ const Login: React.FC = () => {
               <span style={{ color: "black" }}> {t("dont-have-account")} </span>
               <Link href="/signup"> {t("create-account")} </Link>
             </span>
-            {/* <Link href="/forgotLogin"> I&apos;m an admin </Link> */}
           </div>
         </form>
       </div>
