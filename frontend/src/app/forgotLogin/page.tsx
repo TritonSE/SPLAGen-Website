@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { FormEventHandler, useState } from "react";
+import { FormEvent, useState } from "react";
 import { useTranslation } from "react-i18next";
 import styles from "src/app/login/login.module.css";
 
@@ -15,7 +15,7 @@ const ForgotLogin = () => {
 
   const isValid = email !== "";
 
-  const onSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
+  const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
     if (!email) return;
@@ -48,7 +48,7 @@ const ForgotLogin = () => {
 
         <form
           onSubmit={(e) => {
-            onSubmit(e);
+            void onSubmit(e);
           }}
           autoComplete="on"
         >
