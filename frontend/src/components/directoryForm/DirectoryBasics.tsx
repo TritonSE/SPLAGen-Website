@@ -4,7 +4,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Radio } from "@tritonse/tse-constellation";
 import { useStateMachine } from "little-state-machine";
 import dynamic from "next/dynamic";
-import Image from "next/image";
 import { useCallback, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
@@ -265,11 +264,6 @@ export const DirectoryBasics = ({ onNext }: DirectoryBasicsProps) => {
         </div>
 
         <div className={styles.buttonContainer}>
-          <button type="button" className={styles.backButton}>
-            <Image src="/icons/ic_caretleft.svg" alt="Back Icon" width={24} height={24} />
-            Back
-          </button>
-
           <Button type="submit" label="Continue" />
         </div>
       </form>

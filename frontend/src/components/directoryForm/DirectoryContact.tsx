@@ -4,21 +4,26 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Radio } from "@tritonse/tse-constellation";
 import { useStateMachine } from "little-state-machine";
 import Image from "next/image";
-import { useCallback } from "react";
+import { useRouter } from "next/navigation";
+import { useContext, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 import { z } from "zod";
 
 import styles from "./DirectoryContact.module.css";
+import { SpecialtyOption, specialtyOptionsToBackend } from "./DirectoryServices";
 
+import { JoinDirectoryRequestBody, joinDirectory } from "@/api/directory";
 import { Button } from "@/components";
 import { PhoneInput } from "@/components/PhoneInput";
+import { UserContext } from "@/contexts/userContext";
 import { directoryState } from "@/state/stateTypes";
 import updateDirectoryForm from "@/state/updateDirectoryForm";
 
 const formSchema = z
   .object({
-    email: z.string().min(1, "Required").email("Please enter a valid email address"),
-    phone: z.string().min(1, "Required"),
+    workEmail: z.string().min(1, "Required").email("Please enter a valid email address"),
+    workPhone: z.string().min(1, "Required"),
     licenseType: z.enum(["has_license", "no_license"], { required_error: "Required" }),
     licenseNumber: z.string().optional(),
     noLicenseReason: z.string().optional(),
@@ -43,11 +48,14 @@ const formSchema = z
 type FormSchema = z.infer<typeof formSchema>;
 
 type DirectoryContactProps = {
-  onNext: (data: directoryState["data"]) => void;
+  onReset: () => void;
   onBack: () => void;
 };
 
-export const DirectoryContact = ({ onNext, onBack }: DirectoryContactProps) => {
+export const DirectoryContact = ({ onReset, onBack }: DirectoryContactProps) => {
+  const { t } = useTranslation();
+  const { firebaseUser } = useContext(UserContext);
+  const router = useRouter();
   const { state, actions } = useStateMachine({ actions: { updateDirectoryForm } });
 
   const {
@@ -60,24 +68,82 @@ export const DirectoryContact = ({ onNext, onBack }: DirectoryContactProps) => {
     defaultValues: state.directoryForm as FormSchema,
     resolver: zodResolver(formSchema),
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState("");
 
   const licenseType = watch("licenseType");
 
-  const onSubmit = useCallback(
-    (data: FormSchema) => {
-      actions.updateDirectoryForm(data as directoryState["data"]);
-      onNext(data as directoryState["data"]);
-    },
-    [actions, onNext],
-  );
+  const submitDirectoryRequest = async () => {
+    if (!firebaseUser) return;
 
-  const handleFormSubmit = useCallback(
-    (e: React.FormEvent) => {
-      e.preventDefault();
-      void handleSubmit(onSubmit)();
-    },
-    [handleSubmit, onSubmit],
-  );
+    try {
+      setIsSubmitting(true);
+      setError("");
+
+      const token = await firebaseUser.getIdToken();
+      const requestBody: JoinDirectoryRequestBody = {
+        education: {
+          degree: state.directoryForm.educationType,
+          otherDegree: "", // TODO
+          institution: state.directoryForm.educationInstitution,
+        },
+        clinic: {
+          name: state.directoryForm.workClinic,
+          url: state.directoryForm.clinicWebsite,
+          location: {
+            country: state.directoryForm.clinicCountry.value,
+            address: state.directoryForm.addressLine1,
+            suite: state.directoryForm.addressLine2,
+            city: state.directoryForm.city,
+            state: state.directoryForm.state,
+            zipPostCode: state.directoryForm.postcode,
+          },
+        },
+        display: {
+          workEmail: state.directoryForm.workEmail,
+          workPhone: state.directoryForm.workPhone,
+          services: state.directoryForm.specialtyServices.map(
+            (service) => specialtyOptionsToBackend[service as SpecialtyOption],
+          ),
+          languages: state.directoryForm.careLanguages.map((language) => language.toLowerCase()),
+          options: {
+            openToAppointments: state.directoryForm.canMakeAppointments,
+            openToRequests: state.directoryForm.canRequestTests,
+            remote: state.directoryForm.offersTelehealth,
+            authorizedCare: state.directoryForm.authorizedForLanguages,
+          },
+          license:
+            state.directoryForm.licenseType === "has_license"
+              ? [state.directoryForm.licenseNumber]
+              : [],
+          comments: {
+            noLicense: state.directoryForm.noLicenseReason,
+            additional: state.directoryForm.additionalComments,
+          },
+        },
+      };
+      const res = await joinDirectory(requestBody, token);
+      if (res.success) {
+        router.push("/");
+      } else {
+        setError(`Failed to submit directory info: ${res.error}`);
+      }
+    } catch (err) {
+      setError(`Failed to submit directory info: ${String(err)}`);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const onSubmit = (data: FormSchema) => {
+    actions.updateDirectoryForm(data as directoryState["data"]);
+    void submitDirectoryRequest();
+  };
+
+  const handleFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    void handleSubmit(onSubmit)();
+  };
 
   return (
     <div className={styles.container}>
@@ -89,18 +155,20 @@ export const DirectoryContact = ({ onNext, onBack }: DirectoryContactProps) => {
           <div className={styles.questionSection}>
             <p className={styles.sectionText}>Professional email for patients to contact you</p>
             <input
-              type="email"
-              {...register("email")}
+              type="workEmail"
+              {...register("workEmail")}
               className={styles.textInput}
               placeholder="Enter your professional email"
             />
-            <p className={styles.errorText}>{errors.email ? errors.email.message : "\u00A0"}</p>
+            <p className={styles.errorText}>
+              {errors.workEmail ? errors.workEmail.message : "\u00A0"}
+            </p>
           </div>
 
           <div className={styles.questionSection}>
             <p className={styles.sectionText}>Telephone number for patients to contact you</p>
             <Controller
-              name="phone"
+              name="workPhone"
               control={control}
               render={({ field }) => (
                 <PhoneInput
@@ -112,7 +180,9 @@ export const DirectoryContact = ({ onNext, onBack }: DirectoryContactProps) => {
                 />
               )}
             />
-            <p className={styles.errorText}>{errors.phone ? errors.phone.message : "\u00A0"}</p>
+            <p className={styles.errorText}>
+              {errors.workPhone ? errors.workPhone.message : "\u00A0"}
+            </p>
           </div>
 
           <div className={styles.questionSection}>
@@ -204,8 +274,26 @@ export const DirectoryContact = ({ onNext, onBack }: DirectoryContactProps) => {
             Back
           </button>
 
-          <Button type="submit" label="Continue" />
+          <Button
+            type="submit"
+            label={isSubmitting ? t("loading") : "Submit"}
+            disabled={isSubmitting}
+          />
         </div>
+
+        {error && (
+          <>
+            <p className="text-red-600 text-center my-2">{error}</p>
+            <div className="flex justify-center mt-4">
+              <button
+                onClick={onReset}
+                className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100"
+              >
+                {t("start-over")}
+              </button>
+            </div>
+          </>
+        )}
       </form>
     </div>
   );

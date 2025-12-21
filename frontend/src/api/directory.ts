@@ -1,4 +1,5 @@
-import { APIResult, get, handleAPIError } from "./requests";
+import { APIResult, get, handleAPIError, post } from "./requests";
+import { createAuthHeader } from "./users";
 
 export type Counselor = {
   name: string;
@@ -11,6 +12,56 @@ export type Counselor = {
   languages: string[];
   profileUrl: string;
 };
+
+export type JoinDirectoryRequestBody = {
+  education: {
+    degree: string;
+    otherDegree?: string;
+    institution: string;
+  };
+  clinic: {
+    name: string;
+    url: string;
+    location: {
+      country: string;
+      address: string;
+      suite?: string;
+      city: string;
+      state: string;
+      zipPostCode: string;
+    };
+  };
+  display: {
+    workEmail: string;
+    workPhone: string;
+    services: string[];
+    languages: string[];
+    license: string[];
+    options: {
+      openToAppointments: boolean;
+      openToRequests: boolean;
+      remote: boolean;
+      authorizedCare: string | boolean;
+    };
+    comments: {
+      noLicense?: string;
+      additional?: string;
+    };
+  };
+};
+
+export async function joinDirectory(
+  joinDirectoryRequest: JoinDirectoryRequestBody,
+  firebaseToken: string,
+): Promise<APIResult<null>> {
+  try {
+    await post("/api/directory/join", joinDirectoryRequest, createAuthHeader(firebaseToken));
+
+    return { success: true, data: null };
+  } catch (error) {
+    return handleAPIError(error);
+  }
+}
 
 export async function getPublicDirectory(): Promise<APIResult<Counselor[]>> {
   try {

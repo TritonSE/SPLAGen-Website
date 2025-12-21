@@ -1,0 +1,43 @@
+.root {
+  position: absolute;
+  top: 4rem;
+  right: 4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  z-index: 10000;
+}
+
+.userDisplay {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  cursor: pointer;
+  gap: 18px;
+}
+
+.userCol {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.userName {
+  margin: 0;
+  font-size: 18px;
+  color: #0c2b35;
+  font-weight: 600;
+}
+
+.userRole {
+  margin: 0;
+  font-size: 14px;
+  color: #909090;
+}
+
+.logoutButton {
+  padding: 6px 12px;
+  border-radius: 4px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+}

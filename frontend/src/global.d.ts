@@ -46,8 +46,8 @@ declare module "little-state-machine" {
       specialtyServices: string[];
       careLanguages: string[];
       authorizedForLanguages: boolean | string;
-      email: string;
-      phone: string;
+      workEmail: string;
+      workPhone: string;
       licenseType: "has_license" | "no_license";
       licenseNumber: string;
       noLicenseReason: string;

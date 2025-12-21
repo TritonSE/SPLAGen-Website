@@ -300,7 +300,7 @@ export const editDirectoryPersonalInformation = async (
         "clinic.location.suite": newClinicApartmentSuite,
         "clinic.location.city": newClinicCity,
         "clinic.location.state": newClinicState,
-        "clinic.location.zipCode": newClinicZipPostCode,
+        "clinic.location.zipPostCode": newClinicZipPostCode,
       },
       { new: true, runValidators: true },
     );

@@ -88,7 +88,7 @@ export const Navbar: React.FC = () => {
       case "/signup":
         setNavState(NavStateType.onboarding);
         break;
-      case "/directory":
+      case "/directoryForm":
         setNavState(NavStateType.directory);
         break;
       case "/login":

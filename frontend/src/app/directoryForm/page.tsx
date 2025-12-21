@@ -3,16 +3,14 @@
 import { useStateMachine } from "little-state-machine";
 import { useCallback, useState } from "react";
 
-import {
-  DirectoryBasics,
-  DirectoryContact,
-  DirectoryServices,
-  Result,
-} from "@/components/directoryForm";
+import { DirectoryBasics, DirectoryContact, DirectoryServices } from "@/components/directoryForm";
+import { useRedirectToLoginIfNotSignedIn } from "@/hooks/useRedirection";
 import { directoryState } from "@/state/stateTypes";
 import updateDirectoryForm from "@/state/updateDirectoryForm";
 
 export default function DirectoryForm() {
+  useRedirectToLoginIfNotSignedIn();
+
   const { actions } = useStateMachine({ actions: { updateDirectoryForm } });
   const [currentStep, setCurrentStep] = useState(1);
 
@@ -49,8 +47,8 @@ export default function DirectoryForm() {
       careLanguages: [],
       authorizedForLanguages: undefined,
       // Contact page fields
-      email: "",
-      phone: "",
+      workEmail: "",
+      workPhone: "",
       licenseType: "no_license",
       licenseNumber: "",
       noLicenseReason: "",
@@ -67,9 +65,7 @@ export default function DirectoryForm() {
       case 2:
         return <DirectoryServices onNext={handleNext} onBack={handleBack} />;
       case 3:
-        return <DirectoryContact onNext={handleNext} onBack={handleBack} />;
-      case 4:
-        return <Result onReset={handleReset} />;
+        return <DirectoryContact onReset={handleReset} onBack={handleBack} />;
       default:
         setCurrentStep(1);
         return <DirectoryBasics onNext={handleNext} />;

@@ -4,8 +4,11 @@ import React, { useContext, useState } from "react";
 
 import { EditBasicInfoModal, External, LanguageSwitcher, PostCard } from "@/components";
 import { UserContext } from "@/contexts/userContext";
+import { useRedirectToLoginIfNotSignedIn } from "@/hooks/useRedirection";
 
 export default function Dashboard() {
+  useRedirectToLoginIfNotSignedIn();
+
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleCloseModal = () => {

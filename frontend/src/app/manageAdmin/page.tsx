@@ -6,6 +6,10 @@ import { useCallback, useState } from "react";
 import { FilterableTable } from "@/components";
 import styles from "@/components/FilterableTable.module.css";
 import { ProfilePicture } from "@/components/ProfilePicture";
+import {
+  useRedirectToHomeIfNotAdmin,
+  useRedirectToLoginIfNotSignedIn,
+} from "@/hooks/useRedirection";
 
 function capitalize(str: string) {
   return str.charAt(0).toUpperCase() + str.slice(1);
@@ -97,6 +101,9 @@ const InfoItem = ({ icon, label, value }: { icon: string; label: string; value: 
 );
 
 const ManageAdmin: React.FC = () => {
+  useRedirectToLoginIfNotSignedIn();
+  useRedirectToHomeIfNotAdmin();
+
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [invitedName, setInvitedName] = useState<string | null>(null);

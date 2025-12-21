@@ -16,9 +16,35 @@ export const createUser = [
   body("personal.phone").optional().isString().withMessage("Phone number must be a valid string"),
 
   body("professional").optional().notEmpty().withMessage("Professional information is required"),
+  body("professional.title").optional().isString().withMessage("Title must be a string"),
+  body("professional.prefLanguages")
+    .optional()
+    .isArray()
+    .withMessage("Preferred languages must be an array"),
+  body("professional.prefLanguages.*")
+    .isString()
+    .withMessage("Preferred languages must be an array of strings"),
+  body("professional.otherPrefLanguages")
+    .optional()
+    .isString()
+    .withMessage("Other preferred language must be a string"),
+  body("professional.country").optional().isString().withMessage("Country must be a string"),
+
   body("education").optional().notEmpty().withMessage("Education information is required"),
-  body("clinic").optional().notEmpty().withMessage("Clinic information is required"),
-  body("display").optional().notEmpty().withMessage("Display information is required"),
+  body("education.degree").optional().isString().withMessage("Degree must be a string"),
+  body("education.program").optional().isString().withMessage("Program must be a string"),
+  body("education.otherDegree").optional().isString().withMessage("Other degree must be a string"),
+  body("education.institution").optional().isString().withMessage("Institution must be a string"),
+  body("education.email").optional().isString().withMessage("School email must be a string"),
+  body("education.gradDate").optional().isString().withMessage("Graduation date must be a string"),
+
+  body("associate").optional().notEmpty().withMessage("Associate information is required"),
+  body("associate.title").optional().isString().withMessage("Title must be a string"),
+  body("associate.specialization")
+    .optional()
+    .isString()
+    .withMessage("Specialization must be a string"),
+  body("associate.organization").optional().isString().withMessage("Organization must be a string"),
 
   validateRequest,
 ];

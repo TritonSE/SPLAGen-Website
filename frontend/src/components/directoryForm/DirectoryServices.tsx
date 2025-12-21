@@ -31,7 +31,26 @@ const specialtyOptions = [
   "Pharmacogenomics",
   "Metabolic Genetics",
   "Other",
-];
+] as const;
+export type SpecialtyOption = (typeof specialtyOptions)[number];
+
+export const specialtyOptionsToBackend: Record<SpecialtyOption, string> = {
+  "Pediatric Genetics": "pediatrics",
+  "Cardiovascular Genetics": "cardiovascular",
+  Neurogenetics: "neurogenetics",
+  "Rare Diseases": "rareDiseases",
+  "Cancer Genetics": "cancer",
+  "Biochemical Genetics": "biochemical",
+  "Prenatal Genetics": "prenatal",
+  "Adult Genetics": "adult",
+  "Psychiatric Genetics": "psychiatric",
+  "Assisted Reproductive Technologies and Preimplantation Genetic Testing": "reproductive",
+  "Ophthalmic Genetics": "ophthalmic",
+  Research: "research",
+  Pharmacogenomics: "pharmacogenomics",
+  "Metabolic Genetics": "metabolic",
+  Other: "other",
+};
 
 const languageOptions = ["English", "Spanish", "Portuguese", "Other"];
 

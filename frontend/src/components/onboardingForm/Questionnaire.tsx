@@ -139,8 +139,8 @@ export const Questionnaire: React.FC<QuestionnaireProps> = ({
         {answers.field1 === "no" && (
           <div>
             <p className={styles.subtitle}>
-              Do you hold a MD, master&apos;s or PhD in a field such as medicine, nursing, social
-              work, biology, public health?
+              Do you hold a MD, master&apos;s or higher in a field such as medicine, nursing, or
+              other healthcare degree?
             </p>
             <div className={styles.buttonGroup}>
               <Radio

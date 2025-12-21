@@ -3,6 +3,10 @@ import Image from "next/image";
 
 import { FilterableTable } from "@/components";
 import styles from "@/components/FilterableTable.module.css";
+import {
+  useRedirectToHomeIfNotAdmin,
+  useRedirectToLoginIfNotSignedIn,
+} from "@/hooks/useRedirection";
 
 type CounselorRow = {
   id: number;
@@ -94,6 +98,9 @@ const dummyData = [
 ];
 
 const ManageCounselor: React.FC = () => {
+  useRedirectToLoginIfNotSignedIn();
+  useRedirectToHomeIfNotAdmin();
+
   const columns = [
     {
       key: "name",

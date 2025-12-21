@@ -7,6 +7,12 @@ import * as DirectoryValidator from "../validators/directory";
 const router = express.Router();
 
 router.post(
+  "/join",
+  requireSignedIn,
+  DirectoryValidator.requestJoinDirectory,
+  DirectoryController.joinDirectory,
+);
+router.post(
   "/approve",
   requireSignedIn,
   requireAdminOrSuperAdmin,

@@ -10,6 +10,7 @@ import styles from "./post.module.css";
 
 import { createPost } from "@/api/discussion";
 import { UserContext } from "@/contexts/userContext";
+import { useRedirectToLoginIfNotSignedIn } from "@/hooks/useRedirection";
 
 // Schema
 const postSchema = z.object({
@@ -19,6 +20,8 @@ const postSchema = z.object({
 type PostFormData = z.infer<typeof postSchema>;
 
 const CreatePostPage: React.FC = () => {
+  useRedirectToLoginIfNotSignedIn();
+
   const { firebaseUser } = useContext(UserContext);
   const router = useRouter();
   const {

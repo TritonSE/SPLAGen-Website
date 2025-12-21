@@ -3,15 +3,18 @@
 import Link from "next/link";
 import { FormEvent, useState } from "react";
 import { useTranslation } from "react-i18next";
-import styles from "src/app/login/login.module.css";
 
 import { resetUserPassword } from "@/api/users";
+import styles from "@/app/login/login.module.css";
+import { useRedirectToHomeIfSignedIn } from "@/hooks/useRedirection";
 
 const ForgotLogin = () => {
   const [email, setEmail] = useState("");
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
   const { t } = useTranslation();
+
+  useRedirectToHomeIfSignedIn();
 
   const isValid = email !== "";
 

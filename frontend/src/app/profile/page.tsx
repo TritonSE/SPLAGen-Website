@@ -11,6 +11,7 @@ import { PreferredLanguages } from "@/components/PreferredLanguages";
 import { ProfilePicture } from "@/components/ProfilePicture";
 import { EditDirectoryModal } from "@/components/modals/EditDirectoryModal";
 import { UserContext } from "@/contexts/userContext";
+import { useRedirectToLoginIfNotSignedIn } from "@/hooks/useRedirection";
 
 type DisplayComponentProps = {
   user: User | null;
@@ -158,6 +159,8 @@ const DirectorySection = ({ user, openDir }: DisplayComponentProps) => {
 };
 
 const ProfilePage: React.FC = () => {
+  useRedirectToLoginIfNotSignedIn();
+
   const { t } = useTranslation();
 
   // Basic and Professional info updated with use effect and frontend api calls.

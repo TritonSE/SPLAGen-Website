@@ -69,6 +69,7 @@ main {
   overflow-y: scroll;
   scrollbar-width: none;
   background-color: var(--color-grey0);
+  position: relative;
 }
 
 .whiteBackground {

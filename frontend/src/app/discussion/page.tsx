@@ -10,6 +10,7 @@ import styles from "./landingPage.module.css";
 import { Discussion, getPost } from "@/api/discussion";
 import { PostCard } from "@/components/PostCard";
 import { UserContext } from "@/contexts/userContext";
+import { useRedirectToLoginIfNotSignedIn } from "@/hooks/useRedirection";
 type Post = {
   id: string;
   title: string;
@@ -21,6 +22,8 @@ type Post = {
 };
 
 export default function LandingPage() {
+  useRedirectToLoginIfNotSignedIn();
+
   const { t } = useTranslation();
 
   const [originalPosts, setOriginalPosts] = useState<Post[]>([]);

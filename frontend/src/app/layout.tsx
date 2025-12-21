@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import { I18nextProvider } from "react-i18next";
 
 import { I18nClientReady, Navbar } from "@/components";
+import { CurrentUser } from "@/components/CurrentUser";
 import { UserContextProvider } from "@/contexts/userContext";
 import "./globals.css";
 import i18n from "@/i18n";
@@ -28,7 +29,10 @@ export default function RootLayout({
               <div className="layout-container">
                 <Navbar />
                 <section className={`viewPort ${isOnboardingFlow ? "purpleBackground" : ""}`}>
-                  <main className={isOnboardingFlow ? "whiteBackground" : ""}>{children}</main>
+                  <main className={isOnboardingFlow ? "whiteBackground" : ""}>
+                    {isOnboardingFlow ? null : <CurrentUser />}
+                    {children}
+                  </main>
                 </section>
               </div>
             </I18nClientReady>
