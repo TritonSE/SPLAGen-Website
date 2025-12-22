@@ -127,3 +127,8 @@ export const editDirectoryDisplayInfo = [
   body("newRequestOption").isBoolean().withMessage("Request option must be a boolean"),
   validateRequest,
 ];
+
+export const editProfilePicture = [
+  body("profilePicture").optional().isString().withMessage("Profile picture URL must be a string"),
+  validateRequest,
+];

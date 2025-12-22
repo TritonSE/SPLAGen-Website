@@ -498,7 +498,7 @@ const ManageAdmin: React.FC = () => {
               marginBottom: "2rem",
             }}
           >
-            <ProfilePicture size="medium" letter={selectedAdmin.name} />
+            <ProfilePicture size="large" letter={selectedAdmin.name} />
             <div>
               <h2 style={{ fontSize: "1.2rem", marginBottom: "0.25rem", fontWeight: "bold" }}>
                 {selectedAdmin.name}

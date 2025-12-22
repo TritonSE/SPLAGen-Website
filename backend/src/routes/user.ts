@@ -66,4 +66,12 @@ router.put(
   UserController.editDirectoryDisplayInfo,
 );
 
+// Profile picture routes
+router.put(
+  "/general/profile-picture",
+  requireSignedIn,
+  UserValidator.editProfilePicture,
+  UserController.editProfilePicture,
+);
+
 export default router;

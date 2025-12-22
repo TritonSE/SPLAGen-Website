@@ -16,6 +16,7 @@ import { SpecialtyOption, specialtyOptionsToBackend } from "./DirectoryServices"
 import { JoinDirectoryRequestBody, joinDirectory } from "@/api/directory";
 import { Button } from "@/components";
 import { PhoneInput } from "@/components/PhoneInput";
+import { SuccessMessage } from "@/components/SuccessMessage";
 import { UserContext } from "@/contexts/userContext";
 import { directoryState } from "@/state/stateTypes";
 import updateDirectoryForm from "@/state/updateDirectoryForm";
@@ -70,6 +71,7 @@ export const DirectoryContact = ({ onReset, onBack }: DirectoryContactProps) => 
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
 
   const licenseType = watch("licenseType");
 
@@ -79,6 +81,7 @@ export const DirectoryContact = ({ onReset, onBack }: DirectoryContactProps) => 
     try {
       setIsSubmitting(true);
       setError("");
+      setSuccessMessage("");
 
       const token = await firebaseUser.getIdToken();
       const requestBody: JoinDirectoryRequestBody = {
@@ -124,7 +127,10 @@ export const DirectoryContact = ({ onReset, onBack }: DirectoryContactProps) => 
       };
       const res = await joinDirectory(requestBody, token);
       if (res.success) {
-        router.push("/");
+        setSuccessMessage("Submitted directory info");
+        setTimeout(() => {
+          router.push("/");
+        }, 2000);
       } else {
         setError(`Failed to submit directory info: ${res.error}`);
       }
@@ -295,6 +301,12 @@ export const DirectoryContact = ({ onReset, onBack }: DirectoryContactProps) => 
           </>
         )}
       </form>
+      <SuccessMessage
+        message={successMessage}
+        onDismiss={() => {
+          setSuccessMessage("");
+        }}
+      />
     </div>
   );
 };

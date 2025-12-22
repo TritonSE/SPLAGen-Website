@@ -1,11 +1,11 @@
 .root {
-  position: absolute;
+  position: fixed;
   top: 4rem;
   right: 4rem;
   display: flex;
   flex-direction: column;
   gap: 4px;
-  z-index: 10000;
+  z-index: 1;
 }
 
 .userDisplay {
@@ -36,8 +36,17 @@
   color: #909090;
 }
 
-.logoutButton {
-  padding: 6px 12px;
-  border-radius: 4px;
+.buttonsContainer {
+  border-radius: 8px;
   box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  background-color: gray;
+}
+
+.button {
+  width: 100%;
+  padding: 6px 12px;
+  background-color: white;
 }

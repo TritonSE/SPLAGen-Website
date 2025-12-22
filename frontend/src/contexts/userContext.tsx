@@ -1,6 +1,7 @@
 "use client";
 
-import { User as FirebaseUser, onAuthStateChanged } from "firebase/auth";
+import { Auth, User as FirebaseUser, onAuthStateChanged } from "firebase/auth";
+import { FirebaseStorage } from "firebase/storage";
 import { ReactNode, createContext, useCallback, useEffect, useState } from "react";
 
 import { User, getWhoAmI } from "@/api/users";
@@ -9,6 +10,8 @@ import { initFirebase } from "@/firebase/firebase";
 
 // User context interface
 type IUserContext = {
+  firebaseAuth: Auth | null;
+  firebaseStorage: FirebaseStorage | null;
   firebaseUser: FirebaseUser | null;
   user: User | null;
   loadingUser: boolean;
@@ -22,6 +25,8 @@ type IUserContext = {
  * automatically fetching them when the page loads.
  */
 export const UserContext = createContext<IUserContext>({
+  firebaseAuth: null,
+  firebaseStorage: null,
   firebaseUser: null,
   user: null,
   loadingUser: true,
@@ -48,7 +53,7 @@ export const UserContextProvider = ({ children }: { children: ReactNode }) => {
   );
 
   // Initialize Firebase
-  const { auth } = initFirebase();
+  const { auth, storage } = initFirebase();
 
   /**
    * Callback triggered by Firebase when the user logs in/out, or on page load
@@ -108,6 +113,8 @@ export const UserContextProvider = ({ children }: { children: ReactNode }) => {
   return (
     <UserContext.Provider
       value={{
+        firebaseStorage: storage,
+        firebaseAuth: auth,
         firebaseUser,
         user,
         loadingUser,

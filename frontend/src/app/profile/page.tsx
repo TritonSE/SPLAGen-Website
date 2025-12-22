@@ -10,6 +10,7 @@ import { Button, EditBasicInfoModal, ProfessionalInfoModal } from "@/components"
 import { PreferredLanguages } from "@/components/PreferredLanguages";
 import { ProfilePicture } from "@/components/ProfilePicture";
 import { EditDirectoryModal } from "@/components/modals/EditDirectoryModal";
+import { UploadProfilePictureModal } from "@/components/modals/UploadProfilePictureModal";
 import { UserContext } from "@/contexts/userContext";
 import { useRedirectToLoginIfNotSignedIn } from "@/hooks/useRedirection";
 
@@ -22,6 +23,7 @@ type DisplayComponentProps = {
 
 const ProfileSection = ({ user, openBasic, openPro }: DisplayComponentProps) => {
   const { t } = useTranslation(); // define the t function at the top of your component
+  const [isProfilePictureModalOpen, setIsProfilePictureModalOpen] = useState(false);
 
   const formatMembership = (membership: MembershipType | undefined): string => {
     const membershipMap: Record<string, string> = {
@@ -40,7 +42,7 @@ const ProfileSection = ({ user, openBasic, openPro }: DisplayComponentProps) => 
     <div className="flex flex-col gap-5">
       <div className={styles.nameCard}>
         <div className="flex items-center gap-5">
-          <ProfilePicture size="small" />
+          <ProfilePicture size="medium" />
           <div className={styles.nameAndTitle}>
             <span>
               {user?.personal.firstName ?? t("none")} {user?.personal.lastName ?? t("none")}
@@ -49,10 +51,14 @@ const ProfileSection = ({ user, openBasic, openPro }: DisplayComponentProps) => 
           </div>
         </div>
 
-        <div className="flex items-center gap-5">
-          <Button variant="primary" label={t("change-photo")} />
-          <Button variant="secondary" label={t("remove-photo")} />
-        </div>
+        <Button
+          className={styles.profilePhotoButton}
+          variant="primary"
+          label={t("change-photo")}
+          onClick={() => {
+            setIsProfilePictureModalOpen(true);
+          }}
+        />
       </div>
 
       <div className={styles.infoContainer}>
@@ -136,6 +142,13 @@ const ProfileSection = ({ user, openBasic, openPro }: DisplayComponentProps) => 
           </section>
         </div>
       </div>
+
+      <UploadProfilePictureModal
+        isOpen={isProfilePictureModalOpen}
+        onClose={() => {
+          setIsProfilePictureModalOpen(false);
+        }}
+      />
     </div>
   );
 };
@@ -232,16 +245,10 @@ const ProfilePage: React.FC = () => {
       break;
   }
 
-  const membershipStatus = userData?.account.membership;
-
   return (
     <div className={styles.profileContainer}>
       <header>
         <h1> {formState} </h1>
-        <div className="flex items-center gap-2">
-          <ProfilePicture />
-          <button> {userData?.personal.firstName} </button>
-        </div>
       </header>
 
       <div className={styles.switch}>
@@ -259,7 +266,6 @@ const ProfilePage: React.FC = () => {
           onClick={() => {
             setFormState("Directory");
           }}
-          className={membershipStatus === "student" ? "hidden" : ""}
         />
       </div>
 

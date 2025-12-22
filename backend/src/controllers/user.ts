@@ -9,6 +9,7 @@ import {
   CreateUserRequestBody,
   EditDirectoryDisplayInformationRequestBody,
   EditDirectoryPersonalInformationRequestBody,
+  EditProfilePictureRequestBody,
   EditUserPersonalInformationRequestBody,
   EditUserProfessionalInformationRequestBody,
 } from "./types/userTypes";
@@ -387,6 +388,34 @@ export const editDirectoryDisplayInfo = async (
     return;
   } catch (error) {
     console.error("Error updating directory display information:", error);
+    next(error);
+    return;
+  }
+};
+
+export const editProfilePicture = async (
+  req: AuthenticatedRequest<unknown, unknown, EditProfilePictureRequestBody>,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { firebaseUid } = req;
+
+    const updatedUser = await UserModel.findOneAndUpdate(
+      { firebaseId: firebaseUid },
+      {
+        "account.profilePicture": req.body.profilePicture,
+      },
+      { new: true, runValidators: true },
+    );
+
+    if (!updatedUser) {
+      res.status(404).json({ error: "User not found" });
+      return;
+    }
+
+    res.status(200).json({ message: "Profile picture updated", user: updatedUser });
+  } catch (error) {
     next(error);
     return;
   }

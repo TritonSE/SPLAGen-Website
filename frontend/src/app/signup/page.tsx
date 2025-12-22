@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
+import { SuccessMessage } from "@/components/SuccessMessage";
 import {
   Associate,
   Basics,
@@ -27,6 +28,7 @@ export default function OnboardingForm() {
   const { setOnboardingStep } = useContext(UserContext);
   const router = useRouter();
   const { t } = useTranslation();
+  const [successMessage, setSuccessMessage] = useState("");
 
   const handleNext = useCallback(
     (data: onboardingState["data"]) => {
@@ -99,7 +101,10 @@ export default function OnboardingForm() {
         ) {
           setStep(4);
         } else {
-          router.push("/");
+          setSuccessMessage("Registration submitted");
+          setTimeout(() => {
+            router.push("/");
+          }, 2000);
         }
       }
     },
@@ -184,6 +189,13 @@ export default function OnboardingForm() {
           }}
         />
       )}
+
+      <SuccessMessage
+        message={successMessage}
+        onDismiss={() => {
+          setSuccessMessage("");
+        }}
+      />
     </div>
   );
 }

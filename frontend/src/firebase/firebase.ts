@@ -1,5 +1,6 @@
 import { FirebaseOptions, initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
+import { getStorage } from "firebase/storage";
 
 import env from "@/util/validateEnv";
 
@@ -16,6 +17,7 @@ export const initFirebase = () => {
 
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
+  const storage = getStorage(app);
 
-  return { app, auth };
+  return { app, auth, storage };
 };

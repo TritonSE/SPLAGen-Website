@@ -321,6 +321,21 @@ export async function editDirectoryDisplayInfoRequest(
   }
 }
 
+export async function editProfilePicture(
+  profilePicture: string,
+  firebaseToken: string,
+): Promise<APIResult<null>> {
+  try {
+    await put(
+      "/api/users/general/profile-picture",
+      { profilePicture },
+      createAuthHeader(firebaseToken),
+    );
+    return { success: true, data: null };
+  } catch (error) {
+    return handleAPIError(error);
+  }
+}
 export const getUser = async (
   firebaseUid: string,
   firebaseToken: string,

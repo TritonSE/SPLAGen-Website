@@ -104,3 +104,7 @@ export type EditDirectoryDisplayInformationRequestBody = {
   newRemoteOption: boolean;
   newRequestOption: boolean;
 };
+
+export type EditProfilePictureRequestBody = {
+  profilePicture: string;
+};
