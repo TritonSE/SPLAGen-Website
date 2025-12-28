@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 
 import { AuthenticatedRequest } from "../middleware/auth";
-import UserModel, { UserMembership } from "../models/user";
+import UserModel, { User, UserMembership } from "../models/user";
 import { sendDirectoryApprovalEmail, sendDirectoryDenialEmail } from "../services/emailService";
 
 type JoinDirectoryRequestBody = {
@@ -180,6 +180,23 @@ export const denyDirectoryEntry = async (
   }
 };
 
+const formatUserForDirectory = (user: User) => ({
+  name: `${user.personal?.firstName ?? ""} ${user.personal?.lastName ?? ""}`,
+  title: user.professional?.title ?? "Genetic Counselor",
+  address: `${user.clinic?.location?.address ?? ""} ${user.clinic?.location?.suite ?? ""}`.trim(),
+  organization: user.clinic?.name ?? "",
+  email: user.display?.workEmail ?? user.personal?.email ?? "",
+  phone: user.display?.workPhone ?? user.personal?.phone ?? "",
+  specialties: user.display?.services ?? [],
+  languages: [
+    ...(user.display?.languages ?? []),
+    ...(user.professional?.prefLanguages?.includes("other") && user.professional.otherPrefLanguages
+      ? [user.professional.otherPrefLanguages]
+      : []),
+  ],
+  profileUrl: user.clinic?.url ?? "",
+});
+
 export const getPublicDirectory = async (_req: Request, res: Response) => {
   try {
     const users = await UserModel.find({
@@ -187,24 +204,7 @@ export const getPublicDirectory = async (_req: Request, res: Response) => {
       "account.membership": { $in: ["geneticCounselor", "healthcareProvider"] },
     });
 
-    const directory = users.map((user) => ({
-      name: `${user.personal?.firstName ?? ""} ${user.personal?.lastName ?? ""}`,
-      title: user.professional?.title ?? "Genetic Counselor",
-      address:
-        `${user.clinic?.location?.address ?? ""} ${user.clinic?.location?.suite ?? ""}`.trim(),
-      organization: user.clinic?.name ?? "",
-      email: user.display?.workEmail ?? user.personal?.email ?? "",
-      phone: user.display?.workPhone ?? user.personal?.phone ?? "",
-      specialties: user.display?.services ?? [],
-      languages: [
-        ...(user.display?.languages ?? []),
-        ...(user.professional?.prefLanguages?.includes("other") &&
-        user.professional.otherPrefLanguages
-          ? [user.professional.otherPrefLanguages]
-          : []),
-      ],
-      profileUrl: user.clinic?.url ?? "",
-    }));
+    const directory = users.map(formatUserForDirectory);
 
     res.status(200).json(directory);
   } catch (err) {

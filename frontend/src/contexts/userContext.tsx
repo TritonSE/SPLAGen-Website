@@ -18,6 +18,8 @@ type IUserContext = {
   reloadUser: () => unknown;
   onboardingStep: OnboardingStep;
   setOnboardingStep: (step: OnboardingStep) => void;
+  isSuperAdmin: boolean;
+  isAdminOrSuperAdmin: boolean;
 };
 
 /**
@@ -33,6 +35,8 @@ export const UserContext = createContext<IUserContext>({
   reloadUser: () => undefined,
   onboardingStep: 0,
   setOnboardingStep: () => undefined,
+  isSuperAdmin: false,
+  isAdminOrSuperAdmin: false,
 });
 
 /**
@@ -121,6 +125,8 @@ export const UserContextProvider = ({ children }: { children: ReactNode }) => {
         reloadUser,
         onboardingStep,
         setOnboardingStep: setOnboardingStepHandler,
+        isSuperAdmin: user?.role === "superadmin",
+        isAdminOrSuperAdmin: !!user && ["superadmin", "admin"].includes(user.role),
       }}
     >
       {children}

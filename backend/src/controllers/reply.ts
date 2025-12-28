@@ -25,7 +25,7 @@ export const createReply = async (
     const newReply = new Reply({ userId, postId, message });
     await newReply.save();
 
-    res.status(201).json({ message: "Reply created successfully", reply: newReply });
+    res.status(201).json(newReply);
   } catch (error) {
     next(error);
   }
@@ -38,8 +38,10 @@ export const getReplies = async (
 ) => {
   try {
     const { postId } = req.params;
-    const discussionReplies = await Reply.find({ postId });
-    res.status(200).json({ replies: discussionReplies });
+    const discussionReplies = await Reply.find({ postId })
+      .sort({ createdAt: -1 })
+      .populate("userId");
+    res.status(200).json(discussionReplies);
   } catch (error) {
     next(error);
   }
@@ -54,6 +56,7 @@ export const editReply = async (
     const userUid = req.mongoID;
     const { id } = req.params;
     const { message } = req.body;
+    const role = req.role;
 
     // Find the reply by ID
     const reply = await Reply.findById(id);
@@ -63,8 +66,13 @@ export const editReply = async (
     }
 
     // Check if the user is the owner of the reply
-    if (!reply.userId.equals(userUid)) {
-      res.status(403).json({ error: "Unauthorized: You can only edit your own replies" });
+    if (
+      !reply.userId.equals(userUid) &&
+      ![UserRole.ADMIN, UserRole.SUPERADMIN].includes(role as UserRole)
+    ) {
+      res.status(403).json({
+        error: "Unauthorized: You can only edit your own replies if you are not an admin",
+      });
       return;
     }
 
@@ -72,7 +80,7 @@ export const editReply = async (
     reply.message = message;
     await reply.save();
 
-    res.status(200).json({ message: "Reply updated successfully", reply });
+    res.status(200).json(reply);
   } catch (error) {
     next(error);
   }
@@ -107,7 +115,11 @@ export const deleteReply = async (
     }
 
     // Delete the reply
-    await Reply.deleteOne({ _id: id });
+    const result = await Reply.deleteOne({ _id: id });
+    if (!result.acknowledged) {
+      res.status(400).json({ error: "Reply was not deleted" });
+      return;
+    }
 
     res.status(200).json({ message: "Reply deleted successfully" });
   } catch (error) {

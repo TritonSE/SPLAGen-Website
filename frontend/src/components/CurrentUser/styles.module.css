@@ -29,6 +29,12 @@
   font-weight: 600;
 }
 
+.userTitle {
+  margin: 0;
+  font-size: 14px;
+  color: black;
+}
+
 .userRole {
   margin: 0;
   font-size: 14px;

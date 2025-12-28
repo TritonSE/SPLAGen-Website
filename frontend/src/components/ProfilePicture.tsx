@@ -3,9 +3,11 @@ import { useContext, useMemo } from "react";
 
 import styles from "./ProfilePicture.module.css";
 
+import { User } from "@/api/users";
 import { UserContext } from "@/contexts/userContext";
 
 type ProfilePictureProps = {
+  user?: User | null;
   size?: "small" | "medium" | "large";
   letter?: string;
 };
@@ -17,15 +19,23 @@ const imageSizes = {
 };
 
 // Renders fallback letter or first initial from user's first name
-export const ProfilePicture: React.FC<ProfilePictureProps> = ({ size = "small", letter }) => {
-  const { user } = useContext(UserContext);
+export const ProfilePicture: React.FC<ProfilePictureProps> = ({
+  user = null,
+  size = "small",
+  letter,
+}) => {
+  const { user: myself } = useContext(UserContext);
+
+  // Default to currently logged-in user if none is provided
+  // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+  const userToUse = user === null ? myself : user;
 
   const displayLetter = useMemo(() => {
     if (letter?.length) return letter[0].toUpperCase();
-    return user?.personal?.firstName?.[0]?.toUpperCase() ?? "?";
-  }, [letter, user?.personal?.firstName]);
+    return userToUse?.personal?.firstName?.[0]?.toUpperCase() ?? "?";
+  }, [letter, userToUse?.personal?.firstName]);
 
-  const profileURL = user?.account.profilePicture;
+  const profileURL = userToUse?.account.profilePicture;
 
   return (
     <div className={`${styles.profilepic} ${styles[size]}`}>

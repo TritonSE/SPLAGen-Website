@@ -1,17 +1,18 @@
 "use client";
 
+import moment from "moment";
 import React from "react";
 
 import styles from "./PostCard.module.css";
 
+import { User } from "@/api/users";
 import { ProfilePicture } from "@/components/ProfilePicture";
 
 type PostCard = {
-  id: string;
+  href: string;
   profileImage?: string;
-  authorName: string;
-  date: string;
-  time?: string;
+  author: User;
+  createdAt: string;
   title: string;
   audience?: string;
   message: string;
@@ -19,25 +20,25 @@ type PostCard = {
 };
 
 export const PostCard: React.FC<PostCard> = ({
-  id,
-  authorName,
-  date,
-  time,
+  href,
+  author,
+  createdAt,
   title,
   audience,
   message,
   onClick,
 }) => {
   return (
-    <a href={`/discussion/${id}`}>
+    <a href={href}>
       <div className={styles["postcard-container"]} onClick={onClick}>
         <div className={styles["postcard-left"]}>
-          <ProfilePicture size="small" letter={authorName?.[0] ?? "?"} />
+          <ProfilePicture size="small" user={author} />
           <div className={styles["postcard-author-info"]}>
-            <div className={styles["postcard-author-name"]}>{authorName}</div>
+            <div className={styles["postcard-author-name"]}>
+              {author.personal.firstName} {author.personal.lastName}
+            </div>
             <div className={styles["postcard-timestamp"]}>
-              {new Date(date).toISOString().slice(0, 10)}
-              {time ? `, ${time}` : ""}
+              {moment(createdAt).format("MMMM D YYYY")}
             </div>
           </div>
         </div>

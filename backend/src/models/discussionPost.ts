@@ -15,15 +15,14 @@ const discussionPostSchema = new Schema(
       type: String,
       required: true,
     },
-    channel: {
-      type: String,
-      required: true,
-      default: "everyone",
-      // TODO: Add enum for channel values when valid options are defined
-    },
   },
   { timestamps: true },
 );
+
+discussionPostSchema.index({
+  title: "text",
+  message: "text",
+});
 
 type DiscussionPost = InferSchemaType<typeof discussionPostSchema>;
 

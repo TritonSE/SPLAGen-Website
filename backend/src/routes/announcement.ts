@@ -5,18 +5,18 @@ import { requireAdminOrSuperAdmin, requireSignedIn } from "../middleware/auth";
 import * as AnnouncementValidator from "../validators/announcement";
 const router = express.Router();
 
-//TODO add validators
 router.post(
   "/",
   requireSignedIn,
   requireAdminOrSuperAdmin,
-  AnnouncementValidator.createAnnouncement,
+  AnnouncementValidator.createOrEditAnnouncement,
   AnnouncementController.createAnnouncement,
 );
 router.put(
   "/:id",
   requireSignedIn,
   requireAdminOrSuperAdmin,
+  AnnouncementValidator.createOrEditAnnouncement,
   AnnouncementController.editAnnouncement,
 );
 router.delete(

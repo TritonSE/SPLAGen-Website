@@ -2,7 +2,7 @@
 import Link from "next/link";
 import React, { useContext } from "react";
 
-import { External, LanguageSwitcher, PostCard } from "@/components";
+import { External, LanguageSwitcher } from "@/components";
 import { UserContext } from "@/contexts/userContext";
 import { useRedirectToLoginIfNotSignedIn } from "@/hooks/useRedirection";
 
@@ -56,7 +56,7 @@ export default function Dashboard() {
           {/* <ProfessionalInfoModal isOpen={isModalOpen} onClose={handleCloseModal} /> */}
 
           {/* Render a sample PostCard */}
-          <PostCard
+          {/* <PostCard
             id="test"
             authorName="Alex Johnson"
             date="April 7, 2025"
@@ -64,7 +64,7 @@ export default function Dashboard() {
             title="Welcome to the Community!"
             message="We're excited to have you here. Let us know if you need anything."
             audience="New Joiners"
-          />
+          /> */}
         </main>
       </div>
     </div>
