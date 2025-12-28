@@ -8,6 +8,20 @@ import { initFirebase } from "@/firebase/firebase";
 
 export type MembershipType = "student" | "geneticCounselor" | "healthcareProvider" | "associate";
 
+export const membershipDisplayMap: Record<string, string> = {
+  student: "Student",
+  geneticCounselor: "Genetic Counselor",
+  healthcareProvider: "Healthcare Provider",
+  associate: "Associate",
+};
+
+export const professionalTitleOptions = [
+  { value: "medical_geneticist", label: "Medical Geneticist" },
+  { value: "genetic_counselor", label: "Genetic Counselor" },
+  { value: "student", label: "Student" },
+  { value: "other", label: "Other" },
+] as const;
+
 // Define CreateUserRequestBody type based on backend requirements
 export type CreateUserRequestBody = {
   password: string;
@@ -142,7 +156,7 @@ export type EditBasicInfo = {
   newFirstName: string;
   newLastName: string;
   newEmail: string;
-  newPhone: string;
+  newPhone?: string;
 };
 
 export type ProfessionalInfo = {
@@ -183,6 +197,21 @@ export type EditDirectoryDisplayInformationRequestBody = {
   newLicense: string[];
   newRemoteOption: boolean;
   newRequestOption: boolean;
+  newAppointmentsOption: boolean;
+  newAuthorizedOption: string | boolean;
+};
+
+export type EditDirectoryPersonalInformationRequestBody = {
+  newDegree: string;
+  newEducationInstitution: string;
+  newClinicName?: string;
+  newClinicAddress?: string;
+  newClinicCountry?: string;
+  newClinicApartmentSuite?: string;
+  newClinicCity?: string;
+  newClinicState?: string;
+  newClinicZipPostCode?: string;
+  newClinicWebsiteUrl?: string;
 };
 
 export const createAuthHeader = (firebaseToken: string) => ({
@@ -315,6 +344,22 @@ export async function editDirectoryDisplayInfoRequest(
 ): Promise<APIResult<null>> {
   try {
     await put("/api/users/directory/display-info", directoryInfo, createAuthHeader(firebaseToken));
+    return { success: true, data: null };
+  } catch (error) {
+    return handleAPIError(error);
+  }
+}
+
+export async function editDirectoryPersonalInfoRequest(
+  directoryInfo: EditDirectoryPersonalInformationRequestBody,
+  firebaseToken: string,
+): Promise<APIResult<null>> {
+  try {
+    await put(
+      "/api/users/directory/personal-information",
+      directoryInfo,
+      createAuthHeader(firebaseToken),
+    );
     return { success: true, data: null };
   } catch (error) {
     return handleAPIError(error);

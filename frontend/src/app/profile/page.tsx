@@ -1,24 +1,36 @@
 "use client";
-import Image from "next/image";
-import { useCallback, useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import styles from "./page.module.css";
 
-import { MembershipType, User, getWhoAmI } from "@/api/users";
-import { Button, EditBasicInfoModal, ProfessionalInfoModal } from "@/components";
+import { MembershipType, User, membershipDisplayMap, professionalTitleOptions } from "@/api/users";
+import {
+  Button,
+  DirectoryPersonalInfoModal,
+  EditBasicInfoModal,
+  ProfessionalInfoModal,
+} from "@/components";
 import { PreferredLanguages } from "@/components/PreferredLanguages";
+import { ProfilePageCard } from "@/components/ProfilePageCard";
 import { ProfilePicture } from "@/components/ProfilePicture";
-import { EditDirectoryModal } from "@/components/modals/EditDirectoryModal";
+import { specialtyOptionsToFrontend } from "@/components/directoryForm/DirectoryServices";
+import { EditDirectoryDisplayModal } from "@/components/modals/EditDirectoryDisplayModal";
 import { UploadProfilePictureModal } from "@/components/modals/UploadProfilePictureModal";
+import { educationTypeOptions } from "@/components/modals/displayInfoConstants";
 import { UserContext } from "@/contexts/userContext";
 import { useRedirectToLoginIfNotSignedIn } from "@/hooks/useRedirection";
 
 type DisplayComponentProps = {
   user: User | null;
-  openBasic: () => void; // setIsBasicModalOpen
-  openPro: () => void; // setIsProModalOpen
-  openDir: () => void; //setIsDirModalOpen
+
+  // General
+  openBasic: () => void;
+  openPro: () => void;
+
+  // Directory
+  openPersonal: () => void;
+  openDisplay: () => void;
 };
 
 const ProfileSection = ({ user, openBasic, openPro }: DisplayComponentProps) => {
@@ -26,14 +38,7 @@ const ProfileSection = ({ user, openBasic, openPro }: DisplayComponentProps) => 
   const [isProfilePictureModalOpen, setIsProfilePictureModalOpen] = useState(false);
 
   const formatMembership = (membership: MembershipType | undefined): string => {
-    const membershipMap: Record<string, string> = {
-      student: "Student",
-      geneticCounselor: "Genetic Counselor",
-      healthcareProvider: "Healthcare Provider",
-      associate: "Associate",
-    };
-
-    return membership ? (membershipMap[membership] ?? "None") : "None";
+    return membership ? (membershipDisplayMap[membership] ?? "None") : "None";
   };
 
   const formattedMembership = formatMembership(user?.account.membership);
@@ -62,85 +67,48 @@ const ProfileSection = ({ user, openBasic, openPro }: DisplayComponentProps) => 
       </div>
 
       <div className={styles.infoContainer}>
-        <div className={styles.infoCard}>
-          <header>
-            <h2> {t("basic-info")} </h2>
-            <button onClick={openBasic}>
-              <Image src="/icons/line-md.svg" width={25} height={25} alt="Edit basic info icon" />
-            </button>
-          </header>
+        <ProfilePageCard
+          title={t("basic-info")}
+          onClickEdit={openBasic}
+          leftColumnFields={[
+            { label: t("first-name"), value: user?.personal.firstName },
+            { label: t("email"), value: user?.personal.email },
+          ]}
+          rightColumnFields={[
+            { label: t("last-name"), value: user?.personal.lastName },
+            { label: t("phone"), value: user?.personal.phone },
+          ]}
+        />
 
-          <section className={styles.profileDetails}>
-            <ul className={styles.infoColumn}>
-              <li>
-                <label> {t("first-name")} </label> <br />
-                {user?.personal.firstName ?? t("none")}
-              </li>
-
-              <li>
-                <label> {t("email")} </label> <br />
-                {user?.personal.email ?? t("none")}
-              </li>
-            </ul>
-
-            <article className={styles.infoColumn}>
-              <ul className={styles.infoColumn}>
-                <li>
-                  <label> {t("last-name")} </label> <br />
-                  {user?.personal.lastName ?? t("none")}
-                </li>
-
-                <li>
-                  <label> {t("phone")} </label> <br />
-                  {user?.personal.phone ?? t("none")}
-                </li>
-              </ul>
-            </article>
-          </section>
-        </div>
-
-        <div className={styles.infoCard}>
-          <header>
-            <h2> {t("professional-info")} </h2>
-            <button onClick={openPro}>
-              <Image
-                src="/icons/line-md.svg"
-                width={25}
-                height={25}
-                alt="Edit professional info icon"
-              />
-            </button>
-          </header>
-
-          <section className={styles.profileDetails}>
-            <ul className={styles.infoColumn}>
-              <li>
-                <label> {t("professional-title")} </label> <br />
-                {user?.professional?.title ?? t("none")}
-              </li>
-
-              <li>
-                <label> {t("preferred-language")} </label>
-                <br />
-                <PreferredLanguages languages={user?.professional?.prefLanguages ?? []} />
-              </li>
-            </ul>
-
-            <article className={styles.infoColumn}>
-              <ul className={styles.infoColumn}>
-                <li>
-                  <label> {t("country")} </label> <br />
-                  {user?.professional?.country ?? t("none")}
-                </li>
-
-                <li>
-                  <label> {t("splagen-directory")} </label> <br />
-                  {user?.account.inDirectory ? t("yes") : t("no")}
-                </li>
-              </ul>
-            </article>
-          </section>
-        </div>
+        <ProfilePageCard
+          title={t("professional-info")}
+          onClickEdit={openPro}
+          leftColumnFields={[
+            {
+              label: t("professional-title"),
+              value:
+                professionalTitleOptions.find(
+                  (option) => option.value === user?.professional?.title,
+                )?.label ?? `Other (${String(user?.professional?.title)})`,
+            },
+            {
+              label: t("preferred-language"),
+              value: <PreferredLanguages languages={user?.professional?.prefLanguages ?? []} />,
+            },
+          ]}
+          rightColumnFields={[
+            { label: t("country"), value: user?.professional?.country },
+            {
+              label: t("splagen-directory"),
+              value:
+                user?.account.inDirectory === true
+                  ? t("yes")
+                  : user?.account.inDirectory === "pending"
+                    ? "Pending"
+                    : t("no"),
+            },
+          ]}
+        />
       </div>
 
       <UploadProfilePictureModal
@@ -153,22 +121,159 @@ const ProfileSection = ({ user, openBasic, openPro }: DisplayComponentProps) => 
   );
 };
 
+const formatAddress = (
+  address: string | undefined,
+  suite: string | undefined,
+  city: string | undefined,
+  state: string | undefined,
+  country: string | undefined,
+  zipCode: string | undefined,
+) => (
+  <div>
+    {address && <p>{address}</p>}
+    {suite && <p>{suite}</p>}
+    <p>
+      {city}, {state}, {country}
+    </p>
+    <p>{zipCode}</p>
+  </div>
+);
+
 // Directory sub component
-const DirectorySection = ({ user, openDir }: DisplayComponentProps) => {
+const DirectorySection = ({ user, openPersonal, openDisplay }: DisplayComponentProps) => {
   const { t } = useTranslation(); // define the t function at the top of your component
 
-  return (
-    <div>
-      <button onClick={openDir} className={styles.funnyButton}>
-        {" "}
-        Open EditBasicInfoModal{" "}
-      </button>
+  if (user?.account.membership === "student" || user?.account.membership === "associate") {
+    // User's membership type is ineligible to join directory
+    return (
+      <div className={styles.directoryColumn}>
+        <p className={styles.directoryTitle}>You are not in the SPLAGen Directory</p>
+        <p>Only full members can join the directory.</p>
+        <a href="https://www.splagen.org/en/membresia" target="_blank" rel="noopener noreferrer">
+          <Button label="Learn more about membership" />
+        </a>
+      </div>
+    );
+  }
 
-      <br></br>
-      <b> {t("directory-information")} </b>
-      <span> {user?.personal.lastName ?? t("directory-information")} </span>
-    </div>
-  );
+  // User is not in directory, but can join - link them to the directory form
+  switch (user?.account.inDirectory) {
+    case false:
+      return (
+        <div className={styles.directoryColumn}>
+          <p className={styles.directoryTitle}>You are not in the SPLAGen Directory yet</p>
+          <a href="/directoryForm">
+            <Button label="Join the directory" />
+          </a>
+        </div>
+      );
+
+    case true:
+    case "pending":
+    case undefined:
+    default:
+      return (
+        <div className="flex flex-col gap-8">
+          <p>
+            {user?.account.inDirectory === "pending"
+              ? /* User's request to join the directory is pending and they can still edit their information */
+                "Your request to join the directory is being reviewed by our staff. Feel free to update your information in the meantime!"
+              : /* User is in the directory and can edit their information */
+                "Any edits made here will be reflected in the directory."}
+          </p>
+
+          <div className={styles.infoContainer}>
+            <ProfilePageCard
+              title="Personal Info"
+              onClickEdit={openPersonal}
+              leftColumnFields={[
+                {
+                  label: "Degree/certification",
+                  value: educationTypeOptions.find(
+                    (option) => option.value === user?.education?.degree,
+                  )?.label,
+                },
+                { label: "Work Clinic", value: user?.clinic?.name },
+                { label: "Clinic Website", value: user?.clinic?.url },
+              ]}
+              rightColumnFields={[
+                { label: "Education Institution", value: user?.education?.institution },
+                {
+                  label: "Clinic Address",
+                  value:
+                    user?.clinic?.location &&
+                    formatAddress(
+                      user.clinic.location.address,
+                      user.clinic.location.suite,
+                      user.clinic.location.city,
+                      user.clinic.location.state,
+                      user.clinic.location.country,
+                      user.clinic.location.zipPostCode,
+                    ),
+                },
+              ]}
+            />
+
+            <ProfilePageCard
+              title="Display Info"
+              onClickEdit={openDisplay}
+              leftColumnFields={[
+                {
+                  label: "Work Email",
+                  value: user?.display?.workEmail,
+                },
+                {
+                  label: "Genetic services",
+                  value: (user?.display?.services?.length ?? 0) > 0 && (
+                    <div>
+                      {user?.display?.services?.map((service) => (
+                        <p key={service}>{specialtyOptionsToFrontend[service]}</p>
+                      ))}
+                    </div>
+                  ),
+                },
+                {
+                  label: "License number",
+                  value: user?.display?.license?.[0] ? user?.display?.license?.[0] : t("none"),
+                },
+                {
+                  label: "Do you offer remote services?",
+                  value: user?.display?.options?.remote ? t("yes") : t("no"),
+                },
+                {
+                  label: "Are you authorized to provide care?",
+                  value:
+                    user?.display?.options?.authorizedCare === "unsure"
+                      ? "Unsure"
+                      : user?.display?.options?.authorizedCare === true
+                        ? t("yes")
+                        : t("no"),
+                },
+              ]}
+              rightColumnFields={[
+                {
+                  label: "Work Phone",
+                  value: user?.display?.workPhone,
+                },
+                {
+                  label: "Language(s) used to provide care",
+
+                  value: <PreferredLanguages languages={user?.display?.languages ?? []} />,
+                },
+                {
+                  label: "Can patient request genetic tests?",
+                  value: user?.display?.options?.openToRequests ? t("yes") : t("no"),
+                },
+                {
+                  label: "Can patient make appointments for services?",
+                  value: user?.display?.options?.openToAppointments ? t("yes") : t("no"),
+                },
+              ]}
+            />
+          </div>
+        </div>
+      );
+  }
 };
 
 const ProfilePage: React.FC = () => {
@@ -176,74 +281,17 @@ const ProfilePage: React.FC = () => {
 
   const { t } = useTranslation();
 
-  // Basic and Professional info updated with use effect and frontend api calls.
-  const [userData, setUserData] = useState<User | null>(null);
-
   // Basic and Personal Modal state tracking
   const [isBasicModalOpen, setIsBasicModalOpen] = useState(false);
   const [isProfModalOpen, setIsProfModalOpen] = useState(false);
-  const [isDirModalOpen, setIsDirModalOpen] = useState(false);
+  const [isPersonalModalOpen, setIsPersonalModalOpen] = useState(false);
+  const [isDisplayModalOpen, setIsDisplayModalOpen] = useState(false);
 
   // Profile and Directory form state
   const [formState, setFormState] = useState<"Profile" | "Directory">("Profile");
-  let DisplayComponent = formState === "Profile" ? ProfileSection : DirectorySection;
+  const DisplayComponent = formState === "Profile" ? ProfileSection : DirectorySection;
 
-  const { firebaseUser } = useContext(UserContext);
-
-  // Fetch User data with frontend api call
-  const fetchUserData = useCallback(async () => {
-    if (!firebaseUser) return;
-    const firebaseToken = await firebaseUser.getIdToken();
-    const res = await getWhoAmI(firebaseToken);
-    if (res.success) {
-      setUserData(res.data);
-    }
-  }, [setUserData, firebaseUser]);
-
-  // Use effect fetches user data
-  useEffect(() => {
-    fetchUserData().catch((err: unknown) => {
-      console.error("Error in fetching user data: ", err);
-    });
-  }, [fetchUserData]);
-
-  // Modal State management
-  const handleOpenDirectoryInfoModal = () => {
-    setIsDirModalOpen(true);
-  };
-
-  const handleCloseDirectoryModal = () => {
-    setIsDirModalOpen(false);
-    void fetchUserData();
-  };
-
-  const handleOpenBasicModal = () => {
-    setIsBasicModalOpen(true);
-  };
-
-  const handleCloseBasicModal = () => {
-    setIsBasicModalOpen(false);
-    void fetchUserData();
-  };
-
-  const handleOpenProfessionalInfoModal = () => {
-    setIsProfModalOpen(true);
-  };
-
-  const handleCloseProfessionalInfoModal = () => {
-    setIsProfModalOpen(false);
-    void fetchUserData();
-  };
-
-  switch (formState) {
-    case "Profile":
-      DisplayComponent = ProfileSection;
-      break;
-
-    case "Directory":
-      DisplayComponent = DirectorySection;
-      break;
-  }
+  const { user } = useContext(UserContext);
 
   return (
     <div className={styles.profileContainer}>
@@ -269,29 +317,52 @@ const ProfilePage: React.FC = () => {
         />
       </div>
 
-      <EditBasicInfoModal isOpen={isBasicModalOpen} onClose={handleCloseBasicModal} />
+      <EditBasicInfoModal
+        isOpen={isBasicModalOpen}
+        onClose={() => {
+          setIsBasicModalOpen(false);
+        }}
+        populationInfo={user}
+      />
 
-      {userData && (
-        <ProfessionalInfoModal
-          isOpen={isProfModalOpen}
-          onClose={handleCloseProfessionalInfoModal}
-          populationInfo={userData}
-        />
-      )}
+      <ProfessionalInfoModal
+        isOpen={isProfModalOpen}
+        onClose={() => {
+          setIsProfModalOpen(false);
+        }}
+        populationInfo={user}
+      />
 
-      {userData && (
-        <EditDirectoryModal
-          isOpen={isDirModalOpen}
-          onClose={handleCloseDirectoryModal}
-          populationInfo={userData}
-        />
-      )}
+      <EditDirectoryDisplayModal
+        isOpen={isDisplayModalOpen}
+        onClose={() => {
+          setIsDisplayModalOpen(false);
+        }}
+        populationInfo={user}
+      />
+
+      <DirectoryPersonalInfoModal
+        isOpen={isPersonalModalOpen}
+        onClose={() => {
+          setIsPersonalModalOpen(false);
+        }}
+        populationInfo={user}
+      />
 
       <DisplayComponent
-        user={userData}
-        openBasic={handleOpenBasicModal}
-        openPro={handleOpenProfessionalInfoModal}
-        openDir={handleOpenDirectoryInfoModal}
+        user={user}
+        openBasic={() => {
+          setIsBasicModalOpen(true);
+        }}
+        openPro={() => {
+          setIsProfModalOpen(true);
+        }}
+        openPersonal={() => {
+          setIsPersonalModalOpen(true);
+        }}
+        openDisplay={() => {
+          setIsDisplayModalOpen(true);
+        }}
       />
     </div>
   );

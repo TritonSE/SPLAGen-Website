@@ -6,6 +6,7 @@ const initialState: GlobalState = {
     firstName: "",
     lastName: "",
     email: "",
+    phone: "",
     password: "",
     // Basic
     professionalTitle: { value: "", label: "" },

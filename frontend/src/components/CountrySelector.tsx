@@ -15,6 +15,14 @@ type CountrySelectorProps = {
   placeholder?: string;
 };
 
+export const getCountryOptions = () => {
+  const data = (countryList() as { getData: () => CountryOption[] }).getData();
+  return data.map((country) => ({
+    value: country.value,
+    label: country.label,
+  }));
+};
+
 export const CountrySelector: React.FC<CountrySelectorProps> = ({
   value,
   onChange,
@@ -23,11 +31,7 @@ export const CountrySelector: React.FC<CountrySelectorProps> = ({
   // Ensure safe data fetching
   const options = useMemo(() => {
     try {
-      const data = (countryList() as { getData: () => CountryOption[] }).getData();
-      return data.map((country) => ({
-        value: country.value,
-        label: country.label,
-      }));
+      return getCountryOptions();
     } catch (err: unknown) {
       console.error(
         "Error fetching country list:",

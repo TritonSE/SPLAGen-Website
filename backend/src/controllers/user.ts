@@ -361,6 +361,8 @@ export const editDirectoryDisplayInfo = async (
       newLicense,
       newRemoteOption,
       newRequestOption,
+      newAuthorizedOption,
+      newAppointmentsOption,
     } = req.body;
 
     const updatedUser = await UserModel.findOneAndUpdate(
@@ -373,6 +375,8 @@ export const editDirectoryDisplayInfo = async (
         "display.license": newLicense,
         "display.options.remote": newRemoteOption,
         "display.options.openToRequests": newRequestOption,
+        "display.options.authorizedCare": newAuthorizedOption,
+        "display.options.openToAppointments": newAppointmentsOption,
       },
       { new: true, runValidators: true },
     );

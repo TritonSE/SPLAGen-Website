@@ -9,11 +9,5 @@ export const PreferredLanguages = ({ languages }: PreferredLanguagesProps) => {
 
   if (!languages || languages.length === 0) return <>{t("none")}</>;
 
-  return (
-    <ul>
-      {languages.map((lang, idx) => (
-        <li key={idx}>{t(lang)}</li>
-      ))}
-    </ul>
-  );
+  return <p>{languages.map((lang) => t(lang)).join(", ")}</p>;
 };

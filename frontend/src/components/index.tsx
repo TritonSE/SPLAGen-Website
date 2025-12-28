@@ -5,7 +5,7 @@ export { LanguageSwitcher } from "./languageSwitcher";
 export { NavCard } from "./navbar/NavCard";
 export { Navbar } from "./navbar/Navbar";
 export { External } from "./translationDemo";
-export { DirectoryInfoModal } from "./modals/DirectoryInfoModal";
+export { DirectoryPersonalInfoModal } from "./modals/DirectoryPersonalInfoModal";
 export { VerticalStepper } from "./navbar/VerticalStepper";
 export { ProfessionalInfoModal } from "./modals/ProfessionalInfoModal";
 export { PillButton } from "./PillButton";

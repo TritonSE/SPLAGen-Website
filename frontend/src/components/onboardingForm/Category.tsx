@@ -78,6 +78,7 @@ export const Category: React.FC<CategoryProps> = ({ onNext, onBack, onReset, onS
           firstName: state.onboardingForm.firstName,
           lastName: state.onboardingForm.lastName,
           email: state.onboardingForm.email,
+          phone: state.onboardingForm.phone,
         },
       };
 

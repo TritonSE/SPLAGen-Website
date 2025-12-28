@@ -1,19 +1,19 @@
 "use client";
 import Link from "next/link";
-import React, { useContext, useState } from "react";
+import React, { useContext } from "react";
 
-import { EditBasicInfoModal, External, LanguageSwitcher, PostCard } from "@/components";
+import { External, LanguageSwitcher, PostCard } from "@/components";
 import { UserContext } from "@/contexts/userContext";
 import { useRedirectToLoginIfNotSignedIn } from "@/hooks/useRedirection";
 
 export default function Dashboard() {
   useRedirectToLoginIfNotSignedIn();
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  // const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-  };
+  // const handleCloseModal = () => {
+  //   setIsModalOpen(false);
+  // };
 
   const { user } = useContext(UserContext);
 
@@ -52,7 +52,7 @@ export default function Dashboard() {
               {user.personal.firstName} {user.role}
             </p>
           )}
-          <EditBasicInfoModal isOpen={isModalOpen} onClose={handleCloseModal} />
+          {/* <EditBasicInfoModal isOpen={isModalOpen} onClose={handleCloseModal} /> */}
           {/* <ProfessionalInfoModal isOpen={isModalOpen} onClose={handleCloseModal} /> */}
 
           {/* Render a sample PostCard */}

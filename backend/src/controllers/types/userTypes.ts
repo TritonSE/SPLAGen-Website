@@ -56,7 +56,7 @@ export type EditUserPersonalInformationRequestBody = {
   newFirstName: string;
   newLastName: string;
   newEmail: string;
-  newPhone: string;
+  newPhone?: string;
 };
 
 export type EditUserProfessionalInformationRequestBody = {
@@ -69,14 +69,14 @@ export type EditUserProfessionalInformationRequestBody = {
 export type EditDirectoryPersonalInformationRequestBody = {
   newDegree: string;
   newEducationInstitution: string;
-  newClinicName: string;
-  newClinicAddress: string;
-  newClinicCountry: string;
+  newClinicName?: string;
+  newClinicAddress?: string;
+  newClinicCountry?: string;
   newClinicApartmentSuite?: string;
   newClinicCity?: string;
   newClinicState?: string;
   newClinicZipPostCode?: string;
-  newClinicWebsiteUrl: string;
+  newClinicWebsiteUrl?: string;
 };
 
 export type EditDirectoryDisplayInformationRequestBody = {
@@ -103,6 +103,8 @@ export type EditDirectoryDisplayInformationRequestBody = {
   newLicense: string[];
   newRemoteOption: boolean;
   newRequestOption: boolean;
+  newAppointmentsOption: boolean;
+  newAuthorizedOption: string | boolean;
 };
 
 export type EditProfilePictureRequestBody = {

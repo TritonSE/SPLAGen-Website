@@ -13,6 +13,7 @@ import styles from "./DirectoryBasics.module.css";
 import type { CountryOption } from "@/components";
 
 import { Button } from "@/components";
+import { educationTypeOptions } from "@/components/modals/displayInfoConstants";
 import { directoryState } from "@/state/stateTypes";
 import updateDirectoryForm from "@/state/updateDirectoryForm";
 
@@ -90,38 +91,17 @@ export const DirectoryBasics = ({ onNext }: DirectoryBasicsProps) => {
               defaultValue={state.directoryForm?.educationType || ""}
               render={({ field }) => (
                 <>
-                  <Radio
-                    id="education-1"
-                    label="Master's Degree in Genetic Counseling"
-                    checked={field.value === "masters"}
-                    onChange={() => {
-                      field.onChange("masters");
-                    }}
-                  />
-                  <Radio
-                    id="education-2"
-                    label="Diploma in Genetic Counseling"
-                    checked={field.value === "diploma"}
-                    onChange={() => {
-                      field.onChange("diploma");
-                    }}
-                  />
-                  <Radio
-                    id="education-3"
-                    label="Medical Fellowship in Genetics"
-                    checked={field.value === "fellowship"}
-                    onChange={() => {
-                      field.onChange("fellowship");
-                    }}
-                  />
-                  <Radio
-                    id="education-4"
-                    label="Other"
-                    checked={field.value === "other"}
-                    onChange={() => {
-                      field.onChange("other");
-                    }}
-                  />
+                  {educationTypeOptions.map(({ label, value }) => (
+                    <Radio
+                      key={label}
+                      id={`education-${label}`}
+                      label={label}
+                      checked={field.value === value}
+                      onChange={() => {
+                        field.onChange(value);
+                      }}
+                    />
+                  ))}
                 </>
               )}
             />

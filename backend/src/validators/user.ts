@@ -124,7 +124,10 @@ export const editDirectoryDisplayInfo = [
   body("newLicense").isArray().withMessage("License must be an array"),
   body("newLicense.*").isString().withMessage("Each license entry must be a string"),
   body("newRemoteOption").isBoolean().withMessage("Remote option must be a boolean"),
-  body("newRequestOption").isBoolean().withMessage("Request option must be a boolean"),
+  body("newAppointmentsOption").isBoolean().withMessage("Appointments option must be a boolean"),
+  body("newAuthorizedOption")
+    .notEmpty()
+    .withMessage("Authorized option must be a boolean or string"),
   validateRequest,
 ];
 

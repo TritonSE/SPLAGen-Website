@@ -96,8 +96,8 @@ export default function OnboardingForm() {
       if (status === "success") {
         // Professional & healthcare members can be added to the directory
         if (
-          state.onboardingForm.membership === '"Genetic Counselor' ||
-          state.onboardingForm.membership === "Healthcare Professional"
+          state.onboardingForm?.membership === '"Genetic Counselor' ||
+          state.onboardingForm?.membership === "Healthcare Professional"
         ) {
           setStep(4);
         } else {
@@ -108,7 +108,7 @@ export default function OnboardingForm() {
         }
       }
     },
-    [router, setRegistrationStatus, state.onboardingForm.membership],
+    [router, setRegistrationStatus, state.onboardingForm?.membership],
   );
 
   // Show feedback message for registration

@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { ReactNode } from "react";
+import { ReactNode, useEffect } from "react";
 
 import { Button } from "..";
 
@@ -22,6 +22,22 @@ export const Modal = ({
   onClose: () => void;
   onSave: () => unknown;
 }) => {
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        onClose();
+      }
+    };
+
+    if (isOpen) {
+      window.addEventListener("keydown", handleKeyDown);
+    }
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isOpen, onClose]);
+
   return isOpen ? (
     <div className={styles.modalOverlay}>
       <div className={styles.modalContainer}>

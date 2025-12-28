@@ -3,6 +3,8 @@
 import React, { useCallback } from "react";
 import Select, { SingleValue } from "react-select";
 
+import { professionalTitleOptions } from "@/api/users";
+
 export type ProfessionalTitleOption = {
   value: string;
   label: string;
@@ -19,13 +21,6 @@ export const ProfessionalTitleSelector: React.FC<ProfessionalTitleSelectorProps>
   onChange,
   placeholder = "Select your professional title...",
 }) => {
-  const options = [
-    { value: "medical_geneticist", label: "Medical Geneticist" },
-    { value: "genetic_counselor", label: "Genetic Counselor" },
-    { value: "student", label: "Student" },
-    { value: "other", label: "Other" },
-  ];
-
   const changeHandler = useCallback(
     (selectedOption: SingleValue<ProfessionalTitleOption>) => {
       onChange(selectedOption ?? null);
@@ -37,7 +32,7 @@ export const ProfessionalTitleSelector: React.FC<ProfessionalTitleSelectorProps>
     <div style={{ width: "100%" }}>
       <Select
         instanceId="professional-title-selector"
-        options={options}
+        options={professionalTitleOptions}
         value={value}
         onChange={changeHandler}
         placeholder={placeholder}

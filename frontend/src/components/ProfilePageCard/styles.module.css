@@ -1,0 +1,46 @@
+.infoCard {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  border-radius: 10px;
+  padding: 24px;
+  background-color: white;
+  max-width: 575px;
+}
+
+.infoCard header {
+  display: flex;
+  justify-content: space-between;
+  margin: 10px 0px 40px 0px;
+}
+.infoCard header h2 {
+  font-weight: bold;
+}
+
+.editButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 18px;
+  border: 1px solid rgba(0, 0, 0, 0.4);
+}
+
+.profileDetails {
+  display: flex;
+  gap: 8px;
+}
+
+.infoColumn {
+  display: flex;
+  flex: 1 1 50%;
+  word-wrap: break-word;
+  flex-direction: column;
+  flex-grow: 1;
+  gap: 20px;
+}
+
+.infoLabel {
+  color: var(--color-grey4);
+}

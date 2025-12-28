@@ -52,6 +52,16 @@ export const specialtyOptionsToBackend: Record<SpecialtyOption, string> = {
   Other: "other",
 };
 
+export const specialtyOptionsToFrontend = Object.entries(specialtyOptionsToBackend).reduce<
+  Record<string, string>
+>(
+  (prev, [key, val]) => ({
+    ...prev,
+    [val]: key,
+  }),
+  {},
+);
+
 const languageOptions = ["English", "Spanish", "Portuguese", "Other"];
 
 const formSchema = z.object({
@@ -315,7 +325,7 @@ export const DirectoryServices = ({ onNext, onBack }: DirectoryServicesProps) =>
           <div className={styles.questionSection}>
             <p className={styles.sectionText}>
               Based on your state health institutions and policies, are you authorized to provide
-              care in the languages mentioned above:
+              care in the languages mentioned above?
             </p>
             <div className={styles.radioGroup}>
               <Controller

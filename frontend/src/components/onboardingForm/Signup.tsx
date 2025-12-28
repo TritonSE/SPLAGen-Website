@@ -4,13 +4,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useStateMachine } from "little-state-machine";
 import Link from "next/link";
 import React, { useCallback } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
+import { isValidPhoneNumber } from "react-phone-number-input";
 import { z } from "zod";
 
 import style from "./SignUp.module.css";
 
-import { Button } from "@/components";
+import { Button, PhoneInput } from "@/components";
 import { onboardingState } from "@/state/stateTypes";
 import updateOnboardingForm from "@/state/updateOnboardingForm";
 
@@ -22,6 +23,7 @@ type BasicFormData = {
   firstName: string;
   lastName: string;
   email: string;
+  phone?: string;
   password: string;
 };
 
@@ -34,6 +36,12 @@ const formSchema = (t: (key: string) => string) =>
       .email(t("invalid-email"))
       .min(1, t("email-required"))
       .max(254, t("email-max-characters")),
+    phone: z
+      .string()
+      .refine(isValidPhoneNumber, {
+        message: t("invalid-phone-format"),
+      })
+      .optional(),
     password: z
       .string()
       .min(8, t("password-8-characters"))
@@ -49,6 +57,7 @@ export const SignUp = ({ onNext }: SignUpProps) => {
   const { t } = useTranslation();
 
   const {
+    control,
     register,
     handleSubmit,
     formState: { errors, isValid },
@@ -132,6 +141,28 @@ export const SignUp = ({ onNext }: SignUpProps) => {
               autoComplete="email"
             />
             <p className={style.errorText}>{errors.email ? errors.email.message : "\u00A0"}</p>
+          </div>
+
+          <div className={style.inputGroup}>
+            <label htmlFor="email" className={style.label}>
+              Phone number
+              <span className={style.optionalText}> (optional)</span>
+            </label>
+
+            <Controller
+              name="phone"
+              control={control}
+              render={({ field }) => (
+                <PhoneInput
+                  placeholder="Enter your phone number"
+                  value={field.value}
+                  onChange={field.onChange}
+                  defaultCountry="US"
+                  international
+                />
+              )}
+            />
+            <p className={style.errorText}>{errors.phone ? errors.phone.message : "\u00A0"}</p>
           </div>
 
           <div className={style.inputGroup}>
