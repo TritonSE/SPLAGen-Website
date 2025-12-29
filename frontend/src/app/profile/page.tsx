@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { useContext, useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -162,9 +163,9 @@ const DirectorySection = ({ user, openPersonal, openDisplay }: DisplayComponentP
       return (
         <div className={styles.directoryColumn}>
           <p className={styles.directoryTitle}>You are not in the SPLAGen Directory yet</p>
-          <a href="/directoryForm">
+          <Link href="/directoryForm">
             <Button label="Join the directory" />
-          </a>
+          </Link>
         </div>
       );
 

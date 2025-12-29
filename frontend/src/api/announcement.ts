@@ -38,10 +38,11 @@ export const getAnnouncements = async (
   token: string,
   sort: string,
   search: string,
+  limit?: number,
 ): Promise<APIResult<Announcement[]>> => {
   try {
     const response = await get(
-      `/api/announcements?order=${sort}&search=${search}`,
+      `/api/announcements?order=${sort}&search=${search}&limit=${String(limit)}`,
       createAuthHeader(token),
     );
 

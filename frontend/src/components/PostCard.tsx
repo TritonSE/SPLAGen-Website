@@ -1,6 +1,7 @@
 "use client";
 
 import moment from "moment";
+import Link from "next/link";
 import React from "react";
 
 import styles from "./PostCard.module.css";
@@ -29,7 +30,7 @@ export const PostCard: React.FC<PostCard> = ({
   onClick,
 }) => {
   return (
-    <a href={href}>
+    <Link href={href}>
       <div className={styles["postcard-container"]} onClick={onClick}>
         <div className={styles["postcard-left"]}>
           <ProfilePicture size="small" user={author} />
@@ -51,6 +52,6 @@ export const PostCard: React.FC<PostCard> = ({
           <div className={styles["postcard-message"]}>{message}</div>
         </div>
       </div>
-    </a>
+    </Link>
   );
 };

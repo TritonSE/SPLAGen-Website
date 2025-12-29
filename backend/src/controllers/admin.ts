@@ -1,6 +1,27 @@
 import { RequestHandler } from "express";
 
-import User from "../models/user";
+import User, { UserRole } from "../models/user";
+
+/**
+ * Retrieve statistics on the number of members & admins
+ */
+export const getMemeberStats: RequestHandler = async (req, res, next) => {
+  try {
+    const memberCount = await User.countDocuments();
+    const directoryCount = await User.countDocuments({ account: { inDirectory: true } });
+    const adminCount = await User.countDocuments({
+      role: { $in: [UserRole.ADMIN, UserRole.SUPERADMIN] },
+    });
+
+    res.status(200).json({
+      memberCount,
+      directoryCount,
+      adminCount,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
 /**
  * Get all admin users with formatted fields for the table & popup

@@ -1,4 +1,5 @@
 import { ChevronDown, ChevronUp } from "lucide-react";
+import Link from "next/link";
 import { useContext, useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -39,9 +40,9 @@ export const CurrentUser = () => {
 
       {showDropdown && (
         <div className={styles.buttonsContainer}>
-          <a href="/profile">
+          <Link href="/profile">
             <button className={styles.button}>Profile</button>
-          </a>
+          </Link>
           <button
             className={styles.button}
             onClick={() => {

@@ -1,72 +1,137 @@
 "use client";
-import Link from "next/link";
-import React, { useContext } from "react";
 
-import { External, LanguageSwitcher } from "@/components";
+import React, { useCallback, useContext, useEffect, useState } from "react";
+
+import styles from "./page.module.css";
+
+import { MemberStats, getMemberStats } from "@/api/admin";
+import { Announcement, getAnnouncements } from "@/api/announcement";
+import { LanguageSwitcher, PostCard } from "@/components";
+import { MemberCountCard } from "@/components/MemberCountCard";
+import { ResourceCard } from "@/components/ResourceCard";
 import { UserContext } from "@/contexts/userContext";
 import { useRedirectToLoginIfNotSignedIn } from "@/hooks/useRedirection";
 
 export default function Dashboard() {
   useRedirectToLoginIfNotSignedIn();
 
-  // const [isModalOpen, setIsModalOpen] = useState(false);
+  const [recentAnnouncements, setRecentAnnouncements] = useState<Announcement[]>();
+  const [memberStats, setMemberStats] = useState<MemberStats>();
+  const [errorMessage, setErrorMessage] = useState("");
 
-  // const handleCloseModal = () => {
-  //   setIsModalOpen(false);
-  // };
+  const { firebaseUser, isAdminOrSuperAdmin, isSuperAdmin } = useContext(UserContext);
 
-  const { user } = useContext(UserContext);
+  const loadAnnouncements = useCallback(async () => {
+    if (!firebaseUser) return;
+
+    try {
+      setErrorMessage("");
+      const token = await firebaseUser.getIdToken();
+      // Show up to 5 most recent announcements
+      const response = await getAnnouncements(token, "newest", "", 5);
+      if (response.success) {
+        setRecentAnnouncements(response.data);
+      } else {
+        setErrorMessage(`Failed to fetch announcements: ${response.error}`);
+      }
+    } catch (error) {
+      setErrorMessage(`Failed to fetch announcements: ${String(error)}`);
+    }
+  }, [firebaseUser]);
+
+  useEffect(() => {
+    void loadAnnouncements();
+  }, [firebaseUser, loadAnnouncements]);
+
+  const loadMemberStats = useCallback(async () => {
+    if (!firebaseUser || !isAdminOrSuperAdmin) return;
+
+    try {
+      setErrorMessage("");
+      const token = await firebaseUser.getIdToken();
+      const response = await getMemberStats(token);
+      if (response.success) {
+        setMemberStats(response.data);
+      } else {
+        setErrorMessage(`Failed to fetch member counts: ${response.error}`);
+      }
+    } catch (error) {
+      setErrorMessage(`Failed to fetch member counts: ${String(error)}`);
+    }
+  }, [firebaseUser, isAdminOrSuperAdmin]);
+
+  useEffect(() => {
+    void loadMemberStats();
+  }, [firebaseUser, loadMemberStats]);
 
   return (
-    <div className="p-4">
-      <h1> Dashboard/Home </h1>
-      <p>
-        <Link href="/login">go to login</Link>
-      </p>
-      <p>
-        <Link href="/phoneInputDemo"> Go to phone input demo </Link>
-      </p>
-      <p>
-        <Link href="/discussion/post"> Go to post</Link>
-      </p>
-      <p>
-        <Link href="/discussion"> Go to Landing Page</Link>
-      </p>
-      <p>
-        <Link href="flowPopupDemo"> Go to flow popup demo </Link>
-      </p>
-      <p>
-        <Link href="/profile"> Go to profile flow </Link>
-      </p>
-      <p>
-        <Link href="/profile"> Go to Edit Directory Info Modal Demo </Link>
-      </p>
+    <div className={styles.container}>
+      <h1 className={styles.title}>Dashboard</h1>
 
-      <div className="grid grid-rows-[20px_1fr_20px] items-center min-h-screen">
-        <main className="flex flex-col gap-8 row-start-2 items-center">
-          <LanguageSwitcher />
-          <External />
-
-          {user && (
-            <p>
-              {user.personal.firstName} {user.role}
-            </p>
+      {memberStats && (
+        <div className="flex flex-row gap-16">
+          <MemberCountCard
+            count={memberStats.memberCount}
+            label="Members"
+            href="/members?tab=all"
+          />
+          <MemberCountCard
+            count={memberStats.directoryCount}
+            label="in Directory"
+            href="/members?tab=directory"
+          />
+          {isSuperAdmin && (
+            <MemberCountCard count={memberStats.adminCount} label="Admins" href="/admins" />
           )}
-          {/* <EditBasicInfoModal isOpen={isModalOpen} onClose={handleCloseModal} /> */}
-          {/* <ProfessionalInfoModal isOpen={isModalOpen} onClose={handleCloseModal} /> */}
+        </div>
+      )}
 
-          {/* Render a sample PostCard */}
-          {/* <PostCard
-            id="test"
-            authorName="Alex Johnson"
-            date="April 7, 2025"
-            time="11:45 AM"
-            title="Welcome to the Community!"
-            message="We're excited to have you here. Let us know if you need anything."
-            audience="New Joiners"
-          /> */}
-        </main>
+      <div className="flex flex-col gap-4">
+        <h2 className={styles.subtitle}>Resources</h2>
+        <p>Click on each card to access the external resource page.</p>
+        <div className="flex flex-row gap-12">
+          <ResourceCard
+            iconSrc="/icons/education.svg"
+            label="Education"
+            href="https://drive.google.com/drive/folders/1yv2D8KsLlUgcRScUS86G_DOOzUiXM3ln?usp=drive_link"
+          />
+          <ResourceCard
+            iconSrc="/icons/public_policy.svg"
+            label="Public Policy"
+            href="https://drive.google.com/drive/folders/1Xxd0MRpT-RBxMVUakFr9ykWz6qzitLnX?usp=drive_link"
+          />
+          <ResourceCard
+            iconSrc="/icons/research.svg"
+            label="Research"
+            href="https://drive.google.com/drive/folders/1LJ4UUgTKIUS6Bj8bip0hj2rQBaetzWsb"
+          />
+          <ResourceCard
+            iconSrc="/icons/members.svg"
+            label="Members"
+            href="https://drive.google.com/drive/folders/1D_0kRA4leoOnFMjdvlF5YMdt1x6KGxjU?usp=drive_link"
+          />
+        </div>
       </div>
+
+      <div className="flex flex-col gap-4">
+        <h2 className={styles.subtitle}>Recent Announcements</h2>
+        {recentAnnouncements?.map((announcement) => (
+          <PostCard
+            key={announcement._id}
+            href={`/announcements/${announcement._id}`}
+            author={announcement.userId}
+            createdAt={announcement.createdAt}
+            title={announcement.title}
+            message={announcement.message}
+          />
+        ))}
+        {recentAnnouncements && recentAnnouncements.length === 0 && <p>No announcements found</p>}
+      </div>
+
+      {/* TODO: move language switcher to profile dropdown */}
+      <LanguageSwitcher />
+
+      {errorMessage && <div className="text-red-500">{errorMessage}</div>}
     </div>
   );
 }
