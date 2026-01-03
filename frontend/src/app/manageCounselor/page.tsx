@@ -4,7 +4,7 @@ import Image from "next/image";
 import { FilterableTable } from "@/components";
 import styles from "@/components/FilterableTable.module.css";
 import {
-  useRedirectToHomeIfNotAdmin,
+  useRedirectToHomeIfNotAdminOrSuperAdmin,
   useRedirectToLoginIfNotSignedIn,
 } from "@/hooks/useRedirection";
 
@@ -99,7 +99,7 @@ const dummyData = [
 
 const ManageCounselor: React.FC = () => {
   useRedirectToLoginIfNotSignedIn();
-  useRedirectToHomeIfNotAdmin();
+  useRedirectToHomeIfNotAdminOrSuperAdmin();
 
   const columns = [
     {

@@ -67,11 +67,22 @@ export const useRedirectToLoginIfNotSignedIn = () => {
 };
 
 /**
- * A hook that redirects the user to the staff home page if they are signed in, but not an admin
+ * A hook that redirects the user to the staff home page if they are signed in, but not a superadmin
  */
-export const useRedirectToHomeIfNotAdmin = () => {
+export const useRedirectToHomeIfNotSuperAdmin = () => {
   useRedirection({
-    checkShouldRedirect: ({ user }) => user !== null && user.role !== "admin",
+    checkShouldRedirect: ({ user }) => user !== null && user.role !== "superadmin",
+    redirectURL: HOME_URL,
+  });
+};
+
+/**
+ * A hook that redirects the user to the staff home page if they are signed in, but not an admin/superadmin
+ */
+export const useRedirectToHomeIfNotAdminOrSuperAdmin = () => {
+  useRedirection({
+    checkShouldRedirect: ({ user }) =>
+      user !== null && !["admin", "superadmin"].includes(user.role),
     redirectURL: HOME_URL,
   });
 };

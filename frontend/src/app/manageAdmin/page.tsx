@@ -7,7 +7,7 @@ import { FilterableTable } from "@/components";
 import styles from "@/components/FilterableTable.module.css";
 import { ProfilePicture } from "@/components/ProfilePicture";
 import {
-  useRedirectToHomeIfNotAdmin,
+  useRedirectToHomeIfNotSuperAdmin,
   useRedirectToLoginIfNotSignedIn,
 } from "@/hooks/useRedirection";
 
@@ -102,7 +102,7 @@ const InfoItem = ({ icon, label, value }: { icon: string; label: string; value: 
 
 const ManageAdmin: React.FC = () => {
   useRedirectToLoginIfNotSignedIn();
-  useRedirectToHomeIfNotAdmin();
+  useRedirectToHomeIfNotSuperAdmin();
 
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
