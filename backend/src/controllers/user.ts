@@ -126,29 +126,6 @@ export const getUser = async (
   }
 };
 
-export const getPersonalInformation = async (
-  req: AuthenticatedRequest,
-  res: Response,
-  next: NextFunction,
-) => {
-  try {
-    const { firebaseUid } = req;
-    const user = await UserModel.findOne({ firebaseId: firebaseUid });
-
-    if (!user) {
-      res.status(404).json({ error: "User not found" });
-      return;
-    }
-
-    res.status(200).json(user.personal);
-    return;
-  } catch (error) {
-    console.error("Error fetching personal information:", error);
-    next(error);
-    return;
-  }
-};
-
 export const editPersonalInformation = async (
   req: AuthenticatedRequest<unknown, unknown, EditUserPersonalInformationRequestBody>,
   res: Response,
@@ -180,29 +157,6 @@ export const editPersonalInformation = async (
     return;
   } catch (error) {
     console.error("Error updating personal information:", error);
-    next(error);
-    return;
-  }
-};
-
-export const getProfessionalInformation = async (
-  req: AuthenticatedRequest,
-  res: Response,
-  next: NextFunction,
-) => {
-  try {
-    const { firebaseUid } = req;
-    const user = await UserModel.findOne({ firebaseId: firebaseUid });
-
-    if (!user) {
-      res.status(404).json({ error: "User not found" });
-      return;
-    }
-
-    res.status(200).json(user.professional);
-    return;
-  } catch (error) {
-    console.error("Error fetching professional information:", error);
     next(error);
     return;
   }
@@ -240,30 +194,6 @@ export const editProfessionalInformation = async (
     return;
   } catch (error) {
     console.error("Error updating professional information:", error);
-    next(error);
-    return;
-  }
-};
-
-export const getDirectoryPersonalInformation = async (
-  req: AuthenticatedRequest,
-  res: Response,
-  next: NextFunction,
-) => {
-  try {
-    const { firebaseUid } = req;
-    const user = await UserModel.findOne({ firebaseId: firebaseUid });
-
-    if (!user) {
-      res.status(404).json({ error: "User not found" });
-      return;
-    }
-
-    // Combine education and clinic fields for directory information
-    res.status(200).json({ ...user.education, ...user.clinic });
-    return;
-  } catch (error) {
-    console.error("Error fetching directory personal information:", error);
     next(error);
     return;
   }
@@ -318,29 +248,6 @@ export const editDirectoryPersonalInformation = async (
     return;
   } catch (error) {
     console.error("Error updating directory personal information:", error);
-    next(error);
-    return;
-  }
-};
-
-export const getDirectoryDisplayInfo = async (
-  req: AuthenticatedRequest,
-  res: Response,
-  next: NextFunction,
-) => {
-  try {
-    const { firebaseUid } = req;
-    const user = await UserModel.findOne({ firebaseId: firebaseUid });
-
-    if (!user) {
-      res.status(404).json({ error: "User not found" });
-      return;
-    }
-
-    res.status(200).json(user.display);
-    return;
-  } catch (error) {
-    console.error("Error fetching directory display information:", error);
     next(error);
     return;
   }

@@ -28,7 +28,6 @@ router.get("/", requireSignedIn, UserController.getAllUsers);
 router.get("/:firebaseId", requireSignedIn, UserValidator.getUser, UserController.getUser);
 
 // Personal information routes
-router.get("/general/personal-information", requireSignedIn, UserController.getPersonalInformation);
 router.put(
   "/general/personal-information",
   requireSignedIn,
@@ -45,11 +44,6 @@ router.put(
 );
 
 // Directory personal information routes
-router.get(
-  "/directory/personal-information",
-  requireSignedIn,
-  UserController.getDirectoryPersonalInformation,
-);
 router.put(
   "/directory/personal-information",
   requireSignedIn,
@@ -58,7 +52,6 @@ router.put(
 );
 
 // Directory display info routes
-router.get("/directory/display-info", requireSignedIn, UserController.getDirectoryDisplayInfo);
 router.put(
   "/directory/display-info",
   requireSignedIn,

@@ -310,7 +310,6 @@ export async function editBasicInfoRequest(
   firebaseToken: string,
 ): Promise<APIResult<null>> {
   try {
-    //TODO: API result return type needs be updated when route written
     await put(
       "/api/users/general/personal-information",
       basicInfo,
