@@ -1,15 +1,20 @@
 "use client";
 
 import { useStateMachine } from "little-state-machine";
-import { useCallback, useState } from "react";
+import Link from "next/link";
+import { useCallback, useContext, useState } from "react";
 
+import { Button } from "@/components";
 import { DirectoryBasics, DirectoryContact, DirectoryServices } from "@/components/directoryForm";
+import { UserContext } from "@/contexts/userContext";
 import { useRedirectToLoginIfNotSignedIn } from "@/hooks/useRedirection";
 import { directoryState } from "@/state/stateTypes";
 import updateDirectoryForm from "@/state/updateDirectoryForm";
 
 export default function DirectoryForm() {
   useRedirectToLoginIfNotSignedIn();
+
+  const { user } = useContext(UserContext);
 
   const { actions } = useStateMachine({ actions: { updateDirectoryForm } });
   const [currentStep, setCurrentStep] = useState(1);
@@ -72,5 +77,30 @@ export default function DirectoryForm() {
     }
   };
 
-  return <div className="w-full h-full">{renderStep()}</div>;
+  if (user && [true, "pending"].includes(user.account.inDirectory)) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full gap-3">
+        <p className="text-black font-[20px] font-bold">
+          You{" "}
+          {user.account.inDirectory === "pending" ? "have already applied to" : "are already in"}{" "}
+          the SPLAGen directory
+        </p>
+        <Link href="/profile?tab=Directory">
+          <Button label="Edit my directory information" />
+        </Link>
+      </div>
+    );
+  }
+
+  return (
+    <div className="w-full h-full flex flex-col gap-2 items-center pt-10">
+      <div className="flex flex-row items-center gap-8 whitespace-nowrap">
+        <Link href="/">
+          <Button variant="secondary" label="Skip for now" />
+        </Link>
+        <p>You always can join our directory later from your profile page.</p>
+      </div>
+      {renderStep()}
+    </div>
+  );
 }

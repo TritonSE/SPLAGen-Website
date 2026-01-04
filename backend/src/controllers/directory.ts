@@ -65,7 +65,7 @@ export const joinDirectory = async (
       { firebaseId: firebaseUid },
       {
         // Update user's directory status to pending (now we need to wait for admin approval to join)
-        account: { inDirectory: "pending" },
+        "account.inDirectory": "pending",
 
         // Update user with directory information
         "education.degree": education.degree,

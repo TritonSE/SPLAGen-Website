@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useContext, useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -175,13 +176,15 @@ const DirectorySection = ({ user, openPersonal, openDisplay }: DisplayComponentP
     default:
       return (
         <div className="flex flex-col gap-8">
-          <p>
-            {user?.account.inDirectory === "pending"
-              ? /* User's request to join the directory is pending and they can still edit their information */
-                "Your request to join the directory is being reviewed by our staff. Feel free to update your information in the meantime!"
-              : /* User is in the directory and can edit their information */
-                "Any edits made here will be reflected in the directory."}
-          </p>
+          {user?.account.inDirectory === true ? null : (
+            <p>
+              {user?.account.inDirectory === "pending"
+                ? /* User's request to join the directory is pending and they can still edit their information */
+                  "Your request to join the directory is being reviewed by our staff. Feel free to update your information in the meantime!"
+                : /* User is in the directory and can edit their information */
+                  "Any edits made here will be reflected in the directory."}
+            </p>
+          )}
 
           <div className={styles.infoContainer}>
             <ProfilePageCard
@@ -289,7 +292,8 @@ const ProfilePage: React.FC = () => {
   const [isDisplayModalOpen, setIsDisplayModalOpen] = useState(false);
 
   // Profile and Directory form state
-  const [formState, setFormState] = useState<"Profile" | "Directory">("Profile");
+  const searchParams = useSearchParams();
+  const formState = searchParams.get("tab") ?? "Profile";
   const DisplayComponent = formState === "Profile" ? ProfileSection : DirectorySection;
 
   const { user } = useContext(UserContext);
@@ -301,21 +305,19 @@ const ProfilePage: React.FC = () => {
       </header>
 
       <div className={styles.switch}>
-        <Button
-          variant={formState === "Profile" ? "primary" : "secondary"}
-          label={t("profile")}
-          onClick={() => {
-            setFormState("Profile");
-          }}
-        />
+        <Link href="/profile?tab=Profile">
+          <Button
+            variant={formState === "Profile" ? "primary" : "secondary"}
+            label={t("profile")}
+          />
+        </Link>
 
-        <Button
-          variant={formState === "Directory" ? "primary" : "secondary"}
-          label={t("directory")}
-          onClick={() => {
-            setFormState("Directory");
-          }}
-        />
+        <Link href="/profile?tab=Directory">
+          <Button
+            variant={formState === "Directory" ? "primary" : "secondary"}
+            label={t("directory")}
+          />
+        </Link>
       </div>
 
       <EditBasicInfoModal
