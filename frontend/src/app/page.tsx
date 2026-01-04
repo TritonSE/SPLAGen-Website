@@ -139,7 +139,6 @@ export default function Dashboard() {
           {youtubeVideos?.map((video) => (
             <div key={video.id}>
               <a
-                className="underline text-blue-60"
                 href={`https://www.youtube.com/watch?v=${video.id}`}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -156,7 +155,12 @@ export default function Dashboard() {
         </div>
         <p>
           Visit our{" "}
-          <a href="https://www.youtube.com/@SPLAGen" target="_blank" rel="noopener noreferrer">
+          <a
+            className="underline text-blue-60"
+            href="https://www.youtube.com/@SPLAGen"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             YouTube channel
           </a>{" "}
           for more videos!
