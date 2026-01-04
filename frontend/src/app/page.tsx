@@ -6,6 +6,7 @@ import styles from "./page.module.css";
 
 import { MemberStats, getMemberStats } from "@/api/admin";
 import { Announcement, getAnnouncements } from "@/api/announcement";
+import { YoutubeVideo, getYoutubeVideos } from "@/api/videos";
 import { LanguageSwitcher, PostCard } from "@/components";
 import { MemberCountCard } from "@/components/MemberCountCard";
 import { ResourceCard } from "@/components/ResourceCard";
@@ -17,6 +18,7 @@ export default function Dashboard() {
 
   const [recentAnnouncements, setRecentAnnouncements] = useState<Announcement[]>();
   const [memberStats, setMemberStats] = useState<MemberStats>();
+  const [youtubeVideos, setYoutubeVideos] = useState<YoutubeVideo[]>();
   const [errorMessage, setErrorMessage] = useState("");
 
   const { firebaseUser, isAdminOrSuperAdmin, isSuperAdmin } = useContext(UserContext);
@@ -64,12 +66,30 @@ export default function Dashboard() {
     void loadMemberStats();
   }, [firebaseUser, loadMemberStats]);
 
+  const loadYoutubeVideos = useCallback(async () => {
+    try {
+      setErrorMessage("");
+      const response = await getYoutubeVideos();
+      if (response.success) {
+        setYoutubeVideos(response.data);
+      } else {
+        setErrorMessage(`Failed to fetch YouTube videos: ${response.error}`);
+      }
+    } catch (error) {
+      setErrorMessage(`Failed to fetch YouTube videos: ${String(error)}`);
+    }
+  }, []);
+
+  useEffect(() => {
+    void loadYoutubeVideos();
+  }, [loadYoutubeVideos]);
+
   return (
     <div className={styles.container}>
       <h1 className={styles.title}>Dashboard</h1>
 
       {memberStats && (
-        <div className="flex flex-row gap-16">
+        <div className="flex flex-row gap-16 overflow-x-auto">
           <MemberCountCard
             count={memberStats.memberCount}
             label="Members"
@@ -89,7 +109,7 @@ export default function Dashboard() {
       <div className="flex flex-col gap-4">
         <h2 className={styles.subtitle}>Resources</h2>
         <p>Click on each card to access the external resource page.</p>
-        <div className="flex flex-row gap-12">
+        <div className="flex flex-row gap-12 overflow-x-auto">
           <ResourceCard
             iconSrc="/icons/education.svg"
             label="Education"
@@ -111,6 +131,36 @@ export default function Dashboard() {
             href="https://drive.google.com/drive/folders/1D_0kRA4leoOnFMjdvlF5YMdt1x6KGxjU?usp=drive_link"
           />
         </div>
+      </div>
+
+      <div className="flex flex-col gap-4">
+        <h2 className={styles.subtitle}>YouTube videos</h2>
+        <div className="flex flex-row gap-12 overflow-x-auto">
+          {youtubeVideos?.map((video) => (
+            <div key={video.id}>
+              <a
+                className="underline text-blue-60"
+                href={`https://www.youtube.com/watch?v=${video.id}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <div
+                  className={styles.thumbnail}
+                  style={{
+                    backgroundImage: `url('${video.thumbnail}')`,
+                  }}
+                ></div>
+              </a>
+            </div>
+          ))}
+        </div>
+        <p>
+          Visit our{" "}
+          <a href="https://www.youtube.com/@SPLAGen" target="_blank" rel="noopener noreferrer">
+            YouTube channel
+          </a>{" "}
+          for more videos!
+        </p>
       </div>
 
       <div className="flex flex-col gap-4">
