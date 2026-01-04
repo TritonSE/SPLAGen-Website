@@ -32,10 +32,11 @@ export const getPosts = async (
   token: string,
   sort: string,
   search: string,
+  mineOnly: boolean,
 ): Promise<APIResult<Discussion[]>> => {
   try {
     const response = await get(
-      `/api/discussions?order=${sort}&search=${search}`,
+      `/api/discussions?order=${sort}&search=${search}&mine=${mineOnly ? "true" : "false"}`,
       createAuthHeader(token),
     );
 

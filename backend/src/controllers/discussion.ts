@@ -139,13 +139,26 @@ export const getMultipleDiscussions = async (
     const order = req.query.order;
     const newestFirst = order === "newest";
     const searchTerm = req.query.search;
+    const mineOnly = req.query.mine === "true";
+    const userId = req.mongoID;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const filters: any[] = [];
 
     // Text search
-    const query = searchTerm
-      ? {
-          $text: { $search: searchTerm as string },
-        }
-      : {};
+    if (searchTerm) {
+      filters.push({
+        $text: { $search: searchTerm },
+      });
+    }
+
+    if (mineOnly) {
+      filters.push({
+        userId,
+      });
+    }
+
+    const query = filters.length > 0 ? { $and: filters } : {};
 
     const discussions = await DiscussionModel.find(query)
       .sort({

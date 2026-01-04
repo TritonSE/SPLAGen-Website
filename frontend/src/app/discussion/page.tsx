@@ -12,6 +12,9 @@ import { PostCard } from "@/components/PostCard";
 import { UserContext } from "@/contexts/userContext";
 import { useRedirectToLoginIfNotSignedIn } from "@/hooks/useRedirection";
 
+const TABS = ["All Discussions", "My Discussions"] as const;
+type Tab = (typeof TABS)[number];
+
 export default function LandingPage() {
   useRedirectToLoginIfNotSignedIn();
 
@@ -20,6 +23,7 @@ export default function LandingPage() {
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState("");
   const [posts, setPosts] = useState<Discussion[]>();
+  const [activeTab, setActiveTab] = useState<Tab>("All Discussions");
   const [errorMessage, setErrorMessage] = useState("");
 
   const { firebaseUser } = useContext(UserContext);
@@ -30,7 +34,12 @@ export default function LandingPage() {
     setErrorMessage("");
     try {
       const token = await firebaseUser.getIdToken();
-      const response = await getPosts(token, sort || "newest", search);
+      const response = await getPosts(
+        token,
+        sort || "newest",
+        search,
+        activeTab === "My Discussions",
+      );
       if (response.success) {
         setPosts(response.data);
       } else {
@@ -39,11 +48,11 @@ export default function LandingPage() {
     } catch (error) {
       setErrorMessage(`Failed to fetch discussion posts: ${String(error)}`);
     }
-  }, [firebaseUser, search, sort]);
+  }, [firebaseUser, search, sort, activeTab]);
 
   useEffect(() => {
     void loadPosts();
-  }, [firebaseUser, search, sort, loadPosts]);
+  }, [firebaseUser, search, sort, activeTab, loadPosts]);
 
   return (
     <div className={styles.container}>
@@ -55,7 +64,7 @@ export default function LandingPage() {
         <div className={styles.searchAllSortContainer}>
           <input
             type="text"
-            placeholder={t("Search General")}
+            placeholder="Search Discussions"
             className={styles.searchInput}
             value={search}
             onChange={(e) => {
@@ -91,6 +100,21 @@ export default function LandingPage() {
           <Image src="/icons/plus.svg" alt="Plus icon" width={24} height={24} />
         </Link>
       </div>
+
+      <div className={styles.tabsContainer}>
+        {TABS.map((tab) => (
+          <div
+            key={tab}
+            className={`${styles.tab} ${activeTab === tab ? styles.activeTab : ""}`}
+            onClick={() => {
+              setActiveTab(tab);
+            }}
+          >
+            {tab}
+          </div>
+        ))}
+      </div>
+
       <div className={styles.scrollContainer}>
         {posts?.map((post) => (
           <PostCard
