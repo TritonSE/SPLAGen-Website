@@ -30,9 +30,9 @@ export default function Dashboard() {
       setErrorMessage("");
       const token = await firebaseUser.getIdToken();
       // Show up to 5 most recent announcements
-      const response = await getAnnouncements(token, "newest", "", 5);
+      const response = await getAnnouncements(token, "newest", "", 1, 5);
       if (response.success) {
-        setRecentAnnouncements(response.data);
+        setRecentAnnouncements(response.data.announcements);
       } else {
         setErrorMessage(`Failed to fetch announcements: ${response.error}`);
       }

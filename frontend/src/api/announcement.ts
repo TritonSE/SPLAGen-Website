@@ -12,6 +12,11 @@ export type Announcement = {
   userId: User;
 };
 
+export type PaginatedAnnouncementResult = {
+  announcements: Announcement[];
+  count: number;
+};
+
 export const createAnnouncement = async (
   announcementData: {
     title: string;
@@ -34,19 +39,22 @@ export const createAnnouncement = async (
   }
 };
 
+export const ANNOUNCEMENTS_PAGE_SIZE = 5;
+
 export const getAnnouncements = async (
   token: string,
   sort: string,
   search: string,
-  limit?: number,
-): Promise<APIResult<Announcement[]>> => {
+  page: number,
+  pageSize = ANNOUNCEMENTS_PAGE_SIZE,
+): Promise<APIResult<PaginatedAnnouncementResult>> => {
   try {
     const response = await get(
-      `/api/announcements?order=${sort}&search=${search}&limit=${String(limit)}`,
+      `/api/announcements?order=${sort}&search=${search}&page=${String(page)}&pageSize=${String(pageSize)}`,
       createAuthHeader(token),
     );
 
-    const json = (await response.json()) as Announcement[];
+    const json = (await response.json()) as PaginatedAnnouncementResult;
     return { success: true, data: json };
   } catch (error) {
     return handleAPIError(error);

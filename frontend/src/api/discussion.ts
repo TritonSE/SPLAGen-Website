@@ -11,6 +11,11 @@ export type Discussion = {
   userId: User;
 };
 
+export type PaginatedDiscussionResult = {
+  discussions: Discussion[];
+  count: number;
+};
+
 export const createPost = async (
   postData: {
     title: string;
@@ -28,19 +33,23 @@ export const createPost = async (
   }
 };
 
+export const DISCUSSION_PAGE_SIZE = 5;
+
 export const getPosts = async (
   token: string,
   sort: string,
   search: string,
   mineOnly: boolean,
-): Promise<APIResult<Discussion[]>> => {
+  page: number,
+  pageSize = DISCUSSION_PAGE_SIZE,
+): Promise<APIResult<PaginatedDiscussionResult>> => {
   try {
     const response = await get(
-      `/api/discussions?order=${sort}&search=${search}&mine=${mineOnly ? "true" : "false"}`,
+      `/api/discussions?page=${String(page)}&pageSize=${String(pageSize)}&order=${sort}&search=${search}&mine=${mineOnly ? "true" : "false"}`,
       createAuthHeader(token),
     );
 
-    const json = (await response.json()) as Discussion[];
+    const json = (await response.json()) as PaginatedDiscussionResult;
     return { success: true, data: json };
   } catch (error) {
     return handleAPIError(error);

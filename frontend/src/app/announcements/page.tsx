@@ -6,14 +6,17 @@ import { useCallback, useContext, useEffect, useState } from "react";
 
 import styles from "./page.module.css";
 
-import { Announcement, getAnnouncements } from "@/api/announcement";
+import { ANNOUNCEMENTS_PAGE_SIZE, Announcement, getAnnouncements } from "@/api/announcement";
 import { PostCard } from "@/components";
+import { Pagination } from "@/components/Pagination";
 import { UserContext } from "@/contexts/userContext";
 import { useRedirectToLoginIfNotSignedIn } from "@/hooks/useRedirection";
 
 const Announcements: React.FC = () => {
   useRedirectToLoginIfNotSignedIn();
 
+  const [page, setPage] = useState(1);
+  const [numPages, setNumPages] = useState(1);
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState("");
   const [announcements, setAnnouncements] = useState<Announcement[]>();
@@ -27,20 +30,21 @@ const Announcements: React.FC = () => {
     try {
       setErrorMessage("");
       const token = await firebaseUser.getIdToken();
-      const response = await getAnnouncements(token, sort || "newest", search);
+      const response = await getAnnouncements(token, sort || "newest", search, page);
       if (response.success) {
-        setAnnouncements(response.data);
+        setAnnouncements(response.data.announcements);
+        setNumPages(Math.ceil(response.data.count / ANNOUNCEMENTS_PAGE_SIZE));
       } else {
         setErrorMessage(`Failed to fetch announcements: ${response.error}`);
       }
     } catch (error) {
       setErrorMessage(`Failed to fetch announcements: ${String(error)}`);
     }
-  }, [firebaseUser, search, sort]);
+  }, [firebaseUser, search, sort, page]);
 
   useEffect(() => {
     void loadAnnouncements();
-  }, [firebaseUser, search, sort, loadAnnouncements]);
+  }, [firebaseUser, search, sort, page, loadAnnouncements]);
 
   return (
     <div className={styles.container}>
@@ -103,6 +107,8 @@ const Announcements: React.FC = () => {
         ))}
         {announcements && announcements.length === 0 && <p>No announcements found</p>}
       </div>
+
+      <Pagination currentPage={page} numPages={numPages} onPageChange={setPage} />
       {errorMessage && <div className="text-red-500">{errorMessage}</div>}
     </div>
   );

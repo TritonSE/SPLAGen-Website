@@ -80,7 +80,8 @@ export const getMultipleAnnouncements = async (
     const order = req.query.order;
     const newestFirst = order === "newest";
     const searchTerm = req.query.search;
-    const limit = req.query.limit ? parseInt(req.query.limit as string) : null;
+    const page = parseInt(req.query.page as string);
+    const pageSize = parseInt(req.query.pageSize as string);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const filters: any[] = [];
@@ -100,18 +101,17 @@ export const getMultipleAnnouncements = async (
 
     const query = filters.length > 0 ? { $and: filters } : {};
 
-    let mongoQuery = AnnouncementModel.find(query)
+    const total = await AnnouncementModel.countDocuments(query);
+
+    const announcements = await AnnouncementModel.find(query)
       .sort({
         createdAt: newestFirst ? -1 : 1,
       })
+      .skip((page - 1) * pageSize)
+      .limit(pageSize)
       .populate("userId");
-    if (limit) {
-      mongoQuery = mongoQuery.limit(limit);
-    }
 
-    const announcements = await mongoQuery;
-
-    res.status(200).json(announcements);
+    res.status(200).json({ announcements, count: total });
   } catch (error) {
     next(error);
   }

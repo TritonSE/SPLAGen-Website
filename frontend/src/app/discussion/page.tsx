@@ -7,7 +7,8 @@ import { useTranslation } from "react-i18next";
 
 import styles from "./landingPage.module.css";
 
-import { Discussion, getPosts } from "@/api/discussion";
+import { DISCUSSION_PAGE_SIZE, Discussion, getPosts } from "@/api/discussion";
+import { Pagination } from "@/components/Pagination";
 import { PostCard } from "@/components/PostCard";
 import { UserContext } from "@/contexts/userContext";
 import { useRedirectToLoginIfNotSignedIn } from "@/hooks/useRedirection";
@@ -20,6 +21,8 @@ export default function LandingPage() {
 
   const { t } = useTranslation();
 
+  const [page, setPage] = useState(1);
+  const [numPages, setNumPages] = useState(1);
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState("");
   const [posts, setPosts] = useState<Discussion[]>();
@@ -39,20 +42,22 @@ export default function LandingPage() {
         sort || "newest",
         search,
         activeTab === "My Discussions",
+        page,
       );
       if (response.success) {
-        setPosts(response.data);
+        setPosts(response.data.discussions);
+        setNumPages(Math.ceil(response.data.count / DISCUSSION_PAGE_SIZE));
       } else {
         setErrorMessage(`Failed to fetch discussion posts: ${response.error}`);
       }
     } catch (error) {
       setErrorMessage(`Failed to fetch discussion posts: ${String(error)}`);
     }
-  }, [firebaseUser, search, sort, activeTab]);
+  }, [firebaseUser, search, sort, activeTab, page]);
 
   useEffect(() => {
     void loadPosts();
-  }, [firebaseUser, search, sort, activeTab, loadPosts]);
+  }, [firebaseUser, search, sort, activeTab, page, loadPosts]);
 
   return (
     <div className={styles.container}>
@@ -129,6 +134,8 @@ export default function LandingPage() {
 
         {posts && posts.length === 0 && <div>No posts found</div>}
       </div>
+
+      <Pagination currentPage={page} numPages={numPages} onPageChange={setPage} />
       {errorMessage && <div className="text-red-500">{errorMessage}</div>}
     </div>
   );

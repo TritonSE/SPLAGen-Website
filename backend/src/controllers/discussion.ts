@@ -140,6 +140,9 @@ export const getMultipleDiscussions = async (
     const newestFirst = order === "newest";
     const searchTerm = req.query.search;
     const mineOnly = req.query.mine === "true";
+    const page = parseInt(req.query.page as string);
+    const pageSize = parseInt(req.query.pageSize as string);
+
     const userId = req.mongoID;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -160,13 +163,17 @@ export const getMultipleDiscussions = async (
 
     const query = filters.length > 0 ? { $and: filters } : {};
 
+    const total = await DiscussionModel.countDocuments(query);
+
     const discussions = await DiscussionModel.find(query)
       .sort({
         createdAt: newestFirst ? -1 : 1,
       })
+      .skip((page - 1) * pageSize)
+      .limit(pageSize)
       .populate("userId");
 
-    res.status(200).json(discussions);
+    res.status(200).json({ discussions, count: total });
   } catch (error) {
     next(error);
   }
