@@ -42,12 +42,11 @@ type JoinDirectoryRequestBody = {
 };
 
 type ApproveDirectoryRequestBody = {
-  //TODO: maybe MongoID of user to be approved denied depending on the frontend"
-  firebaseId: string;
+  userIds: string[];
 };
 
 type DenyDirectoryRequestBody = {
-  firebaseId: string;
+  userIds: string[];
   reason: string;
 };
 
@@ -109,35 +108,43 @@ export const approveDirectoryEntry = async (
   next: NextFunction,
 ) => {
   try {
-    const pendingUserUid = req.body.firebaseId;
+    const errorMap: Record<string, string> = {};
+    await Promise.all(
+      req.body.userIds.map(async (userId) => {
+        const user = await UserModel.findById(userId);
 
-    const user = await UserModel.findOne({ firebaseId: pendingUserUid });
+        if (!user || !user.personal || !user.account) {
+          errorMap[userId] = "User not found";
+          return;
+        }
 
-    if (!user || !user.personal || !user.account) {
-      res.status(404).json({ error: "User not found" });
+        if (user.account.inDirectory !== "pending") {
+          errorMap[userId] = "User has not requested to be in the directory";
+          return;
+        }
+
+        if (
+          ![UserMembership.GENETIC_COUNSELOR, UserMembership.HEALTHCARE_PROVIDER].includes(
+            user.account.membership as UserMembership,
+          )
+        ) {
+          errorMap[userId] = "User is not a genetic counselor or healthcare provider";
+          return;
+        }
+
+        user.account.inDirectory = true;
+        await user.save();
+
+        const { firstName, email } = user.personal;
+
+        await sendDirectoryApprovalEmail(email, firstName);
+      }),
+    );
+
+    if (Object.keys(errorMap).length > 0) {
+      res.status(400).json(errorMap);
       return;
     }
-
-    if (user.account.inDirectory !== "pending") {
-      res.status(400).json({ error: "User has not requested to be in the directory" });
-      return;
-    }
-
-    if (
-      ![UserMembership.GENETIC_COUNSELOR, UserMembership.HEALTHCARE_PROVIDER].includes(
-        user.account.membership as UserMembership,
-      )
-    ) {
-      res.status(400).json({ error: "User is not a genetic counselor or healthcare provider" });
-      return;
-    }
-
-    user.account.inDirectory = true;
-    await user.save();
-
-    const { firstName, email } = user.personal;
-
-    await sendDirectoryApprovalEmail(email, firstName);
 
     res.status(200).json({ message: "Directory entry approved and email sent" });
   } catch (error) {
@@ -151,28 +158,34 @@ export const denyDirectoryEntry = async (
   next: NextFunction,
 ) => {
   try {
-    // firebaseID for the the user to be denied
-    const { firebaseId, reason } = req.body;
+    const { userIds, reason } = req.body;
+    const errorMap: Record<string, string> = {};
+    await Promise.all(
+      userIds.map(async (userId) => {
+        const user = await UserModel.findById(userId);
 
-    const user = await UserModel.findOne({ firebaseId });
+        if (!user || !user.personal || !user.account) {
+          errorMap[userId] = "User not found";
+          return;
+        }
 
-    if (!user || !user.personal || !user.account) {
-      res.status(404).json({ error: "User not found" });
-      return;
+        if (user.account.inDirectory !== "pending") {
+          errorMap[userId] = "User has not requested to be in the directory";
+          return;
+        }
+
+        user.account.inDirectory = false;
+        await user.save();
+
+        const { firstName, email } = user.personal;
+
+        await sendDirectoryDenialEmail(email, firstName, reason);
+      }),
+    );
+
+    if (Object.keys(errorMap).length > 0) {
+      res.status(400).json(errorMap);
     }
-
-    if (user.account.inDirectory !== "pending") {
-      res.status(400).json({ error: "User has not requested to be in the directory" });
-      return;
-    }
-
-    user.account.inDirectory = false;
-
-    await user.save();
-
-    const { firstName, email } = user.personal;
-
-    await sendDirectoryDenialEmail(email, firstName, reason);
 
     res.status(200).json({ message: "Directory entry denied and email sent" });
   } catch (error) {

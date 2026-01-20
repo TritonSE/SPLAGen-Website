@@ -79,3 +79,41 @@ export async function getPublicDirectory(): Promise<APIResult<Counselor[]>> {
     return handleAPIError(error);
   }
 }
+
+export async function approveDirectoryEntry(
+  firebaseToken: string,
+  userIds: string[],
+): Promise<APIResult<null>> {
+  try {
+    await post(
+      "/api/directory/approve",
+      {
+        userIds,
+      },
+      createAuthHeader(firebaseToken),
+    );
+    return { success: true, data: null };
+  } catch (error) {
+    return handleAPIError(error);
+  }
+}
+
+export async function denyDirectoryEntry(
+  firebaseToken: string,
+  userIds: string[],
+  reason: string,
+): Promise<APIResult<null>> {
+  try {
+    await post(
+      "/api/directory/deny",
+      {
+        userIds,
+        reason,
+      },
+      createAuthHeader(firebaseToken),
+    );
+    return { success: true, data: null };
+  } catch (error) {
+    return handleAPIError(error);
+  }
+}

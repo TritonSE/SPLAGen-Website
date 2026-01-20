@@ -156,6 +156,11 @@ const userSchema = new Schema(
   { timestamps: true },
 );
 
+userSchema.index({
+  "personal.firstName": "text",
+  "personal.lastName": "text",
+});
+
 export type User = InferSchemaType<typeof userSchema>;
 
 export default model<User>("User", userSchema);

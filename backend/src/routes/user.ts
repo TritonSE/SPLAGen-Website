@@ -24,8 +24,14 @@ router.delete(
   UserValidator.deleteUser,
   UserController.deleteUser,
 );
-router.get("/", requireSignedIn, UserController.getAllUsers);
-router.get("/:firebaseId", requireSignedIn, UserValidator.getUser, UserController.getUser);
+router.get("/", requireSignedIn, requireAdminOrSuperAdmin, UserController.getUsers);
+router.get(
+  "/:firebaseId",
+  requireSignedIn,
+  requireAdminOrSuperAdmin,
+  UserValidator.getUser,
+  UserController.getUser,
+);
 
 // Personal information routes
 router.put(

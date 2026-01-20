@@ -54,14 +54,14 @@ export const requestJoinDirectory = [
 ];
 
 export const approveDirectoryEntry = [
-  //TODO: .isMongoId() if we end up sending mongoDB id
-  body("firebaseId").notEmpty().trim().withMessage("Invalid UserId"),
+  body("userIds").isArray().withMessage("User IDs must be an array"),
+  body("userIds.*").isString().isMongoId().withMessage("Each user ID must be a valid MongoDB ID"),
   validateRequest,
 ];
 
 export const denyDirectoryEntry = [
-  //TODO: .isMongoId() if we end up sending mongoDB id
-  body("firebaseId").notEmpty().trim().withMessage("Invalid UserId"),
+  body("userIds").isArray().withMessage("User IDs must be an array"),
+  body("userIds.*").isString().isMongoId().withMessage("Each user ID must be a valid MongoDB ID"),
   body("reason").isString().notEmpty().trim().withMessage("Reason is required"),
   validateRequest,
 ];

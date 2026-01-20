@@ -34,13 +34,7 @@ export default function OnboardingForm() {
     (data: onboardingState["data"]) => {
       actions.updateOnboardingForm(data);
 
-      setStep((prevStep) => {
-        if (prevStep === 3) {
-          return prevStep + 2;
-        } else {
-          return prevStep + 1;
-        }
-      });
+      setStep((prevStep) => prevStep + 1);
     },
     [actions, setStep],
   );

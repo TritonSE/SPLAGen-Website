@@ -152,6 +152,14 @@ export type User = {
   updatedAt: string;
 };
 
+export const formatUserFullName = (user: User) =>
+  `${user.personal.firstName} ${user.personal.lastName}`;
+
+export type PaginateUserResult = {
+  users: User[];
+  count: number;
+};
+
 export type EditBasicInfo = {
   newFirstName: string;
   newLastName: string;
@@ -300,6 +308,29 @@ export const logoutUser = async (): Promise<APIResult<null>> => {
     const { auth } = initFirebase();
     await auth.signOut();
     return { success: true, data: null };
+  } catch (error) {
+    return handleAPIError(error);
+  }
+};
+
+export const USERS_PAGE_SIZE = 20;
+
+export const getMultipleUsers = async (
+  firebaseToken: string,
+  sort: string,
+  search: string,
+  page: number,
+  isAdmin: boolean | "" = "",
+  inDirectory: boolean | "pending" | "" = "",
+  pageSize = USERS_PAGE_SIZE,
+): Promise<APIResult<PaginateUserResult>> => {
+  try {
+    const response = await get(
+      `/api/users?order=${sort}&search=${search}&page=${String(page)}&pageSize=${String(pageSize)}&isAdmin=${String(isAdmin)}&inDirectory=${String(inDirectory)}`,
+      createAuthHeader(firebaseToken),
+    );
+    const data = (await response.json()) as PaginateUserResult;
+    return { success: true, data };
   } catch (error) {
     return handleAPIError(error);
   }

@@ -1,0 +1,399 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  align-items: flex-start;
+  padding-top: 0.5rem;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: bold;
+  color: var(--color-primary2);
+  margin: 18px 0;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  width: 100%;
+}
+
+.directoryToggleContainer {
+  border: 1px solid var(--color-grey3);
+  border-radius: 0.7rem;
+  background-color: white;
+  padding: 7px;
+  gap: 14px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.directoryToggleButton {
+  border: none;
+  color: var(--color-primary2);
+  font-size: 14px;
+  padding: 7px 22px;
+  border-radius: 10px;
+  text-wrap: nowrap;
+}
+
+.directoryToggleButtonActive {
+  color: white;
+  background-color: var(--color-primary2);
+}
+
+.searchContainer {
+  position: relative;
+  width: 30rem;
+  margin-right: auto;
+  padding: 0.5rem;
+  border-radius: 0.7rem;
+  background-color: white;
+}
+
+.searchBar {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  left: 0;
+  width: 100%;
+  height: 100%;
+  font-size: 17px;
+  padding-left: 2.5rem;
+  border: 1px solid var(--color-grey3);
+  border-radius: 0.7rem;
+  background-color: transparent;
+}
+
+.searchBar::placeholder {
+  font-size: 17px;
+}
+
+/* All Counselors+ Directory Button */
+
+.button-container {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.chooseView-button {
+  width: 5rem;
+  height: 5vh;
+  padding: 0.5rem;
+  font-size: 0.9rem;
+  border: 1px solid var(--color-grey3);
+  border-radius: 0.7rem;
+  background-color: white;
+  width: 7rem;
+}
+
+.chooseView-button:hover {
+  background-color: var(--color-primary2);
+  color: white;
+}
+
+/* Filter Sidebar Styles */
+.filter-sidebar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  display: none;
+  height: 100%;
+  width: 50vw;
+  max-width: 424px;
+  background-color: white;
+  transition: right 0.3s ease;
+  padding: 4rem 3rem;
+  overflow-y: auto;
+}
+
+.filter-sidebar.open {
+  display: unset !important;
+}
+
+.filterTitle {
+  font-size: 24px;
+}
+
+.filter-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 1.4rem;
+}
+
+.filter-category {
+  display: flex;
+  margin-top: 1.5rem;
+  flex-direction: column;
+  font-weight: 700;
+}
+
+.filter-category label {
+  display: flex;
+  align-items: center;
+  margin-top: 0.5rem;
+  font-weight: 400;
+}
+
+.filter-category label input {
+  margin-right: 0.5rem;
+}
+
+.filter-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1.25rem;
+}
+
+.filter-actions button:last-child:hover {
+  background-color: #2b1d53;
+}
+
+/* General styling for Filter and Download buttons */
+
+.action-button {
+  text-wrap: nowrap;
+  background-color: white;
+  padding: 12px 24px;
+  border-radius: 0.7rem;
+  border: 1px solid #ddd;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.dark-action-button {
+  text-wrap: nowrap;
+  background-color: var(--color-primary2);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 0.7rem;
+  border: 1px solid #ddd;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.red-action-button {
+  text-wrap: nowrap;
+  background-color: var(--color-error);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 0.7rem;
+  border: 1px solid #ddd;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.red-action-button .button-icon {
+  filter: brightness(0) invert(1);
+}
+
+.action-button.selected,
+.action-button:hover {
+  background-color: var(--color-primary2);
+  color: white;
+}
+
+.action-button .button-icon {
+  filter: brightness(0);
+}
+
+.action-button .small-icon {
+  filter: brightness(0);
+}
+
+button.selected .button-icon,
+button:hover .button-icon {
+  filter: brightness(0) invert(1);
+}
+
+button.selected .small-icon,
+button:hover .small-icon {
+  filter: brightness(0) invert(1);
+}
+
+/* Table */
+.membersTable {
+  width: 100%;
+}
+
+.membersTable thead > tr {
+  background-color: var(--color-primary2);
+  color: white;
+}
+
+.membersTable thead > tr div {
+  font-size: 14px !important;
+}
+
+.membersTable thead th:first-child {
+  border-radius: 6px 0 0;
+}
+
+.membersTable thead th:last-child {
+  border-radius: 0 6px 0 0;
+}
+
+/* Checkboxes */
+
+.membersTable input {
+  border: 3px solid var(--color-grey3) !important;
+}
+
+.membersTable thead label > svg {
+  fill: white !important;
+}
+
+.membersTable tbody label > svg {
+  fill: var(--color-primary2) !important;
+}
+
+.membersTable tbody > tr {
+  /* 
+      Use box-shadow instead of border because border goes outside element and 
+      would make the body rows wider than the header rows
+      */
+  box-shadow: inset 0 0 0 1px gray;
+}
+
+.membersTable tbody > tr[data-selected="true"] td {
+  background-color: rgba(59, 59, 98, 0.25);
+}
+
+.membersTable tbody td {
+  background-color: white;
+  color: #0c2b35;
+  font-size: 14px;
+}
+
+.chipsRow {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+.moreChipRoot {
+  padding: 2px 6px;
+  border-radius: 8px;
+  border: 1px solid #c4c3c3;
+}
+
+.moreChipText {
+  color: var(--color-primary2);
+  font-size: 12px;
+  text-wrap: nowrap;
+}
+
+.closeButton {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+}
+
+/*Counselor Table*/
+
+.table-wrapper {
+  overflow-x: auto;
+  overflow-y: auto;
+  max-height: 68vh;
+  background-color: white;
+  border-radius: 0.5rem;
+  margin-top: 2rem;
+}
+
+.counselor-table {
+  width: 100%;
+}
+
+.counselor-table thead {
+  background-color: var(--color-primary2);
+  color: white;
+}
+
+.counselor-table th {
+  padding: 1rem;
+  text-align: left;
+}
+
+.counselor-table td {
+  padding-left: 1rem;
+  padding-right: 1rem;
+  font-size: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+/*Service */
+.service-tag {
+  display: block;
+  margin: 0.3rem 0.3rem;
+  padding: 0.2rem 0.2rem;
+  border-radius: 15px;
+  font-size: 1rem;
+  color: white;
+  text-align: center;
+  transition: background-color 0.3s ease;
+}
+
+.service-tag:hover {
+  opacity: 0.8;
+}
+
+.service-tag.pediatric-genetics {
+  background-color: #f9e2e2;
+  color: #ce4040;
+}
+
+.service-tag.cancer-genetics {
+  background-color: #fcdaf0;
+  color: #c43975;
+}
+
+.service-tag.rare-diseases {
+  background-color: #cfebe4;
+  color: #28715e;
+}
+
+.service-tag.prenatal-genetics {
+  background-color: #e1f0df;
+  color: #397230;
+}
+
+.service-tag.neurogenetics {
+  background-color: #ece2f3;
+  color: #6d3c94;
+}
+
+.service-tag.cardiovascular-genetics {
+  background-color: #dde4f8;
+  color: #4561ad;
+}
+
+.service-tag.biochemical-genetics {
+  background-color: #1abc9c; /* Teal * Dont know what color to put here*/
+}
+
+.service-tag.adult-genetics {
+  background-color: #ddf3f9;
+  color: #287b91;
+}
+
+.service-tag.default {
+  background-color: #95a5a6;
+}
+
+/*Location*/
+
+.location-icon {
+  width: 0.5rem;
+}

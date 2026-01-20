@@ -1,4 +1,4 @@
-import { APIResult, get, handleAPIError } from "./requests";
+import { APIResult, get, handleAPIError, post } from "./requests";
 import { createAuthHeader } from "./users";
 
 export type MemberStats = {
@@ -17,3 +17,32 @@ export const getMemberStats = async (token: string): Promise<APIResult<MemberSta
     return handleAPIError(error);
   }
 };
+
+export async function removeAdmins(
+  firebaseToken: string,
+  userIds: string[],
+  reason: string,
+): Promise<APIResult<null>> {
+  try {
+    await post(
+      "/api/admin/remove",
+      {
+        userIds,
+        reason,
+      },
+      createAuthHeader(firebaseToken),
+    );
+    return { success: true, data: null };
+  } catch (error) {
+    return handleAPIError(error);
+  }
+}
+
+export async function inviteAdmin(firebaseToken: string, userId: string): Promise<APIResult<null>> {
+  try {
+    await post(`/api/admin/invite/${userId}`, undefined, createAuthHeader(firebaseToken));
+    return { success: true, data: null };
+  } catch (error) {
+    return handleAPIError(error);
+  }
+}

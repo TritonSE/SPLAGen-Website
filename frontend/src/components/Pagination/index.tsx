@@ -1,4 +1,5 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useEffect, useState } from "react";
 
 type PaginationProps = {
   currentPage: number;
@@ -9,6 +10,11 @@ type PaginationProps = {
 export const Pagination = ({ currentPage, numPages, onPageChange }: PaginationProps) => {
   const canGoBack = currentPage !== 1;
   const canGoForward = currentPage !== numPages;
+  const [inputValue, setInputValue] = useState("");
+
+  useEffect(() => {
+    setInputValue(currentPage.toString());
+  }, [currentPage]);
 
   return (
     <div className="flex flex-row gap-3 text-gray-500 items-center justify-center w-full">
@@ -23,13 +29,14 @@ export const Pagination = ({ currentPage, numPages, onPageChange }: PaginationPr
       Page{" "}
       <input
         className="max-w-8 text-center"
-        defaultValue={currentPage}
         onChange={(e) => {
+          setInputValue(e.target.value);
           const newPage = parseInt(e.target.value);
           if (!isNaN(newPage) && newPage > 0) {
             onPageChange(newPage);
           }
         }}
+        value={inputValue}
       />{" "}
       of {numPages}
       <ChevronRight

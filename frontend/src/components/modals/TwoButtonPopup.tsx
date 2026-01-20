@@ -11,9 +11,9 @@ export type TwoButtonPopupProps = {
   isOpen: boolean;
   variant?: "info" | "question" | "warning";
   confirmLabel?: string;
-  onConfirm: () => void;
+  onConfirm: () => unknown;
   cancelLabel?: string;
-  onCancel: () => void;
+  onCancel: () => unknown;
   children: ReactNode;
 };
 

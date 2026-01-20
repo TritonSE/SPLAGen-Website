@@ -15,12 +15,14 @@ export const Modal = ({
   isOpen,
   onClose,
   onSave,
+  hideButtonsRow,
 }: {
   title: string;
   content: ReactNode;
   isOpen: boolean;
   onClose: () => void;
   onSave: () => unknown;
+  hideButtonsRow?: boolean;
 }) => {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -47,10 +49,12 @@ export const Modal = ({
         <h2 className={styles.modalHeader}>{title}</h2>
         {content}
 
-        <div className={styles.buttonsRow}>
-          <Button variant="secondary" label="Cancel" onClick={onClose} />
-          <Button label="Save" onClick={onSave} />
-        </div>
+        {hideButtonsRow ? null : (
+          <div className={styles.buttonsRow}>
+            <Button variant="secondary" label="Cancel" onClick={onClose} />
+            <Button label="Save" onClick={onSave} />
+          </div>
+        )}
       </div>
     </div>
   ) : null;

@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 
 import { AuthenticatedRequest } from "../middleware/auth";
-import UserModel from "../models/user";
+import UserModel, { UserRole } from "../models/user";
 import { firebaseAdminAuth } from "../util/firebase";
 import { deleteUserFromFirebase, deleteUserFromMongoDB, getUserFromMongoDB } from "../util/user";
 
@@ -87,14 +87,118 @@ export const deleteUser = async (
   }
 };
 
-export const getAllUsers = async (
-  _req: AuthenticatedRequest,
-  res: Response,
-  next: NextFunction,
-) => {
+export const getUsers = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
-    const users = await UserModel.find({}).exec();
-    res.status(200).json({ users });
+    // Search
+    const searchTerm = req.query.search;
+
+    // Pagination
+    const page = parseInt(req.query.page as string);
+    const pageSize = parseInt(req.query.pageSize as string);
+
+    // Filters - TODO implement these
+    const isAdminFilter = req.query.isAdmin;
+    const inDirectoryFilter = req.query.inDirectory;
+    const titleFilter = req.query.title;
+    const membershipFilter = req.query.membership;
+    const educationFilter = req.query.education;
+    const servicesFilter = req.query.services;
+
+    // Sorting
+    const sortParam = (req.query.order ?? "") as string;
+    let isSortedDesc = sortParam?.length > 0 && sortParam.startsWith("-");
+    const sortField = isSortedDesc ? sortParam.slice(1) : sortParam;
+
+    const sortFieldsToDBFields: Record<string, string[]> = {
+      name: ["personal.firstName", "personal.lastName"],
+      title: ["professional.title"],
+      membership: ["account.membership"],
+      location: ["clinic.location.country"],
+      languages: ["user.display.languages"],
+      services: ["user.display.services"],
+      createdAt: ["createdAt"],
+    };
+    let sortDBFields = sortFieldsToDBFields[sortField];
+
+    if (!sortDBFields) {
+      // Default to showing most recently joined users first
+      sortDBFields = ["createdAt"];
+      isSortedDesc = true;
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const filters: any[] = [];
+
+    // Text search
+    if (searchTerm) {
+      filters.push({
+        $or: [
+          { "personal.firstName": { $regex: searchTerm, $options: "i" } },
+          { "personal.lastName": { $regex: searchTerm, $options: "i" } },
+        ],
+      });
+    }
+
+    if (isAdminFilter === "true") {
+      filters.push({
+        $or: [
+          { role: UserRole.SUPERADMIN },
+          {
+            role: UserRole.ADMIN,
+          },
+        ],
+      });
+    } else if (isAdminFilter === "false") {
+      filters.push({
+        role: UserRole.MEMBER,
+      });
+    }
+
+    if (inDirectoryFilter !== undefined && inDirectoryFilter !== "") {
+      filters.push({
+        "account.inDirectory":
+          inDirectoryFilter === "true"
+            ? true
+            : inDirectoryFilter === "false"
+              ? false
+              : inDirectoryFilter,
+      });
+    }
+
+    if (titleFilter) {
+      filters.push({
+        "professional.title": titleFilter,
+      });
+    }
+
+    if (membershipFilter) {
+      filters.push({
+        "account.membership": membershipFilter,
+      });
+    }
+
+    if (educationFilter) {
+      filters.push({
+        "education.degree": educationFilter,
+      });
+    }
+
+    if (servicesFilter) {
+      filters.push({
+        "display.services": servicesFilter,
+      });
+    }
+
+    const query = filters.length > 0 ? { $and: filters } : {};
+
+    const total = await UserModel.countDocuments(query);
+
+    const users = await UserModel.find(query)
+      .sort(sortDBFields.reduce((prev, cur) => ({ ...prev, [cur]: isSortedDesc ? -1 : 1 }), {}))
+      .skip((page - 1) * pageSize)
+      .limit(pageSize);
+
+    res.status(200).json({ users, count: total });
     return;
   } catch (error) {
     console.error("Error getting users:", error);

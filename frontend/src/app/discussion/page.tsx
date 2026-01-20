@@ -10,6 +10,7 @@ import styles from "./landingPage.module.css";
 import { DISCUSSION_PAGE_SIZE, Discussion, getPosts } from "@/api/discussion";
 import { Pagination } from "@/components/Pagination";
 import { PostCard } from "@/components/PostCard";
+import { Tabs } from "@/components/Tabs";
 import { UserContext } from "@/contexts/userContext";
 import { useRedirectToLoginIfNotSignedIn } from "@/hooks/useRedirection";
 
@@ -106,19 +107,7 @@ export default function LandingPage() {
         </Link>
       </div>
 
-      <div className={styles.tabsContainer}>
-        {TABS.map((tab) => (
-          <div
-            key={tab}
-            className={`${styles.tab} ${activeTab === tab ? styles.activeTab : ""}`}
-            onClick={() => {
-              setActiveTab(tab);
-            }}
-          >
-            {tab}
-          </div>
-        ))}
-      </div>
+      <Tabs tabs={TABS} activeTab={activeTab} onActiveTabChange={setActiveTab} />
 
       <div className={styles.scrollContainer}>
         {posts?.map((post) => (

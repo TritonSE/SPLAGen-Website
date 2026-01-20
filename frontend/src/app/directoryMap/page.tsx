@@ -101,47 +101,49 @@ export default function DirectoryMapPage() {
             }}
             options={{ pixelOffset: new google.maps.Size(0, -30), disableAutoPan: false }}
           >
-            {/* Header row: name + custom close button */}
-            <div className="flex items-start justify-between space-x-2 font-semibold">
-              <span>
-                {selected.counselor.name}
-                <span className="text-gray-500 font-normal"> ({selected.counselor.title})</span>
-              </span>
+            <>
+              {/* Header row: name + custom close button */}
+              <div className="flex items-start justify-between space-x-2 font-semibold">
+                <span>
+                  {selected.counselor.name}
+                  <span className="text-gray-500 font-normal"> ({selected.counselor.title})</span>
+                </span>
 
-              {/* inline “x” */}
-              <button
-                aria-label="Close"
-                onClick={() => {
-                  setSelected(null);
-                }}
-                className="text-lg leading-none hover:text-red-600"
-              >
-                ×
-              </button>
-            </div>
+                {/* inline “x” */}
+                <button
+                  aria-label="Close"
+                  onClick={() => {
+                    setSelected(null);
+                  }}
+                  className="text-lg leading-none hover:text-red-600"
+                >
+                  ×
+                </button>
+              </div>
 
-            {/* Details */}
-            <div className="mt-1 space-y-1 text-sm">
-              <p>📍 {selected.counselor.address}</p>
-              <p>🏢 {selected.counselor.organization}</p>
-              {selected.counselor.profileUrl && (
-                <p>
-                  🔗{" "}
-                  <a
-                    href={selected.counselor.profileUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="underline text-blue-600"
-                  >
-                    Clinic website
-                  </a>
-                </p>
-              )}
-              <p>🌐 {selected.counselor.email}</p>
-              <p>☎️ {selected.counselor.phone ?? "—"}</p>
-              <p>📚 {formatList(selected.counselor.specialties)}</p>
-              <p>🗣 {formatList(selected.counselor.languages)}</p>
-            </div>
+              {/* Details */}
+              <div className="mt-1 space-y-1 text-sm">
+                <p>📍 {selected.counselor.address}</p>
+                <p>🏢 {selected.counselor.organization}</p>
+                {selected.counselor.profileUrl && (
+                  <p>
+                    🔗{" "}
+                    <a
+                      href={selected.counselor.profileUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="underline text-blue-600"
+                    >
+                      Clinic website
+                    </a>
+                  </p>
+                )}
+                <p>🌐 {selected.counselor.email}</p>
+                <p>☎️ {selected.counselor.phone ?? "—"}</p>
+                <p>📚 {formatList(selected.counselor.specialties)}</p>
+                <p>🗣 {formatList(selected.counselor.languages)}</p>
+              </div>
+            </>
           </InfoWindow>
         )}
       </GoogleMap>

@@ -1,0 +1,10 @@
+.root {
+  padding: 2px 8px;
+  border-radius: 8px;
+}
+
+.text {
+  color: black;
+  font-size: 12px;
+  text-wrap: nowrap;
+}

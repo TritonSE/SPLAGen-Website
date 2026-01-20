@@ -3,8 +3,11 @@ import nodemailer from "nodemailer";
 import Mail from "nodemailer/lib/mailer";
 
 import {
+  ADMIN_INVITE_EMAIL,
+  ADMIN_REMOVAL_EMAIL,
   DIRECTORY_APPROVAL_EMAIL,
   DIRECTORY_DENIAL_EMAIL,
+  PORTAL_LINK,
   REASON_TEXT,
   RECIPIENT_TEXT,
   SIGN_OFF_HTML,
@@ -73,4 +76,48 @@ const sendDirectoryDenialEmail = async (to: string, name: string, reason: string
   });
 };
 
-export { sendDirectoryApprovalEmail, sendDirectoryDenialEmail };
+const sendAdminInvitationEmail = async (to: string, name: string, portalLink: string) => {
+  const emailSubject = "Invitation to be a SPLAGen Admin";
+  const emailHTML =
+    ADMIN_INVITE_EMAIL.replace(RECIPIENT_TEXT, name).replace(PORTAL_LINK, portalLink) +
+    SIGN_OFF_HTML;
+
+  await sendEmail({
+    to,
+    subject: emailSubject,
+    html: emailHTML,
+    attachments: [
+      {
+        filename: "splagen_logo.png",
+        path: `${__dirname}/../../public/splagen_logo.png`,
+        cid: "splagen_logo.png",
+      },
+    ],
+  });
+};
+
+const sendAdminRemovalEmail = async (to: string, name: string, reason: string) => {
+  const emailSubject = "Removal as SPLAGen Admin";
+  const emailHTML =
+    ADMIN_REMOVAL_EMAIL.replace(RECIPIENT_TEXT, name).replace(REASON_TEXT, reason) + SIGN_OFF_HTML;
+
+  await sendEmail({
+    to,
+    subject: emailSubject,
+    html: emailHTML,
+    attachments: [
+      {
+        filename: "splagen_logo.png",
+        path: `${__dirname}/../../public/splagen_logo.png`,
+        cid: "splagen_logo.png",
+      },
+    ],
+  });
+};
+
+export {
+  sendDirectoryApprovalEmail,
+  sendDirectoryDenialEmail,
+  sendAdminInvitationEmail,
+  sendAdminRemovalEmail,
+};
