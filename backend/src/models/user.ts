@@ -59,6 +59,7 @@ const userSchema = new Schema(
       institution: { type: String },
       email: { type: String },
       gradDate: { type: String },
+      schoolCountry: { type: String },
     },
 
     associate: {

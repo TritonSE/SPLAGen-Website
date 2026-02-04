@@ -102,6 +102,33 @@ export const joinDirectory = async (
   }
 };
 
+export const leaveDirectory = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { firebaseUid } = req;
+
+    const updatedUser = await UserModel.findOneAndUpdate(
+      { firebaseId: firebaseUid },
+      {
+        "account.inDirectory": false,
+      },
+      { new: true, runValidators: true },
+    );
+
+    if (!updatedUser) {
+      res.status(404).json({ error: "User not found" });
+      return;
+    }
+
+    res.status(200).json({ message: "Successfully removed from directory", user: updatedUser });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const approveDirectoryEntry = async (
   req: AuthenticatedRequest<unknown, unknown, ApproveDirectoryRequestBody>,
   res: Response,

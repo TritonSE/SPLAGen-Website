@@ -1,8 +1,11 @@
 import { NextFunction, Response } from "express";
 
 import { AuthenticatedRequest } from "../middleware/auth";
+import DiscussionPost from "../models/discussionPost";
 import Reply from "../models/reply";
-import { UserRole } from "../models/user";
+import UserModel, { UserRole } from "../models/user";
+import { sendDiscussionReplyEmail } from "../services/emailService";
+import { getDeploymentUrl } from "../utils/urlHelper";
 
 type CreateReplyRequestBody = {
   postId: string;
@@ -14,7 +17,7 @@ type EditReplyRequestBody = {
 };
 
 export const createReply = async (
-  req: AuthenticatedRequest<unknown, unknown, CreateReplyRequestBody>,
+  req: AuthenticatedRequest<Record<string, string>, unknown, CreateReplyRequestBody>,
   res: Response,
   next: NextFunction,
 ) => {
@@ -24,6 +27,46 @@ export const createReply = async (
 
     const newReply = new Reply({ userId, postId, message });
     await newReply.save();
+
+    // Get the discussion post to find the author
+    const discussion = await DiscussionPost.findById(postId);
+    if (!discussion) {
+      res.status(201).json(newReply);
+      return;
+    }
+
+    // Check if the replier is the same as the discussion author
+    if (!discussion.userId.equals(userId)) {
+      // Get the discussion author's information
+      const discussionAuthor = await UserModel.findById(discussion.userId);
+      const replier = await UserModel.findById(userId);
+
+      if (discussionAuthor?.personal?.email && replier?.personal) {
+        const authorName = discussionAuthor.personal.firstName || "Member";
+        const replierName =
+          `${replier.personal.firstName || ""} ${replier.personal.lastName || ""}`.trim() ||
+          "A member";
+
+        // Get the deployment URL from the request
+        const deploymentUrl = getDeploymentUrl(req);
+        const discussionUrl = `${deploymentUrl}/discussion/${postId}`;
+
+        // Send email asynchronously (don't wait for completion)
+        sendDiscussionReplyEmail(
+          discussionAuthor.personal.email,
+          authorName,
+          replierName,
+          discussion.title,
+          message,
+          discussionUrl,
+        ).catch((error: unknown) => {
+          console.error(
+            `Failed to send reply notification email to ${discussionAuthor.personal?.email ?? ""}:`,
+            error,
+          );
+        });
+      }
+    }
 
     res.status(201).json(newReply);
   } catch (error) {

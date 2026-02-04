@@ -135,7 +135,7 @@ export const EditDirectoryDisplayModal = ({ isOpen, onClose, populationInfo }: M
         const response = await editDirectoryDisplayInfoRequest(formattedData, firebaseToken);
         if (response.success) {
           setSuccessMessage("Display information updated");
-          reloadUser();
+          await reloadUser();
           onClose();
         } else {
           setErrorMessage(`Error updating info: ${response.error}`);

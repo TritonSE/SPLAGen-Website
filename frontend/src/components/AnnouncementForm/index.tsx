@@ -44,6 +44,13 @@ export const AnnouncementForm = ({ announcement }: { announcement?: Announcement
         title: announcement.title,
         message: announcement.message,
       });
+    } else {
+      reset({
+        allRecipients: false,
+        recipients: "",
+        title: "",
+        message: "",
+      });
     }
   }, [announcement, reset]);
 

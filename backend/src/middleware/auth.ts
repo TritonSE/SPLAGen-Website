@@ -7,11 +7,11 @@ import { firebaseAdminAuth } from "../util/firebase";
 const DEFAULT_ERROR = 403;
 
 // Define this custom type for a request to include the "firebaseUid"
-export type AuthenticatedRequest<P = unknown, ResBody = unknown, ReqBody = unknown> = Request<
-  P,
-  ResBody,
-  ReqBody
-> & {
+export type AuthenticatedRequest<
+  P = Record<string, string>,
+  ResBody = unknown,
+  ReqBody = unknown,
+> = Request<P, ResBody, ReqBody> & {
   firebaseUid?: string;
   mongoID?: Types.ObjectId;
   role?: string;

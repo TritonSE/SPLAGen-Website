@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 
 import styles from "./styles.module.css";
 
-import { logoutUser, professionalTitleOptions } from "@/api/users";
+import { logoutUser, membershipDisplayMap } from "@/api/users";
 import { ProfilePicture } from "@/components/ProfilePicture";
 import { UserContext } from "@/contexts/userContext";
 
@@ -28,8 +28,7 @@ export const CurrentUser = () => {
             {user?.personal.firstName ?? t("none")} {user?.personal.lastName ?? t("none")}
           </p>
           <p className={styles.userTitle}>
-            {professionalTitleOptions.find((option) => option.value === user.professional?.title)
-              ?.label ?? t("none")}
+            {membershipDisplayMap[user.account.membership] ?? t("none")}
           </p>
           <p className={styles.userRole}>
             {user?.role ? user.role[0].toUpperCase() + user.role.substring(1) : t("none")}
@@ -41,12 +40,20 @@ export const CurrentUser = () => {
       {showDropdown && (
         <div className={styles.buttonsContainer}>
           <Link href="/profile">
-            <button className={styles.button}>Profile</button>
+            <button
+              className={styles.button}
+              onClick={() => {
+                setShowDropdown(false);
+              }}
+            >
+              Profile
+            </button>
           </Link>
           <button
             className={styles.button}
             onClick={() => {
               void logoutUser();
+              setShowDropdown(false);
             }}
           >
             Logout

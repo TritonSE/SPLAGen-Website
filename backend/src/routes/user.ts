@@ -73,4 +73,28 @@ router.put(
   UserController.editProfilePicture,
 );
 
+// Membership routes
+router.put(
+  "/membership",
+  requireSignedIn,
+  UserValidator.editMembership,
+  UserController.editMembership,
+);
+
+// Student information routes
+router.put(
+  "/general/student-information",
+  requireSignedIn,
+  UserValidator.updateStudentInfo,
+  UserController.updateStudentInfo,
+);
+
+// Associate information routes
+router.put(
+  "/general/associate-information",
+  requireSignedIn,
+  UserValidator.updateAssociateInfo,
+  UserController.updateAssociateInfo,
+);
+
 export default router;

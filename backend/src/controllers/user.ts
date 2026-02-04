@@ -435,3 +435,155 @@ export const editProfilePicture = async (
     return;
   }
 };
+
+export const editMembership = async (
+  req: AuthenticatedRequest<unknown, unknown, { newMembership: string }>,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { firebaseUid } = req;
+    const { newMembership } = req.body;
+
+    const user = await UserModel.findOne({ firebaseId: firebaseUid });
+
+    if (!user) {
+      res.status(404).json({ error: "User not found" });
+      return;
+    }
+
+    // If new membership is student or associate (not eligible for directory),
+    // and user was in directory or pending, remove them from directory
+    const isNewMembershipEligibleForDirectory =
+      newMembership === "geneticCounselor" || newMembership === "healthcareProvider";
+    const wasInDirectoryOrPending =
+      user.account?.inDirectory === true || user.account?.inDirectory === "pending";
+
+    const updateFields: Record<string, unknown> = {
+      "account.membership": newMembership,
+    };
+
+    const shouldRemoveFromDirectory =
+      !isNewMembershipEligibleForDirectory && wasInDirectoryOrPending;
+    if (shouldRemoveFromDirectory) {
+      updateFields["account.inDirectory"] = false;
+    }
+
+    const updatedUser = await UserModel.findOneAndUpdate(
+      { firebaseId: firebaseUid },
+      updateFields,
+      { new: true, runValidators: true },
+    );
+
+    res.status(200).json({
+      message: "Membership updated",
+      user: updatedUser,
+      removedFromDirectory: shouldRemoveFromDirectory,
+    });
+    return;
+  } catch (error) {
+    console.error("Error updating membership:", error);
+    next(error);
+    return;
+  }
+};
+
+type UpdateStudentInfoRequestBody = {
+  schoolCountry: string;
+  schoolName: string;
+  universityEmail: string;
+  degree: string;
+  programName: string;
+  gradDate: string;
+};
+
+export const updateStudentInfo = async (
+  req: AuthenticatedRequest<unknown, unknown, UpdateStudentInfoRequestBody>,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { firebaseUid } = req;
+    const { schoolCountry, schoolName, universityEmail, degree, programName, gradDate } = req.body;
+
+    const user = await UserModel.findOne({ firebaseId: firebaseUid });
+
+    if (!user) {
+      res.status(404).json({ error: "User not found" });
+      return;
+    }
+
+    // Check if user has student membership
+    if (user.account?.membership !== "student") {
+      res.status(403).json({ error: "Only students can update student information" });
+      return;
+    }
+
+    const updatedUser = await UserModel.findOneAndUpdate(
+      { firebaseId: firebaseUid },
+      {
+        "education.schoolCountry": schoolCountry,
+        "education.institution": schoolName,
+        "education.email": universityEmail,
+        "education.degree": degree.toLowerCase(),
+        "education.program": programName,
+        "education.gradDate": gradDate,
+      },
+      { new: true, runValidators: true },
+    );
+
+    res.status(200).json({ message: "Student information updated", user: updatedUser });
+  } catch (error) {
+    console.error("Error updating student information:", error);
+    next(error);
+  }
+};
+
+type UpdateAssociateInfoRequestBody = {
+  jobTitle: string;
+  specialization: string[];
+  isOrganizationRepresentative: string;
+  organizationName: string;
+};
+
+export const updateAssociateInfo = async (
+  req: AuthenticatedRequest<unknown, unknown, UpdateAssociateInfoRequestBody>,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { firebaseUid } = req;
+    const { jobTitle, specialization, isOrganizationRepresentative, organizationName } = req.body;
+
+    const user = await UserModel.findOne({ firebaseId: firebaseUid });
+
+    if (!user) {
+      res.status(404).json({ error: "User not found" });
+      return;
+    }
+
+    // Check if user has associate membership
+    if (user.account?.membership !== "associate") {
+      res.status(403).json({ error: "Only associates can update associate information" });
+      return;
+    }
+
+    // Normalize specializations to lowercase for database enum matching
+    const normalizedSpecializations = specialization?.map((s) => s.toLowerCase());
+
+    const updatedUser = await UserModel.findOneAndUpdate(
+      { firebaseId: firebaseUid },
+      {
+        "associate.title": jobTitle,
+        "associate.specialization": normalizedSpecializations,
+        "associate.organization": isOrganizationRepresentative === "yes" ? organizationName : "",
+      },
+      { new: true, runValidators: true },
+    );
+
+    res.status(200).json({ message: "Associate information updated", user: updatedUser });
+  } catch (error) {
+    console.error("Error updating associate information:", error);
+    next(error);
+  }
+};

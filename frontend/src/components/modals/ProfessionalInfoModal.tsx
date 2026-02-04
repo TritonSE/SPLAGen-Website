@@ -144,7 +144,7 @@ export const ProfessionalInfoModal = ({
         const response = await editProfessionalInfoRequest(formattedData, firebaseToken);
         if (response.success) {
           setSuccessMessage("Professional information updated");
-          reloadUser();
+          await reloadUser();
           onClose();
         } else {
           setErrorMessage(`Error updating info: ${response.error}`);

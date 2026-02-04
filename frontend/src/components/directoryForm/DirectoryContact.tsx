@@ -55,7 +55,7 @@ type DirectoryContactProps = {
 
 export const DirectoryContact = ({ onReset, onBack }: DirectoryContactProps) => {
   const { t } = useTranslation();
-  const { firebaseUser } = useContext(UserContext);
+  const { firebaseUser, reloadUser } = useContext(UserContext);
   const router = useRouter();
   const { state, actions } = useStateMachine({ actions: { updateDirectoryForm } });
 
@@ -75,7 +75,7 @@ export const DirectoryContact = ({ onReset, onBack }: DirectoryContactProps) => 
 
   const licenseType = watch("licenseType");
 
-  const submitDirectoryRequest = async () => {
+  const submitDirectoryRequest = async (formData: FormSchema) => {
     if (!firebaseUser) return;
 
     try {
@@ -103,8 +103,8 @@ export const DirectoryContact = ({ onReset, onBack }: DirectoryContactProps) => 
           },
         },
         display: {
-          workEmail: state.directoryForm.workEmail,
-          workPhone: state.directoryForm.workPhone,
+          workEmail: formData.workEmail,
+          workPhone: formData.workPhone,
           services: state.directoryForm.specialtyServices.map(
             (service) => specialtyOptionsToBackend[service as SpecialtyOption],
           ),
@@ -115,22 +115,18 @@ export const DirectoryContact = ({ onReset, onBack }: DirectoryContactProps) => 
             remote: state.directoryForm.offersTelehealth,
             authorizedCare: state.directoryForm.authorizedForLanguages,
           },
-          license:
-            state.directoryForm.licenseType === "has_license"
-              ? [state.directoryForm.licenseNumber]
-              : [],
+          license: formData.licenseType === "has_license" ? [formData.licenseNumber ?? ""] : [],
           comments: {
-            noLicense: state.directoryForm.noLicenseReason,
-            additional: state.directoryForm.additionalComments,
+            noLicense: formData.noLicenseReason,
+            additional: formData.additionalComments,
           },
         },
       };
       const res = await joinDirectory(requestBody, token);
       if (res.success) {
         setSuccessMessage("Submitted directory info");
-        setTimeout(() => {
-          router.push("/");
-        }, 2000);
+        await reloadUser();
+        router.push("/");
       } else {
         setError(`Failed to submit directory info: ${res.error}`);
       }
@@ -143,7 +139,7 @@ export const DirectoryContact = ({ onReset, onBack }: DirectoryContactProps) => 
 
   const onSubmit = (data: FormSchema) => {
     actions.updateDirectoryForm(data as directoryState["data"]);
-    void submitDirectoryRequest();
+    void submitDirectoryRequest(data);
   };
 
   const handleFormSubmit = (e: React.FormEvent) => {
@@ -161,7 +157,7 @@ export const DirectoryContact = ({ onReset, onBack }: DirectoryContactProps) => 
           <div className={styles.questionSection}>
             <p className={styles.sectionText}>Professional email for patients to contact you</p>
             <input
-              type="workEmail"
+              type="email"
               {...register("workEmail")}
               className={styles.textInput}
               placeholder="Enter your professional email"

@@ -68,7 +68,7 @@ export const UploadProfilePictureModal = ({
       const res = await editProfilePicture(fileURL, token);
       if (res.success) {
         setSuccessMessage("Profile picture updated");
-        reloadUser();
+        await reloadUser();
         onClose();
       } else {
         setError(`Failed to update profile picture: ${res.error}`);

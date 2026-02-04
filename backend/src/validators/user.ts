@@ -135,3 +135,33 @@ export const editProfilePicture = [
   body("profilePicture").optional().isString().withMessage("Profile picture URL must be a string"),
   validateRequest,
 ];
+
+export const editMembership = [
+  body("newMembership")
+    .isIn(["student", "geneticCounselor", "healthcareProvider", "associate"])
+    .withMessage("Invalid membership type"),
+  validateRequest,
+];
+
+export const updateStudentInfo = [
+  body("schoolCountry").isString().notEmpty().withMessage("School country is required"),
+  body("schoolName").isString().notEmpty().withMessage("School name is required"),
+  body("universityEmail").isEmail().withMessage("Valid university email is required"),
+  body("degree").isString().notEmpty().withMessage("Degree is required"),
+  body("programName").isString().notEmpty().withMessage("Program name is required"),
+  body("gradDate").isString().notEmpty().withMessage("Graduation date is required"),
+  validateRequest,
+];
+
+export const updateAssociateInfo = [
+  body("jobTitle").isString().notEmpty().withMessage("Job title is required"),
+  body("specialization")
+    .isArray({ min: 1 })
+    .withMessage("Specializations must be a non-empty array"),
+  body("specialization.*").isString().withMessage("Each specialization must be a string"),
+  body("isOrganizationRepresentative")
+    .isIn(["yes", "no"])
+    .withMessage("Organization representative must be 'yes' or 'no'"),
+  body("organizationName").optional().isString().withMessage("Organization name must be a string"),
+  validateRequest,
+];

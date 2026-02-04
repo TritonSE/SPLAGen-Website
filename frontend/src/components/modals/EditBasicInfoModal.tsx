@@ -89,7 +89,7 @@ export const EditBasicInfoModal = ({
 
         if (response.success) {
           setSuccessMessage("Basic information updated");
-          reloadUser();
+          await reloadUser();
           onClose();
         } else {
           setError(`Error updating info: ${response.error}`);

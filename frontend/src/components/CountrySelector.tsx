@@ -23,6 +23,12 @@ export const getCountryOptions = () => {
   }));
 };
 
+export const getCountryLabelFromCode = (code: string | undefined): string | undefined => {
+  if (!code) return undefined;
+  const options = getCountryOptions();
+  return options.find((option) => option.value === code)?.label;
+};
+
 export const CountrySelector: React.FC<CountrySelectorProps> = ({
   value,
   onChange,

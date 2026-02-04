@@ -25,6 +25,7 @@
 .nameAndTitle {
   display: flex;
   flex-direction: column;
+  gap: 8px;
 }
 
 .nameAndTitle span:nth-child(1) {

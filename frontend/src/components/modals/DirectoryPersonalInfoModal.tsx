@@ -93,14 +93,14 @@ export const DirectoryPersonalInfoModal: React.FC<DirectoryInfoModalProps> = ({
           newClinicCity: data.city,
           newClinicState: data.state,
           newClinicZipPostCode: data.postcode,
-          newClinicCountry: data.country.label,
+          newClinicCountry: data.country.value,
         };
 
         const firebaseToken = await firebaseUser.getIdToken();
         const response = await editDirectoryPersonalInfoRequest(formattedData, firebaseToken);
         if (response.success) {
           setSuccessMessage("Directory personal information updated");
-          reloadUser();
+          await reloadUser();
           onClose();
         } else {
           setErrorMessage(`Error updating info: ${response.error}`);
@@ -120,7 +120,7 @@ export const DirectoryPersonalInfoModal: React.FC<DirectoryInfoModalProps> = ({
         clinic: populationInfo.clinic?.name,
         website: populationInfo.clinic?.url,
         country: getCountryOptions().find(
-          (option) => option.label === populationInfo.clinic?.location?.country,
+          (option) => option.value === populationInfo.clinic?.location?.country,
         ),
         addressLine: populationInfo.clinic?.location?.address,
         apartment: populationInfo.clinic?.location?.suite,

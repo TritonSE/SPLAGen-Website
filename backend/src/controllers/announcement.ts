@@ -2,7 +2,9 @@ import { NextFunction, RequestHandler, Response } from "express";
 
 import { AuthenticatedRequest } from "../middleware/auth";
 import AnnouncementModel, { Announcement } from "../models/announcement";
-import { UserRole } from "../models/user";
+import UserModel, { User, UserRole } from "../models/user";
+import { sendAnnouncementEmail } from "../services/emailService";
+import { getDeploymentUrl } from "../utils/urlHelper";
 
 type CreateOrEditAnnouncementRequestBody = {
   title: string;
@@ -11,7 +13,7 @@ type CreateOrEditAnnouncementRequestBody = {
 };
 
 export const createAnnouncement = async (
-  req: AuthenticatedRequest<unknown, unknown, CreateOrEditAnnouncementRequestBody>,
+  req: AuthenticatedRequest<Record<string, string>, unknown, CreateOrEditAnnouncementRequestBody>,
   res: Response,
   next: NextFunction,
 ) => {
@@ -22,6 +24,58 @@ export const createAnnouncement = async (
     const newAnnouncement = new AnnouncementModel({ userId, title, message, recipients });
 
     await newAnnouncement.save();
+
+    // Get author information for email notification
+    const author = await UserModel.findById(userId);
+    if (!author) {
+      res.status(201).json(newAnnouncement);
+      return;
+    }
+
+    const authorName =
+      `${author.personal?.firstName ?? ""} ${author.personal?.lastName ?? ""}`.trim() ||
+      "SPLAGen Admin";
+
+    // Get the deployment URL from the request
+    const deploymentUrl = getDeploymentUrl(req);
+    const announcementUrl = `${deploymentUrl}/announcements/${newAnnouncement._id.toString()}`;
+
+    // Determine recipients for email
+    let emailRecipients: User[] = [];
+
+    if (recipients[0] === "everyone") {
+      // Get all users' emails
+      const allUsers = await UserModel.find({}, "personal.email personal.firstName");
+      emailRecipients = allUsers;
+    } else {
+      // Get specific users by email
+      const specificUsers = await UserModel.find(
+        { "personal.email": { $in: recipients } },
+        "personal.email personal.firstName",
+      );
+      emailRecipients = specificUsers;
+    }
+
+    // Send emails asynchronously (don't wait for completion)
+    Promise.all(
+      emailRecipients.map((recipient) =>
+        recipient.personal
+          ? sendAnnouncementEmail(
+              recipient.personal.email,
+              recipient.personal.firstName,
+              authorName,
+              title,
+              message,
+              announcementUrl,
+            ).catch((error: unknown) => {
+              console.error(`Failed to send email to ${recipient.personal?.email ?? ""}:`, error);
+            })
+          : Promise.resolve(),
+      ),
+    ).catch((error: unknown) => {
+      console.error("Error sending announcement emails:", error);
+    });
+
     res.status(201).json(newAnnouncement);
   } catch (error) {
     next(error);

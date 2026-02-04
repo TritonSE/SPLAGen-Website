@@ -9,6 +9,7 @@ import { Controller, useForm } from "react-hook-form";
 import styles from "./Associate.module.css";
 
 import { Button } from "@/components";
+import { SPECIALIZATIONS } from "@/constants/specializations";
 import { onboardingState } from "@/state/stateTypes";
 import updateOnboardingForm from "@/state/updateOnboardingForm";
 
@@ -19,21 +20,6 @@ type AssociateProps = {
 
 export const Associate = ({ onNext, onBack }: AssociateProps) => {
   const { state, actions } = useStateMachine({ actions: { updateOnboardingForm } });
-
-  const specializations = [
-    "Rare disease advocacy",
-    "Research",
-    "Public Health",
-    "Bioethics",
-    "Law",
-    "Biology",
-    "Medical Writer",
-    "Medical Science Liaison",
-    "Laboratory scientist",
-    "Professor",
-    "Bioinformatics",
-    "Biotech sales and marketing",
-  ];
 
   const { register, handleSubmit, control, watch, setValue, reset } = useForm({
     defaultValues: state.onboardingForm,
@@ -124,7 +110,7 @@ export const Associate = ({ onNext, onBack }: AssociateProps) => {
             defaultValue={[]}
             render={() => (
               <div className={styles.specializationContainer}>
-                {specializations.map((specialization) => {
+                {SPECIALIZATIONS.map((specialization) => {
                   const isSelected = watchSpecializations.includes(specialization);
                   return (
                     <button

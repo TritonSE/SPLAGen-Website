@@ -26,6 +26,7 @@ router.post(
   DirectoryValidator.denyDirectoryEntry,
   DirectoryController.denyDirectoryEntry,
 );
+router.post("/leave", requireSignedIn, DirectoryController.leaveDirectory);
 router.get("/public", DirectoryController.getPublicDirectory);
 
 export default router;

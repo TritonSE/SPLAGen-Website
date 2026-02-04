@@ -5,11 +5,21 @@ import Mail from "nodemailer/lib/mailer";
 import {
   ADMIN_INVITE_EMAIL,
   ADMIN_REMOVAL_EMAIL,
+  ANNOUNCEMENT_MESSAGE,
+  ANNOUNCEMENT_TITLE,
+  ANNOUNCEMENT_URL,
+  AUTHOR_NAME,
   DIRECTORY_APPROVAL_EMAIL,
   DIRECTORY_DENIAL_EMAIL,
+  DISCUSSION_TITLE,
+  DISCUSSION_URL,
+  NEW_ANNOUNCEMENT_EMAIL,
+  NEW_DISCUSSION_REPLY_EMAIL,
   PORTAL_LINK,
   REASON_TEXT,
   RECIPIENT_TEXT,
+  REPLIER_NAME,
+  REPLY_MESSAGE,
   SIGN_OFF_HTML,
 } from "./emailHtml";
 config();
@@ -115,9 +125,75 @@ const sendAdminRemovalEmail = async (to: string, name: string, reason: string) =
   });
 };
 
+const sendAnnouncementEmail = async (
+  to: string,
+  recipientName: string,
+  authorName: string,
+  announcementTitle: string,
+  announcementMessage: string,
+  announcementUrl: string,
+) => {
+  const emailSubject = "SPLAGen Membership Portal - New Announcement";
+
+  const emailHTML =
+    NEW_ANNOUNCEMENT_EMAIL.replace(RECIPIENT_TEXT, recipientName)
+      .replace(AUTHOR_NAME, authorName)
+      .replace(ANNOUNCEMENT_TITLE, announcementTitle)
+      .replace(ANNOUNCEMENT_MESSAGE, announcementMessage)
+      .replace(ANNOUNCEMENT_URL, announcementUrl)
+      .replace(ANNOUNCEMENT_URL, announcementUrl) + SIGN_OFF_HTML;
+
+  await sendEmail({
+    to,
+    subject: emailSubject,
+    html: emailHTML,
+    attachments: [
+      {
+        filename: "splagen_logo.png",
+        path: `${__dirname}/../../public/splagen_logo.png`,
+        cid: "splagen_logo.png",
+      },
+    ],
+  });
+};
+
+const sendDiscussionReplyEmail = async (
+  to: string,
+  recipientName: string,
+  replierName: string,
+  discussionTitle: string,
+  replyMessage: string,
+  discussionUrl: string,
+) => {
+  const emailSubject = "SPLAGen Membership Portal - New Reply to Your Discussion";
+
+  const emailHTML =
+    NEW_DISCUSSION_REPLY_EMAIL.replace(RECIPIENT_TEXT, recipientName)
+      .replace(REPLIER_NAME, replierName)
+      .replace(DISCUSSION_TITLE, discussionTitle)
+      .replace(REPLY_MESSAGE, replyMessage)
+      .replace(DISCUSSION_URL, discussionUrl)
+      .replace(DISCUSSION_URL, discussionUrl) + SIGN_OFF_HTML;
+
+  await sendEmail({
+    to,
+    subject: emailSubject,
+    html: emailHTML,
+    attachments: [
+      {
+        filename: "splagen_logo.png",
+        path: `${__dirname}/../../public/splagen_logo.png`,
+        cid: "splagen_logo.png",
+      },
+    ],
+  });
+};
+
 export {
   sendDirectoryApprovalEmail,
   sendDirectoryDenialEmail,
   sendAdminInvitationEmail,
   sendAdminRemovalEmail,
+  sendAnnouncementEmail,
+  sendDiscussionReplyEmail,
 };

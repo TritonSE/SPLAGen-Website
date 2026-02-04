@@ -30,8 +30,8 @@ export const RootLayoutComponent = ({
                 <Navbar />
                 <section className={`viewPort ${isOnboardingFlow ? "purpleBackground" : ""}`}>
                   <main className={isOnboardingFlow ? "whiteBackground" : ""}>
-                    {isOnboardingFlow ? null : <CurrentUser />}
                     {children}
+                    {isOnboardingFlow ? null : <CurrentUser />}
                   </main>
                 </section>
               </div>

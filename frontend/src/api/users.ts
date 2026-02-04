@@ -47,6 +47,7 @@ export type CreateUserRequestBody = {
     institution?: string;
     email?: string;
     gradDate?: string;
+    schoolCountry?: string;
   };
   associate?: {
     title?: string;
@@ -84,6 +85,7 @@ export type User = {
     institution?: string;
     email?: string;
     gradDate?: string;
+    schoolCountry?: string;
   };
   associate?: {
     title?: string;
@@ -411,6 +413,68 @@ export async function editProfilePicture(
     return handleAPIError(error);
   }
 }
+
+export async function updateStudentInfo(
+  firebaseToken: string,
+  studentInfo: {
+    schoolCountry: string;
+    schoolName: string;
+    universityEmail: string;
+    degree: string;
+    programName: string;
+    gradDate: string;
+  },
+): Promise<APIResult<null>> {
+  try {
+    await put(
+      "/api/users/general/student-information",
+      studentInfo,
+      createAuthHeader(firebaseToken),
+    );
+    return { success: true, data: null };
+  } catch (error) {
+    return handleAPIError(error);
+  }
+}
+
+export async function updateAssociateInfo(
+  firebaseToken: string,
+  associateInfo: {
+    jobTitle: string;
+    specialization: string[];
+    isOrganizationRepresentative: string;
+    organizationName: string;
+  },
+): Promise<APIResult<null>> {
+  try {
+    await put(
+      "/api/users/general/associate-information",
+      associateInfo,
+      createAuthHeader(firebaseToken),
+    );
+    return { success: true, data: null };
+  } catch (error) {
+    return handleAPIError(error);
+  }
+}
+
+export async function editMembership(
+  newMembership: MembershipType,
+  firebaseToken: string,
+): Promise<APIResult<{ user: User; removedFromDirectory: boolean }>> {
+  try {
+    const response = await put(
+      "/api/users/membership",
+      { newMembership },
+      createAuthHeader(firebaseToken),
+    );
+    const data = (await response.json()) as { user: User; removedFromDirectory: boolean };
+    return { success: true, data };
+  } catch (error) {
+    return handleAPIError(error);
+  }
+}
+
 export const getUser = async (
   firebaseUid: string,
   firebaseToken: string,

@@ -112,30 +112,15 @@ export const Category: React.FC<CategoryProps> = ({ onNext, onBack, onReset, onS
           email: state.onboardingForm.universityEmail,
           program: state.onboardingForm.programName,
           gradDate: state.onboardingForm.graduationDate,
+          schoolCountry: state.onboardingForm.schoolCountry?.value,
         };
       }
 
       if (membership === "associate" && state.onboardingForm.organizationName) {
         // Normalize specializations
-        const specializationEnumMap = {
-          "rare disease advocacy": "rare disease advocacy",
-          research: "research",
-          "public health": "public health",
-          bioethics: "bioethics",
-          law: "law",
-          biology: "biology",
-          "medical writer": "medical writer",
-          "medical science liaison": "medical science liason",
-          "laboratory scientist": "laboratory scientist",
-          professor: "professor",
-          bioinformatics: "bioinformatics",
-          "biotech sales and marketing": "biotech sales and marketing",
-        };
-
-        const specialization = (state.onboardingForm.specializations || [])
-          .map((s) => s.toLowerCase())
-          .map((s) => specializationEnumMap[s as keyof typeof specializationEnumMap])
-          .filter((val): val is string => Boolean(val));
+        const specialization = (state.onboardingForm.specializations || []).map((s) =>
+          s.toLowerCase(),
+        );
 
         userData.associate = {
           title: state.onboardingForm.jobTitle,
@@ -143,8 +128,6 @@ export const Category: React.FC<CategoryProps> = ({ onNext, onBack, onReset, onS
           organization: state.onboardingForm.organizationName,
         };
       }
-
-      console.log("Final user data to register:", userData);
 
       const result = await signUpUser(userData);
 

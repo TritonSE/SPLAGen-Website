@@ -96,9 +96,7 @@ export default function OnboardingForm() {
           setStep(4);
         } else {
           setSuccessMessage("Registration submitted");
-          setTimeout(() => {
-            router.push("/");
-          }, 2000);
+          router.push("/");
         }
       }
     },

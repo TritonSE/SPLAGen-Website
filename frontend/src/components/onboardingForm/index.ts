@@ -5,3 +5,4 @@ export { Associate } from "./Associate";
 export { Category } from "./Category";
 export { SignUp } from "./Signup";
 export { ContinueToDirectory } from "./ContinueToDirectory";
+export { EditMembershipCategory } from "./EditMembershipCategory";

@@ -3,6 +3,7 @@ import { NextFunction, RequestHandler, Response } from "express";
 import { AuthenticatedRequest } from "../middleware/auth";
 import User, { UserRole } from "../models/user";
 import { sendAdminInvitationEmail, sendAdminRemovalEmail } from "../services/emailService";
+import { getDeploymentUrl } from "../utils/urlHelper";
 
 type RemoveAdminsRequestBody = {
   userIds: string[];
@@ -50,7 +51,7 @@ export const inviteAdmin: RequestHandler = async (req, res, next) => {
     user.role = UserRole.ADMIN;
     await user.save();
 
-    const deploymentUrl = req.get("origin") ?? `${req.protocol}://${req.get("host") ?? ""}`;
+    const deploymentUrl = getDeploymentUrl(req);
     await sendAdminInvitationEmail(user.personal.email, user.personal.firstName, deploymentUrl);
 
     res.status(200).json({

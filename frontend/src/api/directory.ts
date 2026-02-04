@@ -117,3 +117,12 @@ export async function denyDirectoryEntry(
     return handleAPIError(error);
   }
 }
+
+export async function leaveDirectory(firebaseToken: string): Promise<APIResult<null>> {
+  try {
+    await post("/api/directory/leave", {}, createAuthHeader(firebaseToken));
+    return { success: true, data: null };
+  } catch (error) {
+    return handleAPIError(error);
+  }
+}

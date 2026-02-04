@@ -1,11 +1,12 @@
 "use client";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useContext, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import styles from "./page.module.css";
 
+import { leaveDirectory } from "@/api/directory";
 import { MembershipType, User, membershipDisplayMap, professionalTitleOptions } from "@/api/users";
 import {
   Button,
@@ -13,15 +14,25 @@ import {
   EditBasicInfoModal,
   ProfessionalInfoModal,
 } from "@/components";
+import { getCountryLabelFromCode } from "@/components/CountrySelector";
 import { PreferredLanguages } from "@/components/PreferredLanguages";
 import { ProfilePageCard } from "@/components/ProfilePageCard";
 import { ProfilePicture } from "@/components/ProfilePicture";
+import { SuccessMessage } from "@/components/SuccessMessage";
+import { Tabs } from "@/components/Tabs";
 import { specialtyOptionsToFrontend } from "@/components/directoryForm/DirectoryServices";
+import { EditAssociateInfoModal } from "@/components/modals/EditAssociateInfoModal";
 import { EditDirectoryDisplayModal } from "@/components/modals/EditDirectoryDisplayModal";
+import { EditStudentInfoModal } from "@/components/modals/EditStudentInfoModal";
+import { TwoButtonPopup } from "@/components/modals/TwoButtonPopup";
 import { UploadProfilePictureModal } from "@/components/modals/UploadProfilePictureModal";
 import { educationTypeOptions } from "@/components/modals/displayInfoConstants";
+import { SPECIALIZATIONS } from "@/constants/specializations";
 import { UserContext } from "@/contexts/userContext";
 import { useRedirectToLoginIfNotSignedIn } from "@/hooks/useRedirection";
+
+const TABS = ["Profile", "Directory"] as const;
+type Tab = (typeof TABS)[number];
 
 type DisplayComponentProps = {
   user: User | null;
@@ -33,17 +44,32 @@ type DisplayComponentProps = {
   // Directory
   openPersonal: () => void;
   openDisplay: () => void;
+  onLeaveDirectory?: () => void;
+};
+
+const degreesToReadable = {
+  masters: "Masters",
+  phd: "PhD",
+  md: "MD",
+  fellowship: "Fellowship",
+  diploma: "Diploma",
+  other: "Other",
+  "": "",
 };
 
 const ProfileSection = ({ user, openBasic, openPro }: DisplayComponentProps) => {
   const { t } = useTranslation(); // define the t function at the top of your component
   const [isProfilePictureModalOpen, setIsProfilePictureModalOpen] = useState(false);
+  const [isStudentInfoModalOpen, setIsStudentInfoModalOpen] = useState(false);
+  const [isAssociateInfoModalOpen, setIsAssociateInfoModalOpen] = useState(false);
 
   const formatMembership = (membership: MembershipType | undefined): string => {
     return membership ? (membershipDisplayMap[membership] ?? "None") : "None";
   };
 
   const formattedMembership = formatMembership(user?.account.membership);
+  const isStudent = user?.account.membership === "student";
+  const isAssociate = user?.account.membership === "associate";
 
   return (
     <div className="flex flex-col gap-5">
@@ -55,6 +81,10 @@ const ProfileSection = ({ user, openBasic, openPro }: DisplayComponentProps) => 
               {user?.personal.firstName ?? t("none")} {user?.personal.lastName ?? t("none")}
             </span>
             <span> {formattedMembership ?? t("none")} </span>
+
+            <Link href="/editMembership">
+              <Button variant="secondary" label="Edit Membership Category" />
+            </Link>
           </div>
         </div>
 
@@ -111,6 +141,58 @@ const ProfileSection = ({ user, openBasic, openPro }: DisplayComponentProps) => 
             },
           ]}
         />
+
+        {isStudent && (
+          <ProfilePageCard
+            title="Student Information"
+            onClickEdit={() => {
+              setIsStudentInfoModalOpen(true);
+            }}
+            leftColumnFields={[
+              {
+                label: "School Country",
+                value: getCountryLabelFromCode(user?.education?.schoolCountry),
+              },
+              { label: "School Name", value: user?.education?.institution },
+              { label: "University Email", value: user?.education?.email },
+            ]}
+            rightColumnFields={[
+              {
+                label: "Degree",
+                value: degreesToReadable[user.education?.degree ?? ""] ?? "Other",
+              },
+              { label: "Program Name", value: user?.education?.program },
+              { label: "Graduation Date", value: user?.education?.gradDate },
+            ]}
+          />
+        )}
+
+        {isAssociate && (
+          <ProfilePageCard
+            title="Associate Information"
+            onClickEdit={() => {
+              setIsAssociateInfoModalOpen(true);
+            }}
+            leftColumnFields={[
+              { label: "Job Title", value: user?.associate?.title },
+              {
+                label: "Specializations",
+                value: user?.associate?.specialization
+                  ?.map((s) => SPECIALIZATIONS.find((spec) => spec.toLowerCase() === s))
+                  .filter(Boolean)
+                  .join(", "),
+              },
+            ]}
+            rightColumnFields={[
+              {
+                label: "Organization Representative",
+                value: user?.associate?.organization ? "Yes" : "No",
+              },
+              // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+              { label: "Organization Name", value: user?.associate?.organization || "N/A" },
+            ]}
+          />
+        )}
       </div>
 
       <UploadProfilePictureModal
@@ -119,6 +201,26 @@ const ProfileSection = ({ user, openBasic, openPro }: DisplayComponentProps) => 
           setIsProfilePictureModalOpen(false);
         }}
       />
+
+      {isStudent && (
+        <EditStudentInfoModal
+          isOpen={isStudentInfoModalOpen}
+          onClose={() => {
+            setIsStudentInfoModalOpen(false);
+          }}
+          populationInfo={user}
+        />
+      )}
+
+      {isAssociate && (
+        <EditAssociateInfoModal
+          isOpen={isAssociateInfoModalOpen}
+          onClose={() => {
+            setIsAssociateInfoModalOpen(false);
+          }}
+          populationInfo={user}
+        />
+      )}
     </div>
   );
 };
@@ -142,7 +244,12 @@ const formatAddress = (
 );
 
 // Directory sub component
-const DirectorySection = ({ user, openPersonal, openDisplay }: DisplayComponentProps) => {
+const DirectorySection = ({
+  user,
+  openPersonal,
+  openDisplay,
+  onLeaveDirectory,
+}: DisplayComponentProps) => {
   const { t } = useTranslation(); // define the t function at the top of your component
 
   if (user?.account.membership === "student" || user?.account.membership === "associate") {
@@ -186,6 +293,18 @@ const DirectorySection = ({ user, openPersonal, openDisplay }: DisplayComponentP
             </p>
           )}
 
+          {(user?.account.inDirectory === true || user?.account.inDirectory === "pending") && (
+            <Button
+              className="mr-auto"
+              label={
+                user?.account.inDirectory === "pending"
+                  ? "Cancel my directory request"
+                  : "Remove me from directory"
+              }
+              onClick={onLeaveDirectory}
+            />
+          )}
+
           <div className={styles.infoContainer}>
             <ProfilePageCard
               title="Personal Info"
@@ -211,7 +330,9 @@ const DirectorySection = ({ user, openPersonal, openDisplay }: DisplayComponentP
                       user.clinic.location.suite,
                       user.clinic.location.city,
                       user.clinic.location.state,
-                      user.clinic.location.country,
+                      // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+                      getCountryLabelFromCode(user.clinic.location.country) ||
+                        user.clinic.location.country,
                       user.clinic.location.zipPostCode,
                     ),
                 },
@@ -283,41 +404,60 @@ const DirectorySection = ({ user, openPersonal, openDisplay }: DisplayComponentP
 const ProfilePage: React.FC = () => {
   useRedirectToLoginIfNotSignedIn();
 
-  const { t } = useTranslation();
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
   // Basic and Personal Modal state tracking
   const [isBasicModalOpen, setIsBasicModalOpen] = useState(false);
   const [isProfModalOpen, setIsProfModalOpen] = useState(false);
   const [isPersonalModalOpen, setIsPersonalModalOpen] = useState(false);
   const [isDisplayModalOpen, setIsDisplayModalOpen] = useState(false);
+  const [isLeaveDirectoryPopupOpen, setIsLeaveDirectoryPopupOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
 
   // Profile and Directory form state
-  const searchParams = useSearchParams();
-  const formState = searchParams.get("tab") ?? "Profile";
+  const formState = (searchParams.get("tab") ?? "Profile") as Tab;
   const DisplayComponent = formState === "Profile" ? ProfileSection : DirectorySection;
 
-  const { user } = useContext(UserContext);
+  const { user, firebaseUser, reloadUser } = useContext(UserContext);
+
+  const handleLeaveDirectory = async () => {
+    if (!firebaseUser) return;
+
+    try {
+      const token = await firebaseUser.getIdToken();
+      const response = await leaveDirectory(token);
+      if (response.success) {
+        setIsLeaveDirectoryPopupOpen(false);
+        setSuccessMessage(
+          user?.account.inDirectory === "pending"
+            ? "Directory request cancelled successfully"
+            : "Successfully removed from directory",
+        );
+        await reloadUser();
+      } else {
+        setErrorMessage(`Failed to leave directory: ${response.error}`);
+      }
+    } catch (error) {
+      setErrorMessage(`Failed to leave directory: ${String(error)}`);
+    }
+  };
 
   return (
     <div className={styles.profileContainer}>
       <header>
-        <h1> {formState} </h1>
+        <h1>Profile</h1>
       </header>
 
-      <div className={styles.switch}>
-        <Link href="/profile?tab=Profile">
-          <Button
-            variant={formState === "Profile" ? "primary" : "secondary"}
-            label={t("profile")}
-          />
-        </Link>
-
-        <Link href="/profile?tab=Directory">
-          <Button
-            variant={formState === "Directory" ? "primary" : "secondary"}
-            label={t("directory")}
-          />
-        </Link>
+      <div className="mr-auto">
+        <Tabs
+          tabs={TABS}
+          activeTab={formState}
+          onActiveTabChange={(tab) => {
+            router.push(`/profile?tab=${tab}`);
+          }}
+        />
       </div>
 
       <EditBasicInfoModal
@@ -366,7 +506,36 @@ const ProfilePage: React.FC = () => {
         openDisplay={() => {
           setIsDisplayModalOpen(true);
         }}
+        onLeaveDirectory={() => {
+          setIsLeaveDirectoryPopupOpen(true);
+        }}
       />
+
+      <TwoButtonPopup
+        isOpen={isLeaveDirectoryPopupOpen}
+        variant="warning"
+        onCancel={() => {
+          setIsLeaveDirectoryPopupOpen(false);
+        }}
+        onConfirm={() => {
+          void handleLeaveDirectory();
+        }}
+      >
+        <p>
+          {user?.account.inDirectory === "pending"
+            ? "Are you sure you want to cancel your directory request?"
+            : "Are you sure you want to remove yourself from the directory?"}
+        </p>
+      </TwoButtonPopup>
+
+      <SuccessMessage
+        message={successMessage}
+        onDismiss={() => {
+          setSuccessMessage("");
+        }}
+      />
+
+      {errorMessage && <div className="text-red-500">{errorMessage}</div>}
     </div>
   );
 };
