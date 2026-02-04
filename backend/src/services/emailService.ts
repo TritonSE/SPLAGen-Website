@@ -2,6 +2,8 @@ import { config } from "dotenv";
 import nodemailer from "nodemailer";
 import Mail from "nodemailer/lib/mailer";
 
+import env from "../util/validateEnv";
+
 import {
   ADMIN_INVITE_EMAIL,
   ADMIN_REMOVAL_EMAIL,
@@ -28,15 +30,13 @@ const sendEmail = async (options: Mail.Options) => {
   const transporter = nodemailer.createTransport({
     service: "gmail", // You can change this if you're using another provider
     auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_APP_PASSWORD,
+      user: env.EMAIL_USER,
+      pass: env.EMAIL_APP_PASSWORD,
     },
   });
 
   const mailOptions = {
-    from: process.env.EMAIL_USER,
-    //TODO: Uncommen IN PRODUCTION
-    // cc: process.env.EMAIL_CC,
+    from: env.EMAIL_USER,
     ...options,
   };
 
@@ -54,6 +54,7 @@ const sendDirectoryApprovalEmail = async (to: string, name: string) => {
 
   await sendEmail({
     to,
+    cc: env.EMAIL_CC,
     subject: emailSubject,
     html: emailHTML,
     attachments: [
@@ -74,6 +75,7 @@ const sendDirectoryDenialEmail = async (to: string, name: string, reason: string
 
   await sendEmail({
     to,
+    cc: env.EMAIL_CC,
     subject: emailSubject,
     html: emailHTML,
     attachments: [
@@ -94,6 +96,7 @@ const sendAdminInvitationEmail = async (to: string, name: string, portalLink: st
 
   await sendEmail({
     to,
+    cc: env.EMAIL_CC,
     subject: emailSubject,
     html: emailHTML,
     attachments: [
@@ -113,6 +116,7 @@ const sendAdminRemovalEmail = async (to: string, name: string, reason: string) =
 
   await sendEmail({
     to,
+    cc: env.EMAIL_CC,
     subject: emailSubject,
     html: emailHTML,
     attachments: [
