@@ -88,23 +88,25 @@ export default function Dashboard() {
     <div className={styles.container}>
       <h1 className={styles.title}>Dashboard</h1>
 
-      {memberStats && (
-        <div className="flex flex-row gap-16 overflow-x-auto">
-          <MemberCountCard
-            count={memberStats.memberCount}
-            label="Members"
-            href="/members?tab=all"
-          />
-          <MemberCountCard
-            count={memberStats.directoryCount}
-            label="in Directory"
-            href="/members?tab=directory"
-          />
-          {isSuperAdmin && (
-            <MemberCountCard count={memberStats.adminCount} label="Admins" href="/admins" />
-          )}
-        </div>
-      )}
+      <div className="flex flex-col gap-4">
+        {memberStats && (
+          <div className="flex flex-row gap-16 overflow-x-auto">
+            <MemberCountCard
+              count={memberStats.memberCount}
+              label="Members"
+              href="/members?tab=all"
+            />
+            <MemberCountCard
+              count={memberStats.directoryCount}
+              label="in Directory"
+              href="/members?tab=directory"
+            />
+            {isSuperAdmin && (
+              <MemberCountCard count={memberStats.adminCount} label="Admins" href="/admins" />
+            )}
+          </div>
+        )}
+      </div>
 
       <div className="flex flex-col gap-4">
         <h2 className={styles.subtitle}>Resources</h2>

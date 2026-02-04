@@ -16,7 +16,7 @@ type RemoveAdminsRequestBody = {
 export const getMemberStats: RequestHandler = async (req, res, next) => {
   try {
     const memberCount = await User.countDocuments();
-    const directoryCount = await User.countDocuments({ account: { inDirectory: true } });
+    const directoryCount = await User.countDocuments({ "account.inDirectory": true });
     const adminCount = await User.countDocuments({
       role: { $in: [UserRole.ADMIN, UserRole.SUPERADMIN] },
     });

@@ -2,6 +2,7 @@ import { Icon, Table } from "@tritonse/tse-constellation";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import moment from "moment";
 import Image from "next/image";
+import { useRouter, useSearchParams } from "next/navigation";
 import { ReactNode, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -62,7 +63,16 @@ export const MembersTablePage = ({ adminsView }: { adminsView: boolean }) => {
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState("");
   const [activeFilters, setActiveFilters] = useState<Record<string, string[]>>({});
-  const [directoryOnly, setDirectoryOnly] = useState(false);
+
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const directoryTab = searchParams.get("tab") ?? "all";
+  const directoryOnly = directoryTab === "directory";
+  const setDirectoryOnly = (newDirectoryOnly: boolean) => {
+    router.push(
+      `/${adminsView ? "admins" : "members"}?tab=${newDirectoryOnly ? "directory" : "all"}`,
+    );
+  };
   const [activeTab, setActiveTab] = useState("Approved");
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [sidebarUserIdx, setSidebarUserIdx] = useState(-1);
