@@ -7,7 +7,7 @@ import styles from "./page.module.css";
 import { MemberStats, getMemberStats } from "@/api/admin";
 import { Announcement, getAnnouncements } from "@/api/announcement";
 import { YoutubeVideo, getYoutubeVideos } from "@/api/videos";
-import { LanguageSwitcher, PostCard } from "@/components";
+import { PostCard } from "@/components";
 import { MemberCountCard } from "@/components/MemberCountCard";
 import { ResourceCard } from "@/components/ResourceCard";
 import { UserContext } from "@/contexts/userContext";
@@ -183,9 +183,6 @@ export default function Dashboard() {
         ))}
         {recentAnnouncements && recentAnnouncements.length === 0 && <p>No announcements found</p>}
       </div>
-
-      {/* TODO: move language switcher to profile dropdown */}
-      <LanguageSwitcher />
 
       {errorMessage && <div className="text-red-500">{errorMessage}</div>}
     </div>

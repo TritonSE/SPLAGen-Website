@@ -109,6 +109,7 @@
   transition: right 0.3s ease;
   padding: 4rem 3rem;
   overflow-y: auto;
+  z-index: 2;
 }
 
 .filter-sidebar.open {

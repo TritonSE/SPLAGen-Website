@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 import { useMemo } from "react";
 import { I18nextProvider } from "react-i18next";
 
-import { I18nClientReady, Navbar } from "@/components";
+import { I18nClientReady, LanguageSwitcher, Navbar } from "@/components";
 import { CurrentUser } from "@/components/CurrentUser";
 import { UserContextProvider } from "@/contexts/userContext";
 import i18n from "@/i18n";
@@ -31,6 +31,7 @@ export const RootLayoutComponent = ({
                 <section className={`viewPort ${isOnboardingFlow ? "purpleBackground" : ""}`}>
                   <main className={isOnboardingFlow ? "whiteBackground" : ""}>
                     {children}
+                    <LanguageSwitcher />
                     {isOnboardingFlow ? null : <CurrentUser />}
                   </main>
                 </section>

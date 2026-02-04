@@ -1,10 +1,13 @@
 .root {
   position: fixed;
-  top: 4rem;
+  top: 2rem;
   right: 4rem;
   display: flex;
   flex-direction: column;
   gap: 4px;
+  background-color: var(--color-grey0);
+  padding: 8px;
+  border-radius: 8px;
 }
 
 .userDisplay {
