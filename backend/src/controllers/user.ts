@@ -87,6 +87,74 @@ export const deleteUser = async (
   }
 };
 
+export const getFilterOptions = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const searchTerm = req.query.search;
+    const isAdminFilter = req.query.isAdmin;
+    const inDirectoryFilter = req.query.inDirectory;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const baseFilters: any[] = [];
+
+    // Text search
+    if (searchTerm) {
+      baseFilters.push({
+        $or: [
+          { "personal.firstName": { $regex: searchTerm, $options: "i" } },
+          { "personal.lastName": { $regex: searchTerm, $options: "i" } },
+        ],
+      });
+    }
+
+    if (isAdminFilter === "true") {
+      baseFilters.push({
+        $or: [{ role: UserRole.SUPERADMIN }, { role: UserRole.ADMIN }],
+      });
+    } else if (isAdminFilter === "false") {
+      baseFilters.push({ role: UserRole.MEMBER });
+    }
+
+    if (inDirectoryFilter !== undefined && inDirectoryFilter !== "") {
+      baseFilters.push({
+        "account.inDirectory":
+          inDirectoryFilter === "true"
+            ? true
+            : inDirectoryFilter === "false"
+              ? false
+              : inDirectoryFilter,
+      });
+    }
+
+    const baseQuery = baseFilters.length > 0 ? { $and: baseFilters } : {};
+
+    // Get distinct values for each filter field
+    const [titles, memberships, educations, services, countries] = await Promise.all([
+      UserModel.distinct("professional.title", baseQuery),
+      UserModel.distinct("account.membership", baseQuery),
+      UserModel.distinct("education.degree", baseQuery),
+      UserModel.distinct("display.services", baseQuery),
+      UserModel.distinct("clinic.location.country", baseQuery),
+    ]);
+
+    const filterOptions = {
+      title: titles.filter(Boolean),
+      membership: memberships.filter(Boolean),
+      education: educations.filter(Boolean),
+      services: services.filter(Boolean),
+      location: countries.filter(Boolean),
+    };
+
+    res.status(200).json(filterOptions);
+  } catch (error) {
+    console.error("Error getting filter options:", error);
+    next(error);
+  }
+};
+
 export const getUsers = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
     // Search
@@ -96,13 +164,21 @@ export const getUsers = async (req: AuthenticatedRequest, res: Response, next: N
     const page = parseInt(req.query.page as string);
     const pageSize = parseInt(req.query.pageSize as string);
 
-    // Filters - TODO implement these
     const isAdminFilter = req.query.isAdmin;
     const inDirectoryFilter = req.query.inDirectory;
-    const titleFilter = req.query.title;
-    const membershipFilter = req.query.membership;
-    const educationFilter = req.query.education;
-    const servicesFilter = req.query.services;
+
+    // Parse filter arrays from query strings
+    const titleFilter = req.query.title ? (req.query.title as string).split(",") : undefined;
+    const membershipFilter = req.query.membership
+      ? (req.query.membership as string).split(",")
+      : undefined;
+    const educationFilter = req.query.education
+      ? (req.query.education as string).split(",")
+      : undefined;
+    const servicesFilter = req.query.services
+      ? (req.query.services as string).split(",")
+      : undefined;
+    const countryFilter = req.query.country ? (req.query.country as string).split(",") : undefined;
 
     // Sorting
     const sortParam = (req.query.order ?? "") as string;
@@ -165,27 +241,33 @@ export const getUsers = async (req: AuthenticatedRequest, res: Response, next: N
       });
     }
 
-    if (titleFilter) {
+    if (titleFilter && titleFilter.length > 0) {
       filters.push({
-        "professional.title": titleFilter,
+        "professional.title": { $in: titleFilter },
       });
     }
 
-    if (membershipFilter) {
+    if (membershipFilter && membershipFilter.length > 0) {
       filters.push({
-        "account.membership": membershipFilter,
+        "account.membership": { $in: membershipFilter },
       });
     }
 
-    if (educationFilter) {
+    if (educationFilter && educationFilter.length > 0) {
       filters.push({
-        "education.degree": educationFilter,
+        "education.degree": { $in: educationFilter },
       });
     }
 
-    if (servicesFilter) {
+    if (servicesFilter && servicesFilter.length > 0) {
       filters.push({
-        "display.services": servicesFilter,
+        "display.services": { $in: servicesFilter },
+      });
+    }
+
+    if (countryFilter && countryFilter.length > 0) {
+      filters.push({
+        "clinic.location.country": { $in: countryFilter },
       });
     }
 

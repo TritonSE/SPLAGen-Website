@@ -16,6 +16,12 @@ const router = express.Router();
  */
 
 router.get("/whoami", requireSignedIn, UserController.getWhoAmI);
+router.get(
+  "/filterOptions",
+  requireSignedIn,
+  requireAdminOrSuperAdmin,
+  UserController.getFilterOptions,
+);
 router.post("/", UserValidator.createUser, UserController.createUser);
 router.delete(
   "/:firebaseId",

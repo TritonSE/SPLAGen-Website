@@ -104,7 +104,7 @@
   display: none;
   height: 100%;
   width: 50vw;
-  max-width: 424px;
+  max-width: 475px;
   background-color: white;
   transition: right 0.3s ease;
   padding: 4rem 3rem;
@@ -397,4 +397,11 @@ button:hover .small-icon {
 
 .location-icon {
   width: 0.5rem;
+}
+
+/* Sidebar Field Labels */
+.fieldLabel {
+  font-size: 14px;
+  font-weight: 400;
+  color: #909090;
 }

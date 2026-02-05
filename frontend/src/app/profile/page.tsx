@@ -47,7 +47,7 @@ type DisplayComponentProps = {
   onLeaveDirectory?: () => void;
 };
 
-const degreesToReadable = {
+export const degreesToReadable = {
   masters: "Masters",
   phd: "PhD",
   md: "MD",
@@ -55,7 +55,7 @@ const degreesToReadable = {
   diploma: "Diploma",
   other: "Other",
   "": "",
-};
+} as const;
 
 const ProfileSection = ({ user, openBasic, openPro }: DisplayComponentProps) => {
   const { t } = useTranslation(); // define the t function at the top of your component

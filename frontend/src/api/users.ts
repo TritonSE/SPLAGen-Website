@@ -317,6 +317,32 @@ export const logoutUser = async (): Promise<APIResult<null>> => {
 
 export const USERS_PAGE_SIZE = 20;
 
+export type FilterOptions = {
+  title: string[];
+  membership: string[];
+  education: string[];
+  services: string[];
+  location: string[];
+};
+
+export const getFilterOptions = async (
+  firebaseToken: string,
+  search = "",
+  isAdmin: boolean | "" = "",
+  inDirectory: boolean | "pending" | "" = "",
+): Promise<APIResult<FilterOptions>> => {
+  try {
+    const response = await get(
+      `/api/users/filterOptions?search=${search}&isAdmin=${String(isAdmin)}&inDirectory=${String(inDirectory)}`,
+      createAuthHeader(firebaseToken),
+    );
+    const data = (await response.json()) as FilterOptions;
+    return { success: true, data };
+  } catch (error) {
+    return handleAPIError(error);
+  }
+};
+
 export const getMultipleUsers = async (
   firebaseToken: string,
   sort: string,
@@ -325,12 +351,26 @@ export const getMultipleUsers = async (
   isAdmin: boolean | "" = "",
   inDirectory: boolean | "pending" | "" = "",
   pageSize = USERS_PAGE_SIZE,
+  filters: Record<string, string[]> = {},
 ): Promise<APIResult<PaginateUserResult>> => {
   try {
-    const response = await get(
-      `/api/users?order=${sort}&search=${search}&page=${String(page)}&pageSize=${String(pageSize)}&isAdmin=${String(isAdmin)}&inDirectory=${String(inDirectory)}`,
-      createAuthHeader(firebaseToken),
-    );
+    const params = new URLSearchParams({
+      order: sort,
+      search,
+      page: String(page),
+      pageSize: String(pageSize),
+      isAdmin: String(isAdmin),
+      inDirectory: String(inDirectory),
+    });
+
+    // Add filter parameters
+    if (filters.title?.length) params.append("title", filters.title.join(","));
+    if (filters.membership?.length) params.append("membership", filters.membership.join(","));
+    if (filters.education?.length) params.append("education", filters.education.join(","));
+    if (filters.services?.length) params.append("services", filters.services.join(","));
+    if (filters.location?.length) params.append("country", filters.location.join(","));
+
+    const response = await get(`/api/users?${params.toString()}`, createAuthHeader(firebaseToken));
     const data = (await response.json()) as PaginateUserResult;
     return { success: true, data };
   } catch (error) {
