@@ -1,9 +1,13 @@
+// TODO figure out how to fix this without ESLint disable
+// eslint-disable-next-line import/no-unresolved
+import { stringify } from "csv-stringify/sync";
 import { NextFunction, Request, Response } from "express";
 
 import { AuthenticatedRequest } from "../middleware/auth";
-import UserModel, { UserRole } from "../models/user";
+import UserModel from "../models/user";
 import { firebaseAdminAuth } from "../util/firebase";
 import { deleteUserFromFirebase, deleteUserFromMongoDB, getUserFromMongoDB } from "../util/user";
+import { buildUserQuery } from "../util/userQuery";
 
 import {
   CreateUserRequestBody,
@@ -12,6 +16,7 @@ import {
   EditProfilePictureRequestBody,
   EditUserPersonalInformationRequestBody,
   EditUserProfessionalInformationRequestBody,
+  ExportUsersRequestBody,
 } from "./types/userTypes";
 
 export const createUser = async (
@@ -97,39 +102,12 @@ export const getFilterOptions = async (
     const isAdminFilter = req.query.isAdmin;
     const inDirectoryFilter = req.query.inDirectory;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const baseFilters: any[] = [];
-
-    // Text search
-    if (searchTerm) {
-      baseFilters.push({
-        $or: [
-          { "personal.firstName": { $regex: searchTerm, $options: "i" } },
-          { "personal.lastName": { $regex: searchTerm, $options: "i" } },
-        ],
-      });
-    }
-
-    if (isAdminFilter === "true") {
-      baseFilters.push({
-        $or: [{ role: UserRole.SUPERADMIN }, { role: UserRole.ADMIN }],
-      });
-    } else if (isAdminFilter === "false") {
-      baseFilters.push({ role: UserRole.MEMBER });
-    }
-
-    if (inDirectoryFilter !== undefined && inDirectoryFilter !== "") {
-      baseFilters.push({
-        "account.inDirectory":
-          inDirectoryFilter === "true"
-            ? true
-            : inDirectoryFilter === "false"
-              ? false
-              : inDirectoryFilter,
-      });
-    }
-
-    const baseQuery = baseFilters.length > 0 ? { $and: baseFilters } : {};
+    // Build base query using helper function
+    const baseQuery = buildUserQuery({
+      search: searchTerm as string | undefined,
+      isAdmin: isAdminFilter as string | undefined,
+      inDirectory: inDirectoryFilter as string | undefined,
+    });
 
     // Get distinct values for each filter field
     const [titles, memberships, educations, services, countries] = await Promise.all([
@@ -202,76 +180,17 @@ export const getUsers = async (req: AuthenticatedRequest, res: Response, next: N
       isSortedDesc = true;
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const filters: any[] = [];
-
-    // Text search
-    if (searchTerm) {
-      filters.push({
-        $or: [
-          { "personal.firstName": { $regex: searchTerm, $options: "i" } },
-          { "personal.lastName": { $regex: searchTerm, $options: "i" } },
-        ],
-      });
-    }
-
-    if (isAdminFilter === "true") {
-      filters.push({
-        $or: [
-          { role: UserRole.SUPERADMIN },
-          {
-            role: UserRole.ADMIN,
-          },
-        ],
-      });
-    } else if (isAdminFilter === "false") {
-      filters.push({
-        role: UserRole.MEMBER,
-      });
-    }
-
-    if (inDirectoryFilter !== undefined && inDirectoryFilter !== "") {
-      filters.push({
-        "account.inDirectory":
-          inDirectoryFilter === "true"
-            ? true
-            : inDirectoryFilter === "false"
-              ? false
-              : inDirectoryFilter,
-      });
-    }
-
-    if (titleFilter && titleFilter.length > 0) {
-      filters.push({
-        "professional.title": { $in: titleFilter },
-      });
-    }
-
-    if (membershipFilter && membershipFilter.length > 0) {
-      filters.push({
-        "account.membership": { $in: membershipFilter },
-      });
-    }
-
-    if (educationFilter && educationFilter.length > 0) {
-      filters.push({
-        "education.degree": { $in: educationFilter },
-      });
-    }
-
-    if (servicesFilter && servicesFilter.length > 0) {
-      filters.push({
-        "display.services": { $in: servicesFilter },
-      });
-    }
-
-    if (countryFilter && countryFilter.length > 0) {
-      filters.push({
-        "clinic.location.country": { $in: countryFilter },
-      });
-    }
-
-    const query = filters.length > 0 ? { $and: filters } : {};
+    // Build query using helper function
+    const query = buildUserQuery({
+      search: searchTerm as string | undefined,
+      isAdmin: isAdminFilter as string | undefined,
+      inDirectory: inDirectoryFilter as string | undefined,
+      title: titleFilter,
+      membership: membershipFilter,
+      education: educationFilter,
+      services: servicesFilter,
+      country: countryFilter,
+    });
 
     const total = await UserModel.countDocuments(query);
 
@@ -667,5 +586,299 @@ export const updateAssociateInfo = async (
   } catch (error) {
     console.error("Error updating associate information:", error);
     next(error);
+  }
+};
+
+export const exportUsers = async (
+  req: AuthenticatedRequest<unknown, unknown, ExportUsersRequestBody>,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const {
+      userIds,
+      search,
+      isAdmin,
+      inDirectory,
+      title,
+      membership,
+      education,
+      services,
+      country,
+    } = req.body;
+
+    let users;
+
+    if (userIds && userIds.length > 0) {
+      // Export specific users by their IDs
+      users = await UserModel.find({ _id: { $in: userIds } });
+    } else {
+      // Export users matching the filters
+      const query = buildUserQuery({
+        search,
+        isAdmin,
+        inDirectory,
+        title,
+        membership,
+        education,
+        services,
+        country,
+      });
+      users = await UserModel.find(query);
+    }
+
+    // Helper functions for formatting
+    const formatRole = (role: string): string => {
+      return role.charAt(0).toUpperCase() + role.slice(1);
+    };
+
+    const formatBoolean = (value: boolean | undefined): string => {
+      return value ? "Yes" : "No";
+    };
+
+    const formatDirectoryStatus = (status: boolean | string | undefined): string => {
+      if (status === true) return "Yes";
+      if (status === false) return "No";
+      if (status === "pending") return "Pending";
+      return "";
+    };
+
+    const formatAuthorizedCare = (value: boolean | string | undefined): string => {
+      if (value === true) return "Yes";
+      if (value === false) return "No";
+      if (value === "unsure") return "Unsure";
+      return "";
+    };
+
+    const membershipDisplayMap: Record<string, string> = {
+      student: "Student",
+      geneticCounselor: "Genetic Counselor",
+      healthcareProvider: "Healthcare Provider",
+      associate: "Associate",
+    };
+
+    const professionalTitleMap: Record<string, string> = {
+      medical_geneticist: "Medical Geneticist",
+      genetic_counselor: "Genetic Counselor",
+      student: "Student",
+      other: "Other",
+    };
+
+    const languageMap: Record<string, string> = {
+      english: "English",
+      spanish: "Spanish",
+      portuguese: "Portuguese",
+      other: "Other",
+    };
+
+    const degreeMap: Record<string, string> = {
+      masters: "Masters",
+      diploma: "Diploma",
+      fellowship: "Fellowship",
+      md: "MD",
+      phd: "PhD",
+      other: "Other",
+    };
+
+    const specializationMap: Record<string, string> = {
+      "rare disease advocacy": "Rare Disease Advocacy",
+      research: "Research",
+      "public health": "Public Health",
+      bioethics: "Bioethics",
+      law: "Law",
+      biology: "Biology",
+      "medical writer": "Medical Writer",
+      "medical science liason": "Medical Science Liaison",
+      "laboratory scientist": "Laboratory Scientist",
+      professor: "Professor",
+      bioinformatics: "Bioinformatics",
+      "biotech sales and marketing": "Biotech Sales and Marketing",
+    };
+
+    const serviceMap: Record<string, string> = {
+      pediatrics: "Pediatrics",
+      cardiovascular: "Cardiovascular",
+      neurogenetics: "Neurogenetics",
+      rareDiseases: "Rare Diseases",
+      cancer: "Cancer",
+      biochemical: "Biochemical",
+      prenatal: "Prenatal",
+      adult: "Adult",
+      psychiatric: "Psychiatric",
+      reproductive: "Reproductive",
+      ophthalmic: "Ophthalmic",
+      research: "Research",
+      pharmacogenomics: "Pharmacogenomics",
+      metabolic: "Metabolic",
+      other: "Other",
+    };
+
+    // Transform users to CSV rows
+    const csvData = users.map((user) => ({
+      // Name (combined first/last)
+      Name: `${user.personal?.firstName ?? ""} ${user.personal?.lastName ?? ""}`.trim(),
+      // Email
+      Email: user.personal?.email ?? "",
+      // Phone
+      Phone: user.personal?.phone ?? "",
+      // Role (title cased)
+      Role: user.role ? formatRole(user.role) : "",
+      // Date Joined
+      "Date Joined": user.createdAt ? new Date(user.createdAt).toISOString().split("T")[0] : "",
+      // User ID
+      "User ID": user._id?.toString() ?? "",
+      // Directory Status (formatted as Yes/No/Pending)
+      "Directory Status": formatDirectoryStatus(
+        user.account?.inDirectory as string | boolean | undefined,
+      ),
+      // Membership Type (using display map)
+      "Membership Type": user.account?.membership
+        ? membershipDisplayMap[user.account.membership] || user.account.membership
+        : "",
+      // Professional Title (using display map)
+      "Professional Title": user.professional?.title
+        ? professionalTitleMap[user.professional.title] || user.professional.title
+        : "",
+      // Preferred Language (coalesced with other, using display map)
+      "Preferred Language":
+        user.professional?.prefLanguage === "other"
+          ? (user.professional?.otherPrefLanguage ?? "Other")
+          : user.professional?.prefLanguage
+            ? languageMap[user.professional.prefLanguage] || user.professional.prefLanguage
+            : "",
+      // Country
+      Country: user.professional?.country ?? "",
+      // Degree (coalesced with other, using display map)
+      Degree:
+        user.education?.degree === "other"
+          ? user.education?.otherDegree || "Other"
+          : user.education?.degree
+            ? degreeMap[user.education.degree] || user.education.degree
+            : "",
+      // Program
+      Program: user.education?.program ?? "",
+      // Institution
+      Institution: user.education?.institution ?? "",
+      // School Email
+      "School Email": user.education?.email ?? "",
+      // Graduation Date
+      "Graduation Date": user.education?.gradDate ?? "",
+      // School Country
+      "School Country": user.education?.schoolCountry ?? "",
+      // Associate Title
+      "Associate Title": user.associate?.title ?? "",
+      // Specializations (comma-separated, using display map)
+      Specializations: user.associate?.specialization
+        ? user.associate.specialization.map((spec) => specializationMap[spec] || spec).join(", ")
+        : "",
+      // Organization
+      Organization: user.associate?.organization ?? "",
+      // Clinic Name
+      "Clinic Name": user.clinic?.name ?? "",
+      // Clinic URL
+      "Clinic URL": user.clinic?.url ?? "",
+      // Clinic Country
+      "Clinic Country": user.clinic?.location?.country ?? "",
+      // Clinic Address
+      "Clinic Address": user.clinic?.location?.address ?? "",
+      // Clinic Suite
+      "Clinic Suite": user.clinic?.location?.suite ?? "",
+      // Clinic City
+      "Clinic City": user.clinic?.location?.city ?? "",
+      // Clinic State
+      "Clinic State": user.clinic?.location?.state ?? "",
+      // Clinic Zip/Post Code
+      "Clinic Zip/Post Code": user.clinic?.location?.zipPostCode ?? "",
+      // Work Email
+      "Work Email": user.display?.workEmail ?? "",
+      // Work Phone
+      "Work Phone": user.display?.workPhone ?? "",
+      // Services (comma-separated, using display map)
+      Services: user.display?.services
+        ? user.display.services.map((service) => serviceMap[service] || service).join(", ")
+        : "",
+      // Care Languages (comma-separated, using display map)
+      "Care Languages": user.display?.languages
+        ? user.display.languages.map((lang) => languageMap[lang] || lang).join(", ")
+        : "",
+      // License Number (single - first one if array)
+      "License Number": Array.isArray(user.display?.license)
+        ? (user.display?.license[0] ?? "")
+        : (user.display?.license ?? ""),
+      // No License Reason
+      "No License Reason": user.display?.comments?.noLicense ?? "",
+      // Additional Comments
+      "Additional Comments": user.display?.comments?.additional ?? "",
+      // Open to Appointments (formatted as Yes/No)
+      "Open to Appointments": formatBoolean(user.display?.options?.openToAppointments),
+      // Open to Requests (formatted as Yes/No)
+      "Open to Requests": formatBoolean(user.display?.options?.openToRequests),
+      // Remote (formatted as Yes/No)
+      Remote: formatBoolean(user.display?.options?.remote),
+      // Authorized Care (formatted as Yes/No/Unsure)
+      "Authorized Care": formatAuthorizedCare(
+        user.display?.options?.authorizedCare as string | boolean | undefined,
+      ),
+    }));
+
+    // Generate CSV using csv-stringify
+    const csv = stringify(csvData, {
+      header: true,
+      columns: [
+        "Name",
+        "Email",
+        "Phone",
+        "Role",
+        "Date Joined",
+        "User ID",
+        "Directory Status",
+        "Membership Type",
+        "Professional Title",
+        "Preferred Language",
+        "Country",
+        "Degree",
+        "Program",
+        "Institution",
+        "School Email",
+        "Graduation Date",
+        "School Country",
+        "Associate Title",
+        "Specializations",
+        "Organization",
+        "Clinic Name",
+        "Clinic URL",
+        "Clinic Country",
+        "Clinic Address",
+        "Clinic Suite",
+        "Clinic City",
+        "Clinic State",
+        "Clinic Zip/Post Code",
+        "Work Email",
+        "Work Phone",
+        "Services",
+        "Care Languages",
+        "License Number",
+        "No License Reason",
+        "Additional Comments",
+        "Open to Appointments",
+        "Open to Requests",
+        "Remote",
+        "Authorized Care",
+      ],
+    });
+
+    // Set headers for file download
+    res.setHeader("Content-Type", "text/csv");
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename="splagen_members_export_${String(Date.now())}.csv"`,
+    );
+
+    res.status(200).send(csv);
+    return;
+  } catch (error) {
+    console.error("Error exporting users:", error);
+    next(error);
+    return;
   }
 };

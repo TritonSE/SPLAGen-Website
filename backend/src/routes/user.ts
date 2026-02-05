@@ -22,6 +22,13 @@ router.get(
   requireAdminOrSuperAdmin,
   UserController.getFilterOptions,
 );
+router.post(
+  "/export",
+  requireSignedIn,
+  requireAdminOrSuperAdmin,
+  UserValidator.exportUsers,
+  UserController.exportUsers,
+);
 router.post("/", UserValidator.createUser, UserController.createUser);
 router.delete(
   "/:firebaseId",

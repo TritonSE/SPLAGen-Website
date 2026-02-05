@@ -159,3 +159,22 @@ export const updateAssociateInfo = [
   body("organizationName").optional().isString().withMessage("Organization name must be a string"),
   validateRequest,
 ];
+
+export const exportUsers = [
+  body("userIds").optional().isArray().withMessage("User IDs must be an array"),
+  body("userIds.*").optional().isString().withMessage("Each user ID must be a string"),
+  body("search").optional().isString().withMessage("Search must be a string"),
+  body("isAdmin").optional().isString().withMessage("isAdmin must be a string"),
+  body("inDirectory").optional().isString().withMessage("inDirectory must be a string"),
+  body("title").optional().isArray().withMessage("Title filter must be an array"),
+  body("title.*").optional().isString().withMessage("Each title must be a string"),
+  body("membership").optional().isArray().withMessage("Membership filter must be an array"),
+  body("membership.*").optional().isString().withMessage("Each membership must be a string"),
+  body("education").optional().isArray().withMessage("Education filter must be an array"),
+  body("education.*").optional().isString().withMessage("Each education must be a string"),
+  body("services").optional().isArray().withMessage("Services filter must be an array"),
+  body("services.*").optional().isString().withMessage("Each service must be a string"),
+  body("country").optional().isArray().withMessage("Country filter must be an array"),
+  body("country.*").optional().isString().withMessage("Each country must be a string"),
+  validateRequest,
+];

@@ -12,6 +12,7 @@ import {
   FilterOptions,
   USERS_PAGE_SIZE,
   User,
+  exportUsers,
   formatUserFullName,
   getFilterOptions,
   getMultipleUsers,
@@ -144,6 +145,41 @@ export const MembersTablePage = ({ adminsView }: { adminsView: boolean }) => {
       setErrorMessage(`Failed to fetch filer options: ${String(error)}`);
     }
   }, [adminsView, firebaseUser, search, directoryOnly, activeTab]);
+
+  const handleDownload = useCallback(async () => {
+    if (!firebaseUser) return;
+
+    setErrorMessage("");
+    try {
+      const token = await firebaseUser.getIdToken();
+
+      // If users are selected, export only those users
+      if (selectedUsers.length > 0) {
+        const userIds = selectedUsers.map((user) => user._id);
+        const response = await exportUsers(token, userIds);
+        if (!response.success) {
+          setErrorMessage(`Failed to export users: ${response.error}`);
+        }
+      } else {
+        // Otherwise, export all users matching current filters
+        const response = await exportUsers(token, undefined, {
+          search,
+          isAdmin: adminsView ? true : "",
+          inDirectory: directoryOnly ? (activeTab === "Approved" ? true : "pending") : "",
+          title: activeFilters.title,
+          membership: activeFilters.membership,
+          education: activeFilters.education,
+          services: activeFilters.services,
+          country: activeFilters.location,
+        });
+        if (!response.success) {
+          setErrorMessage(`Failed to export users: ${response.error}`);
+        }
+      }
+    } catch (error) {
+      setErrorMessage(`Failed to export users: ${String(error)}`);
+    }
+  }, [firebaseUser, selectedUsers, search, adminsView, directoryOnly, activeTab, activeFilters]);
 
   const loadUsers = useCallback(async () => {
     if (!firebaseUser) return;
@@ -418,13 +454,7 @@ export const MembersTablePage = ({ adminsView }: { adminsView: boolean }) => {
               />
             </button>
           ))}
-        <button
-          onClick={() => {
-            // TODO: download as CSV
-            // downloadCSV();
-          }}
-          className={styles["action-button"]}
-        >
+        <button onClick={() => void handleDownload()} className={styles["action-button"]}>
           Download {selectedUsers.length > 0 ? `(${String(selectedUsers.length)})` : "All"}
           <Image
             src="/icons/download.svg"

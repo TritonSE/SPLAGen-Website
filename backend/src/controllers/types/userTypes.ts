@@ -110,3 +110,15 @@ export type EditDirectoryDisplayInformationRequestBody = {
 export type EditProfilePictureRequestBody = {
   profilePicture: string;
 };
+
+export type ExportUsersRequestBody = {
+  userIds?: string[];
+  search?: string;
+  isAdmin?: string;
+  inDirectory?: string;
+  title?: string[];
+  membership?: string[];
+  education?: string[];
+  services?: string[];
+  country?: string[];
+};

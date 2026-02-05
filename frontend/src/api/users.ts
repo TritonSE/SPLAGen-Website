@@ -527,3 +527,75 @@ export const getUser = async (
     return handleAPIError(error);
   }
 };
+
+export type ExportUsersFilters = {
+  search?: string;
+  isAdmin?: boolean | "";
+  inDirectory?: boolean | "pending" | "";
+  title?: string[];
+  membership?: string[];
+  education?: string[];
+  services?: string[];
+  country?: string[];
+};
+
+/**
+ * Export users as CSV file
+ * @param firebaseToken The Firebase authentication token
+ * @param userIds Optional array of user IDs to export specific users
+ * @param filters Optional filters to export users matching criteria
+ */
+export const exportUsers = async (
+  firebaseToken: string,
+  userIds?: string[],
+  filters?: ExportUsersFilters,
+): Promise<APIResult<null>> => {
+  try {
+    const requestBody: {
+      userIds?: string[];
+      search?: string;
+      isAdmin?: string;
+      inDirectory?: string;
+      title?: string[];
+      membership?: string[];
+      education?: string[];
+      services?: string[];
+      country?: string[];
+    } = {};
+
+    if (userIds && userIds.length > 0) {
+      requestBody.userIds = userIds;
+    } else if (filters) {
+      // Convert filters to match backend expectations
+      if (filters.search) requestBody.search = filters.search;
+      if (filters.isAdmin !== undefined && filters.isAdmin !== "")
+        requestBody.isAdmin = String(filters.isAdmin);
+      if (filters.inDirectory !== undefined && filters.inDirectory !== "")
+        requestBody.inDirectory = String(filters.inDirectory);
+      if (filters.title) requestBody.title = filters.title;
+      if (filters.membership) requestBody.membership = filters.membership;
+      if (filters.education) requestBody.education = filters.education;
+      if (filters.services) requestBody.services = filters.services;
+      if (filters.country) requestBody.country = filters.country;
+    }
+
+    const response = await post("/api/users/export", requestBody, createAuthHeader(firebaseToken));
+
+    // Get the CSV data as blob
+    const blob = await response.blob();
+
+    // Create a download link and trigger download
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `splagen_members_export_${String(Date.now())}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+
+    return { success: true, data: null };
+  } catch (error) {
+    return handleAPIError(error);
+  }
+};
