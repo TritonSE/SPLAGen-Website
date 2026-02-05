@@ -16,9 +16,12 @@ export const RootLayoutComponent = ({
 }>) => {
   const pathname = usePathname();
 
-  const isOnboardingFlow = useMemo(() => {
-    return ["/signup", "/login", "/directoryForm"].includes(pathname);
-  }, [pathname]);
+  const isOnboardingFlow = useMemo(
+    () => ["/signup", "/login", "/forgotLogin", "/directoryForm"].includes(pathname),
+    [pathname],
+  );
+  const isDirectoryMap = useMemo(() => pathname === "/directoryMap", [pathname]);
+  const isOnboardingFlowOrMap = isOnboardingFlow || isDirectoryMap;
 
   return (
     <html lang="en">
@@ -31,8 +34,8 @@ export const RootLayoutComponent = ({
                 <section className={`viewPort ${isOnboardingFlow ? "purpleBackground" : ""}`}>
                   <main className={isOnboardingFlow ? "whiteBackground" : ""}>
                     {children}
-                    <LanguageSwitcher />
-                    {isOnboardingFlow ? null : <CurrentUser />}
+                    {isDirectoryMap ? null : <LanguageSwitcher farRight={isOnboardingFlow} />}
+                    {isOnboardingFlowOrMap ? null : <CurrentUser />}
                   </main>
                 </section>
               </div>

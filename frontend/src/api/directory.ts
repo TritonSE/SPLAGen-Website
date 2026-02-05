@@ -63,9 +63,22 @@ export async function joinDirectory(
   }
 }
 
-export async function getPublicDirectory(): Promise<APIResult<Counselor[]>> {
+export async function getPublicDirectory(
+  search?: string,
+  languages?: string[],
+  specializations?: string[],
+): Promise<APIResult<Counselor[]>> {
   try {
-    const res = await get("/api/directory/public", undefined);
+    const params = new URLSearchParams();
+    if (search) params.append("search", search);
+    if (languages && languages.length > 0) params.append("languages", languages.join(","));
+    if (specializations && specializations.length > 0)
+      params.append("specializations", specializations.join(","));
+
+    const queryString = params.toString();
+    const url = `/api/directory/public${queryString ? `?${queryString}` : ""}`;
+
+    const res = await get(url, undefined);
 
     const raw = (await res.json()) as Counselor[];
 

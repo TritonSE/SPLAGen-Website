@@ -16,7 +16,11 @@ export const LANGUAGES = [
 export const getCurrentLanguage = () =>
   LANGUAGES.find((language) => language.code === i18n.language) ?? LANGUAGES[0];
 
-export const LanguageSwitcher = () => {
+type LanguageSwitcherProps = {
+  farRight: boolean;
+};
+
+export const LanguageSwitcher = ({ farRight }: LanguageSwitcherProps) => {
   const currentLanguage = getCurrentLanguage();
   const [showDropdown, setShowDropdown] = useState(false);
 
@@ -30,7 +34,7 @@ export const LanguageSwitcher = () => {
   };
 
   return (
-    <div className={styles.root}>
+    <div className={`${styles.root} ${farRight ? styles.rootFarRight : ""}`}>
       <div
         className={styles.languageDisplay}
         onClick={() => {

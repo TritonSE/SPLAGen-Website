@@ -232,12 +232,47 @@ const formatUserForDirectory = (user: User) => ({
   profileUrl: user.clinic?.url ?? "",
 });
 
-export const getPublicDirectory = async (_req: Request, res: Response) => {
+export const getPublicDirectory = async (req: Request, res: Response) => {
   try {
-    const users = await UserModel.find({
-      "account.inDirectory": true,
-      "account.membership": { $in: ["geneticCounselor", "healthcareProvider"] },
-    });
+    const search = req.query.search as string | undefined;
+    const languages = req.query.languages as string | undefined;
+    const specializations = req.query.specializations as string | undefined;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const filters: any[] = [
+      { "account.inDirectory": true },
+      { "account.membership": { $in: ["geneticCounselor", "healthcareProvider"] } },
+    ];
+
+    // Search by name
+    if (search) {
+      filters.push({
+        $or: [
+          { "personal.firstName": { $regex: search, $options: "i" } },
+          { "personal.lastName": { $regex: search, $options: "i" } },
+        ],
+      });
+    }
+
+    // Filter by languages
+    if (languages) {
+      const languageArray = languages.split(",");
+      filters.push({
+        "display.languages": { $in: languageArray },
+      });
+    }
+
+    // Filter by specializations (services)
+    if (specializations) {
+      const specializationArray = specializations.split(",");
+      filters.push({
+        "display.services": { $in: specializationArray },
+      });
+    }
+
+    const query = { $and: filters };
+
+    const users = await UserModel.find(query);
 
     const directory = users.map(formatUserForDirectory);
 

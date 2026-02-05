@@ -21,6 +21,7 @@ type CardProps = {
 };
 
 enum NavStateType {
+  hidden = "hidden",
   member = "member",
   admin = "admin",
   superadmin = "superadmin",
@@ -85,6 +86,9 @@ export const Navbar: React.FC = () => {
   // Determine Navigation based on route and or user role
   useEffect(() => {
     switch (pathname) {
+      case "/directoryMap":
+        setNavState(NavStateType.hidden);
+        break;
       case "/signup":
         setNavState(NavStateType.onboarding);
         break;
@@ -127,11 +131,12 @@ export const Navbar: React.FC = () => {
       case NavStateType.directory:
         return <VerticalStepper steps={directoryStepLabels} activeStep={3} />;
       case NavStateType.blank:
+      case NavStateType.hidden:
         return null;
     }
   }, [navState, onboardingStep]);
 
-  return (
+  return navState === NavStateType.hidden ? null : (
     <section className={styles.SideNavbar}>
       <Link href="/" className={styles.decoration}>
         <Image src={logo} alt="SPLAGen logo" aria-hidden="true" id={styles.logo} />

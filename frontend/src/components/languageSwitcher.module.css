@@ -10,6 +10,10 @@
   border-radius: 8px;
 }
 
+.rootFarRight {
+  right: 4rem;
+}
+
 .languageDisplay {
   display: flex;
   flex-direction: row;
