@@ -132,25 +132,22 @@ export const Basics = ({ onNext, onBack }: BasicsProps) => {
         </div>
 
         <div>
-          <label className={styles.label}>Preferred Language(s)</label>
+          <label className={styles.label}>Preferred Language</label>
           <Controller
-            name="languages"
+            name="language"
             control={control}
-            defaultValue={[]}
-            render={({ field: { onChange, value = [] } }) => (
+            defaultValue=""
+            render={({ field: { onChange, value = "" } }) => (
               <div className={styles.languageGrid}>
                 {languageOptions.map((option) => {
-                  const isChecked = value.includes(option.value);
+                  const isChecked = value === option.value;
                   return (
                     <div key={option.value} className={styles.checkboxItem}>
                       <Checkmark
                         checked={isChecked}
                         onChange={() => {
-                          if (isChecked) {
-                            onChange(value.filter((v: string) => v !== option.value));
-                          } else {
-                            onChange([...value, option.value]);
-                          }
+                          // Only allow one language to be selected at a time
+                          onChange(option.value);
                         }}
                         label={option.label}
                       />

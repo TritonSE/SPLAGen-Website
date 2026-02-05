@@ -125,7 +125,7 @@ const ProfileSection = ({ user, openBasic, openPro }: DisplayComponentProps) => 
             },
             {
               label: t("preferred-language"),
-              value: <PreferredLanguages languages={user?.professional?.prefLanguages ?? []} />,
+              value: <PreferredLanguages language={user?.professional?.prefLanguage} />,
             },
           ]}
           rightColumnFields={[

@@ -9,11 +9,13 @@ import countryList from "react-select-country-list";
 import { z } from "zod";
 
 import "./ProfessionalInfoModal.css";
+
 import { Modal } from "./Modal";
 
 import { User, editProfessionalInfoRequest, professionalTitleOptions } from "@/api/users";
 import { PillButton, ProfessionalTitleSelector } from "@/components";
 import { SuccessMessage } from "@/components/SuccessMessage";
+import { getCurrentLanguage } from "@/components/languageSwitcher";
 import { UserContext } from "@/contexts/userContext";
 
 type professionalInfoProps = {
@@ -47,7 +49,9 @@ export const professionalInfoSchema = (t: (key: string) => string) =>
     professionalTitle: z.string().min(1, t("professional-title-required")),
     professionalTitleOther: z.string(),
     country: countrySchema(t).optional(),
-    languages: z.array(z.string()).nonempty(t("one-language-required")),
+    language: z.enum(["english", "spanish", "portuguese", "other"], {
+      errorMap: () => ({ message: t("one-language-required") }),
+    }),
     splagenDirectory: z.boolean(),
   });
 
@@ -70,8 +74,6 @@ export const ProfessionalInfoModal = ({
     control,
     watch,
     reset,
-    setValue,
-    setError,
   } = useForm<ProfessionalInfoFormData>({
     resolver: zodResolver(professionalInfoSchema(t)),
     defaultValues: {
@@ -82,7 +84,8 @@ export const ProfessionalInfoModal = ({
         ? populationInfo?.professional?.title
         : "",
       country: getCountryOption(populationInfo?.professional?.country),
-      languages: populationInfo?.professional?.prefLanguages,
+      language:
+        populationInfo?.professional?.prefLanguage ?? getCurrentLanguage()?.dbValue ?? "english",
       splagenDirectory: populationInfo?.account.inDirectory === true,
     },
   });
@@ -90,35 +93,7 @@ export const ProfessionalInfoModal = ({
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
-  const watchedLanguages = watch("languages");
-  const selectedLanguages = React.useMemo(
-    () => watchedLanguages || ["english"],
-    [watchedLanguages],
-  );
-
   const watchedProfessionalTitle = watch("professionalTitle");
-
-  const toggleLanguage = useCallback(
-    (language: string) => {
-      const updatedLanguages = selectedLanguages.includes(language)
-        ? selectedLanguages.filter((lang) => lang !== language)
-        : [...selectedLanguages, language];
-
-      // Default to English if no language is selected
-      if (updatedLanguages.length === 0) {
-        setError("languages", {
-          type: "manual",
-          message: t("one-language-required-default-english"),
-        });
-      }
-
-      setValue(
-        "languages",
-        updatedLanguages.length ? (updatedLanguages as [string, ...string[]]) : ["english"],
-      );
-    },
-    [selectedLanguages, setValue, setError, t],
-  );
 
   // Sends form data to backend
   const onSubmit = useCallback<SubmitHandler<ProfessionalInfoFormData>>(
@@ -129,14 +104,14 @@ export const ProfessionalInfoModal = ({
         setErrorMessage("");
         setSuccessMessage("");
 
-        // backend expectsto have 'new' in the beginning of keys
+        // backend expects to have 'new' in the beginning of keys
         const formattedData = {
           newTitle:
             data.professionalTitle === "other"
               ? data.professionalTitleOther
               : data.professionalTitle,
-          newPrefLanguages: data.languages as ("english" | "spanish" | "portuguese" | "other")[],
-          newOtherPrefLanguages: "",
+          newPrefLanguage: data.language,
+          newOtherPrefLanguage: "",
           newCountry: data.country?.label ?? "",
         };
 
@@ -167,7 +142,8 @@ export const ProfessionalInfoModal = ({
           ? populationInfo.professional?.title
           : "",
         country: getCountryOption(populationInfo.professional?.country),
-        languages: populationInfo.professional?.prefLanguages,
+        language:
+          populationInfo.professional?.prefLanguage ?? getCurrentLanguage()?.dbValue ?? "english",
         splagenDirectory: populationInfo.account.inDirectory === true,
       });
     }
@@ -244,27 +220,33 @@ export const ProfessionalInfoModal = ({
                 <p className="error-message">{errors.country?.message ?? "\u00A0"}</p>
               </div>
 
-              {/* Languages */}
+              {/* Language */}
               <div className="prof-info-field">
-                <label htmlFor="languages">
+                <label htmlFor="language">
                   {t("preferred-language")}
                   <span className="red-text">*</span>
                 </label>
-                <div className="language-options">
-                  {languages.map((language) => (
-                    <PillButton
-                      label={t(language)}
-                      key={language}
-                      isActive={selectedLanguages.includes(language)}
-                      onClick={() => {
-                        toggleLanguage(language);
-                      }}
-                    />
-                  ))}
-                </div>
+                <Controller
+                  name="language"
+                  control={control}
+                  render={({ field }) => (
+                    <div className="language-options">
+                      {languages.map((language) => (
+                        <PillButton
+                          label={t(language)}
+                          key={language}
+                          isActive={field.value === language}
+                          onClick={() => {
+                            field.onChange(language);
+                          }}
+                        />
+                      ))}
+                    </div>
+                  )}
+                />
                 <p className="error-message">
-                  {errors.languages?.message && typeof errors.languages.message === "string"
-                    ? errors.languages.message
+                  {errors.language?.message && typeof errors.language.message === "string"
+                    ? errors.language.message
                     : "\u00A0"}
                 </p>
               </div>

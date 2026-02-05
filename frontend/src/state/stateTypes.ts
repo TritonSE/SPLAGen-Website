@@ -11,7 +11,7 @@ export type onboardingState = {
     professionalTitle: ProfessionalTitleOption;
     professionalTitleOther: string;
     country: CountryOption;
-    languages: string[];
+    language: string;
     membership: string;
     // Associate specific
     // see user modal

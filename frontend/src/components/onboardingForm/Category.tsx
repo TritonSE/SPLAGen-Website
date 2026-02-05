@@ -9,6 +9,7 @@ import styles from "./Category.module.css";
 
 import { CreateUserRequestBody, MembershipType, signUpUser } from "@/api/users";
 import { Button } from "@/components/Button";
+import { LANGUAGES } from "@/components/languageSwitcher";
 import { onboardingState } from "@/state/stateTypes";
 
 type CategoryProps = {
@@ -53,23 +54,11 @@ export const Category: React.FC<CategoryProps> = ({ onNext, onBack, onReset, onS
         "Associate Member": "associate",
       }[state.onboardingForm.membership] as MembershipType;
 
-      // Normalize languages
-      const normalizedLanguages = (state.onboardingForm.languages || [])
-        .map((code) => {
-          switch (code.toLowerCase()) {
-            case "en":
-              return "english";
-            case "es":
-              return "spanish";
-            case "pt":
-              return "portuguese";
-            case "oth":
-              return "other";
-            default:
-              return undefined;
-          }
-        })
-        .filter(Boolean) as ("english" | "spanish" | "portuguese" | "other")[];
+      // Normalize language
+      const languageCode = state.onboardingForm.language;
+      const normalizedLanguage = LANGUAGES.find(
+        (lang) => lang.code === languageCode.toLowerCase(),
+      )?.dbValue;
 
       const userData: CreateUserRequestBody = {
         password: state.onboardingForm.password,
@@ -89,7 +78,7 @@ export const Category: React.FC<CategoryProps> = ({ onNext, onBack, onReset, onS
       userData.professional = {
         title: professionalTitleToUse,
         country: state.onboardingForm.country?.value,
-        prefLanguages: normalizedLanguages,
+        prefLanguage: normalizedLanguage,
       };
 
       if (membership === "student" && state.onboardingForm.schoolName) {

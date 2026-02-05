@@ -15,7 +15,7 @@ declare module "little-state-machine" {
       professionalTitle: ProfessionalTitleOption;
       professionalTitleOther: string;
       country: CountryOption;
-      languages: string[]; // check all we need
+      language: string;
       membership: string;
       // Associate specific
       specializations: string[];

@@ -12,7 +12,7 @@ const initialState: GlobalState = {
     professionalTitle: { value: "", label: "" },
     professionalTitleOther: "",
     country: { value: "", label: "" },
-    languages: [],
+    language: "",
     membership: "",
     // Associate
     specializations: [],

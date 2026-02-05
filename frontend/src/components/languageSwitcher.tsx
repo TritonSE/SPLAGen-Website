@@ -7,15 +7,17 @@ import styles from "./languageSwitcher.module.css";
 
 import i18n from "@/i18n";
 
-const LANGUAGES = [
-  { label: "English", code: "en" },
-  { label: "Español", code: "es" },
-  { label: "Português", code: "pt" },
-];
+export const LANGUAGES = [
+  { label: "English", code: "en", dbValue: "english" },
+  { label: "Español", code: "es", dbValue: "spanish" },
+  { label: "Português", code: "pt", dbValue: "portuguese" },
+] as const;
+
+export const getCurrentLanguage = () =>
+  LANGUAGES.find((language) => language.code === i18n.language) ?? LANGUAGES[0];
 
 export const LanguageSwitcher = () => {
-  const currentLanguage =
-    LANGUAGES.find((language) => language.code === i18n.language) ?? LANGUAGES[0];
+  const currentLanguage = getCurrentLanguage();
   const [showDropdown, setShowDropdown] = useState(false);
 
   const changeLanguage = async (lng: string) => {

@@ -228,12 +228,7 @@ const formatUserForDirectory = (user: User) => ({
   email: user.display?.workEmail ?? user.personal?.email ?? "",
   phone: user.display?.workPhone ?? user.personal?.phone ?? "",
   specialties: user.display?.services ?? [],
-  languages: [
-    ...(user.display?.languages ?? []),
-    ...(user.professional?.prefLanguages?.includes("other") && user.professional.otherPrefLanguages
-      ? [user.professional.otherPrefLanguages]
-      : []),
-  ],
+  languages: user.display?.languages,
   profileUrl: user.clinic?.url ?? "",
 });
 

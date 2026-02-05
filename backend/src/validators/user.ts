@@ -17,14 +17,11 @@ export const createUser = [
 
   body("professional").optional().notEmpty().withMessage("Professional information is required"),
   body("professional.title").optional().isString().withMessage("Title must be a string"),
-  body("professional.prefLanguages")
+  body("professional.prefLanguage")
     .optional()
-    .isArray()
-    .withMessage("Preferred languages must be an array"),
-  body("professional.prefLanguages.*")
-    .isString()
-    .withMessage("Preferred languages must be an array of strings"),
-  body("professional.otherPrefLanguages")
+    .isIn(["english", "spanish", "portuguese", "other"])
+    .withMessage("Invalid preferred language"),
+  body("professional.otherPrefLanguage")
     .optional()
     .isString()
     .withMessage("Other preferred language must be a string"),
@@ -69,13 +66,10 @@ export const editPersonalInformation = [
 
 export const editProfessionalInformation = [
   body("newTitle").isString().withMessage("Title must be a string"),
-  body("newPrefLanguages").isArray({ min: 1 }).withMessage("Preferred languages must be an array"),
-  body("newPrefLanguages.*")
+  body("newPrefLanguage")
     .isIn(["english", "spanish", "portuguese", "other"])
     .withMessage("Invalid preferred language"),
-  body("newOtherPrefLanguages")
-    .isString()
-    .withMessage("Other preferred languages must be a string"),
+  body("newOtherPrefLanguage").isString().withMessage("Other preferred language must be a string"),
   body("newCountry").optional().isString().withMessage("Country must be a string"),
   validateRequest,
 ];

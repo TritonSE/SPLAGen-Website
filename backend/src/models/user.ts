@@ -47,8 +47,8 @@ const userSchema = new Schema(
 
     professional: {
       title: { type: String },
-      prefLanguages: [{ type: String, enum: ["english", "spanish", "portuguese", "other"] }],
-      otherPrefLanguages: { type: String },
+      prefLanguage: { type: String, enum: ["english", "spanish", "portuguese", "other"] },
+      otherPrefLanguage: { type: String },
       country: { type: String },
     },
 

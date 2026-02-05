@@ -538,8 +538,8 @@ export const MembersTablePage = ({ adminsView }: { adminsView: boolean }) => {
                       <span>{sidebarUser.professional?.country ?? t("none")}</span>
                     </div>
                     <div className="flex flex-col">
-                      <span className={styles.fieldLabel}>Languages</span>
-                      <PreferredLanguages languages={sidebarUser.professional?.prefLanguages} />
+                      <span className={styles.fieldLabel}>Language</span>
+                      <PreferredLanguages language={sidebarUser.professional?.prefLanguage} />
                     </div>
                     <div className="flex flex-col">
                       <span className={styles.fieldLabel}>In Directory</span>

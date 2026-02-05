@@ -36,8 +36,8 @@ export type CreateUserRequestBody = {
   };
   professional?: {
     title?: string;
-    prefLanguages?: ("english" | "spanish" | "portuguese" | "other")[];
-    otherPrefLanguages?: string;
+    prefLanguage?: "english" | "spanish" | "portuguese" | "other";
+    otherPrefLanguage?: string;
     country?: string;
   };
   education?: {
@@ -74,8 +74,8 @@ export type User = {
   };
   professional?: {
     title?: string;
-    prefLanguages?: ("english" | "spanish" | "portuguese" | "other")[];
-    otherPrefLanguages?: string;
+    prefLanguage?: "english" | "spanish" | "portuguese" | "other";
+    otherPrefLanguage?: string;
     country?: string;
   };
   education?: {
@@ -171,15 +171,15 @@ export type EditBasicInfo = {
 
 export type ProfessionalInfo = {
   title: string;
-  prefLanguages: ("english" | "spanish" | "portuguese" | "other")[];
-  otherPrefLanguages: string;
+  prefLanguage: "english" | "spanish" | "portuguese" | "other";
+  otherPrefLanguage: string;
   country: string;
 };
 
 export type EditProfessionalInfo = {
   newTitle: string;
-  newPrefLanguages: ("english" | "spanish" | "portuguese" | "other")[];
-  newOtherPrefLanguages: string;
+  newPrefLanguage: "english" | "spanish" | "portuguese" | "other";
+  newOtherPrefLanguage: string;
   newCountry: string;
 };
 

@@ -1,13 +1,22 @@
 import { useTranslation } from "react-i18next";
 
 type PreferredLanguagesProps = {
-  languages: ("english" | "spanish" | "portuguese" | "other")[] | undefined;
+  language?: "english" | "spanish" | "portuguese" | "other";
+  languages?: ("english" | "spanish" | "portuguese" | "other")[];
 };
 
-export const PreferredLanguages = ({ languages }: PreferredLanguagesProps) => {
+export const PreferredLanguages = ({ language, languages }: PreferredLanguagesProps) => {
   const { t } = useTranslation();
 
-  if (!languages || languages.length === 0) return <>{t("none")}</>;
+  // Handle single language (professional preferred language)
+  if (language) {
+    return <p>{t(language)}</p>;
+  }
 
-  return <p>{languages.map((lang) => t(lang)).join(", ")}</p>;
+  // Handle array of languages (directory display languages)
+  if (languages && languages.length > 0) {
+    return <p>{languages.map((lang) => t(lang)).join(", ")}</p>;
+  }
+
+  return <>{t("none")}</>;
 };

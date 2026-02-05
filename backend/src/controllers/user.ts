@@ -355,14 +355,14 @@ export const editProfessionalInformation = async (
 ) => {
   try {
     const { firebaseUid } = req;
-    const { newTitle, newPrefLanguages, newOtherPrefLanguages, newCountry } = req.body;
+    const { newTitle, newPrefLanguage, newOtherPrefLanguage, newCountry } = req.body;
 
     const updatedUser = await UserModel.findOneAndUpdate(
       { firebaseId: firebaseUid },
       {
         "professional.title": newTitle,
-        "professional.prefLanguages": newPrefLanguages,
-        "professional.otherPrefLanguages": newOtherPrefLanguages,
+        "professional.prefLanguage": newPrefLanguage,
+        "professional.otherPrefLanguage": newOtherPrefLanguage,
         "professional.country": newCountry,
       },
       { new: true, runValidators: true },
