@@ -19,6 +19,8 @@ router.put(
   DiscussionController.editDiscussion,
 );
 router.delete("/:id", requireSignedIn, DiscussionController.deleteDiscussion);
+router.post("/:id/subscribe", requireSignedIn, DiscussionController.subscribe);
+router.delete("/:id/subscribe", requireSignedIn, DiscussionController.unsubscribe);
 router.get("/", requireSignedIn, DiscussionController.getMultipleDiscussions);
 router.get("/:id", requireSignedIn, DiscussionController.getDiscussion);
 

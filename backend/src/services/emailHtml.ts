@@ -104,13 +104,13 @@ const NEW_ANNOUNCEMENT_EMAIL = `
 const NEW_DISCUSSION_REPLY_EMAIL = `
 <p style="margin-bottom: 20px;">Dear [Recipient],</p>
 
-<p style="margin-bottom: 20px;"><strong>[ReplierName]</strong> has replied to your post, "[DiscussionTitle]":</p>
+<p style="margin-bottom: 20px;"><strong>[ReplierName]</strong> has replied to the post, "[DiscussionTitle]":</p>
 
 <div style="margin: 30px 0; padding: 20px; background-color: #f5f5f5;">
   <p style="margin: 0; white-space: pre-wrap;">[ReplyMessage]</p>
 </div>
 
-<p style="margin-bottom: 20px;">To view the full discussion and reply, please visit: <a href="[DiscussionUrl]" style="color: blue;">[DiscussionUrl]</a></p>
+<p style="margin-bottom: 20px;">To view the full discussion, reply, or unsubscribe from email notifications, please visit: <a href="[DiscussionUrl]" style="color: blue;">[DiscussionUrl]</a></p>
 
 <p style="margin-bottom: 20px;">We look forward to your active participation in SPLAGen!</p>
 `;

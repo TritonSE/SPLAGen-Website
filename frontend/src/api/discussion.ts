@@ -9,6 +9,7 @@ export type Discussion = {
   createdAt: string;
   updatedAt: string;
   userId: User;
+  isSubscribed?: boolean;
 };
 
 export type PaginatedDiscussionResult = {
@@ -99,6 +100,41 @@ export const deleteDiscussion = async (
   try {
     await httpDelete(`/api/discussions/${discussionId}`, createAuthHeader(token));
     return { success: true, data: null };
+  } catch (error) {
+    return handleAPIError(error);
+  }
+};
+
+export const subscribeToDiscussion = async (
+  token: string,
+  discussionId: string,
+): Promise<APIResult<{ message: string; isSubscribed: boolean }>> => {
+  try {
+    const response = await post(
+      `/api/discussions/${discussionId}/subscribe`,
+      undefined,
+      createAuthHeader(token),
+    );
+
+    const json = (await response.json()) as { message: string; isSubscribed: boolean };
+    return { success: true, data: json };
+  } catch (error) {
+    return handleAPIError(error);
+  }
+};
+
+export const unsubscribeFromDiscussion = async (
+  token: string,
+  discussionId: string,
+): Promise<APIResult<{ message: string; isSubscribed: boolean }>> => {
+  try {
+    const response = await httpDelete(
+      `/api/discussions/${discussionId}/subscribe`,
+      createAuthHeader(token),
+    );
+
+    const json = (await response.json()) as { message: string; isSubscribed: boolean };
+    return { success: true, data: json };
   } catch (error) {
     return handleAPIError(error);
   }

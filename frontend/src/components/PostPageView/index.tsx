@@ -26,6 +26,7 @@ type PostPageViewProps = {
     | {
         variant: "discussion";
         data: Discussion;
+        onReplyPosted?: () => unknown;
       }
     | {
         variant: "reply";
@@ -123,6 +124,15 @@ export const PostPageView = ({ showDotsMenu, post }: PostPageViewProps) => {
     }
   }, [firebaseUser, post]);
 
+  // Wrapper function that calls both loadReplies and onReplyPosted
+  // This is passed to ReplyComposer to refresh both replies and parent data after posting
+  const handleReplyPosted = useCallback(async () => {
+    await loadReplies();
+    if (post.variant === "discussion" && post.onReplyPosted) {
+      post.onReplyPosted();
+    }
+  }, [loadReplies, post]);
+
   useEffect(() => {
     void loadReplies();
   }, [firebaseUser, post, loadReplies]);
@@ -184,7 +194,7 @@ export const PostPageView = ({ showDotsMenu, post }: PostPageViewProps) => {
               onExit={() => {
                 setNewReplyComposerOpen(false);
               }}
-              reloadReplies={loadReplies}
+              reloadReplies={handleReplyPosted}
             />
           ) : (
             <Button

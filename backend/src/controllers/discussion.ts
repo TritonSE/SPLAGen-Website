@@ -21,7 +21,13 @@ export const createDiscussion = async (
     const { title, message } = req.body;
     const userId = req.mongoID;
 
-    const newDiscussion = new DiscussionModel({ userId, title, message });
+    const newDiscussion = new DiscussionModel({
+      userId,
+      title,
+      message,
+      // Automatically subscribe the author to replies to their own post
+      subscribedUserIds: [userId],
+    });
     await newDiscussion.save();
 
     res.status(201).json(newDiscussion);
@@ -187,6 +193,7 @@ export const getDiscussion = async (
 ) => {
   try {
     const { id } = req.params;
+    const userId = req.mongoID;
     const discussion = await DiscussionModel.findById(id).populate("userId");
 
     if (!discussion) {
@@ -194,7 +201,80 @@ export const getDiscussion = async (
       return;
     }
 
-    res.status(200).json(discussion);
+    // Check if the current user is subscribed
+    const isSubscribed = discussion.subscribedUserIds.some((subId) => subId.equals(userId));
+
+    res.status(200).json({ ...discussion.toObject(), isSubscribed });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Subscribe to a discussion post
+export const subscribe = async (
+  req: AuthenticatedRequest<{ id: string }>,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { id } = req.params;
+    const userId = req.mongoID;
+
+    // Validate the discussion ID
+    const objectId = Types.ObjectId.isValid(id) ? new Types.ObjectId(id) : null;
+    if (!objectId) {
+      res.status(400).json({ error: "Invalid ID format" });
+      return;
+    }
+
+    // Find and update the discussion to add user to subscribers
+    const discussion = await DiscussionModel.findByIdAndUpdate(
+      objectId,
+      { $addToSet: { subscribedUserIds: userId } },
+      { new: true },
+    );
+
+    if (!discussion) {
+      res.status(404).json({ error: "Discussion not found" });
+      return;
+    }
+
+    res.status(200).json({ message: "Subscribed successfully", isSubscribed: true });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Unsubscribe from a discussion post
+export const unsubscribe = async (
+  req: AuthenticatedRequest<{ id: string }>,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { id } = req.params;
+    const userId = req.mongoID;
+
+    // Validate the discussion ID
+    const objectId = Types.ObjectId.isValid(id) ? new Types.ObjectId(id) : null;
+    if (!objectId) {
+      res.status(400).json({ error: "Invalid ID format" });
+      return;
+    }
+
+    // Find and update the discussion to remove user from subscribers
+    const discussion = await DiscussionModel.findByIdAndUpdate(
+      objectId,
+      { $pull: { subscribedUserIds: userId } },
+      { new: true },
+    );
+
+    if (!discussion) {
+      res.status(404).json({ error: "Discussion not found" });
+      return;
+    }
+
+    res.status(200).json({ message: "Unsubscribed successfully", isSubscribed: false });
   } catch (error) {
     next(error);
   }

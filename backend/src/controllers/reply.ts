@@ -28,45 +28,55 @@ export const createReply = async (
     const newReply = new Reply({ userId, postId, message });
     await newReply.save();
 
-    // Get the discussion post to find the author
+    // Get the discussion post to find subscribed users
     const discussion = await DiscussionPost.findById(postId);
     if (!discussion) {
       res.status(201).json(newReply);
       return;
     }
 
-    // Check if the replier is the same as the discussion author
-    if (!discussion.userId.equals(userId)) {
-      // Get the discussion author's information
-      const discussionAuthor = await UserModel.findById(discussion.userId);
-      const replier = await UserModel.findById(userId);
+    // Auto-subscribe the replier to the discussion
+    await DiscussionPost.findByIdAndUpdate(postId, {
+      $addToSet: { subscribedUserIds: userId },
+    });
 
-      if (discussionAuthor?.personal?.email && replier?.personal) {
-        const authorName = discussionAuthor.personal.firstName || "Member";
-        const replierName =
-          `${replier.personal.firstName || ""} ${replier.personal.lastName || ""}`.trim() ||
-          "A member";
+    // Get replier information
+    const replier = await UserModel.findById(userId);
+    const replierName = replier?.personal
+      ? `${replier.personal.firstName || ""} ${replier.personal.lastName || ""}`.trim() ||
+        "A member"
+      : "A member";
 
-        // Get the deployment URL from the request
-        const deploymentUrl = getDeploymentUrl(req);
-        const discussionUrl = `${deploymentUrl}/discussion/${postId}`;
+    // Get the deployment URL from the request
+    const deploymentUrl = getDeploymentUrl(req);
+    const discussionUrl = `${deploymentUrl}/discussion/${postId}`;
 
-        // Send email asynchronously (don't wait for completion)
-        sendDiscussionReplyEmail(
-          discussionAuthor.personal.email,
-          authorName,
-          replierName,
-          discussion.title,
-          message,
-          discussionUrl,
-        ).catch((error: unknown) => {
-          console.error(
-            `Failed to send reply notification email to ${discussionAuthor.personal?.email ?? ""}:`,
-            error,
-          );
-        });
-      }
-    }
+    // Send email to all subscribed users (except the replier)
+    const subscriberIds = discussion.subscribedUserIds.filter((subId) => !subId.equals(userId));
+
+    await Promise.all(
+      subscriberIds.map(async (subscriberId) => {
+        const subscriber = await UserModel.findById(subscriberId);
+        if (subscriber?.personal?.email) {
+          const subscriberName = subscriber.personal.firstName || "Member";
+
+          // Send email asynchronously (don't wait for completion)
+          sendDiscussionReplyEmail(
+            subscriber.personal.email,
+            subscriberName,
+            replierName,
+            discussion.title,
+            message,
+            discussionUrl,
+          ).catch((error: unknown) => {
+            console.error(
+              `Failed to send reply notification email to ${subscriber.personal?.email ?? ""}:`,
+              error,
+            );
+          });
+        }
+      }),
+    );
 
     res.status(201).json(newReply);
   } catch (error) {

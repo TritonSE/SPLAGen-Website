@@ -15,6 +15,11 @@ const discussionPostSchema = new Schema(
       type: String,
       required: true,
     },
+    subscribedUserIds: {
+      type: [Schema.Types.ObjectId],
+      ref: "User",
+      default: [],
+    },
   },
   { timestamps: true },
 );

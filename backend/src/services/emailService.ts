@@ -168,7 +168,7 @@ const sendDiscussionReplyEmail = async (
   replyMessage: string,
   discussionUrl: string,
 ) => {
-  const emailSubject = "SPLAGen Membership Portal - New Reply to Your Discussion";
+  const emailSubject = "SPLAGen Membership Portal - New Reply to a Discussion";
 
   const emailHTML =
     NEW_DISCUSSION_REPLY_EMAIL.replace(RECIPIENT_TEXT, recipientName)
