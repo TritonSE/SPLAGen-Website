@@ -67,15 +67,17 @@ export const EditBasicInfoModal = ({
   const { firebaseUser, reloadUser } = useContext(UserContext);
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const onSubmit = useCallback<SubmitHandler<FormData>>(
     async (data) => {
       if (!firebaseUser) return;
 
-      try {
-        setError("");
-        setSuccessMessage("");
+      setError("");
+      setSuccessMessage("");
+      setLoading(true);
 
+      try {
         const firebaseToken = await firebaseUser.getIdToken();
 
         const newData: EditBasicInfo = {
@@ -96,6 +98,8 @@ export const EditBasicInfoModal = ({
         }
       } catch (err) {
         setError(`Error updating info: ${String(err)}`);
+      } finally {
+        setLoading(false);
       }
     },
     [onClose, firebaseUser, reloadUser],
@@ -118,6 +122,7 @@ export const EditBasicInfoModal = ({
         isOpen={isOpen}
         onClose={onClose}
         title={t("edit-basic-info")}
+        loading={loading}
         content={
           <>
             <form className="modal-body">

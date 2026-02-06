@@ -34,6 +34,7 @@ export const AnnouncementForm = ({ announcement }: { announcement?: Announcement
     watch,
   } = useForm<NewAnnouncementData>({ resolver: zodResolver(announcementSchema) });
   const [errorMessage, setErrorMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (announcement) {
@@ -57,8 +58,9 @@ export const AnnouncementForm = ({ announcement }: { announcement?: Announcement
   const onSubmit = useCallback<SubmitHandler<NewAnnouncementData>>(
     async (data) => {
       if (!firebaseUser) return;
+      setErrorMessage("");
+      setLoading(true);
       try {
-        setErrorMessage("");
         const token = await firebaseUser.getIdToken();
 
         const formattedData = {
@@ -92,6 +94,8 @@ export const AnnouncementForm = ({ announcement }: { announcement?: Announcement
         setErrorMessage(
           `Failed to ${announcement ? "update" : "create"} announcement: ${String(error)}`,
         );
+      } finally {
+        setLoading(false);
       }
     },
     [router, firebaseUser, announcement],
@@ -182,11 +186,12 @@ export const AnnouncementForm = ({ announcement }: { announcement?: Announcement
               onClick={() => {
                 router.back();
               }}
+              disabled={loading}
             >
               Cancel
             </button>
-            <button className={styles.buttonPost} type="submit">
-              {announcement ? "Save" : "Post"}
+            <button className={styles.buttonPost} type="submit" disabled={loading}>
+              {loading ? "Loading..." : announcement ? "Save" : "Post"}
             </button>
           </div>
           {errorMessage && <div className="text-red-500">{errorMessage}</div>}

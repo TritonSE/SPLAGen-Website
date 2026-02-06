@@ -61,6 +61,7 @@ export const EditStudentInfoModal = ({
   const { firebaseUser, reloadUser } = useContext(UserContext);
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [loading, setLoading] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState<CountryOption | null>(null);
 
   const selectedDegree = watch("degree") || "";
@@ -90,10 +91,11 @@ export const EditStudentInfoModal = ({
     async (data) => {
       if (!firebaseUser) return;
 
-      try {
-        setError("");
-        setSuccessMessage("");
+      setError("");
+      setSuccessMessage("");
+      setLoading(true);
 
+      try {
         const firebaseToken = await firebaseUser.getIdToken();
 
         // Normalize degree
@@ -117,6 +119,8 @@ export const EditStudentInfoModal = ({
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : "An error occurred");
+      } finally {
+        setLoading(false);
       }
     },
     [firebaseUser, reloadUser, onClose],
@@ -227,6 +231,7 @@ export const EditStudentInfoModal = ({
         isOpen={isOpen}
         onClose={onClose}
         onSave={handleSave}
+        loading={loading}
       />
       {error && <p className={styles.errorMessage}>{error}</p>}
       {successMessage && (

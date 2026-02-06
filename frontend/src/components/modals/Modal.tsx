@@ -16,6 +16,7 @@ export const Modal = ({
   onClose,
   onSave,
   hideButtonsRow,
+  loading = false,
 }: {
   title: string;
   content: ReactNode;
@@ -23,6 +24,7 @@ export const Modal = ({
   onClose: () => void;
   onSave: () => unknown;
   hideButtonsRow?: boolean;
+  loading?: boolean;
 }) => {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -51,8 +53,8 @@ export const Modal = ({
 
         {hideButtonsRow ? null : (
           <div className={styles.buttonsRow}>
-            <Button variant="secondary" label="Cancel" onClick={onClose} />
-            <Button label="Save" onClick={onSave} />
+            <Button variant="secondary" label="Cancel" onClick={onClose} disabled={loading} />
+            <Button label={loading ? "Loading..." : "Save"} onClick={onSave} disabled={loading} />
           </div>
         )}
       </div>

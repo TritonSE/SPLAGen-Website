@@ -415,6 +415,7 @@ const ProfilePage: React.FC = () => {
   const [isLeaveDirectoryPopupOpen, setIsLeaveDirectoryPopupOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [loadingLeaveDirectory, setLoadingLeaveDirectory] = useState(false);
 
   // Profile and Directory form state
   const formState = (searchParams.get("tab") ?? "Profile") as Tab;
@@ -426,6 +427,8 @@ const ProfilePage: React.FC = () => {
     if (!firebaseUser) return;
 
     try {
+      setErrorMessage("");
+      setLoadingLeaveDirectory(true);
       const token = await firebaseUser.getIdToken();
       const response = await leaveDirectory(token);
       if (response.success) {
@@ -441,6 +444,8 @@ const ProfilePage: React.FC = () => {
       }
     } catch (error) {
       setErrorMessage(`Failed to leave directory: ${String(error)}`);
+    } finally {
+      setLoadingLeaveDirectory(false);
     }
   };
 
@@ -520,6 +525,7 @@ const ProfilePage: React.FC = () => {
         onConfirm={() => {
           void handleLeaveDirectory();
         }}
+        loading={loadingLeaveDirectory}
       >
         <p>
           {user?.account.inDirectory === "pending"

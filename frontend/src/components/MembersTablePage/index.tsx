@@ -105,6 +105,7 @@ export const MembersTablePage = ({ adminsView }: { adminsView: boolean }) => {
   const [removingAdmins, setRemovingAdmins] = useState<User[]>([]);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [isDownloading, setIsDownloading] = useState(false);
 
   const { firebaseUser } = useContext(UserContext);
 
@@ -150,6 +151,7 @@ export const MembersTablePage = ({ adminsView }: { adminsView: boolean }) => {
     if (!firebaseUser) return;
 
     setErrorMessage("");
+    setIsDownloading(true);
     try {
       const token = await firebaseUser.getIdToken();
 
@@ -178,6 +180,8 @@ export const MembersTablePage = ({ adminsView }: { adminsView: boolean }) => {
       }
     } catch (error) {
       setErrorMessage(`Failed to export users: ${String(error)}`);
+    } finally {
+      setIsDownloading(false);
     }
   }, [firebaseUser, selectedUsers, search, adminsView, directoryOnly, activeTab, activeFilters]);
 
@@ -454,15 +458,23 @@ export const MembersTablePage = ({ adminsView }: { adminsView: boolean }) => {
               />
             </button>
           ))}
-        <button onClick={() => void handleDownload()} className={styles["action-button"]}>
-          Download {selectedUsers.length > 0 ? `(${String(selectedUsers.length)})` : "All"}
-          <Image
-            src="/icons/download.svg"
-            alt="Download icon"
-            width={20}
-            height={20}
-            className={styles["button-icon"]}
-          />
+        <button
+          onClick={() => void handleDownload()}
+          className={styles["action-button"]}
+          disabled={isDownloading}
+        >
+          {isDownloading
+            ? "Downloading..."
+            : `Download ${selectedUsers.length > 0 ? `(${String(selectedUsers.length)})` : "All"}`}
+          {!isDownloading && (
+            <Image
+              src="/icons/download.svg"
+              alt="Download icon"
+              width={20}
+              height={20}
+              className={styles["button-icon"]}
+            />
+          )}
         </button>
       </div>
 

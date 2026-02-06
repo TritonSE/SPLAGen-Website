@@ -41,6 +41,7 @@ export const PostPageView = ({ showDotsMenu, post }: PostPageViewProps) => {
   const [newReplyComposerOpen, setNewReplyComposerOpen] = useState(false);
   const [editReplyComposerOpen, setEditReplyComposerOpen] = useState(false);
   const [replies, setReplies] = useState<Reply[]>();
+  const [deleteLoading, setDeleteLoading] = useState(false);
   const router = useRouter();
 
   const { firebaseUser, user, isAdminOrSuperAdmin } = useContext(UserContext);
@@ -48,18 +49,24 @@ export const PostPageView = ({ showDotsMenu, post }: PostPageViewProps) => {
   const handleDelete = async () => {
     if (!firebaseUser) return;
 
+    setDeleteLoading(true);
+    setErrorMessage("");
+
     switch (post.variant) {
       case "announcement": {
         try {
           const token = await firebaseUser.getIdToken();
           const response = await deleteAnnouncement(token, post.data._id);
           if (response.success) {
+            setConfirmDeleteOpen(false);
             router.push("/announcements");
           } else {
             setErrorMessage(`Failed to delete announcement: ${response.error}`);
           }
         } catch (error) {
           setErrorMessage(`Failed to delete announcement: ${String(error)}`);
+        } finally {
+          setDeleteLoading(false);
         }
         break;
       }
@@ -68,12 +75,15 @@ export const PostPageView = ({ showDotsMenu, post }: PostPageViewProps) => {
           const token = await firebaseUser.getIdToken();
           const response = await deleteDiscussion(token, post.data._id);
           if (response.success) {
+            setConfirmDeleteOpen(false);
             router.push("/discussion");
           } else {
             setErrorMessage(`Failed to delete post: ${response.error}`);
           }
         } catch (error) {
           setErrorMessage(`Failed to delete post: ${String(error)}`);
+        } finally {
+          setDeleteLoading(false);
         }
         break;
       }
@@ -82,12 +92,15 @@ export const PostPageView = ({ showDotsMenu, post }: PostPageViewProps) => {
           const token = await firebaseUser.getIdToken();
           const response = await deleteReply(token, post.data._id);
           if (response.success) {
+            setConfirmDeleteOpen(false);
             post.reloadReplies();
           } else {
             setErrorMessage(`Failed to delete reply: ${response.error}`);
           }
         } catch (error) {
           setErrorMessage(`Failed to delete reply: ${String(error)}`);
+        } finally {
+          setDeleteLoading(false);
         }
         break;
       }
@@ -240,6 +253,7 @@ export const PostPageView = ({ showDotsMenu, post }: PostPageViewProps) => {
         onConfirm={() => {
           void handleDelete();
         }}
+        loading={deleteLoading}
       >
         <p>Are you sure you want to delete this {post.variant}?</p>
       </TwoButtonPopup>

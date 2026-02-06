@@ -28,6 +28,7 @@ export const UploadProfilePictureModal = ({
   });
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (user?.account.profilePicture) {
@@ -56,6 +57,8 @@ export const UploadProfilePictureModal = ({
 
     setError("");
     setSuccessMessage("");
+    setLoading(true);
+
     try {
       const token = await firebaseUser.getIdToken();
       let fileURL = currentFileURL;
@@ -75,16 +78,18 @@ export const UploadProfilePictureModal = ({
       }
     } catch (err) {
       setError(`Failed to update profile picture: ${String(err)}`);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <>
-      {" "}
       <Modal
         isOpen={isOpen}
         onClose={onClose}
         title="Upload profile picture"
+        loading={loading}
         content={
           <>
             <p>A high-quality photo will make your profile more professional</p>

@@ -49,6 +49,7 @@ export const EditAssociateInfoModal = ({
   const { firebaseUser, reloadUser } = useContext(UserContext);
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const rawSpecializations = watch("specialization");
   const watchSpecializations = useMemo(() => rawSpecializations ?? [], [rawSpecializations]);
@@ -88,10 +89,11 @@ export const EditAssociateInfoModal = ({
     async (data) => {
       if (!firebaseUser) return;
 
-      try {
-        setError("");
-        setSuccessMessage("");
+      setError("");
+      setSuccessMessage("");
+      setLoading(true);
 
+      try {
         const firebaseToken = await firebaseUser.getIdToken();
 
         // Normalize specializations
@@ -114,6 +116,8 @@ export const EditAssociateInfoModal = ({
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : "An error occurred");
+      } finally {
+        setLoading(false);
       }
     },
     [firebaseUser, reloadUser, onClose],
@@ -217,6 +221,7 @@ export const EditAssociateInfoModal = ({
         isOpen={isOpen}
         onClose={onClose}
         onSave={handleSave}
+        loading={loading}
       />
       {error && <p className={styles.errorMessage}>{error}</p>}
       {successMessage && (

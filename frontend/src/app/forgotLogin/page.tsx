@@ -12,6 +12,7 @@ const ForgotLogin = () => {
   const [email, setEmail] = useState("");
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const { t } = useTranslation();
 
   useRedirectToHomeIfSignedIn();
@@ -25,12 +26,19 @@ const ForgotLogin = () => {
 
     setSuccess(false);
     setError("");
+    setLoading(true);
 
-    const res = await resetUserPassword(email);
-    if (res.success) {
-      setSuccess(true);
-    } else {
-      setError(`Failed to reset password: ${res.error}`);
+    try {
+      const res = await resetUserPassword(email);
+      if (res.success) {
+        setSuccess(true);
+      } else {
+        setError(`Failed to reset password: ${res.error}`);
+      }
+    } catch (err) {
+      setError(`Failed to reset password: ${String(err)}`);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -70,11 +78,11 @@ const ForgotLogin = () => {
 
           {/* Submit button is dynamically enabled/disabled based on form state */}
           <button
-            className={`longButton ${!isValid ? "disabledButton" : ""}`}
-            disabled={!isValid}
+            className={`longButton ${!isValid || loading ? "disabledButton" : ""}`}
+            disabled={!isValid || loading}
             type="submit"
           >
-            {t("send-reset-email")}
+            {loading ? t("loading") : t("send-reset-email")}
           </button>
 
           {error && <div className="text-red-500">{error}</div>}

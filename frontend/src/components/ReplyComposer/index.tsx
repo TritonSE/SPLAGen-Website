@@ -30,6 +30,7 @@ export const ReplyComposer = ({ postId, reply, onExit, reloadReplies }: ReplyCom
     reset,
   } = useForm<ReplyFormData>({ resolver: zodResolver(replySchema) });
   const [errorMessage, setErrorMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (reply) {
@@ -43,8 +44,9 @@ export const ReplyComposer = ({ postId, reply, onExit, reloadReplies }: ReplyCom
     async (data) => {
       if (!firebaseUser) return;
 
+      setErrorMessage("");
+      setLoading(true);
       try {
-        setErrorMessage("");
         const token = await firebaseUser.getIdToken();
 
         if (reply) {
@@ -74,6 +76,8 @@ export const ReplyComposer = ({ postId, reply, onExit, reloadReplies }: ReplyCom
         }
       } catch (error) {
         setErrorMessage(`Failed to ${reply ? "update" : "create"} reply: ${String(error)}`);
+      } finally {
+        setLoading(false);
       }
     },
     [reset, firebaseUser, onExit, postId, reloadReplies, reply],
@@ -104,7 +108,12 @@ export const ReplyComposer = ({ postId, reply, onExit, reloadReplies }: ReplyCom
           variant="secondary"
           onClick={onExit}
         />
-        <Button className={styles.button} type="submit" label={reply ? "Save" : "Reply"} />
+        <Button
+          className={styles.button}
+          type="submit"
+          label={loading ? "Loading..." : reply ? "Save" : "Reply"}
+          disabled={loading}
+        />
       </div>
       {errorMessage && <div className="text-red-500">{errorMessage}</div>}
     </form>

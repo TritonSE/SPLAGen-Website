@@ -28,6 +28,7 @@ export const DiscussionForm = ({ post }: { post?: Discussion }) => {
     reset,
   } = useForm<PostFormData>({ resolver: zodResolver(postSchema) });
   const [errorMessage, setErrorMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (post) {
@@ -42,8 +43,9 @@ export const DiscussionForm = ({ post }: { post?: Discussion }) => {
     async (data) => {
       if (!firebaseUser) return;
 
+      setErrorMessage("");
+      setLoading(true);
       try {
-        setErrorMessage("");
         const token = await firebaseUser.getIdToken();
 
         if (post) {
@@ -71,6 +73,8 @@ export const DiscussionForm = ({ post }: { post?: Discussion }) => {
         }
       } catch (error) {
         setErrorMessage(`Failed to ${post ? "update" : "create"} post: ${String(error)}`);
+      } finally {
+        setLoading(false);
       }
     },
     [post, reset, router, firebaseUser],
@@ -126,11 +130,12 @@ export const DiscussionForm = ({ post }: { post?: Discussion }) => {
               onClick={() => {
                 router.push("/discussion");
               }}
+              disabled={loading}
             >
               Cancel
             </button>
-            <button className={styles.buttonPost} type="submit">
-              {post ? "Save" : "Post Discussion"}
+            <button className={styles.buttonPost} type="submit" disabled={loading}>
+              {loading ? "Loading..." : post ? "Save" : "Post Discussion"}
             </button>
           </div>
           {errorMessage && <div className="text-red-500">{errorMessage}</div>}

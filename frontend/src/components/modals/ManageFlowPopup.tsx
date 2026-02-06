@@ -28,12 +28,14 @@ export const DenyDirectoryRequestPopup = ({
   const { firebaseUser } = useContext(UserContext);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const onConfirm = async () => {
     if (!firebaseUser) return;
 
     setErrorMessage("");
     setSuccessMessage("");
+    setLoading(true);
 
     try {
       const token = await firebaseUser.getIdToken();
@@ -50,6 +52,8 @@ export const DenyDirectoryRequestPopup = ({
       }
     } catch (error) {
       setErrorMessage(`Failed to deny directory request: ${String(error)}`);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -62,6 +66,7 @@ export const DenyDirectoryRequestPopup = ({
           confirmLabel="deny-request"
           onConfirm={onConfirm}
           onCancel={onCancel}
+          loading={loading}
         >
           <p className={styles.title}>
             <Trans
@@ -121,12 +126,14 @@ export const ApproveDirectoryRequestPopup = ({
   const { firebaseUser } = useContext(UserContext);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const onConfirm = async () => {
     if (!firebaseUser) return;
 
     setErrorMessage("");
     setSuccessMessage("");
+    setLoading(true);
 
     try {
       const token = await firebaseUser.getIdToken();
@@ -142,6 +149,8 @@ export const ApproveDirectoryRequestPopup = ({
       }
     } catch (error) {
       setErrorMessage(`Failed to approve directory request: ${String(error)}`);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -154,6 +163,7 @@ export const ApproveDirectoryRequestPopup = ({
           confirmLabel="approve-request"
           onConfirm={onConfirm}
           onCancel={onCancel}
+          loading={loading}
         >
           <p className={styles.title}>
             <Trans
@@ -203,12 +213,14 @@ export const ConfirmInviteAdminPopup = ({
   const { firebaseUser } = useContext(UserContext);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const onConfirm = async () => {
     if (!firebaseUser || !user) return;
 
     setErrorMessage("");
     setSuccessMessage("");
+    setLoading(true);
 
     try {
       const token = await firebaseUser.getIdToken();
@@ -221,12 +233,13 @@ export const ConfirmInviteAdminPopup = ({
       }
     } catch (error) {
       setErrorMessage(`Failed to invite admin: ${String(error)}`);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <>
-      {" "}
       {isOpen && user ? (
         <TwoButtonPopup
           isOpen={true}
@@ -234,6 +247,7 @@ export const ConfirmInviteAdminPopup = ({
           confirmLabel={"send-invite"}
           onConfirm={onConfirm}
           onCancel={onCancel}
+          loading={loading}
         >
           <p className={styles.title}>
             <Trans
@@ -273,12 +287,14 @@ export const RemoveAdminPopup = ({
   const { firebaseUser } = useContext(UserContext);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const onConfirm = async () => {
     if (!firebaseUser) return;
 
     setErrorMessage("");
     setSuccessMessage("");
+    setLoading(true);
 
     try {
       const token = await firebaseUser.getIdToken();
@@ -295,6 +311,8 @@ export const RemoveAdminPopup = ({
       }
     } catch (error) {
       setErrorMessage(`Failed to remove admin(s): ${String(error)}`);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -303,7 +321,6 @@ export const RemoveAdminPopup = ({
 
   return (
     <>
-      {" "}
       {isOpen ? (
         <TwoButtonPopup
           isOpen={true}
@@ -311,6 +328,7 @@ export const RemoveAdminPopup = ({
           confirmLabel="remove-admin"
           onConfirm={onConfirm}
           onCancel={onCancel}
+          loading={loading}
         >
           <p className={styles.title}>
             <Trans

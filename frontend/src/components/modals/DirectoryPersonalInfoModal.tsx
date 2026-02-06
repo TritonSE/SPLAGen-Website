@@ -74,15 +74,17 @@ export const DirectoryPersonalInfoModal: React.FC<DirectoryInfoModalProps> = ({
   const { firebaseUser, reloadUser } = useContext(UserContext);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const onSubmit = useCallback<SubmitHandler<DirectoryInfoFormData>>(
     async (data) => {
       if (!firebaseUser) return;
 
-      try {
-        setErrorMessage("");
-        setSuccessMessage("");
+      setErrorMessage("");
+      setSuccessMessage("");
+      setLoading(true);
 
+      try {
         const formattedData = {
           newDegree: data.degree,
           newEducationInstitution: data.institution,
@@ -107,6 +109,8 @@ export const DirectoryPersonalInfoModal: React.FC<DirectoryInfoModalProps> = ({
         }
       } catch (err) {
         setErrorMessage(`Error updating info: ${String(err)}`);
+      } finally {
+        setLoading(false);
       }
     },
     [onClose, firebaseUser, reloadUser],
@@ -133,12 +137,12 @@ export const DirectoryPersonalInfoModal: React.FC<DirectoryInfoModalProps> = ({
 
   return (
     <>
-      {" "}
       <Modal
         isOpen={isOpen}
         onClose={onClose}
         onSave={handleSubmit(onSubmit)}
         title="Edit Personal Information"
+        loading={loading}
         content={
           <form className="modal-form">
             <div className="dir-info-form-group">

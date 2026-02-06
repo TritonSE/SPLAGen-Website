@@ -71,6 +71,7 @@ export const EditDirectoryDisplayModal = ({ isOpen, onClose, populationInfo }: M
   const { firebaseUser, reloadUser } = useContext(UserContext);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
   // Keeps track of which languages are pressed
   const watchedLanguages = watch("languages");
@@ -114,10 +115,11 @@ export const EditDirectoryDisplayModal = ({ isOpen, onClose, populationInfo }: M
     async (data) => {
       if (!firebaseUser) return;
 
-      try {
-        setErrorMessage("");
-        setSuccessMessage("");
+      setErrorMessage("");
+      setSuccessMessage("");
+      setLoading(true);
 
+      try {
         // backend expects to have 'new' in the beginning of keys
         const formattedData = {
           newWorkEmail: data.workEmail,
@@ -142,6 +144,8 @@ export const EditDirectoryDisplayModal = ({ isOpen, onClose, populationInfo }: M
         }
       } catch (err) {
         setErrorMessage(`Error updating info: ${String(err)}`);
+      } finally {
+        setLoading(false);
       }
     },
     [onClose, firebaseUser, reloadUser],
@@ -171,6 +175,7 @@ export const EditDirectoryDisplayModal = ({ isOpen, onClose, populationInfo }: M
         onClose={onClose}
         onSave={handleSubmit(onSubmit)}
         title={t("edit-directory-display-info")}
+        loading={loading}
         content={
           <form>
             {/* Work Email */}

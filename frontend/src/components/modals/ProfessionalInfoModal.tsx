@@ -92,6 +92,7 @@ export const ProfessionalInfoModal = ({
   const { firebaseUser, reloadUser } = useContext(UserContext);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const watchedProfessionalTitle = watch("professionalTitle");
 
@@ -100,10 +101,11 @@ export const ProfessionalInfoModal = ({
     async (data) => {
       if (!firebaseUser) return;
 
-      try {
-        setErrorMessage("");
-        setSuccessMessage("");
+      setErrorMessage("");
+      setSuccessMessage("");
+      setLoading(true);
 
+      try {
         // backend expects to have 'new' in the beginning of keys
         const formattedData = {
           newTitle:
@@ -126,6 +128,8 @@ export const ProfessionalInfoModal = ({
         }
       } catch (err) {
         setErrorMessage(`Error updating info: ${String(err)}`);
+      } finally {
+        setLoading(false);
       }
     },
     [onClose, firebaseUser, setErrorMessage, setSuccessMessage, reloadUser],
@@ -156,6 +160,7 @@ export const ProfessionalInfoModal = ({
         onClose={onClose}
         title={t("edit-professional-info")}
         onSave={handleSubmit(onSubmit)}
+        loading={loading}
         content={
           <>
             <form className="prof-info-form">
