@@ -144,7 +144,6 @@ const sendAnnouncementEmail = async (
       .replace(AUTHOR_NAME, authorName)
       .replace(ANNOUNCEMENT_TITLE, announcementTitle)
       .replace(ANNOUNCEMENT_MESSAGE, announcementMessage)
-      .replace(ANNOUNCEMENT_URL, announcementUrl)
       .replace(ANNOUNCEMENT_URL, announcementUrl) + SIGN_OFF_HTML;
 
   await sendEmail({

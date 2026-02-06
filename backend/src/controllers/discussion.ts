@@ -191,6 +191,7 @@ export const getDiscussion = async (
 
     if (!discussion) {
       res.status(404).json({ error: "Discussion not found" });
+      return;
     }
 
     res.status(200).json(discussion);

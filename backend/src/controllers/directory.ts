@@ -212,6 +212,7 @@ export const denyDirectoryEntry = async (
 
     if (Object.keys(errorMap).length > 0) {
       res.status(400).json(errorMap);
+      return;
     }
 
     res.status(200).json({ message: "Directory entry denied and email sent" });

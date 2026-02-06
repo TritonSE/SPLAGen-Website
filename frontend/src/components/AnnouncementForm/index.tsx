@@ -66,7 +66,10 @@ export const AnnouncementForm = ({ announcement }: { announcement?: Announcement
         const formattedData = {
           recipients: data.allRecipients
             ? ["everyone"]
-            : (data.recipients ?? "").split(",").map((recipient) => recipient.trim()),
+            : (data.recipients ?? "")
+                .split(",")
+                .map((recipient) => recipient.trim())
+                .filter(Boolean),
           title: data.title,
           message: data.message,
         };
