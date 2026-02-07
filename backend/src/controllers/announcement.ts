@@ -47,6 +47,31 @@ export const createAnnouncement = async (
       // Get all users' emails
       const allUsers = await UserModel.find({}, "personal.email personal.firstName");
       emailRecipients = allUsers;
+    } else if (recipients[0]?.startsWith("language:")) {
+      // Filter users by preferred language
+      const targetLanguage = recipients[0].substring("language:".length); // Remove "language:" prefix
+
+      // Get users with matching language, or with no language/other (default to english)
+      if (targetLanguage === "english") {
+        const languageUsers = await UserModel.find(
+          {
+            $or: [
+              { "professional.prefLanguage": "english" },
+              { "professional.prefLanguage": { $exists: false } },
+              { "professional.prefLanguage": null },
+              { "professional.prefLanguage": "other" },
+            ],
+          },
+          "personal.email personal.firstName",
+        );
+        emailRecipients = languageUsers;
+      } else {
+        const languageUsers = await UserModel.find(
+          { "professional.prefLanguage": targetLanguage },
+          "personal.email personal.firstName",
+        );
+        emailRecipients = languageUsers;
+      }
     } else {
       // Get specific users by email
       const specificUsers = await UserModel.find(
@@ -131,6 +156,7 @@ export const getMultipleAnnouncements = async (
   try {
     const userRole = req.role;
     const userEmail = req.userEmail;
+    const userId = req.mongoID;
     const order = req.query.order;
     const newestFirst = order === "newest";
     const searchTerm = req.query.search;
@@ -142,8 +168,17 @@ export const getMultipleAnnouncements = async (
 
     // Non-admins only see relevant announcements
     if (![UserRole.ADMIN, UserRole.SUPERADMIN].includes(userRole as UserRole)) {
-      // If the user is not an admin or super admin, filter announcements by their email
-      filters.push({ recipients: { $in: [userEmail, "everyone"] } });
+      // Get user's preferred language
+      const user = await UserModel.findById(userId, "professional.prefLanguage");
+      const userLanguage =
+        user?.professional?.prefLanguage && user.professional.prefLanguage !== "other"
+          ? user.professional.prefLanguage
+          : "english";
+
+      // Filter announcements by user's email, "everyone", or their preferred language
+      filters.push({
+        recipients: { $in: [userEmail, "everyone", `language:${userLanguage}`] },
+      });
     }
 
     // Text search
@@ -180,6 +215,7 @@ export const getIndividualAnnouncementDetails = async (
     const { id } = req.params;
     const userRole = req.role;
     const userEmail = req.userEmail;
+    const userId = req.mongoID;
 
     const announcement = (await AnnouncementModel.findOne({ _id: id }).populate(
       "userId",
@@ -190,15 +226,26 @@ export const getIndividualAnnouncementDetails = async (
       return;
     }
 
-    if (
-      ![UserRole.ADMIN, UserRole.SUPERADMIN].includes(userRole as UserRole) &&
-      !announcement.recipients.includes("everyone") &&
-      (!userEmail || !announcement.recipients.includes(userEmail))
-    ) {
-      res
-        .status(403)
-        .json({ error: "Unauthorized: You can only view announcements addressed to you" });
-      return;
+    // Check if user is authorized to view this announcement
+    if (![UserRole.ADMIN, UserRole.SUPERADMIN].includes(userRole as UserRole)) {
+      // Get user's preferred language
+      const user = await UserModel.findById(userId, "professional.prefLanguage");
+      const userLanguage =
+        user?.professional?.prefLanguage && user.professional.prefLanguage !== "other"
+          ? user.professional.prefLanguage
+          : "english";
+
+      const isAuthorized =
+        announcement.recipients.includes("everyone") ||
+        (!!userEmail && announcement.recipients.includes(userEmail)) ||
+        announcement.recipients.includes(`language:${userLanguage}`);
+
+      if (!isAuthorized) {
+        res
+          .status(403)
+          .json({ error: "Unauthorized: You can only view announcements addressed to you" });
+        return;
+      }
     }
 
     res.status(200).json(announcement);

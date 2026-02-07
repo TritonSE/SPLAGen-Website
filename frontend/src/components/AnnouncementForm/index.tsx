@@ -1,10 +1,9 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Checkbox } from "@tritonse/tse-constellation";
 import { useRouter } from "next/navigation";
 import React, { useCallback, useContext, useEffect, useState } from "react";
-import { Controller, SubmitHandler, useForm } from "react-hook-form";
+import { SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
 
 import styles from "./styles.module.css";
@@ -16,7 +15,8 @@ import { UserContext } from "@/contexts/userContext";
 const announcementSchema = z.object({
   title: z.string().min(1).max(50),
   message: z.string().min(1).max(500),
-  allRecipients: z.boolean(),
+  recipientType: z.enum(["everyone", "language", "specific", ""]),
+  language: z.enum(["english", "spanish", "portuguese", "other", ""]),
   recipients: z.string().optional(),
 });
 type NewAnnouncementData = z.infer<typeof announcementSchema>;
@@ -25,12 +25,10 @@ export const AnnouncementForm = ({ announcement }: { announcement?: Announcement
   const { firebaseUser } = useContext(UserContext);
   const router = useRouter();
   const {
-    control,
     register,
     handleSubmit,
     formState: { errors },
     reset,
-    setValue,
     watch,
   } = useForm<NewAnnouncementData>({ resolver: zodResolver(announcementSchema) });
   const [errorMessage, setErrorMessage] = useState("");
@@ -38,16 +36,36 @@ export const AnnouncementForm = ({ announcement }: { announcement?: Announcement
 
   useEffect(() => {
     if (announcement) {
+      const firstRecipient = announcement.recipients[0];
+      let recipientType: "everyone" | "language" | "specific" = "specific";
+      let language: "english" | "spanish" | "portuguese" | "other" | "" = "";
+      let recipients = "";
+
+      if (firstRecipient === "everyone") {
+        recipientType = "everyone";
+      } else if (firstRecipient?.startsWith("language:")) {
+        recipientType = "language";
+        language = firstRecipient.substring("language:".length) as
+          | "english"
+          | "spanish"
+          | "portuguese"
+          | "other";
+      } else {
+        recipientType = "specific";
+        recipients = announcement.recipients.join(",");
+      }
+
       reset({
-        allRecipients: announcement.recipients[0] === "everyone",
-        recipients:
-          announcement.recipients[0] === "everyone" ? "" : announcement.recipients.join(","),
+        recipientType,
+        language,
+        recipients,
         title: announcement.title,
         message: announcement.message,
       });
     } else {
       reset({
-        allRecipients: false,
+        recipientType: "",
+        language: "",
         recipients: "",
         title: "",
         message: "",
@@ -63,13 +81,21 @@ export const AnnouncementForm = ({ announcement }: { announcement?: Announcement
       try {
         const token = await firebaseUser.getIdToken();
 
+        let recipients: string[] = [];
+        if (data.recipientType === "everyone") {
+          recipients = ["everyone"];
+        } else if (data.recipientType === "language") {
+          recipients = [`language:${data.language ?? "english"}`];
+        } else {
+          // specific emails
+          recipients = (data.recipients ?? "")
+            .split(",")
+            .map((recipient) => recipient.trim())
+            .filter(Boolean);
+        }
+
         const formattedData = {
-          recipients: data.allRecipients
-            ? ["everyone"]
-            : (data.recipients ?? "")
-                .split(",")
-                .map((recipient) => recipient.trim())
-                .filter(Boolean),
+          recipients,
           title: data.title,
           message: data.message,
         };
@@ -124,34 +150,95 @@ export const AnnouncementForm = ({ announcement }: { announcement?: Announcement
             <label className={styles.fieldLabel} htmlFor="recipient">
               Recipient
             </label>
-            <div className="flex flex-row">
-              <Controller
-                name="allRecipients"
-                control={control}
-                render={({ field }) => (
-                  <Checkbox
-                    id="all-recipients"
-                    checked={field.value}
-                    onChange={(checked) => {
-                      field.onChange(checked);
-                      if (checked) {
-                        setValue("recipients", "");
-                      }
-                    }}
-                  />
-                )}
-              />
 
-              <p>Everyone</p>
+            {/* Radio buttons for recipient type */}
+            <div className={styles.radioGroup}>
+              <label className={styles.radioLabel}>
+                <input
+                  type="radio"
+                  value="everyone"
+                  {...register("recipientType")}
+                  className={styles.radioInput}
+                />
+                <span>Everyone</span>
+              </label>
+
+              <label className={styles.radioLabel}>
+                <input
+                  type="radio"
+                  value="language"
+                  {...register("recipientType")}
+                  className={styles.radioInput}
+                />
+                <span>Specific language only</span>
+              </label>
+
+              <label className={styles.radioLabel}>
+                <input
+                  type="radio"
+                  value="specific"
+                  {...register("recipientType")}
+                  className={styles.radioInput}
+                />
+                <span>Specific users only</span>
+              </label>
             </div>
-            <input
-              id="post-recipient"
-              type="text"
-              className={styles.inputField}
-              disabled={watch("allRecipients")}
-              {...register("recipients")}
-              placeholder="Enter email(s) separated by commas"
-            />
+
+            {/* Language selection - shown when "language" is selected */}
+            {watch("recipientType") === "language" && (
+              <div className={styles.languageGroup}>
+                <label className={styles.radioLabel}>
+                  <input
+                    type="radio"
+                    value="english"
+                    {...register("language")}
+                    className={styles.radioInput}
+                  />
+                  <span>English</span>
+                </label>
+
+                <label className={styles.radioLabel}>
+                  <input
+                    type="radio"
+                    value="spanish"
+                    {...register("language")}
+                    className={styles.radioInput}
+                  />
+                  <span>Spanish</span>
+                </label>
+
+                <label className={styles.radioLabel}>
+                  <input
+                    type="radio"
+                    value="portuguese"
+                    {...register("language")}
+                    className={styles.radioInput}
+                  />
+                  <span>Portuguese</span>
+                </label>
+
+                <label className={styles.radioLabel}>
+                  <input
+                    type="radio"
+                    value="other"
+                    {...register("language")}
+                    className={styles.radioInput}
+                  />
+                  <span>Other</span>
+                </label>
+              </div>
+            )}
+
+            {/* Email input - shown when "specific" is selected */}
+            {watch("recipientType") === "specific" && (
+              <input
+                id="post-recipient"
+                type="text"
+                className={styles.inputField}
+                {...register("recipients")}
+                placeholder="Enter email(s) separated by commas"
+              />
+            )}
             <p className="error-message">{errors.recipients?.message ?? "\u00A0"}</p>
           </div>
 

@@ -3,7 +3,7 @@
 import moment from "moment";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import React, { useCallback, useContext, useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useMemo, useState } from "react";
 
 import styles from "./styles.module.css";
 
@@ -137,6 +137,18 @@ export const PostPageView = ({ showDotsMenu, post }: PostPageViewProps) => {
     void loadReplies();
   }, [firebaseUser, post, loadReplies]);
 
+  const formattedRecipients = useMemo(() => {
+    if (post.variant !== "announcement") return "";
+    if (post.data.recipients[0] === "everyone") {
+      return "Everyone";
+    } else if (post.data.recipients[0].startsWith("language:")) {
+      const language = post.data.recipients[0].substring("language:".length);
+      return `${language[0].toUpperCase()}${language.substring(1)}-speaking users`;
+    } else {
+      return post.data.recipients.join(", ");
+    }
+  }, [post]);
+
   return (
     <div className={styles.announcementContainer}>
       <div className={styles.topRow}>
@@ -147,13 +159,7 @@ export const PostPageView = ({ showDotsMenu, post }: PostPageViewProps) => {
               {post.data.userId.personal.firstName} {post.data.userId.personal.lastName}
             </p>
             <p className={styles.recipients}>
-              {post.variant === "announcement"
-                ? `Sent to ${
-                    post.data.recipients[0] === "everyone"
-                      ? "Everyone"
-                      : post.data.recipients.join(", ")
-                  } • `
-                : ""}
+              {post.variant === "announcement" ? `Sent to ${formattedRecipients} • ` : ""}
               Posted {moment(post.data.createdAt).format("MMMM D YYYY, h:mm:ss A")}
             </p>
           </div>
