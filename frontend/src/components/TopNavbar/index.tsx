@@ -1,5 +1,5 @@
-import { CurrentUser } from "src/components/CurrentUser";
-import { LanguageSwitcher } from "src/components/languageSwitcher";
+import { CurrentUser } from "@/components/CurrentUser";
+import { LanguageSwitcher } from "@/components/languageSwitcher";
 
 import styles from "./styles.module.css";
 
