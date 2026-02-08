@@ -1,0 +1,9 @@
+.root {
+  position: fixed;
+  top: 3rem;
+  right: 4rem;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 1rem;
+}

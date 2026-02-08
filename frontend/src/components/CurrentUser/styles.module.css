@@ -1,7 +1,4 @@
 .root {
-  position: fixed;
-  top: 2rem;
-  right: 4rem;
   display: flex;
   flex-direction: column;
   gap: 4px;

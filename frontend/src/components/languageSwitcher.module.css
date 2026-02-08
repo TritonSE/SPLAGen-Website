@@ -1,13 +1,11 @@
 .root {
-  position: fixed;
-  top: 3rem;
-  right: 25rem;
   display: flex;
   flex-direction: column;
   gap: 4px;
   background-color: var(--color-grey0);
   padding: 8px;
   border-radius: 8px;
+  margin-top: 2rem;
 }
 
 .rootFarRight {
