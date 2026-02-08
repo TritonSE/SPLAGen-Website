@@ -9,12 +9,13 @@ declare module "little-state-machine" {
       firstName: string;
       lastName: string;
       email: string;
+      phone: string;
       password: string;
       // Basic
       professionalTitle: ProfessionalTitleOption;
       professionalTitleOther: string;
       country: CountryOption;
-      languages: string[]; // check all we need
+      language: string;
       membership: string;
       // Associate specific
       specializations: string[];
@@ -46,8 +47,8 @@ declare module "little-state-machine" {
       specialtyServices: string[];
       careLanguages: string[];
       authorizedForLanguages: boolean | string;
-      email: string;
-      phone: string;
+      workEmail: string;
+      workPhone: string;
       licenseType: "has_license" | "no_license";
       licenseNumber: string;
       noLicenseReason: string;

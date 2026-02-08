@@ -1,8 +1,11 @@
 import { NextFunction, Response } from "express";
 
 import { AuthenticatedRequest } from "../middleware/auth";
+import DiscussionPost from "../models/discussionPost";
 import Reply from "../models/reply";
-import { UserRole } from "../models/user";
+import UserModel, { UserRole } from "../models/user";
+import { sendDiscussionReplyEmail } from "../services/emailService";
+import { getDeploymentUrl } from "../utils/urlHelper";
 
 type CreateReplyRequestBody = {
   postId: string;
@@ -14,7 +17,7 @@ type EditReplyRequestBody = {
 };
 
 export const createReply = async (
-  req: AuthenticatedRequest<unknown, unknown, CreateReplyRequestBody>,
+  req: AuthenticatedRequest<Record<string, string>, unknown, CreateReplyRequestBody>,
   res: Response,
   next: NextFunction,
 ) => {
@@ -25,7 +28,57 @@ export const createReply = async (
     const newReply = new Reply({ userId, postId, message });
     await newReply.save();
 
-    res.status(201).json({ message: "Reply created successfully", reply: newReply });
+    // Get the discussion post to find subscribed users
+    const discussion = await DiscussionPost.findById(postId);
+    if (!discussion) {
+      res.status(201).json(newReply);
+      return;
+    }
+
+    // Auto-subscribe the replier to the discussion
+    await DiscussionPost.findByIdAndUpdate(postId, {
+      $addToSet: { subscribedUserIds: userId },
+    });
+
+    // Get replier information
+    const replier = await UserModel.findById(userId);
+    const replierName = replier?.personal
+      ? `${replier.personal.firstName || ""} ${replier.personal.lastName || ""}`.trim() ||
+        "A member"
+      : "A member";
+
+    // Get the deployment URL from the request
+    const deploymentUrl = getDeploymentUrl(req);
+    const discussionUrl = `${deploymentUrl}/discussion/${postId}`;
+
+    // Send email to all subscribed users (except the replier)
+    const subscriberIds = discussion.subscribedUserIds.filter((subId) => !subId.equals(userId));
+
+    await Promise.all(
+      subscriberIds.map(async (subscriberId) => {
+        const subscriber = await UserModel.findById(subscriberId);
+        if (subscriber?.personal?.email) {
+          const subscriberName = subscriber.personal.firstName || "Member";
+
+          // Send email asynchronously (don't wait for completion)
+          sendDiscussionReplyEmail(
+            subscriber.personal.email,
+            subscriberName,
+            replierName,
+            discussion.title,
+            message,
+            discussionUrl,
+          ).catch((error: unknown) => {
+            console.error(
+              `Failed to send reply notification email to ${subscriber.personal?.email ?? ""}:`,
+              error,
+            );
+          });
+        }
+      }),
+    );
+
+    res.status(201).json(newReply);
   } catch (error) {
     next(error);
   }
@@ -38,8 +91,10 @@ export const getReplies = async (
 ) => {
   try {
     const { postId } = req.params;
-    const discussionReplies = await Reply.find({ postId });
-    res.status(200).json({ replies: discussionReplies });
+    const discussionReplies = await Reply.find({ postId })
+      .sort({ createdAt: -1 })
+      .populate("userId");
+    res.status(200).json(discussionReplies);
   } catch (error) {
     next(error);
   }
@@ -54,6 +109,7 @@ export const editReply = async (
     const userUid = req.mongoID;
     const { id } = req.params;
     const { message } = req.body;
+    const role = req.role;
 
     // Find the reply by ID
     const reply = await Reply.findById(id);
@@ -63,8 +119,13 @@ export const editReply = async (
     }
 
     // Check if the user is the owner of the reply
-    if (!reply.userId.equals(userUid)) {
-      res.status(403).json({ error: "Unauthorized: You can only edit your own replies" });
+    if (
+      !reply.userId.equals(userUid) &&
+      ![UserRole.ADMIN, UserRole.SUPERADMIN].includes(role as UserRole)
+    ) {
+      res.status(403).json({
+        error: "Unauthorized: You can only edit your own replies if you are not an admin",
+      });
       return;
     }
 
@@ -72,7 +133,7 @@ export const editReply = async (
     reply.message = message;
     await reply.save();
 
-    res.status(200).json({ message: "Reply updated successfully", reply });
+    res.status(200).json(reply);
   } catch (error) {
     next(error);
   }
@@ -107,7 +168,11 @@ export const deleteReply = async (
     }
 
     // Delete the reply
-    await Reply.deleteOne({ _id: id });
+    const result = await Reply.deleteOne({ _id: id });
+    if (!result.acknowledged) {
+      res.status(400).json({ error: "Reply was not deleted" });
+      return;
+    }
 
     res.status(200).json({ message: "Reply deleted successfully" });
   } catch (error) {

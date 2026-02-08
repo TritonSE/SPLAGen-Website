@@ -7,6 +7,12 @@ import * as DirectoryValidator from "../validators/directory";
 const router = express.Router();
 
 router.post(
+  "/join",
+  requireSignedIn,
+  DirectoryValidator.requestJoinDirectory,
+  DirectoryController.joinDirectory,
+);
+router.post(
   "/approve",
   requireSignedIn,
   requireAdminOrSuperAdmin,
@@ -20,6 +26,7 @@ router.post(
   DirectoryValidator.denyDirectoryEntry,
   DirectoryController.denyDirectoryEntry,
 );
+router.post("/leave", requireSignedIn, DirectoryController.leaveDirectory);
 router.get("/public", DirectoryController.getPublicDirectory);
 
 export default router;

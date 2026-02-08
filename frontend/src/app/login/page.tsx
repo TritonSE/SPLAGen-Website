@@ -1,4 +1,5 @@
 "use client";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
@@ -10,6 +11,7 @@ import styles from "./login.module.css";
 
 import { getWhoAmI, loginUserWithEmailPassword } from "@/api/users";
 import { Checkmark } from "@/components";
+import { useRedirectToHomeIfSignedIn } from "@/hooks/useRedirection";
 
 // Define the schema for form validation using Zod
 const schema = z.object({
@@ -24,8 +26,9 @@ type FormFields = z.infer<typeof schema>;
 // Initialize react-hook-form
 const Login: React.FC = () => {
   const [rememberMe, setRememberMe] = useState(false);
-  const [registrationSuccess, setRegistrationSuccess] = useState(false);
   const { t } = useTranslation();
+
+  useRedirectToHomeIfSignedIn();
 
   const {
     register,
@@ -53,12 +56,6 @@ const Login: React.FC = () => {
     if (rememberedRememberMe) {
       setRememberMe(true);
       setValue("rememberMe", true);
-    }
-
-    // Check if user was redirected from successful registration
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get("registered") === "true") {
-      setRegistrationSuccess(true);
     }
   }, [setValue, setRememberMe]);
 
@@ -118,12 +115,6 @@ const Login: React.FC = () => {
   return (
     <div className={styles.loginPageContainer}>
       <div className={styles.loginPageDiv}>
-        {registrationSuccess && (
-          <div className="mb-4 p-4 bg-green-100 text-green-700 rounded-md">
-            <p className="font-bold">{t("registration-success")}</p>
-            <p>{t("please-login")}</p>
-          </div>
-        )}
         <div className={styles.decorationText}>
           <h1>
             <strong> {t("log-in")} </strong>
@@ -181,7 +172,6 @@ const Login: React.FC = () => {
               <span style={{ color: "black" }}> {t("dont-have-account")} </span>
               <Link href="/signup"> {t("create-account")} </Link>
             </span>
-            {/* <Link href="/forgotLogin"> I&apos;m an admin </Link> */}
           </div>
         </form>
       </div>

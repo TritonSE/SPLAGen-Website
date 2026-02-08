@@ -1,0 +1,25 @@
+.pageContainer {
+  padding: 2rem;
+  max-width: 100%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  height: 100%;
+}
+
+.title {
+  color: var(--color-primary2);
+  font-size: 2rem;
+  font-weight: bold;
+  font-family: "DM-sans";
+}
+
+.backButton {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  align-items: center;
+  font-size: 1.25rem;
+  color: black;
+}

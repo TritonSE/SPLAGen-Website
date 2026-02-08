@@ -1,7 +1,7 @@
 import express from "express";
 
 import * as DiscussionController from "../controllers/discussion";
-import { requireAdminOrSuperAdmin, requireSignedIn } from "../middleware/auth";
+import { requireSignedIn } from "../middleware/auth";
 import * as DiscussionValidator from "../validators/discussion";
 
 const router = express.Router();
@@ -9,39 +9,19 @@ const router = express.Router();
 router.post(
   "/",
   requireSignedIn,
-  DiscussionValidator.createDiscussion,
+  DiscussionValidator.createOrEditDiscussion,
   DiscussionController.createDiscussion,
 );
 router.put(
   "/:id",
   requireSignedIn,
-  DiscussionValidator.editDiscussion,
+  DiscussionValidator.createOrEditDiscussion,
   DiscussionController.editDiscussion,
 );
-router.delete(
-  "/:id",
-  requireSignedIn,
-  DiscussionValidator.deleteDiscussion,
-  DiscussionController.deleteDiscussion,
-);
-router.delete(
-  "/",
-  requireSignedIn,
-  requireAdminOrSuperAdmin,
-  DiscussionValidator.deleteMultipleDiscussions,
-  DiscussionController.deleteMultipleDiscussions,
-);
-router.get(
-  "/",
-  requireSignedIn,
-  DiscussionValidator.getMultipleDiscussions,
-  DiscussionController.getMultipleDiscussions,
-);
-router.get(
-  "/:id",
-  requireSignedIn,
-  DiscussionValidator.getDiscussion,
-  DiscussionController.getDiscussion,
-);
+router.delete("/:id", requireSignedIn, DiscussionController.deleteDiscussion);
+router.post("/:id/subscribe", requireSignedIn, DiscussionController.subscribe);
+router.delete("/:id/subscribe", requireSignedIn, DiscussionController.unsubscribe);
+router.get("/", requireSignedIn, DiscussionController.getMultipleDiscussions);
+router.get("/:id", requireSignedIn, DiscussionController.getDiscussion);
 
 export default router;

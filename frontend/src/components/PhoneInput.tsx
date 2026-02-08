@@ -2,6 +2,7 @@
 
 import { CheckIcon, ChevronsUpDown } from "lucide-react";
 import * as React from "react";
+import { useTranslation } from "react-i18next";
 import * as RPNInput from "react-phone-number-input";
 import flags from "react-phone-number-input/flags";
 
@@ -80,6 +81,7 @@ const CountrySelect = ({
   options: countryList,
   onChange,
 }: CountrySelectProps) => {
+  const { t } = useTranslation();
   // State for dropdown and search
   const [open, setOpen] = React.useState(false);
   const [searchQuery, setSearchQuery] = React.useState("");
@@ -131,7 +133,7 @@ const CountrySelect = ({
           {/* Search input */}
           <Input
             ref={inputRef}
-            placeholder="Search country..."
+            placeholder={t("search-country")}
             value={searchQuery}
             onChange={(e) => {
               setSearchQuery(e.target.value);
@@ -143,7 +145,7 @@ const CountrySelect = ({
           <ScrollArea className="h-72">
             {filteredCountries.length === 0 ? (
               <div className="py-6 text-center text-sm text-muted-foreground">
-                No country found.
+                {t("no-country-found")}
               </div>
             ) : (
               <div className="space-y-1 py-1">

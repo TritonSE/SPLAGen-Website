@@ -1,39 +1,33 @@
 import { NextFunction, Response } from "express";
 import { Types } from "mongoose";
 
-import { getUserNameById } from "../helpers/userHelpers";
 import { AuthenticatedRequest } from "../middleware/auth";
-import discussionPost from "../models/discussionPost";
+import DiscussionModel from "../models/discussionPost";
 import Reply from "../models/reply";
 import { UserRole } from "../models/user";
 
-type DiscussionRequestBody = {
+type CreateOrEditDiscussionRequestBody = {
   title: string;
   message: string;
-  channel: string;
-};
-
-type EditDiscussionRequestBody = {
-  title?: string;
-  message?: string;
-  channel?: string;
-};
-
-type DeleteMultipleDiscussionsRequestBody = {
-  ids: string[];
 };
 
 // Create a discussion post
 export const createDiscussion = async (
-  req: AuthenticatedRequest<unknown, unknown, DiscussionRequestBody>,
+  req: AuthenticatedRequest<unknown, unknown, CreateOrEditDiscussionRequestBody>,
   res: Response,
   next: NextFunction,
 ) => {
   try {
-    const { title, message, channel } = req.body;
+    const { title, message } = req.body;
     const userId = req.mongoID;
 
-    const newDiscussion = new discussionPost({ userId, title, message, channel });
+    const newDiscussion = new DiscussionModel({
+      userId,
+      title,
+      message,
+      // Automatically subscribe the author to replies to their own post
+      subscribedUserIds: [userId],
+    });
     await newDiscussion.save();
 
     res.status(201).json(newDiscussion);
@@ -44,14 +38,15 @@ export const createDiscussion = async (
 
 // Edit a discussion post
 export const editDiscussion = async (
-  req: AuthenticatedRequest<{ id: string }, unknown, EditDiscussionRequestBody>,
+  req: AuthenticatedRequest<{ id: string }, unknown, CreateOrEditDiscussionRequestBody>,
   res: Response,
   next: NextFunction,
 ) => {
   try {
     const { id } = req.params;
-    const { title, message, channel } = req.body;
-    const userUid = req.mongoID;
+    const { title, message } = req.body;
+    const userId = req.mongoID;
+    const role = req.role;
 
     // Ensure the id is valid
     const objectId = Types.ObjectId.isValid(id) ? new Types.ObjectId(id) : null;
@@ -61,30 +56,36 @@ export const editDiscussion = async (
     }
 
     // Find the discussion by ID
-    const discussion = await discussionPost.findById(objectId);
+    const discussion = await DiscussionModel.findById(objectId);
     if (!discussion) {
       res.status(404).json({ error: "Discussion not found" });
       return;
     }
 
-    //Ensure user is the poster
-    if (!discussion.userId.equals(userUid)) {
-      res.status(403).json({ error: "Unauthorized: You can only edit your own posts" });
+    //Ensure user is the poster or an admin
+    if (
+      !discussion.userId.equals(userId) &&
+      ![UserRole.ADMIN, UserRole.SUPERADMIN].includes(role as UserRole)
+    ) {
+      res
+        .status(403)
+        .json({ error: "Unauthorized: You can only edit your own posts if you are not an admin" });
       return;
     }
 
     // Update the discussion if the user is authorized
-    const result = await discussionPost.updateOne(
-      { _id: objectId },
-      { $set: { title, message, channel } },
+    const result = await DiscussionModel.findByIdAndUpdate(
+      { _id: id },
+      { $set: { title, message } },
+      { returnDocument: "after" },
     );
 
-    if (!result.acknowledged) {
+    if (!result) {
       res.status(400).json({ error: "Discussion not updated" });
       return;
     }
 
-    res.status(200).json(discussion);
+    res.status(200).json(result);
   } catch (error) {
     next(error);
   }
@@ -98,27 +99,28 @@ export const deleteDiscussion = async (
 ) => {
   try {
     const { id } = req.params;
-    const userUid = req.mongoID;
+    const userId = req.mongoID;
     const role = req.role;
 
     // Find the discussion by ID
-    const discussion = await discussionPost.findById(id);
+    const discussion = await DiscussionModel.findById(id);
     if (!discussion) {
       res.status(404).json({ error: "Discussion not found" });
       return;
     }
 
+    // Ensure user is the author or an admin
     if (
-      !discussion.userId.equals(userUid) &&
+      !discussion.userId.equals(userId) &&
       ![UserRole.ADMIN, UserRole.SUPERADMIN].includes(role as UserRole)
     ) {
-      res
-        .status(403)
-        .json({ error: "Unauthorized: You can only delete your own posts or are an admin" });
+      res.status(403).json({
+        error: "Unauthorized: You can only delete your own posts if you are not an admin",
+      });
       return;
     }
 
-    const result = await discussionPost.deleteOne({ _id: id });
+    const result = await DiscussionModel.deleteOne({ _id: id });
     if (!result.acknowledged) {
       res.status(400).json({ error: "Discussion was not deleted" });
       return;
@@ -133,32 +135,6 @@ export const deleteDiscussion = async (
   }
 };
 
-// Delete multiple discussion posts
-export const deleteMultipleDiscussions = async (
-  req: AuthenticatedRequest<unknown, unknown, DeleteMultipleDiscussionsRequestBody>,
-  res: Response,
-  next: NextFunction,
-) => {
-  try {
-    const { ids } = req.body;
-
-    const result = await discussionPost.deleteMany({ _id: { $in: ids } });
-    if (!result.acknowledged) {
-      res.status(400).json({ error: "Discussions was not deleted" });
-      return;
-    }
-
-    // Delete replies associated with the discussions
-    await Reply.deleteMany({ postId: { $in: ids } });
-
-    res.status(200).json({
-      message: `${result.deletedCount.toString()} discussion(s) deleted successfully`,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
 // Get multiple discussion posts
 export const getMultipleDiscussions = async (
   req: AuthenticatedRequest,
@@ -166,19 +142,44 @@ export const getMultipleDiscussions = async (
   next: NextFunction,
 ) => {
   try {
-    const discussions = await discussionPost.find().sort({ createdAt: -1 });
+    const order = req.query.order;
+    const newestFirst = order === "newest";
+    const searchTerm = req.query.search;
+    const mineOnly = req.query.mine === "true";
+    const page = parseInt(req.query.page as string);
+    const pageSize = parseInt(req.query.pageSize as string);
 
-    const discussionsWithNames = await Promise.all(
-      discussions.map(async (discussion) => {
-        const userName = await getUserNameById(discussion.userId.toString());
-        return {
-          ...discussion.toObject(),
-          userName,
-        };
-      }),
-    );
+    const userId = req.mongoID;
 
-    res.status(200).json(discussionsWithNames);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const filters: any[] = [];
+
+    // Text search
+    if (searchTerm) {
+      filters.push({
+        $text: { $search: searchTerm },
+      });
+    }
+
+    if (mineOnly) {
+      filters.push({
+        userId,
+      });
+    }
+
+    const query = filters.length > 0 ? { $and: filters } : {};
+
+    const total = await DiscussionModel.countDocuments(query);
+
+    const discussions = await DiscussionModel.find(query)
+      .sort({
+        createdAt: newestFirst ? -1 : 1,
+      })
+      .skip((page - 1) * pageSize)
+      .limit(pageSize)
+      .populate("userId");
+
+    res.status(200).json({ discussions, count: total });
   } catch (error) {
     next(error);
   }
@@ -192,13 +193,88 @@ export const getDiscussion = async (
 ) => {
   try {
     const { id } = req.params;
-    const discussion = await discussionPost.findById(id);
+    const userId = req.mongoID;
+    const discussion = await DiscussionModel.findById(id).populate("userId");
 
     if (!discussion) {
       res.status(404).json({ error: "Discussion not found" });
+      return;
     }
 
-    res.status(200).json({ discussion });
+    // Check if the current user is subscribed
+    const isSubscribed = discussion.subscribedUserIds.some((subId) => subId.equals(userId));
+
+    res.status(200).json({ ...discussion.toObject(), isSubscribed });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Subscribe to a discussion post
+export const subscribe = async (
+  req: AuthenticatedRequest<{ id: string }>,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { id } = req.params;
+    const userId = req.mongoID;
+
+    // Validate the discussion ID
+    const objectId = Types.ObjectId.isValid(id) ? new Types.ObjectId(id) : null;
+    if (!objectId) {
+      res.status(400).json({ error: "Invalid ID format" });
+      return;
+    }
+
+    // Find and update the discussion to add user to subscribers
+    const discussion = await DiscussionModel.findByIdAndUpdate(
+      objectId,
+      { $addToSet: { subscribedUserIds: userId } },
+      { new: true },
+    );
+
+    if (!discussion) {
+      res.status(404).json({ error: "Discussion not found" });
+      return;
+    }
+
+    res.status(200).json({ message: "Subscribed successfully", isSubscribed: true });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Unsubscribe from a discussion post
+export const unsubscribe = async (
+  req: AuthenticatedRequest<{ id: string }>,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { id } = req.params;
+    const userId = req.mongoID;
+
+    // Validate the discussion ID
+    const objectId = Types.ObjectId.isValid(id) ? new Types.ObjectId(id) : null;
+    if (!objectId) {
+      res.status(400).json({ error: "Invalid ID format" });
+      return;
+    }
+
+    // Find and update the discussion to remove user from subscribers
+    const discussion = await DiscussionModel.findByIdAndUpdate(
+      objectId,
+      { $pull: { subscribedUserIds: userId } },
+      { new: true },
+    );
+
+    if (!discussion) {
+      res.status(404).json({ error: "Discussion not found" });
+      return;
+    }
+
+    res.status(200).json({ message: "Unsubscribed successfully", isSubscribed: false });
   } catch (error) {
     next(error);
   }

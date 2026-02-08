@@ -1,5 +1,14 @@
-const Admins: React.FC = () => {
-  return <h1>Admins</h1>;
-};
+"use client";
 
-export default Admins;
+import { MembersTablePage } from "@/components/MembersTablePage";
+import {
+  useRedirectToHomeIfNotSuperAdmin,
+  useRedirectToLoginIfNotSignedIn,
+} from "@/hooks/useRedirection";
+
+export default function Members() {
+  useRedirectToLoginIfNotSignedIn();
+  useRedirectToHomeIfNotSuperAdmin();
+
+  return <MembersTablePage adminsView />;
+}

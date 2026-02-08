@@ -47,8 +47,8 @@ const userSchema = new Schema(
 
     professional: {
       title: { type: String },
-      prefLanguages: [{ type: String, enum: ["english", "spanish", "portuguese", "other"] }],
-      otherPrefLanguages: { type: String },
+      prefLanguage: { type: String, enum: ["english", "spanish", "portuguese", "other"] },
+      otherPrefLanguage: { type: String },
       country: { type: String },
     },
 
@@ -59,6 +59,7 @@ const userSchema = new Schema(
       institution: { type: String },
       email: { type: String },
       gradDate: { type: String },
+      schoolCountry: { type: String },
     },
 
     associate: {
@@ -67,18 +68,18 @@ const userSchema = new Schema(
         {
           type: String,
           enum: [
-            "rare disease advocacy",
+            "rare-disease-advocacy",
             "research",
-            "public health",
+            "public-health",
             "bioethics",
             "law",
             "biology",
-            "medical writer",
-            "medical science liason",
-            "laboratory scientist",
+            "medical-writer",
+            "medical-science-liaison",
+            "laboratory-scientist",
             "professor",
             "bioinformatics",
-            "biotech sales and marketing",
+            "biotech-sales-and-marketing",
           ],
         },
       ],
@@ -155,6 +156,11 @@ const userSchema = new Schema(
 
   { timestamps: true },
 );
+
+userSchema.index({
+  "personal.firstName": "text",
+  "personal.lastName": "text",
+});
 
 export type User = InferSchemaType<typeof userSchema>;
 

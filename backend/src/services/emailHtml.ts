@@ -2,6 +2,24 @@ const RECIPIENT_TEXT = "[Recipient]";
 
 const REASON_TEXT = "[Reason]";
 
+const PORTAL_LINK = "[PortalLink]";
+
+const AUTHOR_NAME = "[AuthorName]";
+
+const ANNOUNCEMENT_TITLE = "[AnnouncementTitle]";
+
+const ANNOUNCEMENT_MESSAGE = "[AnnouncementMessage]";
+
+const ANNOUNCEMENT_URL = "[AnnouncementUrl]";
+
+const REPLIER_NAME = "[ReplierName]";
+
+const DISCUSSION_TITLE = "[DiscussionTitle]";
+
+const REPLY_MESSAGE = "[ReplyMessage]";
+
+const DISCUSSION_URL = "[DiscussionUrl]";
+
 const SIGN_OFF_HTML = `
 <p style="margin-bottom: 20px;"> <strong> This is an automated email. Please do not reply to this email. For any inquiries contact us at <a href="mailto:info@splagen.org" style="color: blue;">info@splagen.org</a> </strong> </p>
 
@@ -37,7 +55,7 @@ const DIRECTORY_DENIAL_EMAIL = `
 
 <p style="margin-bottom: 20px;">Thank you for your interest in joining the Latin American Professional Society for Genetic Counseling (SPLAGen) directory. We appreciate you taking the time to apply.</p>
 
-<p style="margin-bottom: 20px;">After careful review of your application, we regret to inform you that we are unable to offer you membership at this time due to the following reason: </p>
+<p style="margin-bottom: 20px;">After careful review of your application, we regret to inform you that we are unable to include you in our directory at this time due to the following reason: </p>
 
 <p style="margin-bottom: 20px;">[Reason]</p>
 
@@ -46,10 +64,74 @@ const DIRECTORY_DENIAL_EMAIL = `
 <p style="margin-bottom: 20px;">We appreciate your understanding and we look forward to your active participation in SPLAGen! </p>
 `;
 
+const ADMIN_INVITE_EMAIL = `
+<p style="margin-bottom: 20px;">Dear [Recipient],</p>
+
+<p style="margin-bottom: 20px;">You have been invited to be an admin on the SPLAGen membership portal! You can now manage counselors, create announcements, and moderate discussions.</p>
+
+<p style="margin-bottom: 20px;">You can access the membership portal at [PortalLink].</p>
+
+<p style="margin-bottom: 20px;"> We look forward to your active participation in SPLAGen!</p>
+`;
+
+const ADMIN_REMOVAL_EMAIL = `
+<p style="margin-bottom: 20px;">Dear [Recipient],</p>
+
+<p style="margin-bottom: 20px;">We have removed you as an admin on the SPLAGen platform due to the following reason: </p>
+
+<p style="margin-bottom: 20px;">[Reason]</p>
+
+<p style="margin-bottom: 20px;">You are still a genetic counselor, but have lost admin privileges.</p>
+
+<p style="margin-bottom: 20px;">If you believe there has been a misunderstanding or if you have questions about the application process, please don't hesitate to contact us at <a href="mailto:info@splagen.org" style="color: blue;">info@splagen.org</a>.</p>
+`;
+
+const NEW_ANNOUNCEMENT_EMAIL = `
+<p style="margin-bottom: 20px;">Dear [Recipient],</p>
+
+<p style="margin-bottom: 20px;">A new announcement has been posted by <strong>[AuthorName]</strong> in the SPLAGen Membership Portal:</p>
+
+<div style="margin: 30px 0; padding: 20px; background-color: #f5f5f5; border-left: 4px solid #1e40af;">
+  <h2 style="margin-top: 0; margin-bottom: 15px; color: #1e40af;">[AnnouncementTitle]</h2>
+  <p style="margin-bottom: 0; white-space: pre-wrap;">[AnnouncementMessage]</p>
+</div>
+
+<p style="margin-bottom: 20px;">To view this announcement, please visit: <a href="[AnnouncementUrl]" style="color: blue;">[AnnouncementUrl]</a></p>
+
+<p style="margin-bottom: 20px;">We look forward to your active participation in SPLAGen!</p>
+`;
+
+const NEW_DISCUSSION_REPLY_EMAIL = `
+<p style="margin-bottom: 20px;">Dear [Recipient],</p>
+
+<p style="margin-bottom: 20px;"><strong>[ReplierName]</strong> has replied to the post, "[DiscussionTitle]":</p>
+
+<div style="margin: 30px 0; padding: 20px; background-color: #f5f5f5;">
+  <p style="margin: 0; white-space: pre-wrap;">[ReplyMessage]</p>
+</div>
+
+<p style="margin-bottom: 20px;">To view the full discussion, reply, or unsubscribe from email notifications, please visit: <a href="[DiscussionUrl]" style="color: blue;">[DiscussionUrl]</a></p>
+
+<p style="margin-bottom: 20px;">We look forward to your active participation in SPLAGen!</p>
+`;
+
 export {
+  ADMIN_INVITE_EMAIL,
+  ADMIN_REMOVAL_EMAIL,
   DIRECTORY_APPROVAL_EMAIL,
   RECIPIENT_TEXT,
   SIGN_OFF_HTML,
   DIRECTORY_DENIAL_EMAIL,
   REASON_TEXT,
+  PORTAL_LINK,
+  NEW_ANNOUNCEMENT_EMAIL,
+  AUTHOR_NAME,
+  ANNOUNCEMENT_TITLE,
+  ANNOUNCEMENT_MESSAGE,
+  ANNOUNCEMENT_URL,
+  NEW_DISCUSSION_REPLY_EMAIL,
+  REPLIER_NAME,
+  DISCUSSION_TITLE,
+  REPLY_MESSAGE,
+  DISCUSSION_URL,
 };

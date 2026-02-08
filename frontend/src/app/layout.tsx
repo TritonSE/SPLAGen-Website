@@ -1,40 +1,18 @@
-"use client";
-import { usePathname } from "next/navigation";
-import { useMemo } from "react";
-import { I18nextProvider } from "react-i18next";
+import type { Metadata } from "next";
 
-import { I18nClientReady, Navbar } from "@/components";
-import { UserContextProvider } from "@/contexts/userContext";
+import { RootLayoutComponent } from "@/components/RootLayoutComponent";
 import "./globals.css";
-import i18n from "@/i18n";
+
+export const metadata: Metadata = {
+  title: "SPLAGen Membership Portal",
+  description:
+    "SPLAGen's internal membership portal for directory and member management and communication",
+};
 
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const pathname = usePathname();
-
-  const isOnboardingFlow = useMemo(() => {
-    return ["/signup", "/login", "/directoryForm"].includes(pathname);
-  }, [pathname]);
-
-  return (
-    <html lang="en">
-      <body>
-        <UserContextProvider>
-          <I18nextProvider i18n={i18n}>
-            <I18nClientReady>
-              <div className="layout-container">
-                <Navbar />
-                <section className={`viewPort ${isOnboardingFlow ? "purpleBackground" : ""}`}>
-                  <main className={isOnboardingFlow ? "whiteBackground" : ""}>{children}</main>
-                </section>
-              </div>
-            </I18nClientReady>
-          </I18nextProvider>
-        </UserContextProvider>
-      </body>
-    </html>
-  );
+  return <RootLayoutComponent>{children}</RootLayoutComponent>;
 }

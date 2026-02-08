@@ -16,6 +16,19 @@ const router = express.Router();
  */
 
 router.get("/whoami", requireSignedIn, UserController.getWhoAmI);
+router.get(
+  "/filterOptions",
+  requireSignedIn,
+  requireAdminOrSuperAdmin,
+  UserController.getFilterOptions,
+);
+router.post(
+  "/export",
+  requireSignedIn,
+  requireAdminOrSuperAdmin,
+  UserValidator.exportUsers,
+  UserController.exportUsers,
+);
 router.post("/", UserValidator.createUser, UserController.createUser);
 router.delete(
   "/:firebaseId",
@@ -24,11 +37,16 @@ router.delete(
   UserValidator.deleteUser,
   UserController.deleteUser,
 );
-router.get("/", requireSignedIn, UserController.getAllUsers);
-router.get("/:firebaseId", requireSignedIn, UserValidator.getUser, UserController.getUser);
+router.get("/", requireSignedIn, requireAdminOrSuperAdmin, UserController.getUsers);
+router.get(
+  "/:firebaseId",
+  requireSignedIn,
+  requireAdminOrSuperAdmin,
+  UserValidator.getUser,
+  UserController.getUser,
+);
 
 // Personal information routes
-router.get("/general/personal-information", requireSignedIn, UserController.getPersonalInformation);
 router.put(
   "/general/personal-information",
   requireSignedIn,
@@ -45,11 +63,6 @@ router.put(
 );
 
 // Directory personal information routes
-router.get(
-  "/directory/personal-information",
-  requireSignedIn,
-  UserController.getDirectoryPersonalInformation,
-);
 router.put(
   "/directory/personal-information",
   requireSignedIn,
@@ -58,12 +71,43 @@ router.put(
 );
 
 // Directory display info routes
-router.get("/directory/display-info", requireSignedIn, UserController.getDirectoryDisplayInfo);
 router.put(
   "/directory/display-info",
   requireSignedIn,
   UserValidator.editDirectoryDisplayInfo,
   UserController.editDirectoryDisplayInfo,
+);
+
+// Profile picture routes
+router.put(
+  "/general/profile-picture",
+  requireSignedIn,
+  UserValidator.editProfilePicture,
+  UserController.editProfilePicture,
+);
+
+// Membership routes
+router.put(
+  "/membership",
+  requireSignedIn,
+  UserValidator.editMembership,
+  UserController.editMembership,
+);
+
+// Student information routes
+router.put(
+  "/general/student-information",
+  requireSignedIn,
+  UserValidator.updateStudentInfo,
+  UserController.updateStudentInfo,
+);
+
+// Associate information routes
+router.put(
+  "/general/associate-information",
+  requireSignedIn,
+  UserValidator.updateAssociateInfo,
+  UserController.updateAssociateInfo,
 );
 
 export default router;

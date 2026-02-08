@@ -6,6 +6,7 @@ import dynamic from "next/dynamic";
 import Image from "next/image";
 import { useCallback, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 
 import styles from "./Student.module.css";
 
@@ -25,6 +26,7 @@ type StudentProps = {
 };
 
 export const Student = ({ onNext, onBack }: StudentProps) => {
+  const { t } = useTranslation();
   const { state, actions } = useStateMachine({ actions: { updateOnboardingForm } });
   const [selectedCountry, setSelectedCountry] = useState<CountryOption | null>(null);
 
@@ -82,11 +84,11 @@ export const Student = ({ onNext, onBack }: StudentProps) => {
     <div className={styles.container}>
       <form onSubmit={handleFormSubmit} className={styles.form}>
         <div>
-          <h2 className={styles.title}>For Students</h2>
+          <h2 className={styles.title}>{t("student-title")}</h2>
         </div>
 
         <div>
-          <label className={styles.label}>School Location</label>
+          <label className={styles.label}>{t("school-location")}</label>
           <Controller
             name="schoolCountry"
             control={control}
@@ -104,30 +106,30 @@ export const Student = ({ onNext, onBack }: StudentProps) => {
         </div>
 
         <div>
-          <label className={styles.label}>School Name</label>
+          <label className={styles.label}>{t("school-name")}</label>
           <input
             {...register("schoolName")}
             className={styles.input}
-            placeholder="e.g., University of California, San Diego"
+            placeholder={t("school-name-placeholder")}
           />
         </div>
 
         <div>
-          <label className={styles.label}>University Email</label>
+          <label className={styles.label}>{t("university-email")}</label>
           <input
             {...register("universityEmail")}
             className={styles.input}
-            placeholder="Enter your school email"
+            placeholder={t("university-email-placeholder")}
             type="email"
           />
         </div>
 
         <div>
-          <label className={styles.label}>Degree</label>
+          <label className={styles.label}>{t("degree")}</label>
           <div className={styles.radioGroup}>
             <Radio
               id="degree-ms"
-              label="MS"
+              label={t("degree-ms")}
               checked={selectedDegree === "MS"}
               onChange={() => {
                 handleDegreeSelection("MS");
@@ -135,7 +137,7 @@ export const Student = ({ onNext, onBack }: StudentProps) => {
             />
             <Radio
               id="degree-phd"
-              label="PhD"
+              label={t("degree-phd")}
               checked={selectedDegree === "PhD"}
               onChange={() => {
                 handleDegreeSelection("PhD");
@@ -143,7 +145,7 @@ export const Student = ({ onNext, onBack }: StudentProps) => {
             />
             <Radio
               id="degree-md"
-              label="MD"
+              label={t("degree-md")}
               checked={selectedDegree === "MD"}
               onChange={() => {
                 handleDegreeSelection("MD");
@@ -153,21 +155,29 @@ export const Student = ({ onNext, onBack }: StudentProps) => {
         </div>
 
         <div>
-          <label className={styles.label}>Program Name or Department</label>
-          <input {...register("programName")} className={styles.input} placeholder="Enter name" />
+          <label className={styles.label}>{t("program-name")}</label>
+          <input
+            {...register("programName")}
+            className={styles.input}
+            placeholder={t("program-name-placeholder")}
+          />
         </div>
 
         <div>
-          <label className={styles.label}>Graduation Date</label>
-          <input {...register("graduationDate")} className={styles.input} placeholder="MM/YY" />
+          <label className={styles.label}>{t("graduation-date")}</label>
+          <input
+            {...register("graduationDate")}
+            className={styles.input}
+            placeholder={t("graduation-date-placeholder")}
+          />
         </div>
 
         <div className={styles.buttonContainer}>
           <button type="button" onClick={handleBack} className={styles.backButton}>
             <Image src="/icons/ic_caretleft.svg" alt="Back Icon" width={24} height={24} />
-            Back
+            {t("back")}
           </button>
-          <Button type="submit" label="Continue" />
+          <Button type="submit" label={t("continue")} />
         </div>
       </form>
     </div>

@@ -4,9 +4,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Radio } from "@tritonse/tse-constellation";
 import { useStateMachine } from "little-state-machine";
 import dynamic from "next/dynamic";
-import Image from "next/image";
 import { useCallback, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 import { z } from "zod";
 
 import styles from "./DirectoryBasics.module.css";
@@ -14,6 +14,7 @@ import styles from "./DirectoryBasics.module.css";
 import type { CountryOption } from "@/components";
 
 import { Button } from "@/components";
+import { educationTypeOptions } from "@/components/modals/displayInfoConstants";
 import { directoryState } from "@/state/stateTypes";
 import updateDirectoryForm from "@/state/updateDirectoryForm";
 
@@ -21,29 +22,31 @@ const CountrySelector = dynamic(() => import("@/components").then((mod) => mod.C
   ssr: false,
 });
 
-const formSchema = z.object({
-  educationType: z.string().min(1, "Please select an education type"),
-  educationInstitution: z.string().min(1, "Institution name is required"),
-  workClinic: z.string().min(1, "Work clinic name is required"),
-  clinicWebsite: z.string().url("Please enter a valid website URL, like: https://www.example.com"),
-  addressLine1: z.string().min(1, "Address is required"),
-  addressLine2: z.string().optional(),
-  city: z.string().min(1, "City is required"),
-  state: z.string().min(1, "State/territory is required"),
-  postcode: z.string().min(1, "Postcode is required"),
-  clinicCountry: z.object({
-    value: z.string().min(1),
-    label: z.string().min(1),
-  }),
-});
+const formSchema = (t: (key: string) => string) =>
+  z.object({
+    educationType: z.string().min(1, t("select-education-type")),
+    educationInstitution: z.string().min(1, t("institution-name-required")),
+    workClinic: z.string().min(1, t("work-clinic-name-required")),
+    clinicWebsite: z.string().url(t("valid-website-url")),
+    addressLine1: z.string().min(1, t("address-required")),
+    addressLine2: z.string().optional(),
+    city: z.string().min(1, t("city-required")),
+    state: z.string().min(1, t("state-territory-required")),
+    postcode: z.string().min(1, t("postcode-required")),
+    clinicCountry: z.object({
+      value: z.string().min(1),
+      label: z.string().min(1),
+    }),
+  });
 
-type FormSchema = z.infer<typeof formSchema>;
+type FormSchema = z.infer<ReturnType<typeof formSchema>>;
 
 type DirectoryBasicsProps = {
   onNext: (data: directoryState["data"]) => void;
 };
 
 export const DirectoryBasics = ({ onNext }: DirectoryBasicsProps) => {
+  const { t } = useTranslation();
   const { state, actions } = useStateMachine({ actions: { updateDirectoryForm } });
 
   const [selectedCountry, setSelectedCountry] = useState<CountryOption | null>(null);
@@ -55,7 +58,7 @@ export const DirectoryBasics = ({ onNext }: DirectoryBasicsProps) => {
     formState: { errors },
   } = useForm<FormSchema>({
     defaultValues: state.directoryForm as FormSchema,
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(formSchema(t)),
   });
 
   const onSubmit = useCallback(
@@ -78,11 +81,9 @@ export const DirectoryBasics = ({ onNext }: DirectoryBasicsProps) => {
     <div className={styles.container}>
       <form onSubmit={handleFormSubmit} className={styles.form}>
         <div>
-          <h4>Page 1 of 3</h4>
-          <h3 className={styles.sectionTitle}>Education</h3>
-          <p className={styles.sectionText}>
-            What type of education have you received to practice in your profession?
-          </p>
+          <h4>{t("page-1-of-3")}</h4>
+          <h3 className={styles.sectionTitle}>{t("education")}</h3>
+          <p className={styles.sectionText}>{t("education-received-question")}</p>
 
           <div className={styles.buttonGroup}>
             <Controller
@@ -91,38 +92,17 @@ export const DirectoryBasics = ({ onNext }: DirectoryBasicsProps) => {
               defaultValue={state.directoryForm?.educationType || ""}
               render={({ field }) => (
                 <>
-                  <Radio
-                    id="education-1"
-                    label="Master's Degree in Genetic Counseling"
-                    checked={field.value === "masters"}
-                    onChange={() => {
-                      field.onChange("masters");
-                    }}
-                  />
-                  <Radio
-                    id="education-2"
-                    label="Diploma in Genetic Counseling"
-                    checked={field.value === "diploma"}
-                    onChange={() => {
-                      field.onChange("diploma");
-                    }}
-                  />
-                  <Radio
-                    id="education-3"
-                    label="Medical Fellowship in Genetics"
-                    checked={field.value === "fellowship"}
-                    onChange={() => {
-                      field.onChange("fellowship");
-                    }}
-                  />
-                  <Radio
-                    id="education-4"
-                    label="Other"
-                    checked={field.value === "other"}
-                    onChange={() => {
-                      field.onChange("other");
-                    }}
-                  />
+                  {educationTypeOptions.map(({ label, value }) => (
+                    <Radio
+                      key={label}
+                      id={`education-${label}`}
+                      label={t(label)}
+                      checked={field.value === value}
+                      onChange={() => {
+                        field.onChange(value);
+                      }}
+                    />
+                  ))}
                 </>
               )}
             />
@@ -132,14 +112,12 @@ export const DirectoryBasics = ({ onNext }: DirectoryBasicsProps) => {
           </div>
 
           <div>
-            <label className={styles.label}>
-              Name of the institution where you obtained this education
-            </label>
+            <label className={styles.label}>{t("institution-name-label")}</label>
             <input
               type="text"
               {...register("educationInstitution")}
               className={styles.input}
-              placeholder="Enter name of institution, e.g. University of California, San Diego"
+              placeholder={t("institution-name-placeholder")}
             />
             <p className={styles.errorText}>
               {errors.educationInstitution ? errors.educationInstitution.message : "\u00A0"}
@@ -148,19 +126,16 @@ export const DirectoryBasics = ({ onNext }: DirectoryBasicsProps) => {
         </div>
 
         <div>
-          <h3 className={styles.sectionTitle}>Clinic</h3>
-          <p className={styles.sectionText}>Name of work clinic</p>
-          <p className={styles.sectionSubtext}>
-            If you work in multiple locations, please specify only your main work location. We can
-            only include one location per person.
-          </p>
+          <h3 className={styles.sectionTitle}>{t("clinic")}</h3>
+          <p className={styles.sectionText}>{t("name-of-work-clinic")}</p>
+          <p className={styles.sectionSubtext}>{t("multiple-locations-note")}</p>
 
           <div>
             <input
               type="text"
               {...register("workClinic")}
               className={styles.input}
-              placeholder="Enter name of work institution"
+              placeholder={t("work-institution-placeholder")}
             />
             <p className={styles.errorText}>
               {errors.workClinic ? errors.workClinic.message : "\u00A0"}
@@ -168,12 +143,12 @@ export const DirectoryBasics = ({ onNext }: DirectoryBasicsProps) => {
           </div>
 
           <div>
-            <label className={styles.label}>Clinic website link</label>
+            <label className={styles.label}>{t("clinic-website-link")}</label>
             <input
               type="text"
               {...register("clinicWebsite")}
               className={styles.input}
-              placeholder="Enter website link"
+              placeholder={t("enter-website-link")}
             />
             <p className={styles.errorText}>
               {errors.clinicWebsite ? errors.clinicWebsite.message : "\u00A0"}
@@ -181,10 +156,10 @@ export const DirectoryBasics = ({ onNext }: DirectoryBasicsProps) => {
           </div>
 
           <div>
-            <label className={styles.label}>Address of clinic</label>
+            <label className={styles.label}>{t("address-of-clinic")}</label>
 
             <div className={styles.addressField}>
-              <label className={styles.label}>Country</label>
+              <label className={styles.label}>{t("country")}</label>
               <Controller
                 name="clinicCountry"
                 control={control}
@@ -196,7 +171,7 @@ export const DirectoryBasics = ({ onNext }: DirectoryBasicsProps) => {
                       setSelectedCountry(option);
                       field.onChange(option);
                     }}
-                    placeholder="Select country"
+                    placeholder={t("select-country")}
                   />
                 )}
               />
@@ -210,7 +185,7 @@ export const DirectoryBasics = ({ onNext }: DirectoryBasicsProps) => {
                 type="text"
                 {...register("addressLine1")}
                 className={styles.input}
-                placeholder="Address line"
+                placeholder={t("address-line")}
               />
               {errors.addressLine1 && (
                 <p className={styles.errorText}>{errors.addressLine1.message}</p>
@@ -222,7 +197,7 @@ export const DirectoryBasics = ({ onNext }: DirectoryBasicsProps) => {
                 type="text"
                 {...register("addressLine2")}
                 className={styles.input}
-                placeholder="Apartment, suite, etc."
+                placeholder={t("apartment-suite-etc")}
               />
             </div>
 
@@ -233,7 +208,7 @@ export const DirectoryBasics = ({ onNext }: DirectoryBasicsProps) => {
                     type="text"
                     {...register("city")}
                     className={styles.input}
-                    placeholder="City"
+                    placeholder={t("city")}
                   />
                   <p className={styles.errorText}>{errors.city ? errors.city.message : "\u00A0"}</p>
                 </div>
@@ -242,7 +217,7 @@ export const DirectoryBasics = ({ onNext }: DirectoryBasicsProps) => {
                     type="text"
                     {...register("state")}
                     className={styles.input}
-                    placeholder="State/territory"
+                    placeholder={t("state-territory")}
                   />
                   <p className={styles.errorText}>
                     {errors.state ? errors.state.message : "\u00A0"}
@@ -253,7 +228,7 @@ export const DirectoryBasics = ({ onNext }: DirectoryBasicsProps) => {
                     type="text"
                     {...register("postcode")}
                     className={styles.input}
-                    placeholder="Postcode"
+                    placeholder={t("postcode")}
                   />
                   <p className={styles.errorText}>
                     {errors.postcode ? errors.postcode.message : "\u00A0"}
@@ -265,12 +240,7 @@ export const DirectoryBasics = ({ onNext }: DirectoryBasicsProps) => {
         </div>
 
         <div className={styles.buttonContainer}>
-          <button type="button" className={styles.backButton}>
-            <Image src="/icons/ic_caretleft.svg" alt="Back Icon" width={24} height={24} />
-            Back
-          </button>
-
-          <Button type="submit" label="Continue" />
+          <Button type="submit" label={t("continue")} />
         </div>
       </form>
     </div>

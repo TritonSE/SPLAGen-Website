@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useCallback, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import Select, { SingleValue } from "react-select";
 import countryList from "react-select-country-list";
 
@@ -15,19 +16,30 @@ type CountrySelectorProps = {
   placeholder?: string;
 };
 
+export const getCountryOptions = () => {
+  const data = (countryList() as { getData: () => CountryOption[] }).getData();
+  return data.map((country) => ({
+    value: country.value,
+    label: country.label,
+  }));
+};
+
+export const getCountryLabelFromCode = (code: string | undefined): string | undefined => {
+  if (!code) return undefined;
+  const options = getCountryOptions();
+  return options.find((option) => option.value === code)?.label;
+};
+
 export const CountrySelector: React.FC<CountrySelectorProps> = ({
   value,
   onChange,
-  placeholder = "Select a country...",
+  placeholder,
 }) => {
+  const { t } = useTranslation();
   // Ensure safe data fetching
   const options = useMemo(() => {
     try {
-      const data = (countryList() as { getData: () => CountryOption[] }).getData();
-      return data.map((country) => ({
-        value: country.value,
-        label: country.label,
-      }));
+      return getCountryOptions();
     } catch (err: unknown) {
       console.error(
         "Error fetching country list:",
@@ -51,7 +63,7 @@ export const CountrySelector: React.FC<CountrySelectorProps> = ({
         options={options}
         value={value}
         onChange={changeHandler}
-        placeholder={placeholder}
+        placeholder={placeholder ?? t("select-a-country")}
       />
     </div>
   );

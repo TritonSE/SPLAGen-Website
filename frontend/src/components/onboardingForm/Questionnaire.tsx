@@ -3,6 +3,7 @@ import { Radio } from "@tritonse/tse-constellation";
 import { useStateMachine } from "little-state-machine";
 import Image from "next/image";
 import { useCallback, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import styles from "./Questionnaire.module.css";
 
@@ -23,6 +24,7 @@ export const Questionnaire: React.FC<QuestionnaireProps> = ({
   onStudentFlow,
   onAssociateFlow,
 }) => {
+  const { t } = useTranslation();
   const { state, actions } = useStateMachine({ actions: { updateOnboardingForm } });
   const [answers, setAnswers] = useState<Record<string, string>>({});
 
@@ -110,15 +112,11 @@ export const Questionnaire: React.FC<QuestionnaireProps> = ({
       <>
         {/* Question 1 */}
         <div>
-          <p className={styles.subtitle}>
-            Did you complete your genetic counseling training in an accredited masters program in
-            the United States or a formal genetic counseling program in Latin America (either the
-            Cuban or Brazilian genetic counseling masters programs)?
-          </p>
+          <p className={styles.subtitle}>{t("questionnaire-q1")}</p>
           <div className={styles.buttonGroup}>
             <Radio
               id="radio-1"
-              label="Yes"
+              label={t("yes")}
               checked={answers.field1 === "yes"}
               onChange={() => {
                 handleSelection("field1", "yes");
@@ -126,7 +124,7 @@ export const Questionnaire: React.FC<QuestionnaireProps> = ({
             />
             <Radio
               id="radio-2"
-              label="No"
+              label={t("no")}
               checked={answers.field1 === "no"}
               onChange={() => {
                 handleSelection("field1", "no");
@@ -138,14 +136,11 @@ export const Questionnaire: React.FC<QuestionnaireProps> = ({
         {/* Show Question 2 only if field1 is "no" */}
         {answers.field1 === "no" && (
           <div>
-            <p className={styles.subtitle}>
-              Do you hold a MD, master&apos;s or PhD in a field such as medicine, nursing, social
-              work, biology, public health?
-            </p>
+            <p className={styles.subtitle}>{t("questionnaire-q2")}</p>
             <div className={styles.buttonGroup}>
               <Radio
                 id="radio-3"
-                label="Yes"
+                label={t("yes")}
                 checked={answers.field2 === "yes"}
                 onChange={() => {
                   handleSelection("field2", "yes");
@@ -153,7 +148,7 @@ export const Questionnaire: React.FC<QuestionnaireProps> = ({
               />
               <Radio
                 id="radio-4"
-                label="No"
+                label={t("no")}
                 checked={answers.field2 === "no"}
                 onChange={() => {
                   handleSelection("field2", "no");
@@ -166,14 +161,11 @@ export const Questionnaire: React.FC<QuestionnaireProps> = ({
         {/* Show Question 3 only if field2 is "yes" */}
         {answers.field2 === "yes" && (
           <div>
-            <p className={styles.subtitle}>
-              Have you had at least one year of formal clinical training in genetics (e.g.
-              certificate program)?
-            </p>
+            <p className={styles.subtitle}>{t("questionnaire-q3")}</p>
             <div className={styles.buttonGroup}>
               <Radio
                 id="radio-5"
-                label="Yes"
+                label={t("yes")}
                 checked={answers.field3 === "yes"}
                 onChange={() => {
                   handleSelection("field3", "yes");
@@ -181,7 +173,7 @@ export const Questionnaire: React.FC<QuestionnaireProps> = ({
               />
               <Radio
                 id="radio-6"
-                label="No"
+                label={t("no")}
                 checked={answers.field3 === "no"}
                 onChange={() => {
                   handleSelection("field3", "no");
@@ -194,14 +186,12 @@ export const Questionnaire: React.FC<QuestionnaireProps> = ({
         {/* Show Question 4 only if field2 is "no" */}
         {answers.field2 === "no" && (
           <div>
-            <p className={styles.subtitle}>
-              Select the following membership category that best suits you.
-            </p>
+            <p className={styles.subtitle}>{t("questionnaire-q4")}</p>
 
             <div className={styles.radioGroup}>
               <Radio
                 id="radio-7"
-                label="Student"
+                label={t("membership-student")}
                 checked={answers.field4 === "Student"}
                 onChange={() => {
                   handleSelection("field4", "Student");
@@ -209,14 +199,14 @@ export const Questionnaire: React.FC<QuestionnaireProps> = ({
               />
               <div className={styles.expandableIndent}>
                 <ExpandableSection
-                  title="Student Membership"
-                  content="Student membership will be granted to students enrolled in genetic counseling programs offered by an accredited institution, as well as to students enrolled in other degree-granting programs and who are interested in supporting the mission of society. Interested students can submit an application and, upon approval by officials, student membership can be granted or denied. Student members have the privileges of full members; however, they will not be granted a vote on issues or elections open to full and associate members. Student members are not eligible to serve on the Board of Directors or as committee chairs, with the exception of any committee specifically created for students. Student leadership roles will be filled by genetic counseling students."
+                  title={t("membership-student-title")}
+                  content={t("membership-student-desc")}
                 />
               </div>
 
               <Radio
                 id="radio-8"
-                label="Associate Member"
+                label={t("membership-associate")}
                 checked={answers.field4 === "Associate Member"}
                 onChange={() => {
                   handleSelection("field4", "Associate Member");
@@ -224,8 +214,8 @@ export const Questionnaire: React.FC<QuestionnaireProps> = ({
               />
               <div className={styles.expandableIndent}>
                 <ExpandableSection
-                  title="Associate Membership"
-                  content="Associate membership will be granted to all applicants interested in supporting the mission of Splagen and who are not eligible for full or student membership. Interested individuals can submit an application and, upon approval by officials, associated membership can be granted or denied. Associate members have all the privileges of full members, but are not eligible for a position on the Board of Directors and can only vote, hold positions as committee chairs and leadership positions related to their specialty and professional background."
+                  title={t("membership-associate-title")}
+                  content={t("membership-associate-desc")}
                 />
               </div>
             </div>
@@ -239,7 +229,7 @@ export const Questionnaire: React.FC<QuestionnaireProps> = ({
     <div className={styles.container}>
       <form className={styles.form}>
         <div>
-          <h2 className={styles.title}>Membership Questionnaire</h2>
+          <h2 className={styles.title}>{t("questionnaire-title")}</h2>
         </div>
 
         {renderQuestions()}
@@ -247,12 +237,12 @@ export const Questionnaire: React.FC<QuestionnaireProps> = ({
         <div className={styles.buttonContainer}>
           <button type="button" onClick={onBack} className={styles.backButton}>
             <Image src="/icons/ic_caretleft.svg" alt="Back Icon" width={24} height={24} />
-            Back
+            {t("back")}
           </button>
           <Button
             type="button"
             onClick={handleContinue}
-            label="Continue"
+            label={t("continue")}
             disabled={!isContinueEnabled}
           />
         </div>

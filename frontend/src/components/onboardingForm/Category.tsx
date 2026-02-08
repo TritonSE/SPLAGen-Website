@@ -7,18 +7,23 @@ import { useTranslation } from "react-i18next";
 
 import styles from "./Category.module.css";
 
-import { CreateUserRequestBody, MembershipType, signUpUser } from "@/api/users";
+import {
+  CreateUserRequestBody,
+  MembershipType,
+  getWhoAmI,
+  loginUserWithEmailPassword,
+  signUpUser,
+} from "@/api/users";
 import { Button } from "@/components/Button";
-import { onboardingState } from "@/state/stateTypes";
+import { LANGUAGES } from "@/components/languageSwitcher";
 
 type CategoryProps = {
-  onNext: (data: onboardingState["data"]) => void;
   onBack: () => void;
   onReset: () => void;
   onStatusChange: (status: "idle" | "submitting" | "success" | "error") => void;
 };
 
-export const Category: React.FC<CategoryProps> = ({ onNext, onBack, onReset, onStatusChange }) => {
+export const Category: React.FC<CategoryProps> = ({ onBack, onReset, onStatusChange }) => {
   const { state } = useStateMachine();
   const { t } = useTranslation();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -26,18 +31,18 @@ export const Category: React.FC<CategoryProps> = ({ onNext, onBack, onReset, onS
 
   const membershipType = state.onboardingForm.membership;
 
-  const [article, membershipText] = useMemo(() => {
+  const membershipText = useMemo(() => {
     switch (membershipType) {
       case "Student":
-        return ["a", "Student"];
+        return t("category-membership-student");
       case "Healthcare Professional":
-        return ["a", "Healthcare Professional"];
+        return t("category-membership-healthcare");
       case "Genetic Counselor":
-        return ["a", "Genetic Counselor"];
+        return t("category-membership-genetic-counselor");
       default:
-        return ["an", "Associate Member"];
+        return t("category-membership-associate");
     }
-  }, [membershipType]);
+  }, [membershipType, t]);
 
   const registerUser = useCallback(async () => {
     try {
@@ -53,23 +58,11 @@ export const Category: React.FC<CategoryProps> = ({ onNext, onBack, onReset, onS
         "Associate Member": "associate",
       }[state.onboardingForm.membership] as MembershipType;
 
-      // Normalize languages
-      const normalizedLanguages = (state.onboardingForm.languages || [])
-        .map((code) => {
-          switch (code.toLowerCase()) {
-            case "en":
-              return "english";
-            case "es":
-              return "spanish";
-            case "pt":
-              return "portuguese";
-            case "oth":
-              return "other";
-            default:
-              return undefined;
-          }
-        })
-        .filter(Boolean) as ("english" | "spanish" | "portuguese" | "other")[];
+      // Normalize language
+      const languageCode = state.onboardingForm.language;
+      const normalizedLanguage = LANGUAGES.find(
+        (lang) => lang.code === languageCode.toLowerCase(),
+      )?.dbValue;
 
       const userData: CreateUserRequestBody = {
         password: state.onboardingForm.password,
@@ -78,6 +71,7 @@ export const Category: React.FC<CategoryProps> = ({ onNext, onBack, onReset, onS
           firstName: state.onboardingForm.firstName,
           lastName: state.onboardingForm.lastName,
           email: state.onboardingForm.email,
+          phone: state.onboardingForm.phone,
         },
       };
 
@@ -88,7 +82,7 @@ export const Category: React.FC<CategoryProps> = ({ onNext, onBack, onReset, onS
       userData.professional = {
         title: professionalTitleToUse,
         country: state.onboardingForm.country?.value,
-        prefLanguages: normalizedLanguages,
+        prefLanguage: normalizedLanguage,
       };
 
       if (membership === "student" && state.onboardingForm.schoolName) {
@@ -111,30 +105,15 @@ export const Category: React.FC<CategoryProps> = ({ onNext, onBack, onReset, onS
           email: state.onboardingForm.universityEmail,
           program: state.onboardingForm.programName,
           gradDate: state.onboardingForm.graduationDate,
+          schoolCountry: state.onboardingForm.schoolCountry?.value,
         };
       }
 
       if (membership === "associate" && state.onboardingForm.organizationName) {
         // Normalize specializations
-        const specializationEnumMap = {
-          "rare disease advocacy": "rare disease advocacy",
-          research: "research",
-          "public health": "public health",
-          bioethics: "bioethics",
-          law: "law",
-          biology: "biology",
-          "medical writer": "medical writer",
-          "medical science liaison": "medical science liason",
-          "laboratory scientist": "laboratory scientist",
-          professor: "professor",
-          bioinformatics: "bioinformatics",
-          "biotech sales and marketing": "biotech sales and marketing",
-        };
-
-        const specialization = (state.onboardingForm.specializations || [])
-          .map((s) => s.toLowerCase())
-          .map((s) => specializationEnumMap[s as keyof typeof specializationEnumMap])
-          .filter((val): val is string => Boolean(val));
+        const specialization = (state.onboardingForm.specializations || []).map((s) =>
+          s.toLowerCase(),
+        );
 
         userData.associate = {
           title: state.onboardingForm.jobTitle,
@@ -143,13 +122,28 @@ export const Category: React.FC<CategoryProps> = ({ onNext, onBack, onReset, onS
         };
       }
 
-      console.log("Final user data to register:", userData);
-
       const result = await signUpUser(userData);
 
       if (result.success) {
+        // Log in with Firebase
+        const loginResult = await loginUserWithEmailPassword(
+          userData.personal.email,
+          userData.password,
+        );
+        if (!loginResult.success) {
+          setError(loginResult.error || t("registration-failed"));
+          onStatusChange("error");
+          return;
+        }
+
+        const authResult = await getWhoAmI(loginResult.data.token);
+        if (!authResult.success) {
+          setError(authResult.error || t("registration-failed"));
+          onStatusChange("error");
+          return;
+        }
+
         onStatusChange("success");
-        onNext(state.onboardingForm); // Advance flow if needed
       } else {
         setError(result.error || t("registration-failed"));
         onStatusChange("error");
@@ -161,19 +155,19 @@ export const Category: React.FC<CategoryProps> = ({ onNext, onBack, onReset, onS
     } finally {
       setIsSubmitting(false);
     }
-  }, [state.onboardingForm, onNext, onStatusChange, t]);
+  }, [state.onboardingForm, onStatusChange, t]);
 
   return (
     <div className={styles.darkContainer}>
       <div className={styles.container}>
-        <h2 className={styles.welcome}>Welcome to SPLAGen!</h2>
+        <h2 className={styles.welcome}>{t("category-welcome")}</h2>
 
         <div className={styles.iconContainer}>
           <Image src="/icons/ic_success.svg" alt="Checkbox icon" width={81} height={81} />
         </div>
 
         <p className={styles.text}>
-          You are being added to SPLAGen&apos;s full membership as {article}{" "}
+          {t("category-membership-text")}{" "}
           <span className={styles.membershipCategory}>{membershipText}</span>.
         </p>
 
@@ -194,7 +188,7 @@ export const Category: React.FC<CategoryProps> = ({ onNext, onBack, onReset, onS
         <div className={styles.buttonContainer}>
           <button type="button" onClick={onBack} className={styles.backButton}>
             <Image src="/icons/ic_caretleft.svg" alt="Back Icon" width={24} height={24} />
-            Back
+            {t("back")}
           </button>
 
           <Button

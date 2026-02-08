@@ -5,12 +5,13 @@ import { useRouter } from "next/navigation";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
+import { SuccessMessage } from "@/components/SuccessMessage";
 import {
   Associate,
   Basics,
   Category,
+  ContinueToDirectory,
   Questionnaire,
-  Result,
   SignUp,
   Student,
 } from "@/components/onboardingForm";
@@ -27,18 +28,13 @@ export default function OnboardingForm() {
   const { setOnboardingStep } = useContext(UserContext);
   const router = useRouter();
   const { t } = useTranslation();
+  const [successMessage, setSuccessMessage] = useState("");
 
   const handleNext = useCallback(
     (data: onboardingState["data"]) => {
       actions.updateOnboardingForm(data);
 
-      setStep((prevStep) => {
-        if (prevStep === 3) {
-          return prevStep + 2;
-        } else {
-          return prevStep + 1;
-        }
-      });
+      setStep((prevStep) => prevStep + 1);
     },
     [actions, setStep],
   );
@@ -56,7 +52,7 @@ export default function OnboardingForm() {
       professionalTitle: { value: "", label: "" },
       professionalTitleOther: "",
       country: { value: "", label: "" },
-      languages: [],
+      language: "",
     });
     setStep(0);
   }, [actions, setStep]);
@@ -90,14 +86,21 @@ export default function OnboardingForm() {
     (status: "idle" | "submitting" | "success" | "error") => {
       setRegistrationStatus(status);
 
-      // If registration is successful, redirect after a short delay
+      // If registration is successful, redirect to home page
       if (status === "success") {
-        setTimeout(() => {
-          router.push("/login?registered=true");
-        }, 2000);
+        // Professional & healthcare members can be added to the directory
+        if (
+          state.onboardingForm?.membership === "Genetic Counselor" ||
+          state.onboardingForm?.membership === "Healthcare Professional"
+        ) {
+          setStep(4);
+        } else {
+          setSuccessMessage(t("registration-submitted"));
+          router.push("/");
+        }
       }
     },
-    [router, setRegistrationStatus],
+    [router, setRegistrationStatus, state.onboardingForm?.membership, t],
   );
 
   // Show feedback message for registration
@@ -151,7 +154,6 @@ export default function OnboardingForm() {
 
       {step === 3 && (
         <Category
-          onNext={handleNext}
           onBack={() => {
             // If we're coming from an intermediate step, go back to Step2
             const membership = state.onboardingForm.membership;
@@ -168,7 +170,23 @@ export default function OnboardingForm() {
         />
       )}
 
-      {step === 5 && <Result onReset={handleReset} />}
+      {step === 4 && (
+        <ContinueToDirectory
+          onNo={() => {
+            router.push("/");
+          }}
+          onYes={() => {
+            router.push("/directoryForm");
+          }}
+        />
+      )}
+
+      <SuccessMessage
+        message={successMessage}
+        onDismiss={() => {
+          setSuccessMessage("");
+        }}
+      />
     </div>
   );
 }

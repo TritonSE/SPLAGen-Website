@@ -13,8 +13,8 @@ export type CreateUserRequestBody = {
 
   professional?: {
     title?: string;
-    prefLanguages?: ("english" | "spanish" | "portuguese" | "other")[];
-    otherPrefLanguages?: string;
+    prefLanguage?: "english" | "spanish" | "portuguese" | "other";
+    otherPrefLanguage?: string;
     country?: string;
   };
 
@@ -29,25 +29,7 @@ export type CreateUserRequestBody = {
 
   associate?: {
     title?: string;
-    specialization?: [
-      {
-        type: string;
-        enum: [
-          "rare disease advocacy",
-          "research",
-          "public health",
-          "bioethics",
-          "law",
-          "biology",
-          "medical writer",
-          "medical science liason",
-          "laboratory scientist",
-          "professor",
-          "bioinformatics",
-          "biotech sales and marketing",
-        ];
-      },
-    ];
+    specialization?: string[];
     organization?: string;
   };
 };
@@ -56,27 +38,27 @@ export type EditUserPersonalInformationRequestBody = {
   newFirstName: string;
   newLastName: string;
   newEmail: string;
-  newPhone: string;
+  newPhone?: string;
 };
 
 export type EditUserProfessionalInformationRequestBody = {
   newTitle: string;
-  newPrefLanguages: ("english" | "spanish" | "portuguese" | "other")[];
-  newOtherPrefLanguages: string;
+  newPrefLanguage: "english" | "spanish" | "portuguese" | "other";
+  newOtherPrefLanguage: string;
   newCountry: string;
 };
 
 export type EditDirectoryPersonalInformationRequestBody = {
   newDegree: string;
   newEducationInstitution: string;
-  newClinicName: string;
-  newClinicAddress: string;
-  newClinicCountry: string;
+  newClinicName?: string;
+  newClinicAddress?: string;
+  newClinicCountry?: string;
   newClinicApartmentSuite?: string;
   newClinicCity?: string;
   newClinicState?: string;
   newClinicZipPostCode?: string;
-  newClinicWebsiteUrl: string;
+  newClinicWebsiteUrl?: string;
 };
 
 export type EditDirectoryDisplayInformationRequestBody = {
@@ -103,4 +85,22 @@ export type EditDirectoryDisplayInformationRequestBody = {
   newLicense: string[];
   newRemoteOption: boolean;
   newRequestOption: boolean;
+  newAppointmentsOption: boolean;
+  newAuthorizedOption: string | boolean;
+};
+
+export type EditProfilePictureRequestBody = {
+  profilePicture: string;
+};
+
+export type ExportUsersRequestBody = {
+  userIds?: string[];
+  search?: string;
+  isAdmin?: string;
+  inDirectory?: string;
+  title?: string[];
+  membership?: string[];
+  education?: string[];
+  services?: string[];
+  country?: string[];
 };

@@ -14,8 +14,8 @@ const router = express.Router();
  */
 
 router.post("/", requireSignedIn, ReplyValidator.createReply, ReplyController.createReply);
-router.get("/:postId", requireSignedIn, ReplyValidator.getReplies, ReplyController.getReplies);
+router.get("/:postId", requireSignedIn, ReplyController.getReplies);
 router.put("/:id", requireSignedIn, ReplyValidator.editReply, ReplyController.editReply);
-router.delete("/:id", requireSignedIn, ReplyValidator.deleteReply, ReplyController.deleteReply);
+router.delete("/:id", requireSignedIn, ReplyController.deleteReply);
 
 export default router;

@@ -5,10 +5,12 @@ import { useStateMachine } from "little-state-machine";
 import Image from "next/image";
 import { useCallback, useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 
 import styles from "./Associate.module.css";
 
 import { Button } from "@/components";
+import { SPECIALIZATIONS } from "@/constants/specializations";
 import { onboardingState } from "@/state/stateTypes";
 import updateOnboardingForm from "@/state/updateOnboardingForm";
 
@@ -18,22 +20,8 @@ type AssociateProps = {
 };
 
 export const Associate = ({ onNext, onBack }: AssociateProps) => {
+  const { t } = useTranslation();
   const { state, actions } = useStateMachine({ actions: { updateOnboardingForm } });
-
-  const specializations = [
-    "Rare disease advocacy",
-    "Research",
-    "Public Health",
-    "Bioethics",
-    "Law",
-    "Biology",
-    "Medical Writer",
-    "Medical Science Liaison",
-    "Laboratory scientist",
-    "Professor",
-    "Bioinformatics",
-    "Biotech sales and marketing",
-  ];
 
   const { register, handleSubmit, control, watch, setValue, reset } = useForm({
     defaultValues: state.onboardingForm,
@@ -102,29 +90,27 @@ export const Associate = ({ onNext, onBack }: AssociateProps) => {
     <div className={styles.container}>
       <form onSubmit={handleFormSubmit} className={styles.form}>
         <div>
-          <h2 className={styles.title}>For Associate Members</h2>
+          <h2 className={styles.title}>{t("associate-title")}</h2>
         </div>
 
         <div>
-          <label className={styles.label}>
-            What is your job title or the name of the service you provide?
-          </label>
+          <label className={styles.label}>{t("associate-job-title-label")}</label>
           <input
             {...register("jobTitle")}
             className={styles.input}
-            placeholder="e.g., Genetic Counselor"
+            placeholder={t("associate-job-title-placeholder")}
           />
         </div>
 
         <div>
-          <label className={styles.label}>Area of Specialization</label>
+          <label className={styles.label}>{t("area-of-specialization")}</label>
           <Controller
             name="specializations"
             control={control}
             defaultValue={[]}
             render={() => (
               <div className={styles.specializationContainer}>
-                {specializations.map((specialization) => {
+                {SPECIALIZATIONS.map((specialization) => {
                   const isSelected = watchSpecializations.includes(specialization);
                   return (
                     <button
@@ -135,7 +121,7 @@ export const Associate = ({ onNext, onBack }: AssociateProps) => {
                         toggleSpecialization(specialization);
                       }}
                     >
-                      {specialization}
+                      {t(specialization)}
                     </button>
                   );
                 })}
@@ -145,11 +131,11 @@ export const Associate = ({ onNext, onBack }: AssociateProps) => {
         </div>
 
         <div>
-          <label className={styles.label}>Are you a representative of an organization?</label>
+          <label className={styles.label}>{t("representative-question")}</label>
           <div className={styles.radioGroup}>
             <Radio
               id="representative-yes"
-              label="Yes"
+              label={t("yes")}
               checked={isRepresentative === "yes"}
               onChange={() => {
                 handleRepresentativeSelection("yes");
@@ -157,7 +143,7 @@ export const Associate = ({ onNext, onBack }: AssociateProps) => {
             />
             <Radio
               id="representative-no"
-              label="No"
+              label={t("no")}
               checked={isRepresentative === "no"}
               onChange={() => {
                 handleRepresentativeSelection("no");
@@ -167,22 +153,20 @@ export const Associate = ({ onNext, onBack }: AssociateProps) => {
         </div>
 
         <div>
-          <label className={styles.label}>
-            If yes, what is the name of the organization you are representing?
-          </label>
+          <label className={styles.label}>{t("organization-name-label")}</label>
           <input
             {...register("organizationName")}
             className={styles.input}
-            placeholder="Name of organization"
+            placeholder={t("organization-name-placeholder")}
           />
         </div>
 
         <div className={styles.buttonContainer}>
           <button type="button" onClick={handleBack} className={styles.backButton}>
             <Image src="/icons/ic_caretleft.svg" alt="Back Icon" width={24} height={24} />
-            Back
+            {t("back")}
           </button>
-          <Button type="submit" label="Continue" />
+          <Button type="submit" label={t("continue")} />
         </div>
       </form>
     </div>

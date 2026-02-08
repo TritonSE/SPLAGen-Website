@@ -41,3 +41,22 @@ export const serviceKeyToLabelMap: Record<ValidService, string> = Object.entries
   acc[key] = label;
   return acc;
 }, {}) as Record<ValidService, string>;
+
+export const educationTypeOptions = [
+  {
+    label: "education-masters-degree-counseling",
+    value: "masters",
+  },
+  {
+    label: "education-diploma-counseling",
+    value: "diploma",
+  },
+  {
+    label: "education-medical-fellowship-genetics",
+    value: "fellowship",
+  },
+  {
+    label: "other",
+    value: "other",
+  },
+];

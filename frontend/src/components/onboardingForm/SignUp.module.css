@@ -50,6 +50,14 @@
   font-weight: 500;
 }
 
+.optionalText {
+  color: var(--color-grey4);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 150%;
+  letter-spacing: 0.32px;
+}
+
 .input {
   padding: 0.5rem;
   border: 1px solid var(--color-grey3);

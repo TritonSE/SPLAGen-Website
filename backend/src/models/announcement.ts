@@ -1,26 +1,38 @@
 import { InferSchemaType, Schema, model } from "mongoose";
 
+export const VALID_LANGUAGES = ["english", "spanish", "portuguese", "other"];
+
+export const validateRecipients = (value: string[]) => {
+  if (!Array.isArray(value)) return false;
+
+  return value.every((recipient) => {
+    if (typeof recipient !== "string") return false;
+
+    // Check if it's "everyone"
+    if (recipient === "everyone") return true;
+
+    // Check if it's a language target (e.g., "language:english")
+    if (recipient.startsWith("language:")) {
+      const language = recipient.substring("language:".length); // Remove "language:" prefix
+      return VALID_LANGUAGES.includes(language);
+    }
+
+    // Check if it's a valid email
+    return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(recipient);
+  });
+};
+
 const announcementSchema = new Schema(
   {
-    userId: { type: Schema.Types.ObjectId, required: true },
+    userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
     title: { type: String, required: true },
     recipients: {
-      type: Schema.Types.Mixed, // Allows either a string or an array
+      type: [String],
       required: true,
-      default: "everyone",
+      default: ["everyone"],
       validate: {
-        validator: function (value: "everyone" | string[]) {
-          if (typeof value === "string") {
-            return value === "everyone";
-          }
-          if (Array.isArray(value)) {
-            return value.every(
-              (email) => typeof email === "string" && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email),
-            );
-          }
-          return false;
-        },
-        message: "Channel must be 'everyone' or an array of valid email addresses.",
+        validator: validateRecipients,
+        message: "Recipients must be 'everyone' or an array of valid email addresses.",
       },
     },
     message: { type: String, required: true },
@@ -31,6 +43,13 @@ const announcementSchema = new Schema(
   { timestamps: true },
 );
 
-type Announcement = InferSchemaType<typeof announcementSchema>;
+announcementSchema.index({
+  title: "text",
+  message: "text",
+});
+
+export type Announcement = InferSchemaType<typeof announcementSchema> & {
+  recipients: string | string[];
+};
 
 export default model<Announcement>("Announcement", announcementSchema);

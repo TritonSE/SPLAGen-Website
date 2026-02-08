@@ -15,6 +15,7 @@ import directoryRoutes from "./routes/directory";
 import discussionRoutes from "./routes/discussion";
 import replyRoutes from "./routes/reply";
 import userRoutes from "./routes/user";
+import env from "./util/validateEnv";
 
 // Load environment variables
 dotenv.config();
@@ -35,7 +36,7 @@ void mongoose
   });
 
 const app: Express = express();
-const port = process.env.PORT ?? "3001";
+const port = env.PORT;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -47,7 +48,7 @@ app.use(express.urlencoded({ extended: true }));
 // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin
 app.use(
   cors({
-    origin: process.env.FRONTEND_ORIGIN,
+    origin: env.FRONTEND_ORIGIN,
   }),
 );
 
@@ -85,5 +86,5 @@ app.use((error: unknown, req: Request, res: Response, next: NextFunction) => {
 
 // Start the server
 app.listen(port, () => {
-  console.log(`[server]: Server is running at http://localhost:${port}`);
+  console.log(`[server]: Server is running at http://localhost:${String(port)}`);
 });

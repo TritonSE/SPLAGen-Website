@@ -1,4 +1,5 @@
-import { APIResult, get, handleAPIError } from "./requests";
+import { APIResult, get, handleAPIError, post } from "./requests";
+import { createAuthHeader } from "./users";
 
 export type Counselor = {
   name: string;
@@ -12,9 +13,72 @@ export type Counselor = {
   profileUrl: string;
 };
 
-export async function getPublicDirectory(): Promise<APIResult<Counselor[]>> {
+export type JoinDirectoryRequestBody = {
+  education: {
+    degree: string;
+    otherDegree?: string;
+    institution: string;
+  };
+  clinic: {
+    name: string;
+    url: string;
+    location: {
+      country: string;
+      address: string;
+      suite?: string;
+      city: string;
+      state: string;
+      zipPostCode: string;
+    };
+  };
+  display: {
+    workEmail: string;
+    workPhone: string;
+    services: string[];
+    languages: string[];
+    license: string[];
+    options: {
+      openToAppointments: boolean;
+      openToRequests: boolean;
+      remote: boolean;
+      authorizedCare: string | boolean;
+    };
+    comments: {
+      noLicense?: string;
+      additional?: string;
+    };
+  };
+};
+
+export async function joinDirectory(
+  joinDirectoryRequest: JoinDirectoryRequestBody,
+  firebaseToken: string,
+): Promise<APIResult<null>> {
   try {
-    const res = await get("/api/directory/public", undefined);
+    await post("/api/directory/join", joinDirectoryRequest, createAuthHeader(firebaseToken));
+
+    return { success: true, data: null };
+  } catch (error) {
+    return handleAPIError(error);
+  }
+}
+
+export async function getPublicDirectory(
+  search?: string,
+  languages?: string[],
+  specializations?: string[],
+): Promise<APIResult<Counselor[]>> {
+  try {
+    const params = new URLSearchParams();
+    if (search) params.append("search", search);
+    if (languages && languages.length > 0) params.append("languages", languages.join(","));
+    if (specializations && specializations.length > 0)
+      params.append("specializations", specializations.join(","));
+
+    const queryString = params.toString();
+    const url = `/api/directory/public${queryString ? `?${queryString}` : ""}`;
+
+    const res = await get(url, undefined);
 
     const raw = (await res.json()) as Counselor[];
 
@@ -24,6 +88,53 @@ export async function getPublicDirectory(): Promise<APIResult<Counselor[]>> {
     }));
 
     return { success: true, data };
+  } catch (error) {
+    return handleAPIError(error);
+  }
+}
+
+export async function approveDirectoryEntry(
+  firebaseToken: string,
+  userIds: string[],
+): Promise<APIResult<null>> {
+  try {
+    await post(
+      "/api/directory/approve",
+      {
+        userIds,
+      },
+      createAuthHeader(firebaseToken),
+    );
+    return { success: true, data: null };
+  } catch (error) {
+    return handleAPIError(error);
+  }
+}
+
+export async function denyDirectoryEntry(
+  firebaseToken: string,
+  userIds: string[],
+  reason: string,
+): Promise<APIResult<null>> {
+  try {
+    await post(
+      "/api/directory/deny",
+      {
+        userIds,
+        reason,
+      },
+      createAuthHeader(firebaseToken),
+    );
+    return { success: true, data: null };
+  } catch (error) {
+    return handleAPIError(error);
+  }
+}
+
+export async function leaveDirectory(firebaseToken: string): Promise<APIResult<null>> {
+  try {
+    await post("/api/directory/leave", {}, createAuthHeader(firebaseToken));
+    return { success: true, data: null };
   } catch (error) {
     return handleAPIError(error);
   }

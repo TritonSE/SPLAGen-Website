@@ -11,10 +11,11 @@ export type TwoButtonPopupProps = {
   isOpen: boolean;
   variant?: "info" | "question" | "warning";
   confirmLabel?: string;
-  onConfirm: () => void;
+  onConfirm: () => unknown;
   cancelLabel?: string;
-  onCancel: () => void;
+  onCancel: () => unknown;
   children: ReactNode;
+  loading?: boolean;
 };
 
 export const TwoButtonPopup = ({
@@ -25,6 +26,7 @@ export const TwoButtonPopup = ({
   cancelLabel = "cancel",
   onCancel,
   children,
+  loading = false,
 }: TwoButtonPopupProps) => {
   const { t } = useTranslation();
 
@@ -51,8 +53,18 @@ export const TwoButtonPopup = ({
         {children}
 
         <div className={styles.buttonContainer}>
-          <Button variant="secondary" onClick={onCancel} label={t(cancelLabel)} />
-          <Button variant="primary" onClick={onConfirm} label={t(confirmLabel)} />
+          <Button
+            variant="secondary"
+            onClick={onCancel}
+            label={t(cancelLabel)}
+            disabled={loading}
+          />
+          <Button
+            variant="primary"
+            onClick={onConfirm}
+            label={loading ? t("loading") : t(confirmLabel)}
+            disabled={loading}
+          />
         </div>
       </div>
     </div>

@@ -1,0 +1,283 @@
+"use client";
+
+import moment from "moment";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import React, { useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
+
+import styles from "./styles.module.css";
+
+import { Announcement, deleteAnnouncement } from "@/api/announcement";
+import { Discussion, deleteDiscussion } from "@/api/discussion";
+import { Reply, deleteReply, getReplies } from "@/api/reply";
+import { Button } from "@/components";
+import { ProfilePicture } from "@/components/ProfilePicture";
+import { ReplyComposer } from "@/components/ReplyComposer";
+import { TwoButtonPopup } from "@/components/modals/TwoButtonPopup";
+import { UserContext } from "@/contexts/userContext";
+
+type PostPageViewProps = {
+  showDotsMenu: boolean;
+  post:
+    | {
+        variant: "announcement";
+        data: Announcement;
+      }
+    | {
+        variant: "discussion";
+        data: Discussion;
+        onReplyPosted?: () => unknown;
+      }
+    | {
+        variant: "reply";
+        data: Reply;
+        reloadReplies: () => unknown;
+      };
+};
+
+export const PostPageView = ({ showDotsMenu, post }: PostPageViewProps) => {
+  const { t } = useTranslation();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [newReplyComposerOpen, setNewReplyComposerOpen] = useState(false);
+  const [editReplyComposerOpen, setEditReplyComposerOpen] = useState(false);
+  const [replies, setReplies] = useState<Reply[]>();
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const router = useRouter();
+
+  const { firebaseUser, user, isAdminOrSuperAdmin } = useContext(UserContext);
+
+  const handleDelete = async () => {
+    if (!firebaseUser) return;
+
+    setDeleteLoading(true);
+    setErrorMessage("");
+
+    switch (post.variant) {
+      case "announcement": {
+        try {
+          const token = await firebaseUser.getIdToken();
+          const response = await deleteAnnouncement(token, post.data._id);
+          if (response.success) {
+            setConfirmDeleteOpen(false);
+            router.push("/announcements");
+          } else {
+            setErrorMessage(`${t("failed-to-delete-announcement")}: ${response.error}`);
+          }
+        } catch (error) {
+          setErrorMessage(`${t("failed-to-delete-announcement")}: ${String(error)}`);
+        } finally {
+          setDeleteLoading(false);
+        }
+        break;
+      }
+      case "discussion": {
+        try {
+          const token = await firebaseUser.getIdToken();
+          const response = await deleteDiscussion(token, post.data._id);
+          if (response.success) {
+            setConfirmDeleteOpen(false);
+            router.push("/discussion");
+          } else {
+            setErrorMessage(`${t("failed-to-delete-post")}: ${response.error}`);
+          }
+        } catch (error) {
+          setErrorMessage(`${t("failed-to-delete-post")}: ${String(error)}`);
+        } finally {
+          setDeleteLoading(false);
+        }
+        break;
+      }
+      case "reply": {
+        try {
+          const token = await firebaseUser.getIdToken();
+          const response = await deleteReply(token, post.data._id);
+          if (response.success) {
+            setConfirmDeleteOpen(false);
+            post.reloadReplies();
+          } else {
+            setErrorMessage(`${t("failed-to-delete-reply")}: ${response.error}`);
+          }
+        } catch (error) {
+          setErrorMessage(`${t("failed-to-delete-reply")}: ${String(error)}`);
+        } finally {
+          setDeleteLoading(false);
+        }
+        break;
+      }
+    }
+  };
+
+  const loadReplies = useCallback(async () => {
+    if (!firebaseUser || post.variant !== "discussion") return;
+
+    try {
+      const token = await firebaseUser.getIdToken();
+      const response = await getReplies(token, post.data._id);
+      if (response.success) {
+        setReplies(response.data);
+      } else {
+        setErrorMessage(`${t("failed-to-load-replies")}: ${response.error}`);
+      }
+    } catch (error) {
+      setErrorMessage(`${t("failed-to-load-replies")}: ${String(error)}`);
+    }
+  }, [firebaseUser, post, t]);
+
+  // Wrapper function that calls both loadReplies and onReplyPosted
+  // This is passed to ReplyComposer to refresh both replies and parent data after posting
+  const handleReplyPosted = useCallback(async () => {
+    await loadReplies();
+    if (post.variant === "discussion" && post.onReplyPosted) {
+      post.onReplyPosted();
+    }
+  }, [loadReplies, post]);
+
+  useEffect(() => {
+    void loadReplies();
+  }, [firebaseUser, post, loadReplies]);
+
+  const formattedRecipients = useMemo(() => {
+    if (post.variant !== "announcement") return "";
+    if (post.data.recipients[0] === "everyone") {
+      return t("everyone");
+    } else if (post.data.recipients[0].startsWith("language:")) {
+      const language = post.data.recipients[0].substring("language:".length);
+      return `${language[0].toUpperCase()}${language.substring(1)}-${t("speaking-users")}`;
+    } else {
+      return post.data.recipients.join(", ");
+    }
+  }, [post, t]);
+
+  return (
+    <div className={styles.announcementContainer}>
+      <div className={styles.topRow}>
+        <div className={styles.topLeft}>
+          <ProfilePicture size="small" user={post.data.userId} />
+          <div className={styles.authorColumn}>
+            <p className={styles.authorName}>
+              {post.data.userId.personal.firstName} {post.data.userId.personal.lastName}
+            </p>
+            <p className={styles.recipients}>
+              {post.variant === "announcement" ? `${t("sent-to")} ${formattedRecipients} • ` : ""}
+              {t("posted")} {moment(post.data.createdAt).format("MMMM D YYYY, h:mm:ss A")}
+            </p>
+          </div>
+        </div>
+        {showDotsMenu && (
+          <button
+            className={styles.threeDotsButton}
+            onClick={() => {
+              setMenuOpen(!menuOpen);
+            }}
+          >
+            <Image src="/icons/three_dots.svg" alt="Three dots menu" width={6} height={24} />
+          </button>
+        )}
+      </div>
+
+      {(post.variant === "announcement" || post.variant === "discussion") && (
+        <h2 className={styles.announcementTitle}>{post.data.title}</h2>
+      )}
+      {editReplyComposerOpen && post.variant === "reply" ? (
+        <ReplyComposer
+          postId={post.data.postId}
+          reply={post.data}
+          onExit={() => {
+            setEditReplyComposerOpen(false);
+          }}
+          reloadReplies={post.reloadReplies}
+        />
+      ) : (
+        <p className={styles.announcementBody}>{post.data.message}</p>
+      )}
+
+      {post.variant === "discussion" && (
+        <>
+          {newReplyComposerOpen ? (
+            <ReplyComposer
+              postId={post.data._id}
+              onExit={() => {
+                setNewReplyComposerOpen(false);
+              }}
+              reloadReplies={handleReplyPosted}
+            />
+          ) : (
+            <Button
+              className={styles.replyButton}
+              label={t("reply")}
+              onClick={() => {
+                setNewReplyComposerOpen(true);
+              }}
+            />
+          )}
+          <div className={styles.repliesDivider} />
+          <div className={styles.repliesContainer}>
+            {replies?.map((reply) => (
+              <PostPageView
+                key={reply._id}
+                showDotsMenu={reply.userId._id === user?._id || isAdminOrSuperAdmin}
+                post={{
+                  variant: "reply",
+                  data: reply,
+                  reloadReplies: loadReplies,
+                }}
+              />
+            ))}
+          </div>
+          {replies && replies.length === 0 && <p>{t("no-replies-yet")}</p>}
+        </>
+      )}
+
+      {menuOpen && (
+        <div className={styles.menuContainer}>
+          {post.variant === "reply" ? (
+            <Button
+              className={styles.menuButton}
+              label={t("edit")}
+              variant="primary"
+              onClick={() => {
+                setMenuOpen(false);
+                setEditReplyComposerOpen(true);
+              }}
+            />
+          ) : (
+            <a
+              className="w-full"
+              href={`/${post.variant === "announcement" ? "announcements" : "discussion"}/${post.data._id}/edit`}
+            >
+              <Button className={styles.menuButton} label={t("edit")} variant="primary" />
+            </a>
+          )}
+          <Button
+            className={styles.menuButton}
+            label={t("delete")}
+            variant="secondary"
+            onClick={() => {
+              setMenuOpen(false);
+              setConfirmDeleteOpen(true);
+            }}
+          />
+        </div>
+      )}
+      <TwoButtonPopup
+        isOpen={confirmDeleteOpen}
+        variant="warning"
+        onCancel={() => {
+          setConfirmDeleteOpen(false);
+        }}
+        onConfirm={() => {
+          void handleDelete();
+        }}
+        loading={deleteLoading}
+      >
+        <p>
+          {t("are-you-sure-delete")} {post.variant}?
+        </p>
+      </TwoButtonPopup>
+      {errorMessage && <div className="text-red-500">{errorMessage}</div>}
+    </div>
+  );
+};

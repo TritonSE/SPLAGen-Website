@@ -2,180 +2,79 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import styles from "./landingPage.module.css";
 
-import { Discussion, getPost } from "@/api/discussion";
+import { DISCUSSION_PAGE_SIZE, Discussion, getPosts } from "@/api/discussion";
+import { Pagination } from "@/components/Pagination";
 import { PostCard } from "@/components/PostCard";
+import { Tabs } from "@/components/Tabs";
 import { UserContext } from "@/contexts/userContext";
-type Post = {
-  id: string;
-  title: string;
-  content: string;
-  date: string;
-  author: string;
-  audience?: string;
-  time?: string;
-};
+import { useRedirectToLoginIfNotSignedIn } from "@/hooks/useRedirection";
+
+const TABS = ["all-discussions", "my-discussions"] as const;
+type Tab = (typeof TABS)[number];
 
 export default function LandingPage() {
+  useRedirectToLoginIfNotSignedIn();
+
   const { t } = useTranslation();
 
-  const [originalPosts, setOriginalPosts] = useState<Post[]>([]);
-  const [posts, setPosts] = useState<Post[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [query, setQuery] = useState("");
+  const [page, setPage] = useState(1);
+  const [numPages, setNumPages] = useState(1);
+  const [search, setSearch] = useState("");
   const [sort, setSort] = useState("");
+  const [posts, setPosts] = useState<Discussion[]>();
+  const [activeTab, setActiveTab] = useState<Tab>("all-discussions");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const { firebaseUser } = useContext(UserContext);
 
-  const mapDiscussionToPost = (discussion: Discussion): Post => ({
-    id: discussion._id,
-    title: discussion.title,
-    content: discussion.message,
-    date: discussion.createdAt,
-    author: discussion.userName,
-    audience: discussion.audience,
-    time: discussion.time,
-  });
-
-  useEffect(() => {
+  const loadPosts = useCallback(async () => {
     if (!firebaseUser) return;
-    const fetchPosts = async () => {
-      const firebaseToken = await firebaseUser.getIdToken();
-      const result = await getPost(firebaseToken);
 
-      if (result.success) {
-        const fetchedPosts = result.data.map(mapDiscussionToPost);
-        setOriginalPosts(fetchedPosts);
-        setPosts(fetchedPosts);
+    setErrorMessage("");
+    try {
+      const token = await firebaseUser.getIdToken();
+      const response = await getPosts(
+        token,
+        sort || "newest",
+        search,
+        activeTab === "my-discussions",
+        page,
+      );
+      if (response.success) {
+        setPosts(response.data.discussions);
+        setNumPages(Math.ceil(response.data.count / DISCUSSION_PAGE_SIZE));
       } else {
-        console.error("Failed to load posts", result.error);
+        setErrorMessage(`${t("failed-to-fetch-discussion-posts")}: ${response.error}`);
       }
-      setLoading(false);
-    };
-    void fetchPosts();
-  }, [firebaseUser]);
-
-  // const onSubmit: SubmitHandler<SearchFormInputs> = (data) => {
-  //   const searchQuery = data.query?.toLowerCase() ?? "";
-  //   const filtered = originalPosts.filter(
-  //     (post) =>
-  //       post.title.toLowerCase().includes(searchQuery) ||
-  //       post.content.toLowerCase().includes(searchQuery),
-  //   );
-
-  //   switch (data.sort) {
-  //     case "date-desc":
-  //       filtered.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-  //       break;
-  //     case "date-asc":
-  //       filtered.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-  //       break;
-  //     case "author-asc":
-  //       filtered.sort((a, b) => a.author.localeCompare(b.author));
-  //       break;
-  //     case "author-desc":
-  //       filtered.sort((a, b) => b.author.localeCompare(a.author));
-  //       break;
-  //     case undefined: {
-  //       throw new Error("Not implemented yet: undefined case");
-  //     }
-  //     default:
-  //       break;
-  //   }
-
-  //   setPosts(filtered);
-  // };
+    } catch (error) {
+      setErrorMessage(`${t("failed-to-fetch-discussion-posts")}: ${String(error)}`);
+    }
+  }, [firebaseUser, search, sort, activeTab, page, t]);
 
   useEffect(() => {
-    let result = [...originalPosts];
-    // Filter
-    if (query) {
-      result = originalPosts.filter(
-        (post) =>
-          post.title.toLowerCase().includes(query) ||
-          post.content.toLowerCase().includes(query) ||
-          post.author.toLowerCase().includes(query),
-      );
-    }
-
-    // Sort
-    result.sort((a, b) => {
-      switch (sort) {
-        case "date-desc":
-          return new Date(b.date).getTime() - new Date(a.date).getTime();
-        case "date-asc":
-          return new Date(a.date).getTime() - new Date(b.date).getTime();
-        case "author-asc":
-          return a.author.localeCompare(b.author);
-        case "author-desc":
-          return b.author.localeCompare(a.author);
-        default:
-          return 0;
-      }
-    });
-    console.log("Sorted posts:", result);
-    setPosts(result);
-  }, [query, sort, originalPosts, setPosts]);
-
-  if (loading) return <div>{t("Loading...")}</div>;
-
-  const normalizeDate = (date: Date) => {
-    const normalizedDate = new Date(date);
-    normalizedDate.setHours(0, 0, 0, 0);
-    return normalizedDate;
-  };
-
-  const visiblePosts = posts;
-
-  // Step 3: Create time boundaries
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  const startOfWeek = new Date(today);
-  startOfWeek.setDate(today.getDate() - today.getDay());
-  startOfWeek.setHours(0, 0, 0, 0);
-
-  const endOfWeek = new Date(today);
-  endOfWeek.setDate(today.getDate() + (6 - today.getDay()));
-  endOfWeek.setHours(23, 59, 59, 999);
-
-  // Step 4: Group the visible posts
-  const todayPosts: Post[] = [];
-  const thisWeekPosts: Post[] = [];
-  const earlierPosts: Post[] = [];
-
-  visiblePosts.forEach((post) => {
-    const postDate = new Date(post.date);
-    const normalizedPostDate = normalizeDate(postDate);
-
-    if (normalizedPostDate.getTime() === today.getTime()) {
-      todayPosts.push(post);
-    } else if (postDate >= startOfWeek && postDate <= endOfWeek) {
-      thisWeekPosts.push(post);
-    } else {
-      earlierPosts.push(post);
-    }
-  });
+    void loadPosts();
+  }, [firebaseUser, search, sort, activeTab, page, loadPosts]);
 
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <h1 className={styles.title}>{t("Discussion")}</h1>
+        <h1 className={styles.title}>{t("discussion")}</h1>
       </div>
       <div className={styles.searchForm}>
         {/* Wrap the search input and 'Sort By' dropdown */}
         <div className={styles.searchAllSortContainer}>
           <input
             type="text"
-            placeholder={t("Search General")}
+            placeholder={t("search-discussions")}
             className={styles.searchInput}
-            value={query}
+            value={search}
             onChange={(e) => {
-              setQuery(e.target.value);
+              setSearch(e.target.value);
             }}
           />
 
@@ -189,30 +88,13 @@ export default function LandingPage() {
                   }}
                   value={sort}
                 >
-                  <option value="">{t("Sort By")}</option>
-                  <option value="date-desc">{t("Newest First")}</option>
-                  <option value="date-asc">{t("Oldest First")}</option>
-                  <option value="author-asc">{t("Author A-Z")}</option>
-                  <option value="author-desc">{t("Author Z-A")}</option>
+                  <option value="">{t("sort-by")}</option>
+                  <option value="newest">{t("newest-first")}</option>
+                  <option value="oldest">{t("oldest-first")}</option>
                 </select>
 
-                <div className="sortIconWrapper">
-                  <svg
-                    className="sortIcon"
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                  >
-                    <path
-                      d="M8 20V10M8 20L5 17M8 20L11 17M16 4V14M16 4L19 7M16 4L13 7"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
+                <div className={styles.sortIconWrapper}>
+                  <Image src="/icons/sort.svg" alt="Sort arrows" width={24} height={24} />
                 </div>
               </div>
             </div>
@@ -220,83 +102,30 @@ export default function LandingPage() {
         </div>
 
         <Link href="/discussion/post" className={styles.newPostButton}>
-          {t("create-discussion")}
+          {t("create-post")}
           <Image src="/icons/plus.svg" alt="Plus icon" width={24} height={24} />
         </Link>
       </div>
+
+      <Tabs tabs={TABS} activeTab={activeTab} onActiveTabChange={setActiveTab} />
+
       <div className={styles.scrollContainer}>
-        {/* Today's Posts */}
-        {todayPosts.length > 0 && (
-          <div className={styles.todaySection}>
-            <div className={styles.sectionHeader}>
-              <h2>{t("Today")}</h2>
-            </div>
+        {posts?.map((post) => (
+          <PostCard
+            key={post._id}
+            href={`/discussion/${post._id}`}
+            author={post.userId}
+            createdAt={post.createdAt}
+            title={post.title}
+            message={post.message}
+          />
+        ))}
 
-            <div className={styles.postList}>
-              {todayPosts
-                .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-                .map((post) => (
-                  <div key={post.id} className={styles.postWrapper}>
-                    <PostCard
-                      id={post.id}
-                      authorName={post.author}
-                      date={post.date}
-                      time={post.time}
-                      title={post.title}
-                      message={post.content}
-                      audience={post.audience}
-                    />
-                  </div>
-                ))}
-            </div>
-          </div>
-        )}
-
-        {/* This Week's Posts */}
-        {thisWeekPosts.length > 0 && (
-          <div className={styles.thisWeekSection}>
-            <h2>{t("This Week")}</h2>
-            {thisWeekPosts
-              .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-              .map((post) => (
-                <PostCard
-                  id={post.id}
-                  key={post.id}
-                  authorName={post.author}
-                  date={post.date}
-                  time={post.time}
-                  title={post.title}
-                  message={post.content}
-                  audience={post.audience}
-                />
-              ))}
-          </div>
-        )}
-
-        {/* Earlier Posts */}
-        {earlierPosts.length > 0 && (
-          <div className={styles.earlierSection}>
-            <h2>{t("Earlier")}</h2>
-            {earlierPosts
-              .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-              .map((post) => (
-                <PostCard
-                  id={post.id}
-                  key={post.id}
-                  authorName={post.author}
-                  date={post.date}
-                  time={post.time}
-                  title={post.title}
-                  message={post.content}
-                  audience={post.audience}
-                />
-              ))}
-          </div>
-        )}
-
-        {/* If no posts */}
-        {posts.length === 0 && <div>No posts yet.</div>}
+        {posts && posts.length === 0 && <div>{t("no-posts-found")}</div>}
       </div>
+
+      <Pagination currentPage={page} numPages={numPages} onPageChange={setPage} />
+      {errorMessage && <div className="text-red-500">{errorMessage}</div>}
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { getAuth, sendPasswordResetEmail, signInWithEmailAndPassword } from "firebase/auth";
 
 import { APIResult, get, handleAPIError, post, put } from "./requests";
 
@@ -7,6 +7,20 @@ import type { UserCredential } from "firebase/auth";
 import { initFirebase } from "@/firebase/firebase";
 
 export type MembershipType = "student" | "geneticCounselor" | "healthcareProvider" | "associate";
+
+export const membershipDisplayMap: Record<string, string> = {
+  student: "student-membership",
+  geneticCounselor: "genetic-counselor-membership",
+  healthcareProvider: "healthcare-provider-membership",
+  associate: "associate-membership",
+};
+
+export const professionalTitleOptions = [
+  { value: "medical_geneticist", label: "medical-geneticist" },
+  { value: "genetic_counselor", label: "genetic-counselor-title" },
+  { value: "student", label: "student-title" },
+  { value: "other", label: "other" },
+] as const;
 
 // Define CreateUserRequestBody type based on backend requirements
 export type CreateUserRequestBody = {
@@ -22,8 +36,8 @@ export type CreateUserRequestBody = {
   };
   professional?: {
     title?: string;
-    prefLanguages?: ("english" | "spanish" | "portuguese" | "other")[];
-    otherPrefLanguages?: string;
+    prefLanguage?: "english" | "spanish" | "portuguese" | "other";
+    otherPrefLanguage?: string;
     country?: string;
   };
   education?: {
@@ -33,6 +47,7 @@ export type CreateUserRequestBody = {
     institution?: string;
     email?: string;
     gradDate?: string;
+    schoolCountry?: string;
   };
   associate?: {
     title?: string;
@@ -59,8 +74,8 @@ export type User = {
   };
   professional?: {
     title?: string;
-    prefLanguages?: ("english" | "spanish" | "portuguese" | "other")[];
-    otherPrefLanguages?: string;
+    prefLanguage?: "english" | "spanish" | "portuguese" | "other";
+    otherPrefLanguage?: string;
     country?: string;
   };
   education?: {
@@ -70,22 +85,23 @@ export type User = {
     institution?: string;
     email?: string;
     gradDate?: string;
+    schoolCountry?: string;
   };
   associate?: {
     title?: string;
     specialization?: (
-      | "rare disease advocacy"
+      | "rare-disease-advocacy"
       | "research"
-      | "public health"
+      | "public-health"
       | "bioethics"
       | "law"
       | "biology"
-      | "medical writer"
-      | "medical science liason"
-      | "laboratory scientist"
+      | "medical-writer"
+      | "medical-science-liaison"
+      | "laboratory-scientist"
       | "professor"
       | "bioinformatics"
-      | "biotech sales and marketing"
+      | "biotech-sales-and-marketing"
     )[];
     organization?: string;
   };
@@ -138,24 +154,32 @@ export type User = {
   updatedAt: string;
 };
 
+export const formatUserFullName = (user: User) =>
+  `${user.personal.firstName} ${user.personal.lastName}`;
+
+export type PaginateUserResult = {
+  users: User[];
+  count: number;
+};
+
 export type EditBasicInfo = {
   newFirstName: string;
   newLastName: string;
   newEmail: string;
-  newPhone: string;
+  newPhone?: string;
 };
 
 export type ProfessionalInfo = {
   title: string;
-  prefLanguages: ("english" | "spanish" | "portuguese" | "other")[];
-  otherPrefLanguages: string;
+  prefLanguage: "english" | "spanish" | "portuguese" | "other";
+  otherPrefLanguage: string;
   country: string;
 };
 
 export type EditProfessionalInfo = {
   newTitle: string;
-  newPrefLanguages: ("english" | "spanish" | "portuguese" | "other")[];
-  newOtherPrefLanguages: string;
+  newPrefLanguage: "english" | "spanish" | "portuguese" | "other";
+  newOtherPrefLanguage: string;
   newCountry: string;
 };
 
@@ -183,6 +207,21 @@ export type EditDirectoryDisplayInformationRequestBody = {
   newLicense: string[];
   newRemoteOption: boolean;
   newRequestOption: boolean;
+  newAppointmentsOption: boolean;
+  newAuthorizedOption: string | boolean;
+};
+
+export type EditDirectoryPersonalInformationRequestBody = {
+  newDegree: string;
+  newEducationInstitution: string;
+  newClinicName?: string;
+  newClinicAddress?: string;
+  newClinicCountry?: string;
+  newClinicApartmentSuite?: string;
+  newClinicCity?: string;
+  newClinicState?: string;
+  newClinicZipPostCode?: string;
+  newClinicWebsiteUrl?: string;
 };
 
 export const createAuthHeader = (firebaseToken: string) => ({
@@ -251,6 +290,17 @@ export const loginUserWithEmailPassword = async (
   }
 };
 
+export const resetUserPassword = async (email: string): Promise<APIResult<null>> => {
+  const auth = getAuth();
+  try {
+    await sendPasswordResetEmail(auth, email);
+
+    return { success: true, data: null };
+  } catch (error) {
+    return handleAPIError(error);
+  }
+};
+
 /**
  * Logs out the current user from Firebase
  * @returns API result indicating success
@@ -265,12 +315,74 @@ export const logoutUser = async (): Promise<APIResult<null>> => {
   }
 };
 
+export const USERS_PAGE_SIZE = 20;
+
+export type FilterOptions = {
+  title: string[];
+  membership: string[];
+  education: string[];
+  services: string[];
+  location: string[];
+};
+
+export const getFilterOptions = async (
+  firebaseToken: string,
+  search = "",
+  isAdmin: boolean | "" = "",
+  inDirectory: boolean | "pending" | "" = "",
+): Promise<APIResult<FilterOptions>> => {
+  try {
+    const response = await get(
+      `/api/users/filterOptions?search=${search}&isAdmin=${String(isAdmin)}&inDirectory=${String(inDirectory)}`,
+      createAuthHeader(firebaseToken),
+    );
+    const data = (await response.json()) as FilterOptions;
+    return { success: true, data };
+  } catch (error) {
+    return handleAPIError(error);
+  }
+};
+
+export const getMultipleUsers = async (
+  firebaseToken: string,
+  sort: string,
+  search: string,
+  page: number,
+  isAdmin: boolean | "" = "",
+  inDirectory: boolean | "pending" | "" = "",
+  pageSize = USERS_PAGE_SIZE,
+  filters: Record<string, string[]> = {},
+): Promise<APIResult<PaginateUserResult>> => {
+  try {
+    const params = new URLSearchParams({
+      order: sort,
+      search,
+      page: String(page),
+      pageSize: String(pageSize),
+      isAdmin: String(isAdmin),
+      inDirectory: String(inDirectory),
+    });
+
+    // Add filter parameters
+    if (filters.title?.length) params.append("title", filters.title.join(","));
+    if (filters.membership?.length) params.append("membership", filters.membership.join(","));
+    if (filters.education?.length) params.append("education", filters.education.join(","));
+    if (filters.services?.length) params.append("services", filters.services.join(","));
+    if (filters.location?.length) params.append("country", filters.location.join(","));
+
+    const response = await get(`/api/users?${params.toString()}`, createAuthHeader(firebaseToken));
+    const data = (await response.json()) as PaginateUserResult;
+    return { success: true, data };
+  } catch (error) {
+    return handleAPIError(error);
+  }
+};
+
 export async function editBasicInfoRequest(
   basicInfo: EditBasicInfo,
   firebaseToken: string,
 ): Promise<APIResult<null>> {
   try {
-    //TODO: API result return type needs be updated when route written
     await put(
       "/api/users/general/personal-information",
       basicInfo,
@@ -310,6 +422,99 @@ export async function editDirectoryDisplayInfoRequest(
   }
 }
 
+export async function editDirectoryPersonalInfoRequest(
+  directoryInfo: EditDirectoryPersonalInformationRequestBody,
+  firebaseToken: string,
+): Promise<APIResult<null>> {
+  try {
+    await put(
+      "/api/users/directory/personal-information",
+      directoryInfo,
+      createAuthHeader(firebaseToken),
+    );
+    return { success: true, data: null };
+  } catch (error) {
+    return handleAPIError(error);
+  }
+}
+
+export async function editProfilePicture(
+  profilePicture: string,
+  firebaseToken: string,
+): Promise<APIResult<null>> {
+  try {
+    await put(
+      "/api/users/general/profile-picture",
+      { profilePicture },
+      createAuthHeader(firebaseToken),
+    );
+    return { success: true, data: null };
+  } catch (error) {
+    return handleAPIError(error);
+  }
+}
+
+export async function updateStudentInfo(
+  firebaseToken: string,
+  studentInfo: {
+    schoolCountry: string;
+    schoolName: string;
+    universityEmail: string;
+    degree: string;
+    programName: string;
+    gradDate: string;
+  },
+): Promise<APIResult<null>> {
+  try {
+    await put(
+      "/api/users/general/student-information",
+      studentInfo,
+      createAuthHeader(firebaseToken),
+    );
+    return { success: true, data: null };
+  } catch (error) {
+    return handleAPIError(error);
+  }
+}
+
+export async function updateAssociateInfo(
+  firebaseToken: string,
+  associateInfo: {
+    jobTitle: string;
+    specialization: string[];
+    isOrganizationRepresentative: string;
+    organizationName: string;
+  },
+): Promise<APIResult<null>> {
+  try {
+    await put(
+      "/api/users/general/associate-information",
+      associateInfo,
+      createAuthHeader(firebaseToken),
+    );
+    return { success: true, data: null };
+  } catch (error) {
+    return handleAPIError(error);
+  }
+}
+
+export async function editMembership(
+  newMembership: MembershipType,
+  firebaseToken: string,
+): Promise<APIResult<{ user: User; removedFromDirectory: boolean }>> {
+  try {
+    const response = await put(
+      "/api/users/membership",
+      { newMembership },
+      createAuthHeader(firebaseToken),
+    );
+    const data = (await response.json()) as { user: User; removedFromDirectory: boolean };
+    return { success: true, data };
+  } catch (error) {
+    return handleAPIError(error);
+  }
+}
+
 export const getUser = async (
   firebaseUid: string,
   firebaseToken: string,
@@ -318,6 +523,78 @@ export const getUser = async (
     const response = await get(`/api/users/${firebaseUid}`, createAuthHeader(firebaseToken));
     const data = (await response.json()) as User;
     return { success: true, data };
+  } catch (error) {
+    return handleAPIError(error);
+  }
+};
+
+export type ExportUsersFilters = {
+  search?: string;
+  isAdmin?: boolean | "";
+  inDirectory?: boolean | "pending" | "";
+  title?: string[];
+  membership?: string[];
+  education?: string[];
+  services?: string[];
+  country?: string[];
+};
+
+/**
+ * Export users as CSV file
+ * @param firebaseToken The Firebase authentication token
+ * @param userIds Optional array of user IDs to export specific users
+ * @param filters Optional filters to export users matching criteria
+ */
+export const exportUsers = async (
+  firebaseToken: string,
+  userIds?: string[],
+  filters?: ExportUsersFilters,
+): Promise<APIResult<null>> => {
+  try {
+    const requestBody: {
+      userIds?: string[];
+      search?: string;
+      isAdmin?: string;
+      inDirectory?: string;
+      title?: string[];
+      membership?: string[];
+      education?: string[];
+      services?: string[];
+      country?: string[];
+    } = {};
+
+    if (userIds && userIds.length > 0) {
+      requestBody.userIds = userIds;
+    } else if (filters) {
+      // Convert filters to match backend expectations
+      if (filters.search) requestBody.search = filters.search;
+      if (filters.isAdmin !== undefined && filters.isAdmin !== "")
+        requestBody.isAdmin = String(filters.isAdmin);
+      if (filters.inDirectory !== undefined && filters.inDirectory !== "")
+        requestBody.inDirectory = String(filters.inDirectory);
+      if (filters.title) requestBody.title = filters.title;
+      if (filters.membership) requestBody.membership = filters.membership;
+      if (filters.education) requestBody.education = filters.education;
+      if (filters.services) requestBody.services = filters.services;
+      if (filters.country) requestBody.country = filters.country;
+    }
+
+    const response = await post("/api/users/export", requestBody, createAuthHeader(firebaseToken));
+
+    // Get the CSV data as blob
+    const blob = await response.blob();
+
+    // Create a download link and trigger download
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `splagen_members_export_${String(Date.now())}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+
+    return { success: true, data: null };
   } catch (error) {
     return handleAPIError(error);
   }

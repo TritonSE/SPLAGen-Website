@@ -11,7 +11,7 @@ export type onboardingState = {
     professionalTitle: ProfessionalTitleOption;
     professionalTitleOther: string;
     country: CountryOption;
-    languages: string[];
+    language: string;
     membership: string;
     // Associate specific
     // see user modal
@@ -47,8 +47,8 @@ export type directoryState = {
     specialtyServices: string[];
     careLanguages: string[];
     authorizedForLanguages: boolean | string;
-    email: string;
-    phone: string;
+    workEmail: string;
+    workPhone: string;
     licenseType: "has_license" | "no_license";
     licenseNumber: string;
     noLicenseReason: string;

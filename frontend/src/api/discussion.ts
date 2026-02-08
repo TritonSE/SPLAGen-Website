@@ -1,16 +1,20 @@
-import { APIResult, get, handleAPIError, post } from "./requests";
-import { createAuthHeader } from "./users";
+import { APIResult, get, handleAPIError, httpDelete, post, put } from "./requests";
+import { User, createAuthHeader } from "./users";
 
 // Assuming the structure of a Discussion item
 export type Discussion = {
-  userName: string;
   _id: string;
   title: string;
   message: string;
   createdAt: string;
-  userId: string;
-  audience?: string;
-  time?: string;
+  updatedAt: string;
+  userId: User;
+  isSubscribed?: boolean;
+};
+
+export type PaginatedDiscussionResult = {
+  discussions: Discussion[];
+  count: number;
 };
 
 export const createPost = async (
@@ -21,11 +25,7 @@ export const createPost = async (
   firebaseToken: string,
 ): Promise<APIResult<Discussion>> => {
   try {
-    const response: Response = await post(
-      "/api/discussions",
-      postData,
-      createAuthHeader(firebaseToken),
-    );
+    const response = await post("/api/discussions", postData, createAuthHeader(firebaseToken));
     const data = (await response.json()) as Discussion;
 
     return { success: true, data };
@@ -34,15 +34,106 @@ export const createPost = async (
   }
 };
 
-export const getPost = async (token: string): Promise<APIResult<Discussion[]>> => {
+export const DISCUSSION_PAGE_SIZE = 5;
+
+export const getPosts = async (
+  token: string,
+  sort: string,
+  search: string,
+  mineOnly: boolean,
+  page: number,
+  pageSize = DISCUSSION_PAGE_SIZE,
+): Promise<APIResult<PaginatedDiscussionResult>> => {
   try {
-    const response: Response = await get("/api/discussions", createAuthHeader(token));
+    const response = await get(
+      `/api/discussions?page=${String(page)}&pageSize=${String(pageSize)}&order=${sort}&search=${search}&mine=${mineOnly ? "true" : "false"}`,
+      createAuthHeader(token),
+    );
 
-    if (!response.ok) {
-      return handleAPIError("Failed to fetch posts");
-    }
+    const json = (await response.json()) as PaginatedDiscussionResult;
+    return { success: true, data: json };
+  } catch (error) {
+    return handleAPIError(error);
+  }
+};
 
-    const json = (await response.json()) as Discussion[];
+export const getIndividualPost = async (
+  token: string,
+  discussionId: string,
+): Promise<APIResult<Discussion>> => {
+  try {
+    const response = await get(`/api/discussions/${discussionId}`, createAuthHeader(token));
+
+    const json = (await response.json()) as Discussion;
+    return { success: true, data: json };
+  } catch (error) {
+    return handleAPIError(error);
+  }
+};
+
+export const updateDiscussion = async (
+  token: string,
+  discussionId: string,
+  discussionData: {
+    title: string;
+    message: string;
+  },
+): Promise<APIResult<Discussion>> => {
+  try {
+    const response = await put(
+      `/api/discussions/${discussionId}`,
+      discussionData,
+      createAuthHeader(token),
+    );
+
+    const json = (await response.json()) as Discussion;
+    return { success: true, data: json };
+  } catch (error) {
+    return handleAPIError(error);
+  }
+};
+
+export const deleteDiscussion = async (
+  token: string,
+  discussionId: string,
+): Promise<APIResult<null>> => {
+  try {
+    await httpDelete(`/api/discussions/${discussionId}`, createAuthHeader(token));
+    return { success: true, data: null };
+  } catch (error) {
+    return handleAPIError(error);
+  }
+};
+
+export const subscribeToDiscussion = async (
+  token: string,
+  discussionId: string,
+): Promise<APIResult<{ message: string; isSubscribed: boolean }>> => {
+  try {
+    const response = await post(
+      `/api/discussions/${discussionId}/subscribe`,
+      undefined,
+      createAuthHeader(token),
+    );
+
+    const json = (await response.json()) as { message: string; isSubscribed: boolean };
+    return { success: true, data: json };
+  } catch (error) {
+    return handleAPIError(error);
+  }
+};
+
+export const unsubscribeFromDiscussion = async (
+  token: string,
+  discussionId: string,
+): Promise<APIResult<{ message: string; isSubscribed: boolean }>> => {
+  try {
+    const response = await httpDelete(
+      `/api/discussions/${discussionId}/subscribe`,
+      createAuthHeader(token),
+    );
+
+    const json = (await response.json()) as { message: string; isSubscribed: boolean };
     return { success: true, data: json };
   } catch (error) {
     return handleAPIError(error);

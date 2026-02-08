@@ -1,18 +1,23 @@
 "use client";
 
 import { useStateMachine } from "little-state-machine";
-import { useCallback, useState } from "react";
+import Link from "next/link";
+import { useCallback, useContext, useState } from "react";
+import { useTranslation } from "react-i18next";
 
-import {
-  DirectoryBasics,
-  DirectoryContact,
-  DirectoryServices,
-  Result,
-} from "@/components/directoryForm";
+import { Button } from "@/components";
+import { DirectoryBasics, DirectoryContact, DirectoryServices } from "@/components/directoryForm";
+import { UserContext } from "@/contexts/userContext";
+import { useRedirectToLoginIfNotSignedIn } from "@/hooks/useRedirection";
 import { directoryState } from "@/state/stateTypes";
 import updateDirectoryForm from "@/state/updateDirectoryForm";
 
 export default function DirectoryForm() {
+  useRedirectToLoginIfNotSignedIn();
+
+  const { t } = useTranslation();
+  const { user } = useContext(UserContext);
+
   const { actions } = useStateMachine({ actions: { updateDirectoryForm } });
   const [currentStep, setCurrentStep] = useState(1);
 
@@ -49,8 +54,8 @@ export default function DirectoryForm() {
       careLanguages: [],
       authorizedForLanguages: undefined,
       // Contact page fields
-      email: "",
-      phone: "",
+      workEmail: "",
+      workPhone: "",
       licenseType: "no_license",
       licenseNumber: "",
       noLicenseReason: "",
@@ -67,14 +72,37 @@ export default function DirectoryForm() {
       case 2:
         return <DirectoryServices onNext={handleNext} onBack={handleBack} />;
       case 3:
-        return <DirectoryContact onNext={handleNext} onBack={handleBack} />;
-      case 4:
-        return <Result onReset={handleReset} />;
+        return <DirectoryContact onReset={handleReset} onBack={handleBack} />;
       default:
         setCurrentStep(1);
         return <DirectoryBasics onNext={handleNext} />;
     }
   };
 
-  return <div className="w-full h-full">{renderStep()}</div>;
+  if (user && [true, "pending"].includes(user.account.inDirectory)) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full gap-3">
+        <p className="text-black font-[20px] font-bold">
+          {user.account.inDirectory === "pending"
+            ? t("already-applied-to-directory")
+            : t("already-in-directory")}
+        </p>
+        <Link href="/profile?tab=Directory">
+          <Button label={t("edit-directory-information")} />
+        </Link>
+      </div>
+    );
+  }
+
+  return (
+    <div className="w-full h-full flex flex-col gap-2 items-center pt-10">
+      <div className="flex flex-row items-center gap-8 whitespace-nowrap">
+        <Link href="/">
+          <Button variant="secondary" label={t("skip-for-now")} />
+        </Link>
+        <p>{t("join-directory-later")}</p>
+      </div>
+      {renderStep()}
+    </div>
+  );
 }

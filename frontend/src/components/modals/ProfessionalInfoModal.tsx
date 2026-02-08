@@ -2,23 +2,26 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import dynamic from "next/dynamic";
-import Image from "next/image";
-import React, { useCallback, useContext, useEffect } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import countryList from "react-select-country-list";
 import { z } from "zod";
 
-import ExitButton from "@/../public/icons/ExitButton.svg";
 import "./ProfessionalInfoModal.css";
-import { User, editProfessionalInfoRequest } from "@/api/users";
-import { PillButton } from "@/components";
+
+import { Modal } from "./Modal";
+
+import { User, editProfessionalInfoRequest, professionalTitleOptions } from "@/api/users";
+import { PillButton, ProfessionalTitleSelector } from "@/components";
+import { SuccessMessage } from "@/components/SuccessMessage";
+import { getCurrentLanguage } from "@/components/languageSwitcher";
 import { UserContext } from "@/contexts/userContext";
 
 type professionalInfoProps = {
   isOpen: boolean;
   onClose: () => void;
-  populationInfo: User;
+  populationInfo: User | null;
 };
 const CountryOptions = countryList().getData();
 
@@ -35,8 +38,6 @@ const getCountryOption = (value?: string | null) => {
   return CountryOptions.find((c) => c.value === value || c.label === value);
 };
 
-const ExitButtonSrc: string = ExitButton as unknown as string;
-
 const countrySchema = (t: (key: string) => string) =>
   z.object({
     value: z.string().min(1, t("invalid-country-selection")),
@@ -46,8 +47,11 @@ const countrySchema = (t: (key: string) => string) =>
 export const professionalInfoSchema = (t: (key: string) => string) =>
   z.object({
     professionalTitle: z.string().min(1, t("professional-title-required")),
+    professionalTitleOther: z.string(),
     country: countrySchema(t).optional(),
-    languages: z.array(z.string()).nonempty(t("one-language-required")),
+    language: z.enum(["english", "spanish", "portuguese", "other"], {
+      errorMap: () => ({ message: t("one-language-required") }),
+    }),
     splagenDirectory: z.boolean(),
   });
 
@@ -58,6 +62,10 @@ export const ProfessionalInfoModal = ({
   onClose,
   populationInfo,
 }: professionalInfoProps) => {
+  const isOtherProfessionalTitleOption = (value: string | undefined) =>
+    value &&
+    (value === "other" || !professionalTitleOptions.find((option) => option.value === value));
+
   const { t } = useTranslation();
   const {
     register,
@@ -66,168 +74,202 @@ export const ProfessionalInfoModal = ({
     control,
     watch,
     reset,
-    setValue,
-    setError,
   } = useForm<ProfessionalInfoFormData>({
     resolver: zodResolver(professionalInfoSchema(t)),
     defaultValues: {
-      professionalTitle: populationInfo?.professional?.title,
+      professionalTitle: isOtherProfessionalTitleOption(populationInfo?.professional?.title)
+        ? "other"
+        : populationInfo?.professional?.title,
+      professionalTitleOther: isOtherProfessionalTitleOption(populationInfo?.professional?.title)
+        ? populationInfo?.professional?.title
+        : "",
       country: getCountryOption(populationInfo?.professional?.country),
-      languages: populationInfo?.professional?.prefLanguages,
+      language:
+        populationInfo?.professional?.prefLanguage ?? getCurrentLanguage()?.dbValue ?? "english",
       splagenDirectory: populationInfo?.account.inDirectory === true,
     },
   });
-  const { firebaseUser } = useContext(UserContext);
+  const { firebaseUser, reloadUser } = useContext(UserContext);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const watchedLanguages = watch("languages");
-  const selectedLanguages = React.useMemo(
-    () => watchedLanguages || ["english"],
-    [watchedLanguages],
-  );
-
-  const toggleLanguage = useCallback(
-    (language: string) => {
-      const updatedLanguages = selectedLanguages.includes(language)
-        ? selectedLanguages.filter((lang) => lang !== language)
-        : [...selectedLanguages, language];
-
-      // Default to English if no language is selected
-      if (updatedLanguages.length === 0) {
-        setError("languages", {
-          type: "manual",
-          message: t("one-language-required-default-english"),
-        });
-      }
-
-      setValue(
-        "languages",
-        updatedLanguages.length ? (updatedLanguages as [string, ...string[]]) : ["english"],
-      );
-    },
-    [selectedLanguages, setValue, setError, t],
-  );
+  const watchedProfessionalTitle = watch("professionalTitle");
 
   // Sends form data to backend
   const onSubmit = useCallback<SubmitHandler<ProfessionalInfoFormData>>(
     async (data) => {
       if (!firebaseUser) return;
-      // backend expectsto have 'new' in the beginning of keys
-      const formattedData = {
-        newTitle: data.professionalTitle,
-        newPrefLanguages: data.languages as ("english" | "spanish" | "portuguese" | "other")[],
-        newOtherPrefLanguages: "",
-        newCountry: data.country?.label ?? "",
-      };
 
-      const firebaseToken = await firebaseUser.getIdToken();
-      const response = await editProfessionalInfoRequest(formattedData, firebaseToken);
-      if (response.success) {
-        onClose();
+      setErrorMessage("");
+      setSuccessMessage("");
+      setLoading(true);
+
+      try {
+        // backend expects to have 'new' in the beginning of keys
+        const formattedData = {
+          newTitle:
+            data.professionalTitle === "other"
+              ? data.professionalTitleOther
+              : data.professionalTitle,
+          newPrefLanguage: data.language,
+          newOtherPrefLanguage: "",
+          newCountry: data.country?.label ?? "",
+        };
+
+        const firebaseToken = await firebaseUser.getIdToken();
+        const response = await editProfessionalInfoRequest(formattedData, firebaseToken);
+        if (response.success) {
+          setSuccessMessage(t("professional-information-updated"));
+          await reloadUser();
+          onClose();
+        } else {
+          setErrorMessage(`${t("error-updating-info-colon")}: ${response.error}`);
+        }
+      } catch (err) {
+        setErrorMessage(`${t("error-updating-info-colon")}: ${String(err)}`);
+      } finally {
+        setLoading(false);
       }
     },
-    [onClose, firebaseUser],
+    [onClose, firebaseUser, setErrorMessage, setSuccessMessage, reloadUser, t],
   );
 
   // Populates form inputs when modal is opened
   useEffect(() => {
     if (isOpen && populationInfo) {
       reset({
-        professionalTitle: populationInfo.professional?.title,
+        professionalTitle: isOtherProfessionalTitleOption(populationInfo.professional?.title)
+          ? "other"
+          : populationInfo.professional?.title,
+        professionalTitleOther: isOtherProfessionalTitleOption(populationInfo.professional?.title)
+          ? populationInfo.professional?.title
+          : "",
         country: getCountryOption(populationInfo.professional?.country),
-        languages: populationInfo.professional?.prefLanguages,
+        language:
+          populationInfo.professional?.prefLanguage ?? getCurrentLanguage()?.dbValue ?? "english",
         splagenDirectory: populationInfo.account.inDirectory === true,
       });
     }
   }, [isOpen, populationInfo, reset]);
 
-  const handleFormSubmit = useCallback(
-    (e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
-      void handleSubmit(onSubmit)();
-    },
-    [handleSubmit, onSubmit],
-  );
-
-  if (!isOpen) return null;
-
   return (
-    <div className="modal-overlay">
-      <div className="modal-container">
-        <button className="close-button" onClick={onClose}>
-          <Image src={ExitButtonSrc} alt="Exit" />
-        </button>
-        <h2 id="prof-info-h2">{t("edit-professional-info")}</h2>
-        <form className="prof-info-form" onSubmit={handleFormSubmit}>
-          {/* Professional Title */}
-          <div className="prof-info-field">
-            <label htmlFor="professionalTitle">
-              {t("professional-title")}
-              <span className="red-text">*</span>
-            </label>
-            <input
-              type="text"
-              id="professionalTitle"
-              placeholder={t("professional-title-placeholder")}
-              {...register("professionalTitle")}
-            />
-            <p className="error-message">{errors.professionalTitle?.message ?? "\u00A0"}</p>
-          </div>
+    <>
+      <Modal
+        isOpen={isOpen}
+        onClose={onClose}
+        title={t("edit-professional-info")}
+        onSave={handleSubmit(onSubmit)}
+        loading={loading}
+        content={
+          <>
+            <form className="prof-info-form">
+              {/* Professional Title */}
+              <div className="prof-info-field">
+                <label htmlFor="professionalTitle">
+                  {t("professional-title")}
+                  <span className="red-text">*</span>
+                </label>
 
-          {/* Country */}
-          <div className="prof-info-field">
-            <label>{t("country")}</label>
-            <Controller
-              control={control}
-              name="country"
-              render={({ field }) => (
-                <CountrySelector
-                  value={field.value ?? null}
-                  onChange={field.onChange}
-                  placeholder={t("country-ellipsis")}
+                <Controller
+                  name="professionalTitle"
+                  control={control}
+                  render={({ field }) => (
+                    <ProfessionalTitleSelector
+                      value={
+                        professionalTitleOptions.find((option) => option.value === field.value) ??
+                        null
+                      }
+                      onChange={(newValue) => {
+                        field.onChange(newValue?.value);
+                      }}
+                    />
+                  )}
                 />
+                <p className="error-message">{errors.professionalTitle?.message ?? "\u00A0"}</p>
+              </div>
+
+              {/* Professional title other - please specify */}
+
+              {isOtherProfessionalTitleOption(watchedProfessionalTitle) && (
+                <div className="prof-info-field">
+                  <label htmlFor="professionalTitleOther">{t("please-specify")}</label>
+                  <Controller
+                    name="professionalTitleOther"
+                    control={control}
+                    render={() => (
+                      <input
+                        {...register("professionalTitleOther")}
+                        placeholder={t("please-specify")}
+                      />
+                    )}
+                  />
+
+                  <p className="error-message">
+                    {errors.professionalTitleOther?.message ?? "\u00A0"}
+                  </p>
+                </div>
               )}
-            />
-            <p className="error-message">{errors.country?.message ?? "\u00A0"}</p>
-          </div>
 
-          {/* Languages */}
-          <div className="prof-info-field">
-            <label htmlFor="languages">
-              {t("preferred-language")}
-              <span className="red-text">*</span>
-            </label>
-            <div className="language-options">
-              {languages.map((language) => (
-                <PillButton
-                  label={t(language)}
-                  key={language}
-                  isActive={selectedLanguages.includes(language)}
-                  onClick={() => {
-                    toggleLanguage(language);
-                  }}
+              {/* Country */}
+              <div className="prof-info-field">
+                <label>{t("country")}</label>
+                <Controller
+                  control={control}
+                  name="country"
+                  render={({ field }) => (
+                    <CountrySelector
+                      value={field.value ?? null}
+                      onChange={field.onChange}
+                      placeholder={t("country-ellipsis")}
+                    />
+                  )}
                 />
-              ))}
-            </div>
-            <p className="error-message">
-              {errors.languages?.message && typeof errors.languages.message === "string"
-                ? errors.languages.message
-                : "\u00A0"}
-            </p>
-          </div>
+                <p className="error-message">{errors.country?.message ?? "\u00A0"}</p>
+              </div>
 
-          {/* SPLAGen Directory */}
-          <div className="prof-info-field no-error-message-field">
-            <label>
-              {t("splagen-directory")}
-              <span className="red-text">*</span>
-            </label>
-            <p>{watch("splagenDirectory") ? t("yes") : t("no")}</p>
-          </div>
-          <button type="submit" id="prof-info-submit" className="button">
-            {t("save")}
-          </button>
-        </form>
-      </div>
-    </div>
+              {/* Language */}
+              <div className="prof-info-field">
+                <label htmlFor="language">
+                  {t("preferred-language")}
+                  <span className="red-text">*</span>
+                </label>
+                <Controller
+                  name="language"
+                  control={control}
+                  render={({ field }) => (
+                    <div className="language-options">
+                      {languages.map((language) => (
+                        <PillButton
+                          label={t(language)}
+                          key={language}
+                          isActive={field.value === language}
+                          onClick={() => {
+                            field.onChange(language);
+                          }}
+                        />
+                      ))}
+                    </div>
+                  )}
+                />
+                <p className="error-message">
+                  {errors.language?.message && typeof errors.language.message === "string"
+                    ? errors.language.message
+                    : "\u00A0"}
+                </p>
+              </div>
+
+              {errorMessage && <div className="text-red-500">{errorMessage}</div>}
+            </form>
+          </>
+        }
+      />
+      <SuccessMessage
+        message={successMessage}
+        onDismiss={() => {
+          setSuccessMessage("");
+        }}
+      />
+    </>
   );
 };
