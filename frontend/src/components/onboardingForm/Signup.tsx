@@ -145,8 +145,8 @@ export const SignUp = ({ onNext }: SignUpProps) => {
 
           <div className={style.inputGroup}>
             <label htmlFor="email" className={style.label}>
-              Phone number
-              <span className={style.optionalText}> (optional)</span>
+              {t("phone-number")}
+              <span className={style.optionalText}> {t("optional")}</span>
             </label>
 
             <Controller
@@ -154,7 +154,7 @@ export const SignUp = ({ onNext }: SignUpProps) => {
               control={control}
               render={({ field }) => (
                 <PhoneInput
-                  placeholder="Enter your phone number"
+                  placeholder={t("enter-phone-number")}
                   value={field.value}
                   onChange={field.onChange}
                   defaultCountry="US"

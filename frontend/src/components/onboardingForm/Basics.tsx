@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import Image from "next/image";
 import { useCallback, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 
 import styles from "./Basics.module.css";
 
@@ -31,6 +32,7 @@ type BasicsProps = {
 };
 
 export const Basics = ({ onNext, onBack }: BasicsProps) => {
+  const { t } = useTranslation();
   const { state, actions } = useStateMachine({ actions: { updateOnboardingForm } });
 
   const [selectedCountry, setSelectedCountry] = useState<CountryOption | null>(null);
@@ -59,22 +61,22 @@ export const Basics = ({ onNext, onBack }: BasicsProps) => {
   );
 
   const languageOptions = [
-    { value: "ES", label: "Spanish" },
-    { value: "EN", label: "English" },
-    { value: "PT", label: "Portuguese" },
-    { value: "OTH", label: "Other" },
+    { value: "ES", label: t("spanish") },
+    { value: "EN", label: t("english") },
+    { value: "PT", label: t("portuguese") },
+    { value: "OTH", label: t("other") },
   ];
 
   return (
     <div className={styles.container}>
       <form onSubmit={handleFormSubmit} className={styles.form}>
         <div>
-          <h2 className={styles.title}>Let&apos;s start with the basics</h2>
-          <p className={styles.subtitle}>Help us get to know you</p>
+          <h2 className={styles.title}>{t("basics-title")}</h2>
+          <p className={styles.subtitle}>{t("basics-subtitle")}</p>
         </div>
 
         <div>
-          <label className={styles.label}>Professional Title</label>
+          <label className={styles.label}>{t("professional-title")}</label>
           <Controller
             name="professionalTitle"
             control={control}
@@ -93,7 +95,7 @@ export const Basics = ({ onNext, onBack }: BasicsProps) => {
 
         {selectedProfessionalTitle?.value === "other" && (
           <div>
-            <label className={styles.label}>Please Specify</label>
+            <label className={styles.label}>{t("please-specify")}</label>
             <Controller
               name="professionalTitleOther"
               control={control}
@@ -102,7 +104,7 @@ export const Basics = ({ onNext, onBack }: BasicsProps) => {
                 <input
                   {...register("professionalTitleOther")}
                   className={styles.input}
-                  placeholder="Please specify"
+                  placeholder={t("please-specify")}
                 />
               )}
             />
@@ -111,8 +113,8 @@ export const Basics = ({ onNext, onBack }: BasicsProps) => {
 
         <div>
           <label className={styles.label}>
-            Country
-            <span className={styles.optionalText}> (optional)</span>
+            {t("country")}
+            <span className={styles.optionalText}> {t("optional")}</span>
           </label>
           <Controller
             name="country"
@@ -125,14 +127,14 @@ export const Basics = ({ onNext, onBack }: BasicsProps) => {
                   setSelectedCountry(option);
                   field.onChange(option);
                 }}
-                placeholder="Select country"
+                placeholder={t("select-country")}
               />
             )}
           />
         </div>
 
         <div>
-          <label className={styles.label}>Preferred Language</label>
+          <label className={styles.label}>{t("preferred-language")}</label>
           <Controller
             name="language"
             control={control}
@@ -160,44 +162,41 @@ export const Basics = ({ onNext, onBack }: BasicsProps) => {
         </div>
 
         <div className={styles.membershipSection}>
-          <h3 className={styles.sectionTitle}>Membership</h3>
-          <p className={styles.sectionText}>
-            The next section of the questionnaire will place you in a membership category. First,
-            review the different types below by clicking on the &quot;+&quot; icon.
-          </p>
+          <h3 className={styles.sectionTitle}>{t("membership-section-title")}</h3>
+          <p className={styles.sectionText}>{t("membership-section-text")}</p>
 
-          <h4 className={styles.membershipLabel}>Genetic Counselor</h4>
+          <h4 className={styles.membershipLabel}>{t("membership-genetic-counselor")}</h4>
           <ExpandableSection
-            title="Genetic Counselor Membership"
-            content="Full membership should be extended to any individual who holds a master's degree from an accredited genetic counseling training program. Full members can attend all meetings open to members, vote, serve as officers, committee chairs and on the Board of Directors."
+            title={t("membership-genetic-counselor-title")}
+            content={t("membership-genetic-counselor-desc")}
           />
 
-          <h4 className={styles.membershipLabel}>Healthcare Provider</h4>
+          <h4 className={styles.membershipLabel}>{t("membership-healthcare-provider")}</h4>
           <ExpandableSection
-            title="Healthcare Provider Membership"
-            content="Full membership should be extended to any individual who has an MD, master's or doctorate degree in a related field, such as nursing, social work or public health, and has had formal training in genetic counseling with at least 1 year of formal clinical training in genetics or has obtained a certificate in genetic counseling training and has at least 3 years of clinical experience in a role where their primary responsibility is genetic counseling. Full members can attend all meetings of members, vote, serve as officers, committee chairs and on the Board of Directors."
+            title={t("membership-healthcare-provider-title")}
+            content={t("membership-healthcare-provider-desc")}
           />
 
-          <h4 className={styles.membershipLabel}>Associate Member</h4>
+          <h4 className={styles.membershipLabel}>{t("membership-associate")}</h4>
           <ExpandableSection
-            title="Associate Membership"
-            content="Associate membership will be granted to all applicants interested in supporting the mission of Splagen and who are not eligible for full or student membership. Interested individuals can submit an application and, upon approval by officials, associated membership can be granted or denied. Associate members have all the privileges of full members, but are not eligible for a position on the Board of Directors and can only vote, hold positions as committee chairs and leadership positions related to their specialty and professional background."
+            title={t("membership-associate-title")}
+            content={t("membership-associate-desc")}
           />
 
-          <h4 className={styles.membershipLabel}>Student</h4>
+          <h4 className={styles.membershipLabel}>{t("membership-student")}</h4>
           <ExpandableSection
-            title="Student Membership"
-            content="Student membership will be granted to students enrolled in genetic counseling programs offered by an accredited institution, as well as to students enrolled in other degree-granting programs and who are interested in supporting the mission of society. Interested students can submit an application and, upon approval by officials, student membership can be granted or denied. Student members have the privileges of full members; however, they will not be granted a vote on issues or elections open to full and associate members. Student members are not eligible to serve on the Board of Directors or as committee chairs, with the exception of any committee specifically created for students. Student leadership roles will be filled by genetic counseling students."
+            title={t("membership-student-title")}
+            content={t("membership-student-desc")}
           />
         </div>
 
         <div className={styles.buttonContainer}>
           <button type="button" onClick={onBack} className={styles.backButton}>
             <Image src="/icons/ic_caretleft.svg" alt="Back Icon" width={24} height={24} />
-            Back
+            {t("back")}
           </button>
 
-          <Button type="submit" label="Continue" />
+          <Button type="submit" label={t("continue")} />
         </div>
       </form>
     </div>

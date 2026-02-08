@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Radio } from "@tritonse/tse-constellation";
 import React, { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 import { z } from "zod";
 
 import styles from "./EditAssociateInfoModal.module.css";
@@ -14,16 +15,17 @@ import { SuccessMessage } from "@/components/SuccessMessage";
 import { SPECIALIZATIONS } from "@/constants/specializations";
 import { UserContext } from "@/contexts/userContext";
 
-const schema = z.object({
-  jobTitle: z.string().min(1, "Job title is required"),
-  specialization: z.array(z.string()).min(1, "Please select at least one specialization"),
-  isOrganizationRepresentative: z.enum(["yes", "no"], {
-    errorMap: () => ({ message: "Please select an option" }),
-  }),
-  organizationName: z.string().optional(),
-});
+const schema = (t: (key: string) => string) =>
+  z.object({
+    jobTitle: z.string().min(1, t("job-title-required")),
+    specialization: z.array(z.string()).min(1, t("select-at-least-one-specialization-required")),
+    isOrganizationRepresentative: z.enum(["yes", "no"], {
+      errorMap: () => ({ message: t("please-select-option") }),
+    }),
+    organizationName: z.string().optional(),
+  });
 
-type FormData = z.infer<typeof schema>;
+type FormData = z.infer<ReturnType<typeof schema>>;
 
 export const EditAssociateInfoModal = ({
   isOpen,
@@ -34,6 +36,7 @@ export const EditAssociateInfoModal = ({
   onClose: () => void;
   populationInfo: User | null;
 }) => {
+  const { t } = useTranslation();
   const {
     control,
     register,
@@ -43,7 +46,7 @@ export const EditAssociateInfoModal = ({
     watch,
     setValue,
   } = useForm<FormData>({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(schema(t)),
   });
 
   const { firebaseUser, reloadUser } = useContext(UserContext);
@@ -72,7 +75,7 @@ export const EditAssociateInfoModal = ({
   const toggleSpecialization = useCallback(
     (specialization: string) => {
       const currentSpecializations = [...watchSpecializations];
-      const index = currentSpecializations.indexOf(specialization.toLowerCase());
+      const index = currentSpecializations.indexOf(specialization);
 
       if (index === -1) {
         currentSpecializations.push(specialization);
@@ -96,31 +99,28 @@ export const EditAssociateInfoModal = ({
       try {
         const firebaseToken = await firebaseUser.getIdToken();
 
-        // Normalize specializations
-        const specialization = data.specialization.map((s) => s.toLowerCase()).filter(Boolean);
-
         const response = await updateAssociateInfo(firebaseToken, {
           jobTitle: data.jobTitle,
-          specialization,
+          specialization: data.specialization,
           isOrganizationRepresentative: data.isOrganizationRepresentative,
           // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
           organizationName: data.organizationName || "",
         });
 
         if (response.success) {
-          setSuccessMessage("Associate information updated successfully!");
+          setSuccessMessage(t("associate-information-updated"));
           await reloadUser();
           onClose();
         } else {
-          setError(`Error updating info: ${response.error}`);
+          setError(`${t("error-updating-info-colon")}: ${response.error}`);
         }
       } catch (err) {
-        setError(err instanceof Error ? err.message : "An error occurred");
+        setError(err instanceof Error ? err.message : t("an-error-occurred"));
       } finally {
         setLoading(false);
       }
     },
-    [firebaseUser, reloadUser, onClose],
+    [firebaseUser, reloadUser, onClose, t],
   );
 
   const handleSave = useCallback(() => {
@@ -130,19 +130,17 @@ export const EditAssociateInfoModal = ({
   const content = (
     <>
       <div className={styles.field}>
-        <label className={styles.label}>
-          What is your job title or the name of the service you provide?
-        </label>
+        <label className={styles.label}>{t("job-title-question")}</label>
         <input
           {...register("jobTitle")}
           className={styles.input}
-          placeholder="e.g., Genetic Counselor"
+          placeholder={t("job-title-placeholder")}
         />
         {errors.jobTitle && <span className={styles.error}>{errors.jobTitle.message}</span>}
       </div>
 
       <div className={styles.field}>
-        <label className={styles.label}>Area of Specialization</label>
+        <label className={styles.label}>{t("area-of-specialization")}</label>
         <Controller
           name="specialization"
           control={control}
@@ -150,17 +148,17 @@ export const EditAssociateInfoModal = ({
           render={() => (
             <div className={styles.specializationContainer}>
               {SPECIALIZATIONS.map((specialization) => {
-                const isSelected = watchSpecializations.includes(specialization.toLowerCase());
+                const isSelected = watchSpecializations.includes(specialization);
                 return (
                   <button
                     key={specialization}
                     type="button"
                     className={`${styles.specializationButton} ${isSelected ? styles.specializationButtonSelected : ""}`}
                     onClick={() => {
-                      toggleSpecialization(specialization.toLowerCase());
+                      toggleSpecialization(specialization);
                     }}
                   >
-                    {specialization}
+                    {t(specialization)}
                   </button>
                 );
               })}
@@ -173,11 +171,11 @@ export const EditAssociateInfoModal = ({
       </div>
 
       <div className={styles.field}>
-        <label className={styles.label}>Are you a representative of an organization?</label>
+        <label className={styles.label}>{t("organization-representative-question")}</label>
         <div className={styles.radioGroup}>
           <Radio
             id="representative-yes"
-            label="Yes"
+            label={t("yes")}
             checked={isRepresentative === "yes"}
             onChange={() => {
               setValue("isOrganizationRepresentative", "yes");
@@ -185,7 +183,7 @@ export const EditAssociateInfoModal = ({
           />
           <Radio
             id="representative-no"
-            label="No"
+            label={t("no")}
             checked={isRepresentative === "no"}
             onChange={() => {
               setValue("isOrganizationRepresentative", "no");
@@ -198,13 +196,11 @@ export const EditAssociateInfoModal = ({
       </div>
 
       <div className={styles.field}>
-        <label className={styles.label}>
-          If yes, what is the name of the organization you are representing?
-        </label>
+        <label className={styles.label}>{t("organization-name-question")}</label>
         <input
           {...register("organizationName")}
           className={styles.input}
-          placeholder="Name of organization"
+          placeholder={t("organization-name-placeholder")}
         />
         {errors.organizationName && (
           <span className={styles.error}>{errors.organizationName.message}</span>
@@ -216,7 +212,7 @@ export const EditAssociateInfoModal = ({
   return (
     <>
       <Modal
-        title="Edit Associate Information"
+        title={t("edit-associate-information")}
         content={content}
         isOpen={isOpen}
         onClose={onClose}

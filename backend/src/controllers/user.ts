@@ -681,18 +681,18 @@ export const exportUsers = async (
     };
 
     const specializationMap: Record<string, string> = {
-      "rare disease advocacy": "Rare Disease Advocacy",
+      "rare-disease-advocacy": "Rare Disease Advocacy",
       research: "Research",
-      "public health": "Public Health",
+      "public-health": "Public Health",
       bioethics: "Bioethics",
       law: "Law",
       biology: "Biology",
-      "medical writer": "Medical Writer",
-      "medical science liason": "Medical Science Liaison",
-      "laboratory scientist": "Laboratory Scientist",
+      "medical-writer": "Medical Writer",
+      "medical-science-liaison": "Medical Science Liaison",
+      "laboratory-scientist": "Laboratory Scientist",
       professor: "Professor",
       bioinformatics: "Bioinformatics",
-      "biotech sales and marketing": "Biotech Sales and Marketing",
+      "biotech-sales-and-marketing": "Biotech Sales and Marketing",
     };
 
     const serviceMap: Record<string, string> = {

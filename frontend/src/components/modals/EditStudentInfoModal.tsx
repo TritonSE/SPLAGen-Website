@@ -5,6 +5,7 @@ import { Radio } from "@tritonse/tse-constellation";
 import dynamic from "next/dynamic";
 import React, { useCallback, useContext, useEffect, useState } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 import { z } from "zod";
 
 import styles from "./EditStudentInfoModal.module.css";
@@ -21,21 +22,22 @@ const CountrySelector = dynamic(() => import("@/components").then((mod) => mod.C
   ssr: false,
 });
 
-const schema = z.object({
-  schoolCountry: z.object({
-    value: z.string().min(1, "School country is required"),
-    label: z.string(),
-  }),
-  schoolName: z.string().min(1, "School name is required"),
-  universityEmail: z.string().email("Invalid email format"),
-  degree: z.enum(["masters", "diploma", "fellowship", "md", "phd", "other"], {
-    errorMap: () => ({ message: "Please select a degree" }),
-  }),
-  programName: z.string().min(1, "Program name is required"),
-  gradDate: z.string().min(1, "Graduation date is required"),
-});
+const schema = (t: (key: string) => string) =>
+  z.object({
+    schoolCountry: z.object({
+      value: z.string().min(1, t("school-country-required")),
+      label: z.string(),
+    }),
+    schoolName: z.string().min(1, t("school-name-required")),
+    universityEmail: z.string().email(t("invalid-email-format")),
+    degree: z.enum(["masters", "diploma", "fellowship", "md", "phd", "other"], {
+      errorMap: () => ({ message: t("please-select-degree") }),
+    }),
+    programName: z.string().min(1, t("program-name-required")),
+    gradDate: z.string().min(1, t("graduation-date-required")),
+  });
 
-type FormData = z.infer<typeof schema>;
+type FormData = z.infer<ReturnType<typeof schema>>;
 
 export const EditStudentInfoModal = ({
   isOpen,
@@ -46,6 +48,7 @@ export const EditStudentInfoModal = ({
   onClose: () => void;
   populationInfo: User | null;
 }) => {
+  const { t } = useTranslation();
   const {
     control,
     register,
@@ -55,7 +58,7 @@ export const EditStudentInfoModal = ({
     watch,
     setValue,
   } = useForm<FormData>({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(schema(t)),
   });
 
   const { firebaseUser, reloadUser } = useContext(UserContext);
@@ -111,19 +114,19 @@ export const EditStudentInfoModal = ({
         });
 
         if (response.success) {
-          setSuccessMessage("Student information updated successfully!");
+          setSuccessMessage(t("student-information-updated"));
           await reloadUser();
           onClose();
         } else {
-          setError(`Error updating info: ${response.error}`);
+          setError(`${t("error-updating-info-colon")}: ${response.error}`);
         }
       } catch (err) {
-        setError(err instanceof Error ? err.message : "An error occurred");
+        setError(err instanceof Error ? err.message : t("an-error-occurred"));
       } finally {
         setLoading(false);
       }
     },
-    [firebaseUser, reloadUser, onClose],
+    [firebaseUser, reloadUser, onClose, t],
   );
 
   const handleSave = useCallback(() => {
@@ -133,7 +136,7 @@ export const EditStudentInfoModal = ({
   const content = (
     <>
       <div className={styles.field}>
-        <label className={styles.label}>School Location</label>
+        <label className={styles.label}>{t("school-location")}</label>
         <Controller
           name="schoolCountry"
           control={control}
@@ -156,21 +159,21 @@ export const EditStudentInfoModal = ({
       </div>
 
       <div className={styles.field}>
-        <label className={styles.label}>School Name</label>
+        <label className={styles.label}>{t("school-name")}</label>
         <input
           {...register("schoolName")}
           className={styles.input}
-          placeholder="e.g., University of California, San Diego"
+          placeholder={t("school-name-placeholder")}
         />
         {errors.schoolName && <span className={styles.error}>{errors.schoolName.message}</span>}
       </div>
 
       <div className={styles.field}>
-        <label className={styles.label}>University Email</label>
+        <label className={styles.label}>{t("university-email")}</label>
         <input
           {...register("universityEmail")}
           className={styles.input}
-          placeholder="Enter your school email"
+          placeholder={t("enter-school-email")}
           type="email"
         />
         {errors.universityEmail && (
@@ -179,11 +182,11 @@ export const EditStudentInfoModal = ({
       </div>
 
       <div className={styles.field}>
-        <label className={styles.label}>Degree</label>
+        <label className={styles.label}>{t("degree")}</label>
         <div className={styles.radioGroup}>
           <Radio
             id="degree-ms"
-            label="MS"
+            label={t("masters")}
             checked={selectedDegree === "masters"}
             onChange={() => {
               setValue("degree", "masters");
@@ -191,7 +194,7 @@ export const EditStudentInfoModal = ({
           />
           <Radio
             id="degree-phd"
-            label="PhD"
+            label={t("phd")}
             checked={selectedDegree === "phd"}
             onChange={() => {
               setValue("degree", "phd");
@@ -199,7 +202,7 @@ export const EditStudentInfoModal = ({
           />
           <Radio
             id="degree-md"
-            label="MD"
+            label={t("md")}
             checked={selectedDegree === "md"}
             onChange={() => {
               setValue("degree", "md");
@@ -210,14 +213,22 @@ export const EditStudentInfoModal = ({
       </div>
 
       <div className={styles.field}>
-        <label className={styles.label}>Program Name or Department</label>
-        <input {...register("programName")} className={styles.input} placeholder="Enter name" />
+        <label className={styles.label}>{t("program-name-or-department")}</label>
+        <input
+          {...register("programName")}
+          className={styles.input}
+          placeholder={t("enter-name")}
+        />
         {errors.programName && <span className={styles.error}>{errors.programName.message}</span>}
       </div>
 
       <div className={styles.field}>
-        <label className={styles.label}>Graduation Date</label>
-        <input {...register("gradDate")} className={styles.input} placeholder="MM/YY" />
+        <label className={styles.label}>{t("graduation-date")}</label>
+        <input
+          {...register("gradDate")}
+          className={styles.input}
+          placeholder={t("graduation-date-placeholder")}
+        />
         {errors.gradDate && <span className={styles.error}>{errors.gradDate.message}</span>}
       </div>
     </>
@@ -226,7 +237,7 @@ export const EditStudentInfoModal = ({
   return (
     <>
       <Modal
-        title="Edit Student Information"
+        title={t("edit-student-information")}
         content={content}
         isOpen={isOpen}
         onClose={onClose}

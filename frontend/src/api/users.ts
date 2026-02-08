@@ -9,17 +9,17 @@ import { initFirebase } from "@/firebase/firebase";
 export type MembershipType = "student" | "geneticCounselor" | "healthcareProvider" | "associate";
 
 export const membershipDisplayMap: Record<string, string> = {
-  student: "Student",
-  geneticCounselor: "Genetic Counselor",
-  healthcareProvider: "Healthcare Provider",
-  associate: "Associate",
+  student: "student-membership",
+  geneticCounselor: "genetic-counselor-membership",
+  healthcareProvider: "healthcare-provider-membership",
+  associate: "associate-membership",
 };
 
 export const professionalTitleOptions = [
-  { value: "medical_geneticist", label: "Medical Geneticist" },
-  { value: "genetic_counselor", label: "Genetic Counselor" },
-  { value: "student", label: "Student" },
-  { value: "other", label: "Other" },
+  { value: "medical_geneticist", label: "medical-geneticist" },
+  { value: "genetic_counselor", label: "genetic-counselor-title" },
+  { value: "student", label: "student-title" },
+  { value: "other", label: "other" },
 ] as const;
 
 // Define CreateUserRequestBody type based on backend requirements
@@ -90,18 +90,18 @@ export type User = {
   associate?: {
     title?: string;
     specialization?: (
-      | "rare disease advocacy"
+      | "rare-disease-advocacy"
       | "research"
-      | "public health"
+      | "public-health"
       | "bioethics"
       | "law"
       | "biology"
-      | "medical writer"
-      | "medical science liason"
-      | "laboratory scientist"
+      | "medical-writer"
+      | "medical-science-liaison"
+      | "laboratory-scientist"
       | "professor"
       | "bioinformatics"
-      | "biotech sales and marketing"
+      | "biotech-sales-and-marketing"
     )[];
     organization?: string;
   };

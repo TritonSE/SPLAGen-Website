@@ -20,7 +20,7 @@ export const RootLayoutComponent = ({
     () => ["/signup", "/login", "/forgotLogin", "/directoryForm"].includes(pathname),
     [pathname],
   );
-  const isDirectoryMap = useMemo(() => pathname === "/directoryMap", [pathname]);
+  const isDirectoryMap = useMemo(() => pathname.startsWith("/directoryMap"), [pathname]);
   const isOnboardingFlowOrMap = isOnboardingFlow || isDirectoryMap;
 
   return (

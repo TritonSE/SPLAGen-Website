@@ -2,6 +2,7 @@
 
 import { GoogleMap, InfoWindow, Marker, useJsApiLoader } from "@react-google-maps/api";
 import React, { useCallback, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import type { Counselor } from "@/api/directory";
 import type { APIResult } from "@/api/requests";
@@ -33,43 +34,38 @@ const geocodeAddress = async (address: string): Promise<GeoLocation> => {
   return data.results?.[0]?.geometry?.location ?? { lat: 0, lng: 0 };
 };
 
-const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
-const formatList = (arr: string[]) =>
-  arr.length ? Array.from(new Set(arr)).map(capitalize).join(", ") : "—";
-
-// Professional title display map
+// Professional title display map - now using translation keys
 const professionalTitleMap: Record<string, string> = {
-  medical_geneticist: "Medical Geneticist",
-  genetic_counselor: "Genetic Counselor",
-  student: "Student",
-  other: "Other",
+  medical_geneticist: "medical-geneticist",
+  genetic_counselor: "genetic-counselor-title",
+  student: "student-title",
+  other: "other",
 };
 
-const formatTitle = (title: string): string => {
-  return professionalTitleMap[title] || capitalize(title);
-};
+// Available languages and specializations for filtering - using translation keys
+const AVAILABLE_LANGUAGES = ["english", "spanish", "portuguese", "other"];
 
-// Available languages and specializations for filtering
-const AVAILABLE_LANGUAGES = ["English", "Spanish", "Portuguese", "Other"];
+// Service keys matching backend enum values
 const AVAILABLE_SPECIALIZATIONS = [
-  "Pediatrics",
-  "Cardiovascular",
-  "Neurogenetics",
-  "Rare Diseases",
-  "Cancer",
-  "Biochemical",
-  "Prenatal",
-  "Adult",
-  "Psychiatric",
-  "Reproductive",
-  "Ophthalmic",
-  "Research",
-  "Pharmacogenomics",
-  "Metabolic",
-  "Other",
+  "pediatrics",
+  "cardiovascular",
+  "neurogenetics",
+  "rareDiseases",
+  "cancer",
+  "biochemical",
+  "prenatal",
+  "adult",
+  "psychiatric",
+  "reproductive",
+  "ophthalmic",
+  "research",
+  "pharmacogenomics",
+  "metabolic",
+  "other",
 ];
 
 export default function DirectoryMapPage() {
+  const { t } = useTranslation();
   const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
     googleMapsApiKey: env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,
@@ -84,20 +80,23 @@ export default function DirectoryMapPage() {
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
   const [selectedSpecializations, setSelectedSpecializations] = useState<string[]>([]);
 
+  // Helper functions for translation
+  const formatTitle = (title: string): string => {
+    return t(professionalTitleMap[title] || "other");
+  };
+
+  const formatTranslatedList = (arr: string[]): string => {
+    if (!arr.length) return "—";
+    return Array.from(new Set(arr))
+      .map((item) => t(item.toLowerCase()))
+      .join(", ");
+  };
+
   const loadDirectory = useCallback(async () => {
     const result: APIResult<Counselor[]> = await getPublicDirectory(
       searchQuery || undefined,
-      selectedLanguages.length > 0 ? selectedLanguages.map((l) => l.toLowerCase()) : undefined,
-      selectedSpecializations.length > 0
-        ? selectedSpecializations.map((s) => {
-            // Map display names back to backend values
-            const serviceMap: Record<string, string> = {
-              "Rare Diseases": "rareDiseases",
-            };
-            const lowerCase = s.toLowerCase();
-            return serviceMap[s] || lowerCase.replace(/\s+/g, "");
-          })
-        : undefined,
+      selectedLanguages.length > 0 ? selectedLanguages : undefined,
+      selectedSpecializations.length > 0 ? selectedSpecializations : undefined,
     );
 
     if (!result.success) {
@@ -134,21 +133,26 @@ export default function DirectoryMapPage() {
     );
   };
 
-  if (!isLoaded) return <p className="p-4">Loading map…</p>;
-  if (error) return <p className="text-red-600 p-4">Error: {error}</p>;
+  if (!isLoaded) return <p className="p-4">{t("loading-map")}</p>;
+  if (error)
+    return (
+      <p className="text-red-600 p-4">
+        {t("error")}: {error}
+      </p>
+    );
 
   return (
     <div className="flex">
       {/* Left Sidebar - Search and Filters */}
       <aside className={LEFT_SIDEBAR_STYLE}>
-        <h2 className="font-bold text-lg mb-4">Search & Filters</h2>
+        <h2 className="font-bold text-lg mb-4">{t("search-and-filters")}</h2>
 
         {/* Search */}
         <div className="mb-4">
-          <label className="block text-sm font-medium mb-1">Search by Name</label>
+          <label className="block text-sm font-medium mb-1">{t("search-by-name")}</label>
           <input
             type="text"
-            placeholder="Search..."
+            placeholder={t("search-placeholder")}
             value={searchQuery}
             onChange={(e) => {
               setSearchQuery(e.target.value);
@@ -159,7 +163,7 @@ export default function DirectoryMapPage() {
 
         {/* Language Filters */}
         <div className="mb-4">
-          <h3 className="font-medium text-base mb-2">Languages</h3>
+          <h3 className="font-medium text-base mb-2">{t("languages")}</h3>
           {AVAILABLE_LANGUAGES.map((lang) => (
             <label key={lang} className="flex items-center text-base mb-2">
               <input
@@ -170,14 +174,14 @@ export default function DirectoryMapPage() {
                 }}
                 className="mr-2 w-4 h-4"
               />
-              {lang}
+              {t(lang)}
             </label>
           ))}
         </div>
 
         {/* Specialization Filters */}
         <div className="mb-4">
-          <h3 className="font-medium text-base mb-2">Specializations</h3>
+          <h3 className="font-medium text-base mb-2">{t("specializations")}</h3>
           <div className="max-h-100 overflow-y-auto">
             {AVAILABLE_SPECIALIZATIONS.map((spec) => (
               <label key={spec} className="flex items-center text-base mb-2">
@@ -189,13 +193,15 @@ export default function DirectoryMapPage() {
                   }}
                   className="mr-2 w-4 h-4"
                 />
-                {spec}
+                {t(spec)}
               </label>
             ))}
           </div>
         </div>
 
-        <p className="text-base text-gray-500 mt-4">{markers.length} providers found</p>
+        <p className="text-base text-gray-500 mt-4">
+          {t("providers-found", { count: markers.length })}
+        </p>
       </aside>
 
       {/* Map */}
@@ -257,8 +263,8 @@ export default function DirectoryMapPage() {
                 )}
                 <p>🌐 {selected.counselor.email}</p>
                 <p>☎️ {selected.counselor.phone ?? "—"}</p>
-                <p>📚 {formatList(selected.counselor.specialties)}</p>
-                <p>🗣 {formatList(selected.counselor.languages)}</p>
+                <p>📚 {formatTranslatedList(selected.counselor.specialties)}</p>
+                <p>🗣 {formatTranslatedList(selected.counselor.languages)}</p>
               </div>
             </>
           </InfoWindow>
@@ -296,8 +302,8 @@ export default function DirectoryMapPage() {
             )}
             <p className="text-sm">🌐 {counselor.email}</p>
             <p className="text-sm">☎️ {counselor.phone ?? "—"}</p>
-            <p className="text-sm">📚 {formatList(counselor.specialties)}</p>
-            <p className="text-sm">🗣 {formatList(counselor.languages)}</p>
+            <p className="text-sm">📚 {formatTranslatedList(counselor.specialties)}</p>
+            <p className="text-sm">🗣 {formatTranslatedList(counselor.languages)}</p>
             <hr className="my-2" />
           </div>
         ))}

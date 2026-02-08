@@ -1,5 +1,6 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 type PaginationProps = {
   currentPage: number;
@@ -8,6 +9,7 @@ type PaginationProps = {
 };
 
 export const Pagination = ({ currentPage, numPages, onPageChange }: PaginationProps) => {
+  const { t } = useTranslation();
   const canGoBack = currentPage !== 1;
   const canGoForward = currentPage !== numPages;
   const [inputValue, setInputValue] = useState("");
@@ -26,7 +28,7 @@ export const Pagination = ({ currentPage, numPages, onPageChange }: PaginationPr
           }
         }}
       />
-      Page{" "}
+      {t("page")}{" "}
       <input
         className="max-w-8 text-center"
         onChange={(e) => {
@@ -38,7 +40,7 @@ export const Pagination = ({ currentPage, numPages, onPageChange }: PaginationPr
         }}
         value={inputValue}
       />{" "}
-      of {numPages}
+      {t("of")} {numPages}
       <ChevronRight
         className={canGoForward ? "cursor-pointer" : ""}
         onClick={() => {

@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import React, { useCallback, useContext, useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 import { z } from "zod";
 
 import styles from "./styles.module.css";
@@ -19,6 +20,7 @@ const postSchema = z.object({
 type PostFormData = z.infer<typeof postSchema>;
 
 export const DiscussionForm = ({ post }: { post?: Discussion }) => {
+  const { t } = useTranslation();
   const { firebaseUser } = useContext(UserContext);
   const router = useRouter();
   const {
@@ -56,7 +58,7 @@ export const DiscussionForm = ({ post }: { post?: Discussion }) => {
             router.push(`/discussion/${result.data._id}`);
           } else {
             setErrorMessage(
-              `Failed to update post: ${result.success ? JSON.stringify(result.data) : result.error}`,
+              `${t("failed-to-update-post")}: ${result.success ? JSON.stringify(result.data) : result.error}`,
             );
           }
         } else {
@@ -67,17 +69,19 @@ export const DiscussionForm = ({ post }: { post?: Discussion }) => {
             router.push(`/discussion/${result.data._id}`);
           } else {
             setErrorMessage(
-              `Failed to create post: ${result.success ? JSON.stringify(result.data) : result.error}`,
+              `${t("failed-to-create-post")}: ${result.success ? JSON.stringify(result.data) : result.error}`,
             );
           }
         }
       } catch (error) {
-        setErrorMessage(`Failed to ${post ? "update" : "create"} post: ${String(error)}`);
+        setErrorMessage(
+          `${t(post ? "failed-to-update-post" : "failed-to-create-post")}: ${String(error)}`,
+        );
       } finally {
         setLoading(false);
       }
     },
-    [post, reset, router, firebaseUser],
+    [post, reset, router, firebaseUser, t],
   );
 
   const handleFormSubmit = useCallback(
@@ -91,34 +95,34 @@ export const DiscussionForm = ({ post }: { post?: Discussion }) => {
   return (
     <div className={styles.createPostPageContainer}>
       <div className={styles.titleBackDiv}>
-        <h1 className={styles.title}>Discussion</h1>
+        <h1 className={styles.title}>{t("discussion")}</h1>
       </div>
       <div className={styles.postPageDiv}>
-        <h2 className={styles.pageTitle}>{post ? "Edit" : "Create New"} Post</h2>
+        <h2 className={styles.pageTitle}>{post ? t("edit-post") : t("create-new-post")}</h2>
         <form onSubmit={handleFormSubmit} className={styles.createPostForm}>
           <div className={styles.formGroup}>
             <label className={styles.fieldLabel} htmlFor="post-title">
-              Subject
+              {t("subject")}
             </label>
             <input
               id="post-title"
               type="text"
               className={styles.inputField}
               {...register("title")}
-              placeholder="Enter subject"
+              placeholder={t("enter-subject")}
             />
             <p className="error-message">{errors.title?.message ?? "\u00A0"}</p>
           </div>
 
           <div className={styles.formGroup}>
             <label className={styles.fieldLabel} htmlFor="post-message">
-              Message
+              {t("message")}
             </label>
             <textarea
               id="post-message"
               className={styles.textAreaField}
               {...register("message")}
-              placeholder="Enter message"
+              placeholder={t("enter-message")}
             />
             <p className="error-message">{errors.message?.message ?? "\u00A0"}</p>
           </div>
@@ -132,10 +136,10 @@ export const DiscussionForm = ({ post }: { post?: Discussion }) => {
               }}
               disabled={loading}
             >
-              Cancel
+              {t("cancel")}
             </button>
             <button className={styles.buttonPost} type="submit" disabled={loading}>
-              {loading ? "Loading..." : post ? "Save" : "Post Discussion"}
+              {loading ? t("loading") : post ? t("save") : t("post-discussion")}
             </button>
           </div>
           {errorMessage && <div className="text-red-500">{errorMessage}</div>}

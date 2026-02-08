@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useCallback, useContext, useEffect, useState } from "react";
+import { Trans, useTranslation } from "react-i18next";
 
 import styles from "./page.module.css";
 
@@ -14,6 +15,7 @@ import { UserContext } from "@/contexts/userContext";
 import { useRedirectToLoginIfNotSignedIn } from "@/hooks/useRedirection";
 
 export default function Dashboard() {
+  const { t } = useTranslation();
   useRedirectToLoginIfNotSignedIn();
 
   const [recentAnnouncements, setRecentAnnouncements] = useState<Announcement[]>();
@@ -34,12 +36,12 @@ export default function Dashboard() {
       if (response.success) {
         setRecentAnnouncements(response.data.announcements);
       } else {
-        setErrorMessage(`Failed to fetch announcements: ${response.error}`);
+        setErrorMessage(`${t("failed-to-fetch-announcements")}: ${response.error}`);
       }
     } catch (error) {
-      setErrorMessage(`Failed to fetch announcements: ${String(error)}`);
+      setErrorMessage(`${t("failed-to-fetch-announcements")}: ${String(error)}`);
     }
-  }, [firebaseUser]);
+  }, [firebaseUser, t]);
 
   useEffect(() => {
     void loadAnnouncements();
@@ -55,12 +57,12 @@ export default function Dashboard() {
       if (response.success) {
         setMemberStats(response.data);
       } else {
-        setErrorMessage(`Failed to fetch member counts: ${response.error}`);
+        setErrorMessage(`${t("failed-to-fetch-member-counts")}: ${response.error}`);
       }
     } catch (error) {
-      setErrorMessage(`Failed to fetch member counts: ${String(error)}`);
+      setErrorMessage(`${t("failed-to-fetch-member-counts")}: ${String(error)}`);
     }
-  }, [firebaseUser, isAdminOrSuperAdmin]);
+  }, [firebaseUser, isAdminOrSuperAdmin, t]);
 
   useEffect(() => {
     void loadMemberStats();
@@ -73,12 +75,12 @@ export default function Dashboard() {
       if (response.success) {
         setYoutubeVideos(response.data);
       } else {
-        setErrorMessage(`Failed to fetch YouTube videos: ${response.error}`);
+        setErrorMessage(`${t("failed-to-fetch-youtube-videos")}: ${response.error}`);
       }
     } catch (error) {
-      setErrorMessage(`Failed to fetch YouTube videos: ${String(error)}`);
+      setErrorMessage(`${t("failed-to-fetch-youtube-videos")}: ${String(error)}`);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     void loadYoutubeVideos();
@@ -86,57 +88,57 @@ export default function Dashboard() {
 
   return (
     <div className={styles.container}>
-      <h1 className={styles.title}>Dashboard</h1>
+      <h1 className={styles.title}>{t("dashboard")}</h1>
 
       <div className="flex flex-col gap-4">
         {memberStats && (
           <div className="flex flex-row gap-16 overflow-x-auto">
             <MemberCountCard
               count={memberStats.memberCount}
-              label="Members"
+              label={t("members")}
               href="/members?tab=all"
             />
             <MemberCountCard
               count={memberStats.directoryCount}
-              label="in Directory"
+              label={t("in-directory")}
               href="/members?tab=directory"
             />
             {isSuperAdmin && (
-              <MemberCountCard count={memberStats.adminCount} label="Admins" href="/admins" />
+              <MemberCountCard count={memberStats.adminCount} label={t("admins")} href="/admins" />
             )}
           </div>
         )}
       </div>
 
       <div className="flex flex-col gap-4">
-        <h2 className={styles.subtitle}>Resources</h2>
-        <p>Click on each card to access the external resource page.</p>
+        <h2 className={styles.subtitle}>{t("resources")}</h2>
+        <p>{t("click-card-access-resource")}</p>
         <div className="flex flex-row gap-12 overflow-x-auto">
           <ResourceCard
             iconSrc="/icons/education.svg"
-            label="Education"
+            label={t("education")}
             href="https://drive.google.com/drive/folders/1yv2D8KsLlUgcRScUS86G_DOOzUiXM3ln?usp=drive_link"
           />
           <ResourceCard
             iconSrc="/icons/public_policy.svg"
-            label="Public Policy"
+            label={t("public-policy")}
             href="https://drive.google.com/drive/folders/1Xxd0MRpT-RBxMVUakFr9ykWz6qzitLnX?usp=drive_link"
           />
           <ResourceCard
             iconSrc="/icons/research.svg"
-            label="Research"
+            label={t("research")}
             href="https://drive.google.com/drive/folders/1LJ4UUgTKIUS6Bj8bip0hj2rQBaetzWsb"
           />
           <ResourceCard
             iconSrc="/icons/members.svg"
-            label="Members"
+            label={t("members")}
             href="https://drive.google.com/drive/folders/1D_0kRA4leoOnFMjdvlF5YMdt1x6KGxjU?usp=drive_link"
           />
         </div>
       </div>
 
       <div className="flex flex-col gap-4">
-        <h2 className={styles.subtitle}>YouTube videos</h2>
+        <h2 className={styles.subtitle}>{t("youtube-videos")}</h2>
         <div className="flex flex-row gap-12 overflow-x-auto">
           {youtubeVideos?.map((video) => (
             <div key={video.id}>
@@ -155,22 +157,23 @@ export default function Dashboard() {
             </div>
           ))}
         </div>
-        <p>
-          Visit our{" "}
-          <a
-            className="underline text-blue-60"
-            href="https://www.youtube.com/@SPLAGen"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            YouTube channel
-          </a>{" "}
-          for more videos!
-        </p>
+        <Trans
+          i18nKey="visit-youtube-channel"
+          components={{
+            a: (
+              <a
+                className="underline text-blue-60"
+                href="https://www.youtube.com/@SPLAGen"
+                target="_blank"
+                rel="noopener noreferrer"
+              />
+            ),
+          }}
+        />
       </div>
 
       <div className="flex flex-col gap-4">
-        <h2 className={styles.subtitle}>Recent Announcements</h2>
+        <h2 className={styles.subtitle}>{t("recent-announcements")}</h2>
         {recentAnnouncements?.map((announcement) => (
           <PostCard
             key={announcement._id}
@@ -181,7 +184,9 @@ export default function Dashboard() {
             message={announcement.message}
           />
         ))}
-        {recentAnnouncements && recentAnnouncements.length === 0 && <p>No announcements found</p>}
+        {recentAnnouncements && recentAnnouncements.length === 0 && (
+          <p>{t("no-announcements-found")}</p>
+        )}
       </div>
 
       {errorMessage && <div className="text-red-500">{errorMessage}</div>}

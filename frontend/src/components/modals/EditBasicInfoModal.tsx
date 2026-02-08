@@ -90,19 +90,19 @@ export const EditBasicInfoModal = ({
         const response = await editBasicInfoRequest(newData, firebaseToken);
 
         if (response.success) {
-          setSuccessMessage("Basic information updated");
+          setSuccessMessage(t("basic-information-updated"));
           await reloadUser();
           onClose();
         } else {
-          setError(`Error updating info: ${response.error}`);
+          setError(`${t("error-updating-info-colon")}: ${response.error}`);
         }
       } catch (err) {
-        setError(`Error updating info: ${String(err)}`);
+        setError(`${t("error-updating-info-colon")}: ${String(err)}`);
       } finally {
         setLoading(false);
       }
     },
-    [onClose, firebaseUser, reloadUser],
+    [onClose, firebaseUser, reloadUser, t],
   );
 
   useEffect(() => {
@@ -176,7 +176,7 @@ export const EditBasicInfoModal = ({
                   control={control}
                   render={({ field }) => (
                     <PhoneInput
-                      placeholder="Enter your phone number"
+                      placeholder={t("enter-phone-number")}
                       value={field.value}
                       onChange={field.onChange}
                       defaultCountry="US"

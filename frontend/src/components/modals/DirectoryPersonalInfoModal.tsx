@@ -101,19 +101,19 @@ export const DirectoryPersonalInfoModal: React.FC<DirectoryInfoModalProps> = ({
         const firebaseToken = await firebaseUser.getIdToken();
         const response = await editDirectoryPersonalInfoRequest(formattedData, firebaseToken);
         if (response.success) {
-          setSuccessMessage("Directory personal information updated");
+          setSuccessMessage(t("directory-personal-information-updated"));
           await reloadUser();
           onClose();
         } else {
-          setErrorMessage(`Error updating info: ${response.error}`);
+          setErrorMessage(`${t("error-updating-info-colon")}: ${response.error}`);
         }
       } catch (err) {
-        setErrorMessage(`Error updating info: ${String(err)}`);
+        setErrorMessage(`${t("error-updating-info-colon")}: ${String(err)}`);
       } finally {
         setLoading(false);
       }
     },
-    [onClose, firebaseUser, reloadUser],
+    [onClose, firebaseUser, reloadUser, t],
   );
 
   useEffect(() => {
@@ -141,7 +141,7 @@ export const DirectoryPersonalInfoModal: React.FC<DirectoryInfoModalProps> = ({
         isOpen={isOpen}
         onClose={onClose}
         onSave={handleSubmit(onSubmit)}
-        title="Edit Personal Information"
+        title={t("edit-personal-information")}
         loading={loading}
         content={
           <form className="modal-form">
@@ -160,7 +160,7 @@ export const DirectoryPersonalInfoModal: React.FC<DirectoryInfoModalProps> = ({
                       <Radio
                         key={label}
                         id={`education-${label}`}
-                        label={label}
+                        label={t(label)}
                         checked={field.value === value}
                         onChange={() => {
                           field.onChange(value);
@@ -189,13 +189,14 @@ export const DirectoryPersonalInfoModal: React.FC<DirectoryInfoModalProps> = ({
 
             <div className="dir-info-form-group">
               <label htmlFor="clinic">
-                Name of work clinic<span className="red">*</span>
+                {t("name-of-work-clinic-label")}
+                <span className="red">*</span>
               </label>
               <input
                 className="dir-info-form-input"
                 id="clinic"
                 {...register("clinic")}
-                placeholder="Enter name of clinic"
+                placeholder={t("enter-name-of-clinic")}
               />
               <p className="error-message">{errors.clinic?.message ?? "\u00A0"}</p>
             </div>

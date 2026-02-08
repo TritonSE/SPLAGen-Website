@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { ReactNode, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 
 import { Button } from "..";
 
@@ -26,6 +27,8 @@ export const Modal = ({
   hideButtonsRow?: boolean;
   loading?: boolean;
 }) => {
+  const { t } = useTranslation();
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
@@ -53,8 +56,12 @@ export const Modal = ({
 
         {hideButtonsRow ? null : (
           <div className={styles.buttonsRow}>
-            <Button variant="secondary" label="Cancel" onClick={onClose} disabled={loading} />
-            <Button label={loading ? "Loading..." : "Save"} onClick={onSave} disabled={loading} />
+            <Button variant="secondary" label={t("cancel")} onClick={onClose} disabled={loading} />
+            <Button
+              label={loading ? t("loading") : t("save")}
+              onClick={onSave}
+              disabled={loading}
+            />
           </div>
         )}
       </div>

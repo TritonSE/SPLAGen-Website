@@ -2,6 +2,7 @@ import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import Image from "next/image";
 import { useContext, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
+import { useTranslation } from "react-i18next";
 
 import { Button } from "..";
 
@@ -19,6 +20,7 @@ export const UploadProfilePictureModal = ({
   isOpen: boolean;
   onClose: () => void;
 }) => {
+  const { t } = useTranslation();
   const [currentFileURL, setCurrentFileURL] = useState("");
   const { firebaseStorage, firebaseUser, user, reloadUser } = useContext(UserContext);
   // 10 MB max file size
@@ -70,14 +72,14 @@ export const UploadProfilePictureModal = ({
 
       const res = await editProfilePicture(fileURL, token);
       if (res.success) {
-        setSuccessMessage("Profile picture updated");
+        setSuccessMessage(t("profile-picture-updated"));
         await reloadUser();
         onClose();
       } else {
-        setError(`Failed to update profile picture: ${res.error}`);
+        setError(`${t("failed-update-profile-picture")}: ${res.error}`);
       }
     } catch (err) {
-      setError(`Failed to update profile picture: ${String(err)}`);
+      setError(`${t("failed-update-profile-picture")}: ${String(err)}`);
     } finally {
       setLoading(false);
     }
@@ -88,30 +90,30 @@ export const UploadProfilePictureModal = ({
       <Modal
         isOpen={isOpen}
         onClose={onClose}
-        title="Upload profile picture"
+        title={t("upload-profile-picture")}
         loading={loading}
         content={
           <>
-            <p>A high-quality photo will make your profile more professional</p>
+            <p>{t("high-quality-photo-message")}</p>
             <div className={styles.container}>
               <div className={styles.picture}>
                 {currentFileURL ? (
                   <Image src={currentFileURL} alt="Profile picture" width={200} height={200} />
                 ) : (
-                  <p>No picture uploaded</p>
+                  <p>{t("no-picture-uploaded")}</p>
                 )}
               </div>
               <div className={styles.buttonsRow}>
                 <Button
                   disabled={!currentFileURL}
-                  label="Remove photo"
+                  label={t("remove-photo")}
                   onClick={() => {
                     setCurrentFileURL("");
                   }}
                 />
                 <div {...getRootProps()}>
                   <input {...getInputProps()} />
-                  <Button variant="secondary" label="Upload photo" />
+                  <Button variant="secondary" label={t("upload-photo")} />
                 </div>
               </div>
 

@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { useCallback, useContext, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import { Button } from "..";
 
@@ -18,6 +19,7 @@ type InviteAdminPopupProps = {
 };
 
 export const InviteAdminPopup = ({ isOpen, onClose, onInviteAdmin }: InviteAdminPopupProps) => {
+  const { t } = useTranslation();
   const { firebaseUser } = useContext(UserContext);
 
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
@@ -35,12 +37,12 @@ export const InviteAdminPopup = ({ isOpen, onClose, onInviteAdmin }: InviteAdmin
       if (response.success) {
         setUsers(response.data.users);
       } else {
-        setErrorMessage(`Failed to fetch users: ${response.error}`);
+        setErrorMessage(`${t("failed-to-fetch-users")}: ${response.error}`);
       }
     } catch (error) {
-      setErrorMessage(`Failed to fetch users: ${String(error)}`);
+      setErrorMessage(`${t("failed-to-fetch-users")}: ${String(error)}`);
     }
-  }, [firebaseUser, search]);
+  }, [firebaseUser, search, t]);
 
   useEffect(() => {
     void loadUsers();
@@ -52,14 +54,14 @@ export const InviteAdminPopup = ({ isOpen, onClose, onInviteAdmin }: InviteAdmin
         hideButtonsRow
         isOpen={isOpen}
         onClose={onClose}
-        title="Invite Admin"
+        title={t("invite-admin")}
         onSave={() => null}
         content={
           <div className={styles.root}>
             <div className={styles.searchContainer}>
               <Image src="/icons/search.svg" alt="Search icon" width={27} height={16} />
               <input
-                placeholder="Search Counselors"
+                placeholder={t("search-counselors")}
                 value={search}
                 onChange={(e) => {
                   setSearch(e.target.value);
@@ -80,13 +82,13 @@ export const InviteAdminPopup = ({ isOpen, onClose, onInviteAdmin }: InviteAdmin
                     onClick={() => {
                       setSelectedUser(user);
                     }}
-                    label="Invite"
+                    label={t("invite")}
                   />
                 </div>
               ))}
             </div>
 
-            {users && users.length === 0 ? <p>No users found</p> : null}
+            {users && users.length === 0 ? <p>{t("no-users-found")}</p> : null}
             {errorMessage && <div className="text-red-500">{errorMessage}</div>}
           </div>
         }

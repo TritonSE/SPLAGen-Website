@@ -45,13 +45,13 @@ export const DenyDirectoryRequestPopup = ({
         reason,
       );
       if (response.success) {
-        setSuccessMessage("Request denied successfully");
+        setSuccessMessage(t("request-denied-successfully"));
         onDeny();
       } else {
-        setErrorMessage(`Failed to deny directory request: ${response.error}`);
+        setErrorMessage(`${t("failed-deny-directory-request")}: ${response.error}`);
       }
     } catch (error) {
-      setErrorMessage(`Failed to deny directory request: ${String(error)}`);
+      setErrorMessage(`${t("failed-deny-directory-request")}: ${String(error)}`);
     } finally {
       setLoading(false);
     }
@@ -142,13 +142,13 @@ export const ApproveDirectoryRequestPopup = ({
         users.map((user) => user._id),
       );
       if (response.success) {
-        setSuccessMessage("Request approved successfully");
+        setSuccessMessage(t("request-approved-successfully"));
         onApprove();
       } else {
-        setErrorMessage(`Failed to approve directory request: ${response.error}`);
+        setErrorMessage(`${t("failed-approve-directory-request")}: ${response.error}`);
       }
     } catch (error) {
-      setErrorMessage(`Failed to approve directory request: ${String(error)}`);
+      setErrorMessage(`${t("failed-approve-directory-request")}: ${String(error)}`);
     } finally {
       setLoading(false);
     }
@@ -226,13 +226,13 @@ export const ConfirmInviteAdminPopup = ({
       const token = await firebaseUser.getIdToken();
       const response = await inviteAdmin(token, user._id);
       if (response.success) {
-        setSuccessMessage("Admin invited successfully");
+        setSuccessMessage(t("admin-invited-successfully"));
         onInvite();
       } else {
-        setErrorMessage(`Failed to invite admin: ${response.error}`);
+        setErrorMessage(`${t("failed-invite-admin")}: ${response.error}`);
       }
     } catch (error) {
-      setErrorMessage(`Failed to invite admin: ${String(error)}`);
+      setErrorMessage(`${t("failed-invite-admin")}: ${String(error)}`);
     } finally {
       setLoading(false);
     }
@@ -304,13 +304,13 @@ export const RemoveAdminPopup = ({
         reason,
       );
       if (response.success) {
-        setSuccessMessage("Admin(s) removed successfully");
+        setSuccessMessage(t("admins-removed-successfully"));
         onRemove();
       } else {
-        setErrorMessage(`Failed to remove admin(s): ${response.error}`);
+        setErrorMessage(`${t("failed-remove-admins")}: ${response.error}`);
       }
     } catch (error) {
-      setErrorMessage(`Failed to remove admin(s): ${String(error)}`);
+      setErrorMessage(`${t("failed-remove-admins")}: ${String(error)}`);
     } finally {
       setLoading(false);
     }

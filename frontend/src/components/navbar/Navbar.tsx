@@ -81,7 +81,7 @@ export const Navbar: React.FC = () => {
   const { user, onboardingStep } = useContext(UserContext);
   const { t } = useTranslation();
 
-  const pathname = usePathname();
+  const pathname = `/${usePathname().split("/")[1]}`;
 
   // Determine Navigation based on route and or user role
   useEffect(() => {

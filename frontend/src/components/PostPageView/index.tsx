@@ -4,6 +4,7 @@ import moment from "moment";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React, { useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import styles from "./styles.module.css";
 
@@ -36,6 +37,7 @@ type PostPageViewProps = {
 };
 
 export const PostPageView = ({ showDotsMenu, post }: PostPageViewProps) => {
+  const { t } = useTranslation();
   const [menuOpen, setMenuOpen] = useState(false);
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -62,10 +64,10 @@ export const PostPageView = ({ showDotsMenu, post }: PostPageViewProps) => {
             setConfirmDeleteOpen(false);
             router.push("/announcements");
           } else {
-            setErrorMessage(`Failed to delete announcement: ${response.error}`);
+            setErrorMessage(`${t("failed-to-delete-announcement")}: ${response.error}`);
           }
         } catch (error) {
-          setErrorMessage(`Failed to delete announcement: ${String(error)}`);
+          setErrorMessage(`${t("failed-to-delete-announcement")}: ${String(error)}`);
         } finally {
           setDeleteLoading(false);
         }
@@ -79,10 +81,10 @@ export const PostPageView = ({ showDotsMenu, post }: PostPageViewProps) => {
             setConfirmDeleteOpen(false);
             router.push("/discussion");
           } else {
-            setErrorMessage(`Failed to delete post: ${response.error}`);
+            setErrorMessage(`${t("failed-to-delete-post")}: ${response.error}`);
           }
         } catch (error) {
-          setErrorMessage(`Failed to delete post: ${String(error)}`);
+          setErrorMessage(`${t("failed-to-delete-post")}: ${String(error)}`);
         } finally {
           setDeleteLoading(false);
         }
@@ -96,10 +98,10 @@ export const PostPageView = ({ showDotsMenu, post }: PostPageViewProps) => {
             setConfirmDeleteOpen(false);
             post.reloadReplies();
           } else {
-            setErrorMessage(`Failed to delete reply: ${response.error}`);
+            setErrorMessage(`${t("failed-to-delete-reply")}: ${response.error}`);
           }
         } catch (error) {
-          setErrorMessage(`Failed to delete reply: ${String(error)}`);
+          setErrorMessage(`${t("failed-to-delete-reply")}: ${String(error)}`);
         } finally {
           setDeleteLoading(false);
         }
@@ -117,12 +119,12 @@ export const PostPageView = ({ showDotsMenu, post }: PostPageViewProps) => {
       if (response.success) {
         setReplies(response.data);
       } else {
-        setErrorMessage(`Failed to load replies: ${response.error}`);
+        setErrorMessage(`${t("failed-to-load-replies")}: ${response.error}`);
       }
     } catch (error) {
-      setErrorMessage(`Failed to load replies: ${String(error)}`);
+      setErrorMessage(`${t("failed-to-load-replies")}: ${String(error)}`);
     }
-  }, [firebaseUser, post]);
+  }, [firebaseUser, post, t]);
 
   // Wrapper function that calls both loadReplies and onReplyPosted
   // This is passed to ReplyComposer to refresh both replies and parent data after posting
@@ -140,14 +142,14 @@ export const PostPageView = ({ showDotsMenu, post }: PostPageViewProps) => {
   const formattedRecipients = useMemo(() => {
     if (post.variant !== "announcement") return "";
     if (post.data.recipients[0] === "everyone") {
-      return "Everyone";
+      return t("everyone");
     } else if (post.data.recipients[0].startsWith("language:")) {
       const language = post.data.recipients[0].substring("language:".length);
-      return `${language[0].toUpperCase()}${language.substring(1)}-speaking users`;
+      return `${language[0].toUpperCase()}${language.substring(1)}-${t("speaking-users")}`;
     } else {
       return post.data.recipients.join(", ");
     }
-  }, [post]);
+  }, [post, t]);
 
   return (
     <div className={styles.announcementContainer}>
@@ -159,8 +161,8 @@ export const PostPageView = ({ showDotsMenu, post }: PostPageViewProps) => {
               {post.data.userId.personal.firstName} {post.data.userId.personal.lastName}
             </p>
             <p className={styles.recipients}>
-              {post.variant === "announcement" ? `Sent to ${formattedRecipients} • ` : ""}
-              Posted {moment(post.data.createdAt).format("MMMM D YYYY, h:mm:ss A")}
+              {post.variant === "announcement" ? `${t("sent-to")} ${formattedRecipients} • ` : ""}
+              {t("posted")} {moment(post.data.createdAt).format("MMMM D YYYY, h:mm:ss A")}
             </p>
           </div>
         </div>
@@ -205,7 +207,7 @@ export const PostPageView = ({ showDotsMenu, post }: PostPageViewProps) => {
           ) : (
             <Button
               className={styles.replyButton}
-              label="Reply"
+              label={t("reply")}
               onClick={() => {
                 setNewReplyComposerOpen(true);
               }}
@@ -225,7 +227,7 @@ export const PostPageView = ({ showDotsMenu, post }: PostPageViewProps) => {
               />
             ))}
           </div>
-          {replies && replies.length === 0 && <p>No replies yet</p>}
+          {replies && replies.length === 0 && <p>{t("no-replies-yet")}</p>}
         </>
       )}
 
@@ -234,7 +236,7 @@ export const PostPageView = ({ showDotsMenu, post }: PostPageViewProps) => {
           {post.variant === "reply" ? (
             <Button
               className={styles.menuButton}
-              label="Edit"
+              label={t("edit")}
               variant="primary"
               onClick={() => {
                 setMenuOpen(false);
@@ -246,12 +248,12 @@ export const PostPageView = ({ showDotsMenu, post }: PostPageViewProps) => {
               className="w-full"
               href={`/${post.variant === "announcement" ? "announcements" : "discussion"}/${post.data._id}/edit`}
             >
-              <Button className={styles.menuButton} label="Edit" variant="primary" />
+              <Button className={styles.menuButton} label={t("edit")} variant="primary" />
             </a>
           )}
           <Button
             className={styles.menuButton}
-            label="Delete"
+            label={t("delete")}
             variant="secondary"
             onClick={() => {
               setMenuOpen(false);
@@ -271,7 +273,9 @@ export const PostPageView = ({ showDotsMenu, post }: PostPageViewProps) => {
         }}
         loading={deleteLoading}
       >
-        <p>Are you sure you want to delete this {post.variant}?</p>
+        <p>
+          {t("are-you-sure-delete")} {post.variant}?
+        </p>
       </TwoButtonPopup>
       {errorMessage && <div className="text-red-500">{errorMessage}</div>}
     </div>

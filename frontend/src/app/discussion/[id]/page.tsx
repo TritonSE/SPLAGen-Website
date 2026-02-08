@@ -4,6 +4,7 @@ import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useCallback, useContext, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import styles from "./page.module.css";
 
@@ -19,6 +20,7 @@ import { UserContext } from "@/contexts/userContext";
 import { useRedirectToLoginIfNotSignedIn } from "@/hooks/useRedirection";
 
 const DiscussionPostDetailPage = () => {
+  const { t } = useTranslation();
   useRedirectToLoginIfNotSignedIn();
   const params = useParams();
 
@@ -40,12 +42,12 @@ const DiscussionPostDetailPage = () => {
         setPost(response.data);
         setIsSubscribed(response.data.isSubscribed ?? false);
       } else {
-        setErrorMessage(`Failed to retrieve discussion post: ${response.error}`);
+        setErrorMessage(`${t("failed-to-retrieve-discussion-post")}: ${response.error}`);
       }
     } catch (error) {
-      setErrorMessage(`Failed to retrieve discussion post: ${String(error)}`);
+      setErrorMessage(`${t("failed-to-retrieve-discussion-post")}: ${String(error)}`);
     }
-  }, [firebaseUser, params]);
+  }, [firebaseUser, params, t]);
 
   const handleSubscriptionToggle = useCallback(async () => {
     if (!firebaseUser || !params.id) return;
@@ -64,18 +66,18 @@ const DiscussionPostDetailPage = () => {
         setIsSubscribed(response.data.isSubscribed);
         setSuccessMessage(
           response.data.isSubscribed
-            ? "Successfully subscribed to email notifications!"
-            : "Successfully unsubscribed from email notifications!",
+            ? t("successfully-subscribed")
+            : t("successfully-unsubscribed"),
         );
       } else {
-        setSubscriptionError(`Failed to update subscription: ${response.error}`);
+        setSubscriptionError(`${t("failed-to-update-subscription")}: ${response.error}`);
       }
     } catch (error) {
-      setSubscriptionError(`Failed to update subscription: ${String(error)}`);
+      setSubscriptionError(`${t("failed-to-update-subscription")}: ${String(error)}`);
     } finally {
       setSubscriptionLoading(false);
     }
-  }, [firebaseUser, params, isSubscribed]);
+  }, [firebaseUser, params, isSubscribed, t]);
 
   useEffect(() => {
     void loadPost();
@@ -83,10 +85,10 @@ const DiscussionPostDetailPage = () => {
 
   return (
     <div className={styles.pageContainer}>
-      <h1 className={styles.title}>Discussion</h1>
+      <h1 className={styles.title}>{t("discussion")}</h1>
       <Link href="/discussion" className={styles.backButton}>
         <ChevronLeft />
-        Back
+        {t("back")}
       </Link>
 
       {post && (
@@ -104,9 +106,9 @@ const DiscussionPostDetailPage = () => {
                 disabled={subscriptionLoading}
                 className={styles.subscriptionCheckbox}
               />
-              <span>Subscribe to email notifications for replies</span>
+              <span>{t("subscribe-email-notifications")}</span>
             </label>
-            {subscriptionLoading && <span className={styles.loadingText}>Updating...</span>}
+            {subscriptionLoading && <span className={styles.loadingText}>{t("updating")}</span>}
             {subscriptionError && <div className="text-red-500">{subscriptionError}</div>}
           </div>
         </>

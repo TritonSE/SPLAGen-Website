@@ -48,12 +48,12 @@ type DisplayComponentProps = {
 };
 
 export const degreesToReadable = {
-  masters: "Masters",
-  phd: "PhD",
-  md: "MD",
-  fellowship: "Fellowship",
-  diploma: "Diploma",
-  other: "Other",
+  masters: "masters",
+  phd: "phd",
+  md: "md",
+  fellowship: "fellowship",
+  diploma: "diploma",
+  other: "other",
   "": "",
 } as const;
 
@@ -64,7 +64,7 @@ const ProfileSection = ({ user, openBasic, openPro }: DisplayComponentProps) => 
   const [isAssociateInfoModalOpen, setIsAssociateInfoModalOpen] = useState(false);
 
   const formatMembership = (membership: MembershipType | undefined): string => {
-    return membership ? (membershipDisplayMap[membership] ?? "None") : "None";
+    return membership ? t(membershipDisplayMap[membership] ?? "none") : t("none");
   };
 
   const formattedMembership = formatMembership(user?.account.membership);
@@ -83,7 +83,7 @@ const ProfileSection = ({ user, openBasic, openPro }: DisplayComponentProps) => 
             <span> {formattedMembership ?? t("none")} </span>
 
             <Link href="/editMembership">
-              <Button variant="secondary" label="Edit Membership Category" />
+              <Button variant="secondary" label={t("edit-membership-category")} />
             </Link>
           </div>
         </div>
@@ -118,10 +118,22 @@ const ProfileSection = ({ user, openBasic, openPro }: DisplayComponentProps) => 
           leftColumnFields={[
             {
               label: t("professional-title"),
-              value:
-                professionalTitleOptions.find(
-                  (option) => option.value === user?.professional?.title,
-                )?.label ?? `Other (${String(user?.professional?.title)})`,
+              value: professionalTitleOptions.find(
+                (option) => option.value === user?.professional?.title,
+              )
+                ? t(
+                    professionalTitleOptions.find(
+                      (option) => option.value === user?.professional?.title,
+                    )?.label ?? "",
+                  ) +
+                  (!professionalTitleOptions.find(
+                    (option) => option.value === user?.professional?.title,
+                  ) && user?.professional?.title
+                    ? ` (${String(user?.professional?.title)})`
+                    : "")
+                : user?.professional?.title
+                  ? `${t("other")} (${String(user?.professional?.title)})`
+                  : t("other"),
             },
             {
               label: t("preferred-language"),
@@ -136,7 +148,7 @@ const ProfileSection = ({ user, openBasic, openPro }: DisplayComponentProps) => 
                 user?.account.inDirectory === true
                   ? t("yes")
                   : user?.account.inDirectory === "pending"
-                    ? "Pending"
+                    ? t("pending")
                     : t("no"),
             },
           ]}
@@ -144,52 +156,57 @@ const ProfileSection = ({ user, openBasic, openPro }: DisplayComponentProps) => 
 
         {isStudent && (
           <ProfilePageCard
-            title="Student Information"
+            title={t("student-information-title")}
             onClickEdit={() => {
               setIsStudentInfoModalOpen(true);
             }}
             leftColumnFields={[
               {
-                label: "School Country",
+                label: t("school-country-short"),
                 value: getCountryLabelFromCode(user?.education?.schoolCountry),
               },
-              { label: "School Name", value: user?.education?.institution },
-              { label: "University Email", value: user?.education?.email },
+              { label: t("school-name-short"), value: user?.education?.institution },
+              { label: t("university-email-short"), value: user?.education?.email },
             ]}
             rightColumnFields={[
               {
-                label: "Degree",
-                value: degreesToReadable[user.education?.degree ?? ""] ?? "Other",
+                label: t("degree-short"),
+                value: t(degreesToReadable[user.education?.degree ?? ""] || "other"),
               },
-              { label: "Program Name", value: user?.education?.program },
-              { label: "Graduation Date", value: user?.education?.gradDate },
+              { label: t("program-name-short"), value: user?.education?.program },
+              { label: t("graduation-date-short"), value: user?.education?.gradDate },
             ]}
           />
         )}
 
         {isAssociate && (
           <ProfilePageCard
-            title="Associate Information"
+            title={t("associate-information-title")}
             onClickEdit={() => {
               setIsAssociateInfoModalOpen(true);
             }}
             leftColumnFields={[
-              { label: "Job Title", value: user?.associate?.title },
+              { label: t("job-title-short"), value: user?.associate?.title },
               {
-                label: "Specializations",
+                label: t("specializations-short"),
                 value: user?.associate?.specialization
-                  ?.map((s) => SPECIALIZATIONS.find((spec) => spec.toLowerCase() === s))
+                  ?.map((s) => {
+                    const key = SPECIALIZATIONS.find((spec) => spec.toLowerCase() === s);
+                    return key ? t(key) : null;
+                  })
                   .filter(Boolean)
                   .join(", "),
               },
             ]}
             rightColumnFields={[
               {
-                label: "Organization Representative",
-                value: user?.associate?.organization ? "Yes" : "No",
+                label: t("organization-representative-short"),
+                value: user?.associate?.organization ? t("yes") : t("no"),
               },
-              // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-              { label: "Organization Name", value: user?.associate?.organization || "N/A" },
+              {
+                label: t("organization-name-short"),
+                value: user?.associate?.organization ?? t("na"),
+              },
             ]}
           />
         )}
@@ -256,10 +273,10 @@ const DirectorySection = ({
     // User's membership type is ineligible to join directory
     return (
       <div className={styles.directoryColumn}>
-        <p className={styles.directoryTitle}>You are not in the SPLAGen Directory</p>
-        <p>Only full members can join the directory.</p>
+        <p className={styles.directoryTitle}>{t("not-in-directory")}</p>
+        <p>{t("only-full-members")}</p>
         <a href="https://www.splagen.org/en/membresia" target="_blank" rel="noopener noreferrer">
-          <Button label="Learn more about membership" />
+          <Button label={t("learn-more-membership")} />
         </a>
       </div>
     );
@@ -270,9 +287,9 @@ const DirectorySection = ({
     case false:
       return (
         <div className={styles.directoryColumn}>
-          <p className={styles.directoryTitle}>You are not in the SPLAGen Directory yet</p>
+          <p className={styles.directoryTitle}>{t("not-in-directory-yet")}</p>
           <Link href="/directoryForm">
-            <Button label="Join the directory" />
+            <Button label={t("join-directory")} />
           </Link>
         </div>
       );
@@ -287,9 +304,9 @@ const DirectorySection = ({
             <p>
               {user?.account.inDirectory === "pending"
                 ? /* User's request to join the directory is pending and they can still edit their information */
-                  "Your request to join the directory is being reviewed by our staff. Feel free to update your information in the meantime!"
+                  t("directory-request-pending")
                 : /* User is in the directory and can edit their information */
-                  "Any edits made here will be reflected in the directory."}
+                  t("edits-reflected-directory")}
             </p>
           )}
 
@@ -298,8 +315,8 @@ const DirectorySection = ({
               className="mr-auto"
               label={
                 user?.account.inDirectory === "pending"
-                  ? "Cancel my directory request"
-                  : "Remove me from directory"
+                  ? t("cancel-directory-request")
+                  : t("remove-from-directory")
               }
               onClick={onLeaveDirectory}
             />
@@ -307,22 +324,23 @@ const DirectorySection = ({
 
           <div className={styles.infoContainer}>
             <ProfilePageCard
-              title="Personal Info"
+              title={t("personal-info")}
               onClickEdit={openPersonal}
               leftColumnFields={[
                 {
-                  label: "Degree/certification",
-                  value: educationTypeOptions.find(
-                    (option) => option.value === user?.education?.degree,
-                  )?.label,
+                  label: t("degree-certification-short"),
+                  value: t(
+                    educationTypeOptions.find((option) => option.value === user?.education?.degree)
+                      ?.label ?? "other",
+                  ),
                 },
-                { label: "Work Clinic", value: user?.clinic?.name },
-                { label: "Clinic Website", value: user?.clinic?.url },
+                { label: t("work-clinic-short"), value: user?.clinic?.name },
+                { label: t("clinic-website-short"), value: user?.clinic?.url },
               ]}
               rightColumnFields={[
-                { label: "Education Institution", value: user?.education?.institution },
+                { label: t("education-institution"), value: user?.education?.institution },
                 {
-                  label: "Clinic Address",
+                  label: t("clinic-address-short"),
                   value:
                     user?.clinic?.location &&
                     formatAddress(
@@ -340,15 +358,15 @@ const DirectorySection = ({
             />
 
             <ProfilePageCard
-              title="Display Info"
+              title={t("display-info")}
               onClickEdit={openDisplay}
               leftColumnFields={[
                 {
-                  label: "Work Email",
+                  label: t("work-email-short"),
                   value: user?.display?.workEmail,
                 },
                 {
-                  label: "Genetic services",
+                  label: t("genetic-services-short"),
                   value: (user?.display?.services?.length ?? 0) > 0 && (
                     <div>
                       {user?.display?.services?.map((service) => (
@@ -358,18 +376,18 @@ const DirectorySection = ({
                   ),
                 },
                 {
-                  label: "License number",
+                  label: t("license-number-short"),
                   value: user?.display?.license?.[0] ? user?.display?.license?.[0] : t("none"),
                 },
                 {
-                  label: "Do you offer remote services?",
+                  label: t("offer-remote-services-question"),
                   value: user?.display?.options?.remote ? t("yes") : t("no"),
                 },
                 {
-                  label: "Are you authorized to provide care?",
+                  label: t("authorized-care-question"),
                   value:
                     user?.display?.options?.authorizedCare === "unsure"
-                      ? "Unsure"
+                      ? t("unsure")
                       : user?.display?.options?.authorizedCare === true
                         ? t("yes")
                         : t("no"),
@@ -377,20 +395,20 @@ const DirectorySection = ({
               ]}
               rightColumnFields={[
                 {
-                  label: "Work Phone",
+                  label: t("work-phone-short"),
                   value: user?.display?.workPhone,
                 },
                 {
-                  label: "Language(s) used to provide care",
+                  label: t("language-used-care"),
 
                   value: <PreferredLanguages languages={user?.display?.languages ?? []} />,
                 },
                 {
-                  label: "Can patient request genetic tests?",
+                  label: t("patient-request-tests"),
                   value: user?.display?.options?.openToRequests ? t("yes") : t("no"),
                 },
                 {
-                  label: "Can patient make appointments for services?",
+                  label: t("patient-make-appointments"),
                   value: user?.display?.options?.openToAppointments ? t("yes") : t("no"),
                 },
               ]}
@@ -402,6 +420,7 @@ const DirectorySection = ({
 };
 
 const ProfilePage: React.FC = () => {
+  const { t } = useTranslation();
   useRedirectToLoginIfNotSignedIn();
 
   const router = useRouter();
@@ -435,15 +454,15 @@ const ProfilePage: React.FC = () => {
         setIsLeaveDirectoryPopupOpen(false);
         setSuccessMessage(
           user?.account.inDirectory === "pending"
-            ? "Directory request cancelled successfully"
-            : "Successfully removed from directory",
+            ? t("directory-request-cancelled")
+            : t("removed-from-directory"),
         );
         await reloadUser();
       } else {
-        setErrorMessage(`Failed to leave directory: ${response.error}`);
+        setErrorMessage(`${t("failed-leave-directory")}: ${response.error}`);
       }
     } catch (error) {
-      setErrorMessage(`Failed to leave directory: ${String(error)}`);
+      setErrorMessage(`${t("failed-leave-directory")}: ${String(error)}`);
     } finally {
       setLoadingLeaveDirectory(false);
     }
@@ -452,7 +471,7 @@ const ProfilePage: React.FC = () => {
   return (
     <div className={styles.profileContainer}>
       <header>
-        <h1>Profile</h1>
+        <h1>{t("profile")}</h1>
       </header>
 
       <div className="mr-auto">
@@ -529,8 +548,8 @@ const ProfilePage: React.FC = () => {
       >
         <p>
           {user?.account.inDirectory === "pending"
-            ? "Are you sure you want to cancel your directory request?"
-            : "Are you sure you want to remove yourself from the directory?"}
+            ? t("cancel-directory-request-confirm")
+            : t("remove-from-directory-confirm")}
         </p>
       </TwoButtonPopup>
 

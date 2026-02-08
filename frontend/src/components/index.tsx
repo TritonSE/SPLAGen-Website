@@ -4,7 +4,6 @@ export { Checkmark } from "./CheckMark";
 export { LanguageSwitcher } from "./languageSwitcher";
 export { NavCard } from "./navbar/NavCard";
 export { Navbar } from "./navbar/Navbar";
-export { External } from "./translationDemo";
 export { DirectoryPersonalInfoModal } from "./modals/DirectoryPersonalInfoModal";
 export { VerticalStepper } from "./navbar/VerticalStepper";
 export { ProfessionalInfoModal } from "./modals/ProfessionalInfoModal";

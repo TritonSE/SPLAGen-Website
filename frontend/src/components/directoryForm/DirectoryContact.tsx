@@ -21,32 +21,33 @@ import { UserContext } from "@/contexts/userContext";
 import { directoryState } from "@/state/stateTypes";
 import updateDirectoryForm from "@/state/updateDirectoryForm";
 
-const formSchema = z
-  .object({
-    workEmail: z.string().min(1, "Required").email("Please enter a valid email address"),
-    workPhone: z.string().min(1, "Required"),
-    licenseType: z.enum(["has_license", "no_license"], { required_error: "Required" }),
-    licenseNumber: z.string().optional(),
-    noLicenseReason: z.string().optional(),
-    additionalComments: z.string().optional(),
-  })
-  .refine(
-    (data) => {
-      if (data.licenseType === "has_license" && !data.licenseNumber?.trim()) {
-        return false;
-      }
-      if (data.licenseType === "no_license" && !data.noLicenseReason?.trim()) {
-        return false;
-      }
-      return true;
-    },
-    {
-      message: "This field is required",
-      path: ["licenseNumber"],
-    },
-  );
+const formSchema = (t: (key: string) => string) =>
+  z
+    .object({
+      workEmail: z.string().min(1, t("required")).email(t("invalid-email")),
+      workPhone: z.string().min(1, t("required")),
+      licenseType: z.enum(["has_license", "no_license"], { required_error: t("required") }),
+      licenseNumber: z.string().optional(),
+      noLicenseReason: z.string().optional(),
+      additionalComments: z.string().optional(),
+    })
+    .refine(
+      (data) => {
+        if (data.licenseType === "has_license" && !data.licenseNumber?.trim()) {
+          return false;
+        }
+        if (data.licenseType === "no_license" && !data.noLicenseReason?.trim()) {
+          return false;
+        }
+        return true;
+      },
+      {
+        message: t("field-required"),
+        path: ["licenseNumber"],
+      },
+    );
 
-type FormSchema = z.infer<typeof formSchema>;
+type FormSchema = z.infer<ReturnType<typeof formSchema>>;
 
 type DirectoryContactProps = {
   onReset: () => void;
@@ -67,7 +68,7 @@ export const DirectoryContact = ({ onReset, onBack }: DirectoryContactProps) => 
     formState: { errors },
   } = useForm<FormSchema>({
     defaultValues: state.directoryForm as FormSchema,
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(formSchema(t)),
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -124,14 +125,14 @@ export const DirectoryContact = ({ onReset, onBack }: DirectoryContactProps) => 
       };
       const res = await joinDirectory(requestBody, token);
       if (res.success) {
-        setSuccessMessage("Submitted directory info");
+        setSuccessMessage(t("submitted-directory-info"));
         await reloadUser();
         router.push("/");
       } else {
-        setError(`Failed to submit directory info: ${res.error}`);
+        setError(`${t("failed-submit-directory")}: ${res.error}`);
       }
     } catch (err) {
-      setError(`Failed to submit directory info: ${String(err)}`);
+      setError(`${t("failed-submit-directory")}: ${String(err)}`);
     } finally {
       setIsSubmitting(false);
     }
@@ -151,16 +152,16 @@ export const DirectoryContact = ({ onReset, onBack }: DirectoryContactProps) => 
     <div className={styles.container}>
       <form onSubmit={handleFormSubmit} className={styles.form}>
         <div>
-          <h4>Page 3 of 3</h4>
-          <h3 className={styles.sectionTitle}>Contact</h3>
+          <h4>{t("page-3-of-3")}</h4>
+          <h3 className={styles.sectionTitle}>{t("contact")}</h3>
 
           <div className={styles.questionSection}>
-            <p className={styles.sectionText}>Professional email for patients to contact you</p>
+            <p className={styles.sectionText}>{t("professional-email-for-contact")}</p>
             <input
               type="email"
               {...register("workEmail")}
               className={styles.textInput}
-              placeholder="Enter your professional email"
+              placeholder={t("enter-professional-email")}
             />
             <p className={styles.errorText}>
               {errors.workEmail ? errors.workEmail.message : "\u00A0"}
@@ -168,13 +169,13 @@ export const DirectoryContact = ({ onReset, onBack }: DirectoryContactProps) => 
           </div>
 
           <div className={styles.questionSection}>
-            <p className={styles.sectionText}>Telephone number for patients to contact you</p>
+            <p className={styles.sectionText}>{t("telephone-number-for-contact")}</p>
             <Controller
               name="workPhone"
               control={control}
               render={({ field }) => (
                 <PhoneInput
-                  placeholder="Enter your phone number"
+                  placeholder={t("enter-phone-number")}
                   value={field.value}
                   onChange={field.onChange}
                   defaultCountry="US"
@@ -188,14 +189,8 @@ export const DirectoryContact = ({ onReset, onBack }: DirectoryContactProps) => 
           </div>
 
           <div className={styles.questionSection}>
-            <p className={styles.sectionText}>
-              What is your license number to practice medicine or genetic counseling?
-            </p>
-            <p className={styles.subText}>
-              We use this information to assure the public that everyone in our directory can
-              provide genetic counseling services. We will not share this information with the
-              public.
-            </p>
+            <p className={styles.sectionText}>{t("license-number-question")}</p>
+            <p className={styles.subText}>{t("license-info-privacy")}</p>
 
             <div className={styles.radioGroup}>
               <Controller
@@ -205,7 +200,7 @@ export const DirectoryContact = ({ onReset, onBack }: DirectoryContactProps) => 
                   <>
                     <Radio
                       id="has-license"
-                      label="My medical or genetic counseling license number is..."
+                      label={t("has-license-label")}
                       checked={field.value === "has_license"}
                       onChange={() => {
                         field.onChange("has_license");
@@ -216,18 +211,18 @@ export const DirectoryContact = ({ onReset, onBack }: DirectoryContactProps) => 
                         type="text"
                         {...register("licenseNumber")}
                         className={styles.textInput}
-                        placeholder="Enter medical or genetic counseling license number"
+                        placeholder={t("enter-license-number")}
                       />
                       <p className={styles.errorText}>
                         {licenseType === "has_license" && errors.licenseNumber
-                          ? "This field is required"
+                          ? t("field-required")
                           : "\u00A0"}
                       </p>
                     </div>
 
                     <Radio
                       id="no-license"
-                      label="I do not have a medical or genetic counseling license number because..."
+                      label={t("no-license-label")}
                       checked={field.value === "no_license"}
                       onChange={() => {
                         field.onChange("no_license");
@@ -238,11 +233,11 @@ export const DirectoryContact = ({ onReset, onBack }: DirectoryContactProps) => 
                         type="text"
                         {...register("noLicenseReason")}
                         className={styles.textInput}
-                        placeholder="Reasoning"
+                        placeholder={t("reasoning")}
                       />
                       <p className={styles.errorText}>
                         {licenseType === "no_license" && errors.noLicenseReason
-                          ? "This field is required"
+                          ? t("field-required")
                           : "\u00A0"}
                       </p>
                     </div>
@@ -256,13 +251,11 @@ export const DirectoryContact = ({ onReset, onBack }: DirectoryContactProps) => 
           </div>
 
           <div className={styles.questionSection}>
-            <p className={styles.sectionText}>
-              Any additional comments you have regarding the questions mentioned above
-            </p>
+            <p className={styles.sectionText}>{t("additional-comments-question")}</p>
             <input
               {...register("additionalComments")}
               className={styles.textArea}
-              placeholder="Type here"
+              placeholder={t("type-here")}
             />
             <p className={styles.errorText}>
               {errors.additionalComments ? errors.additionalComments.message : "\u00A0"}
@@ -273,12 +266,12 @@ export const DirectoryContact = ({ onReset, onBack }: DirectoryContactProps) => 
         <div className={styles.buttonContainer}>
           <button type="button" className={styles.backButton} onClick={onBack}>
             <Image src="/icons/ic_caretleft.svg" alt="Back Icon" width={24} height={24} />
-            Back
+            {t("back")}
           </button>
 
           <Button
             type="submit"
-            label={isSubmitting ? t("loading") : "Submit"}
+            label={isSubmitting ? t("loading") : t("submit")}
             disabled={isSubmitting}
           />
         </div>

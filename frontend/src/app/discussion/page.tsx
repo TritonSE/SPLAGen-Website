@@ -14,7 +14,7 @@ import { Tabs } from "@/components/Tabs";
 import { UserContext } from "@/contexts/userContext";
 import { useRedirectToLoginIfNotSignedIn } from "@/hooks/useRedirection";
 
-const TABS = ["All Discussions", "My Discussions"] as const;
+const TABS = ["all-discussions", "my-discussions"] as const;
 type Tab = (typeof TABS)[number];
 
 export default function LandingPage() {
@@ -27,7 +27,7 @@ export default function LandingPage() {
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState("");
   const [posts, setPosts] = useState<Discussion[]>();
-  const [activeTab, setActiveTab] = useState<Tab>("All Discussions");
+  const [activeTab, setActiveTab] = useState<Tab>("all-discussions");
   const [errorMessage, setErrorMessage] = useState("");
 
   const { firebaseUser } = useContext(UserContext);
@@ -42,19 +42,19 @@ export default function LandingPage() {
         token,
         sort || "newest",
         search,
-        activeTab === "My Discussions",
+        activeTab === "my-discussions",
         page,
       );
       if (response.success) {
         setPosts(response.data.discussions);
         setNumPages(Math.ceil(response.data.count / DISCUSSION_PAGE_SIZE));
       } else {
-        setErrorMessage(`Failed to fetch discussion posts: ${response.error}`);
+        setErrorMessage(`${t("failed-to-fetch-discussion-posts")}: ${response.error}`);
       }
     } catch (error) {
-      setErrorMessage(`Failed to fetch discussion posts: ${String(error)}`);
+      setErrorMessage(`${t("failed-to-fetch-discussion-posts")}: ${String(error)}`);
     }
-  }, [firebaseUser, search, sort, activeTab, page]);
+  }, [firebaseUser, search, sort, activeTab, page, t]);
 
   useEffect(() => {
     void loadPosts();
@@ -63,14 +63,14 @@ export default function LandingPage() {
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <h1 className={styles.title}>{t("Discussion")}</h1>
+        <h1 className={styles.title}>{t("discussion")}</h1>
       </div>
       <div className={styles.searchForm}>
         {/* Wrap the search input and 'Sort By' dropdown */}
         <div className={styles.searchAllSortContainer}>
           <input
             type="text"
-            placeholder="Search Discussions"
+            placeholder={t("search-discussions")}
             className={styles.searchInput}
             value={search}
             onChange={(e) => {
@@ -88,9 +88,9 @@ export default function LandingPage() {
                   }}
                   value={sort}
                 >
-                  <option value="">{t("Sort By")}</option>
-                  <option value="newest">{t("Newest First")}</option>
-                  <option value="oldest">{t("Oldest First")}</option>
+                  <option value="">{t("sort-by")}</option>
+                  <option value="newest">{t("newest-first")}</option>
+                  <option value="oldest">{t("oldest-first")}</option>
                 </select>
 
                 <div className={styles.sortIconWrapper}>
@@ -102,7 +102,7 @@ export default function LandingPage() {
         </div>
 
         <Link href="/discussion/post" className={styles.newPostButton}>
-          Create Post
+          {t("create-post")}
           <Image src="/icons/plus.svg" alt="Plus icon" width={24} height={24} />
         </Link>
       </div>
@@ -121,7 +121,7 @@ export default function LandingPage() {
           />
         ))}
 
-        {posts && posts.length === 0 && <div>No posts found</div>}
+        {posts && posts.length === 0 && <div>{t("no-posts-found")}</div>}
       </div>
 
       <Pagination currentPage={page} numPages={numPages} onPageChange={setPage} />

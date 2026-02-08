@@ -2,6 +2,7 @@
 
 import { useParams } from "next/navigation";
 import { useCallback, useContext, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import { Discussion, getIndividualPost } from "@/api/discussion";
 import { DiscussionForm } from "@/components/DiscussionForm";
@@ -9,6 +10,7 @@ import { UserContext } from "@/contexts/userContext";
 import { useRedirectToLoginIfNotSignedIn } from "@/hooks/useRedirection";
 
 const EditPostPage = () => {
+  const { t } = useTranslation();
   useRedirectToLoginIfNotSignedIn();
   const params = useParams();
 
@@ -25,12 +27,12 @@ const EditPostPage = () => {
       if (response.success) {
         setPost(response.data);
       } else {
-        setErrorMessage(`Failed to retrieve discussion post: ${response.error}`);
+        setErrorMessage(`${t("failed-to-retrieve-discussion-post")}: ${response.error}`);
       }
     } catch (error) {
-      setErrorMessage(`Failed to retrieve discussion post: ${String(error)}`);
+      setErrorMessage(`${t("failed-to-retrieve-discussion-post")}: ${String(error)}`);
     }
-  }, [firebaseUser, params]);
+  }, [firebaseUser, params, t]);
 
   useEffect(() => {
     void loadPost();

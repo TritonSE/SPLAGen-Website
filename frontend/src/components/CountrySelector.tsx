@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useCallback, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import Select, { SingleValue } from "react-select";
 import countryList from "react-select-country-list";
 
@@ -32,8 +33,9 @@ export const getCountryLabelFromCode = (code: string | undefined): string | unde
 export const CountrySelector: React.FC<CountrySelectorProps> = ({
   value,
   onChange,
-  placeholder = "Select a country...",
+  placeholder,
 }) => {
+  const { t } = useTranslation();
   // Ensure safe data fetching
   const options = useMemo(() => {
     try {
@@ -61,7 +63,7 @@ export const CountrySelector: React.FC<CountrySelectorProps> = ({
         options={options}
         value={value}
         onChange={changeHandler}
-        placeholder={placeholder}
+        placeholder={placeholder ?? t("select-a-country")}
       />
     </div>
   );

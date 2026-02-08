@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import React, { useCallback, useContext, useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 import { z } from "zod";
 
 import styles from "./styles.module.css";
@@ -22,6 +23,7 @@ const announcementSchema = z.object({
 type NewAnnouncementData = z.infer<typeof announcementSchema>;
 
 export const AnnouncementForm = ({ announcement }: { announcement?: Announcement }) => {
+  const { t } = useTranslation();
   const { firebaseUser } = useContext(UserContext);
   const router = useRouter();
   const {
@@ -106,7 +108,7 @@ export const AnnouncementForm = ({ announcement }: { announcement?: Announcement
             router.push(`/announcements/${result.data._id}`);
           } else {
             setErrorMessage(
-              `Failed to update announcement: ${result.success ? JSON.stringify(result.data) : result.error}`,
+              `${t("failed-to-update-announcement")}: ${result.success ? JSON.stringify(result.data) : result.error}`,
             );
           }
         } else {
@@ -115,19 +117,19 @@ export const AnnouncementForm = ({ announcement }: { announcement?: Announcement
             router.push(`/announcements/${result.data._id}`);
           } else {
             setErrorMessage(
-              `Failed to create announcement: ${result.success ? JSON.stringify(result.data) : result.error}`,
+              `${t("failed-to-create-announcement")}: ${result.success ? JSON.stringify(result.data) : result.error}`,
             );
           }
         }
       } catch (error) {
         setErrorMessage(
-          `Failed to ${announcement ? "update" : "create"} announcement: ${String(error)}`,
+          `${t(announcement ? "failed-to-update-announcement" : "failed-to-create-announcement")}: ${String(error)}`,
         );
       } finally {
         setLoading(false);
       }
     },
-    [router, firebaseUser, announcement],
+    [router, firebaseUser, announcement, t],
   );
 
   const handleFormSubmit = useCallback(
@@ -141,14 +143,14 @@ export const AnnouncementForm = ({ announcement }: { announcement?: Announcement
   return (
     <div className={styles.createPostPageContainer}>
       <div className={styles.titleBackDiv}>
-        <h1 className={styles.title}>Announcements</h1>
+        <h1 className={styles.title}>{t("announcements")}</h1>
       </div>
       <div className={styles.postPageDiv}>
-        <h2 className={styles.pageTitle}>Create New Announcement</h2>
+        <h2 className={styles.pageTitle}>{t("create-new-announcement")}</h2>
         <form onSubmit={handleFormSubmit} className={styles.createPostForm}>
           <div className={styles.formGroup}>
             <label className={styles.fieldLabel} htmlFor="recipient">
-              Recipient
+              {t("recipient")}
             </label>
 
             {/* Radio buttons for recipient type */}
@@ -160,7 +162,7 @@ export const AnnouncementForm = ({ announcement }: { announcement?: Announcement
                   {...register("recipientType")}
                   className={styles.radioInput}
                 />
-                <span>Everyone</span>
+                <span>{t("everyone")}</span>
               </label>
 
               <label className={styles.radioLabel}>
@@ -170,7 +172,7 @@ export const AnnouncementForm = ({ announcement }: { announcement?: Announcement
                   {...register("recipientType")}
                   className={styles.radioInput}
                 />
-                <span>Specific language only</span>
+                <span>{t("specific-language-only")}</span>
               </label>
 
               <label className={styles.radioLabel}>
@@ -180,7 +182,7 @@ export const AnnouncementForm = ({ announcement }: { announcement?: Announcement
                   {...register("recipientType")}
                   className={styles.radioInput}
                 />
-                <span>Specific users only</span>
+                <span>{t("specific-users-only")}</span>
               </label>
             </div>
 
@@ -194,7 +196,7 @@ export const AnnouncementForm = ({ announcement }: { announcement?: Announcement
                     {...register("language")}
                     className={styles.radioInput}
                   />
-                  <span>English</span>
+                  <span>{t("english")}</span>
                 </label>
 
                 <label className={styles.radioLabel}>
@@ -204,7 +206,7 @@ export const AnnouncementForm = ({ announcement }: { announcement?: Announcement
                     {...register("language")}
                     className={styles.radioInput}
                   />
-                  <span>Spanish</span>
+                  <span>{t("spanish")}</span>
                 </label>
 
                 <label className={styles.radioLabel}>
@@ -214,7 +216,7 @@ export const AnnouncementForm = ({ announcement }: { announcement?: Announcement
                     {...register("language")}
                     className={styles.radioInput}
                   />
-                  <span>Portuguese</span>
+                  <span>{t("portuguese")}</span>
                 </label>
 
                 <label className={styles.radioLabel}>
@@ -224,7 +226,7 @@ export const AnnouncementForm = ({ announcement }: { announcement?: Announcement
                     {...register("language")}
                     className={styles.radioInput}
                   />
-                  <span>Other</span>
+                  <span>{t("other")}</span>
                 </label>
               </div>
             )}
@@ -236,7 +238,7 @@ export const AnnouncementForm = ({ announcement }: { announcement?: Announcement
                 type="text"
                 className={styles.inputField}
                 {...register("recipients")}
-                placeholder="Enter email(s) separated by commas"
+                placeholder={t("enter-emails-comma-separated")}
               />
             )}
             <p className="error-message">{errors.recipients?.message ?? "\u00A0"}</p>
@@ -244,27 +246,27 @@ export const AnnouncementForm = ({ announcement }: { announcement?: Announcement
 
           <div className={styles.formGroup}>
             <label className={styles.fieldLabel} htmlFor="title">
-              Subject
+              {t("subject")}
             </label>
             <input
               id="post-title"
               type="text"
               className={styles.inputField}
               {...register("title")}
-              placeholder="Enter subject"
+              placeholder={t("enter-subject")}
             />
             <p className="error-message">{errors.title?.message ?? "\u00A0"}</p>
           </div>
 
           <div className={styles.formGroup}>
             <label className={styles.fieldLabel} htmlFor="post-message">
-              Message
+              {t("message")}
             </label>
             <textarea
               id="post-message"
               className={styles.textAreaField}
               {...register("message")}
-              placeholder="Enter message"
+              placeholder={t("enter-message")}
             />
             <p className="error-message">{errors.message?.message ?? "\u00A0"}</p>
           </div>
@@ -278,10 +280,10 @@ export const AnnouncementForm = ({ announcement }: { announcement?: Announcement
               }}
               disabled={loading}
             >
-              Cancel
+              {t("cancel")}
             </button>
             <button className={styles.buttonPost} type="submit" disabled={loading}>
-              {loading ? "Loading..." : announcement ? "Save" : "Post"}
+              {loading ? t("loading") : announcement ? t("save") : t("post")}
             </button>
           </div>
           {errorMessage && <div className="text-red-500">{errorMessage}</div>}

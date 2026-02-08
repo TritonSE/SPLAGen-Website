@@ -6,6 +6,11 @@ import en from "./translations/en.json";
 import es from "./translations/es.json";
 import pt from "./translations/pt.json";
 
+const detectionOptions = {
+  order: ["path", "cookie", "localStorage", "navigator"],
+  lookupFromPathIndex: 1, // For directory map: /directoryMap/{en,es,pt}
+};
+
 // eslint-disable-next-line import/no-named-as-default-member
 void i18n
   .use(LanguageDetector)
@@ -21,6 +26,7 @@ void i18n
     interpolation: {
       escapeValue: false,
     },
+    detection: detectionOptions,
   });
 
 export default i18n;

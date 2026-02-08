@@ -120,19 +120,19 @@ export const ProfessionalInfoModal = ({
         const firebaseToken = await firebaseUser.getIdToken();
         const response = await editProfessionalInfoRequest(formattedData, firebaseToken);
         if (response.success) {
-          setSuccessMessage("Professional information updated");
+          setSuccessMessage(t("professional-information-updated"));
           await reloadUser();
           onClose();
         } else {
-          setErrorMessage(`Error updating info: ${response.error}`);
+          setErrorMessage(`${t("error-updating-info-colon")}: ${response.error}`);
         }
       } catch (err) {
-        setErrorMessage(`Error updating info: ${String(err)}`);
+        setErrorMessage(`${t("error-updating-info-colon")}: ${String(err)}`);
       } finally {
         setLoading(false);
       }
     },
-    [onClose, firebaseUser, setErrorMessage, setSuccessMessage, reloadUser],
+    [onClose, firebaseUser, setErrorMessage, setSuccessMessage, reloadUser, t],
   );
 
   // Populates form inputs when modal is opened
@@ -193,12 +193,15 @@ export const ProfessionalInfoModal = ({
 
               {isOtherProfessionalTitleOption(watchedProfessionalTitle) && (
                 <div className="prof-info-field">
-                  <label htmlFor="professionalTitleOther">Please Specify</label>
+                  <label htmlFor="professionalTitleOther">{t("please-specify")}</label>
                   <Controller
                     name="professionalTitleOther"
                     control={control}
                     render={() => (
-                      <input {...register("professionalTitleOther")} placeholder="Please specify" />
+                      <input
+                        {...register("professionalTitleOther")}
+                        placeholder={t("please-specify")}
+                      />
                     )}
                   />
 

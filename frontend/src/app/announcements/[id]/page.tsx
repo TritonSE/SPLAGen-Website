@@ -4,6 +4,7 @@ import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useCallback, useContext, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import styles from "./page.module.css";
 
@@ -13,6 +14,7 @@ import { UserContext } from "@/contexts/userContext";
 import { useRedirectToLoginIfNotSignedIn } from "@/hooks/useRedirection";
 
 const AnnouncementDetailPage = () => {
+  const { t } = useTranslation();
   useRedirectToLoginIfNotSignedIn();
   const params = useParams();
 
@@ -29,12 +31,12 @@ const AnnouncementDetailPage = () => {
       if (response.success) {
         setAnnouncement(response.data);
       } else {
-        setErrorMessage(`Failed to retrieve announcement: ${response.error}`);
+        setErrorMessage(`${t("failed-to-retrieve-announcement")}: ${response.error}`);
       }
     } catch (error) {
-      setErrorMessage(`Failed to retrieve announcement: ${String(error)}`);
+      setErrorMessage(`${t("failed-to-retrieve-announcement")}: ${String(error)}`);
     }
-  }, [firebaseUser, params]);
+  }, [firebaseUser, params, t]);
 
   useEffect(() => {
     void loadAnnouncement();
@@ -42,10 +44,10 @@ const AnnouncementDetailPage = () => {
 
   return (
     <div className={styles.pageContainer}>
-      <h1 className={styles.title}>Announcements</h1>
+      <h1 className={styles.title}>{t("announcements")}</h1>
       <Link href="/announcements" className={styles.backButton}>
         <ChevronLeft />
-        Back
+        {t("back")}
       </Link>
 
       {announcement && (

@@ -52,7 +52,7 @@ export default function OnboardingForm() {
       professionalTitle: { value: "", label: "" },
       professionalTitleOther: "",
       country: { value: "", label: "" },
-      languages: [],
+      language: "",
     });
     setStep(0);
   }, [actions, setStep]);
@@ -90,17 +90,17 @@ export default function OnboardingForm() {
       if (status === "success") {
         // Professional & healthcare members can be added to the directory
         if (
-          state.onboardingForm?.membership === '"Genetic Counselor' ||
+          state.onboardingForm?.membership === "Genetic Counselor" ||
           state.onboardingForm?.membership === "Healthcare Professional"
         ) {
           setStep(4);
         } else {
-          setSuccessMessage("Registration submitted");
+          setSuccessMessage(t("registration-submitted"));
           router.push("/");
         }
       }
     },
-    [router, setRegistrationStatus, state.onboardingForm?.membership],
+    [router, setRegistrationStatus, state.onboardingForm?.membership, t],
   );
 
   // Show feedback message for registration
@@ -154,7 +154,6 @@ export default function OnboardingForm() {
 
       {step === 3 && (
         <Category
-          onNext={handleNext}
           onBack={() => {
             // If we're coming from an intermediate step, go back to Step2
             const membership = state.onboardingForm.membership;

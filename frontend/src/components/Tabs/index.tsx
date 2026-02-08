@@ -1,3 +1,5 @@
+import { useTranslation } from "react-i18next";
+
 import styles from "./styles.module.css";
 
 type TabsProps<T extends string> = {
@@ -7,6 +9,8 @@ type TabsProps<T extends string> = {
 };
 
 export const Tabs = <T extends string>({ tabs, activeTab, onActiveTabChange }: TabsProps<T>) => {
+  const { t } = useTranslation();
+
   return (
     <div className={styles.tabsContainer}>
       {tabs.map((tab) => (
@@ -17,7 +21,7 @@ export const Tabs = <T extends string>({ tabs, activeTab, onActiveTabChange }: T
             onActiveTabChange(tab);
           }}
         >
-          {tab}
+          {t(tab)}
         </div>
       ))}
     </div>

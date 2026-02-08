@@ -3,17 +3,27 @@
 import { useStateMachine } from "little-state-machine";
 import Image from "next/image";
 import { useCallback, useContext, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import styles from "./Category.module.css";
 
 import {
   MembershipType,
   editMembership,
+  membershipDisplayMap,
   updateAssociateInfo,
   updateStudentInfo,
 } from "@/api/users";
 import { Button } from "@/components/Button";
 import { UserContext } from "@/contexts/userContext";
+
+// Map display membership to API membership type
+const membershipMap: Record<string, MembershipType> = {
+  Student: "student",
+  "Healthcare Professional": "healthcareProvider",
+  "Genetic Counselor": "geneticCounselor",
+  "Associate Member": "associate",
+};
 
 type EditMembershipCategoryProps = {
   onNext: () => void;
@@ -26,6 +36,7 @@ export const EditMembershipCategory: React.FC<EditMembershipCategoryProps> = ({
   onBack,
   onStatusChange,
 }) => {
+  const { t } = useTranslation();
   const { state } = useStateMachine();
   const { firebaseUser, reloadUser } = useContext(UserContext);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -33,17 +44,8 @@ export const EditMembershipCategory: React.FC<EditMembershipCategoryProps> = ({
 
   const membershipType = state.onboardingForm.membership;
 
-  const [article, membershipText] = useMemo(() => {
-    switch (membershipType) {
-      case "Student":
-        return ["a", "Student"];
-      case "Healthcare Professional":
-        return ["a", "Healthcare Professional"];
-      case "Genetic Counselor":
-        return ["a", "Genetic Counselor"];
-      default:
-        return ["an", "Associate Member"];
-    }
+  const membershipKey = useMemo(() => {
+    return membershipMap[membershipType];
   }, [membershipType]);
 
   const updateMembership = useCallback(async () => {
@@ -54,14 +56,6 @@ export const EditMembershipCategory: React.FC<EditMembershipCategoryProps> = ({
       setError(null);
       onStatusChange("submitting");
 
-      // Map display membership to API membership type
-      const membershipMap: Record<string, MembershipType> = {
-        Student: "student",
-        "Healthcare Professional": "healthcareProvider",
-        "Genetic Counselor": "geneticCounselor",
-        "Associate Member": "associate",
-      };
-
       const membership = membershipMap[state.onboardingForm.membership];
       const token = await firebaseUser.getIdToken();
 
@@ -69,7 +63,7 @@ export const EditMembershipCategory: React.FC<EditMembershipCategoryProps> = ({
       const response = await editMembership(membership, token);
 
       if (!response.success) {
-        setError(response.error || "Failed to update membership");
+        setError(response.error || t("failed-to-update-membership"));
         onStatusChange("error");
         return;
       }
@@ -99,7 +93,7 @@ export const EditMembershipCategory: React.FC<EditMembershipCategoryProps> = ({
         });
 
         if (!studentInfoResponse.success) {
-          setError(studentInfoResponse.error || "Failed to update student information");
+          setError(studentInfoResponse.error || t("failed-to-update-student-information"));
           onStatusChange("error");
           return;
         }
@@ -120,7 +114,7 @@ export const EditMembershipCategory: React.FC<EditMembershipCategoryProps> = ({
         });
 
         if (!associateInfoResponse.success) {
-          setError(associateInfoResponse.error || "Failed to update associate information");
+          setError(associateInfoResponse.error || t("failed-to-update-associate-information"));
           onStatusChange("error");
           return;
         }
@@ -136,20 +130,21 @@ export const EditMembershipCategory: React.FC<EditMembershipCategoryProps> = ({
     } finally {
       setIsSubmitting(false);
     }
-  }, [firebaseUser, state.onboardingForm, onNext, onStatusChange, reloadUser]);
+  }, [firebaseUser, state.onboardingForm, onNext, onStatusChange, reloadUser, t]);
 
   return (
     <div className={styles.darkContainer}>
       <div className={styles.container}>
-        <h2 className={styles.welcome}>Update Membership Category</h2>
+        <h2 className={styles.welcome}>{t("update-membership-category")}</h2>
 
         <div className={styles.iconContainer}>
           <Image src="/icons/ic_success.svg" alt="Checkbox icon" width={81} height={81} />
         </div>
 
         <p className={styles.text}>
-          Your membership category will be updated to {article}{" "}
-          <span className={styles.membershipCategory}>{membershipText}</span>.
+          {t("membership-update-message", {
+            membership: t(membershipDisplayMap[membershipKey]),
+          })}
         </p>
 
         {error && (
@@ -160,7 +155,7 @@ export const EditMembershipCategory: React.FC<EditMembershipCategoryProps> = ({
                 onClick={onBack}
                 className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100"
               >
-                Go Back
+                {t("back")}
               </button>
             </div>
           </>
@@ -169,12 +164,12 @@ export const EditMembershipCategory: React.FC<EditMembershipCategoryProps> = ({
         <div className={styles.buttonContainer}>
           <button type="button" onClick={onBack} className={styles.backButton}>
             <Image src="/icons/ic_caretleft.svg" alt="Back Icon" width={24} height={24} />
-            Back
+            {t("back")}
           </button>
 
           <Button
             onClick={() => void updateMembership()}
-            label={isSubmitting ? "Updating..." : "Confirm and Update"}
+            label={isSubmitting ? t("updating") : t("confirm-and-update")}
             disabled={isSubmitting}
           />
         </div>

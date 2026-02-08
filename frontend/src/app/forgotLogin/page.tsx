@@ -33,10 +33,10 @@ const ForgotLogin = () => {
       if (res.success) {
         setSuccess(true);
       } else {
-        setError(`Failed to reset password: ${res.error}`);
+        setError(`${t("failed-to-reset-password")}: ${res.error}`);
       }
     } catch (err) {
-      setError(`Failed to reset password: ${String(err)}`);
+      setError(`${t("failed-to-reset-password")}: ${String(err)}`);
     } finally {
       setLoading(false);
     }

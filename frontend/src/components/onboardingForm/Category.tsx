@@ -7,19 +7,23 @@ import { useTranslation } from "react-i18next";
 
 import styles from "./Category.module.css";
 
-import { CreateUserRequestBody, MembershipType, signUpUser } from "@/api/users";
+import {
+  CreateUserRequestBody,
+  MembershipType,
+  getWhoAmI,
+  loginUserWithEmailPassword,
+  signUpUser,
+} from "@/api/users";
 import { Button } from "@/components/Button";
 import { LANGUAGES } from "@/components/languageSwitcher";
-import { onboardingState } from "@/state/stateTypes";
 
 type CategoryProps = {
-  onNext: (data: onboardingState["data"]) => void;
   onBack: () => void;
   onReset: () => void;
   onStatusChange: (status: "idle" | "submitting" | "success" | "error") => void;
 };
 
-export const Category: React.FC<CategoryProps> = ({ onNext, onBack, onReset, onStatusChange }) => {
+export const Category: React.FC<CategoryProps> = ({ onBack, onReset, onStatusChange }) => {
   const { state } = useStateMachine();
   const { t } = useTranslation();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -27,18 +31,18 @@ export const Category: React.FC<CategoryProps> = ({ onNext, onBack, onReset, onS
 
   const membershipType = state.onboardingForm.membership;
 
-  const [article, membershipText] = useMemo(() => {
+  const membershipText = useMemo(() => {
     switch (membershipType) {
       case "Student":
-        return ["a", "Student"];
+        return t("category-membership-student");
       case "Healthcare Professional":
-        return ["a", "Healthcare Professional"];
+        return t("category-membership-healthcare");
       case "Genetic Counselor":
-        return ["a", "Genetic Counselor"];
+        return t("category-membership-genetic-counselor");
       default:
-        return ["an", "Associate Member"];
+        return t("category-membership-associate");
     }
-  }, [membershipType]);
+  }, [membershipType, t]);
 
   const registerUser = useCallback(async () => {
     try {
@@ -121,8 +125,25 @@ export const Category: React.FC<CategoryProps> = ({ onNext, onBack, onReset, onS
       const result = await signUpUser(userData);
 
       if (result.success) {
+        // Log in with Firebase
+        const loginResult = await loginUserWithEmailPassword(
+          userData.personal.email,
+          userData.password,
+        );
+        if (!loginResult.success) {
+          setError(loginResult.error || t("registration-failed"));
+          onStatusChange("error");
+          return;
+        }
+
+        const authResult = await getWhoAmI(loginResult.data.token);
+        if (!authResult.success) {
+          setError(authResult.error || t("registration-failed"));
+          onStatusChange("error");
+          return;
+        }
+
         onStatusChange("success");
-        onNext(state.onboardingForm); // Advance flow if needed
       } else {
         setError(result.error || t("registration-failed"));
         onStatusChange("error");
@@ -134,19 +155,19 @@ export const Category: React.FC<CategoryProps> = ({ onNext, onBack, onReset, onS
     } finally {
       setIsSubmitting(false);
     }
-  }, [state.onboardingForm, onNext, onStatusChange, t]);
+  }, [state.onboardingForm, onStatusChange, t]);
 
   return (
     <div className={styles.darkContainer}>
       <div className={styles.container}>
-        <h2 className={styles.welcome}>Welcome to SPLAGen!</h2>
+        <h2 className={styles.welcome}>{t("category-welcome")}</h2>
 
         <div className={styles.iconContainer}>
           <Image src="/icons/ic_success.svg" alt="Checkbox icon" width={81} height={81} />
         </div>
 
         <p className={styles.text}>
-          You are being added to SPLAGen&apos;s full membership as {article}{" "}
+          {t("category-membership-text")}{" "}
           <span className={styles.membershipCategory}>{membershipText}</span>.
         </p>
 
@@ -167,7 +188,7 @@ export const Category: React.FC<CategoryProps> = ({ onNext, onBack, onReset, onS
         <div className={styles.buttonContainer}>
           <button type="button" onClick={onBack} className={styles.backButton}>
             <Image src="/icons/ic_caretleft.svg" alt="Back Icon" width={24} height={24} />
-            Back
+            {t("back")}
           </button>
 
           <Button

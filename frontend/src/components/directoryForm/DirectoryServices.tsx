@@ -7,6 +7,7 @@ import { useStateMachine } from "little-state-machine";
 import Image from "next/image";
 import { useCallback, useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 import { z } from "zod";
 
 import styles from "./DirectoryServices.module.css";
@@ -81,6 +82,7 @@ type DirectoryServicesProps = {
 };
 
 export const DirectoryServices = ({ onNext, onBack }: DirectoryServicesProps) => {
+  const { t } = useTranslation();
   const { state, actions } = useStateMachine({ actions: { updateDirectoryForm } });
 
   const {
@@ -152,11 +154,11 @@ export const DirectoryServices = ({ onNext, onBack }: DirectoryServicesProps) =>
     <div className={styles.container}>
       <form onSubmit={handleFormSubmit} className={styles.form}>
         <div>
-          <h4>Page 2 of 3</h4>
-          <h3 className={styles.sectionTitle}>Services</h3>
+          <h4>{t("page-2-of-3")}</h4>
+          <h3 className={styles.sectionTitle}>{t("services")}</h3>
 
           <div className={styles.questionSection}>
-            <p className={styles.sectionText}>Can patients make appointments for your services?</p>
+            <p className={styles.sectionText}>{t("can-patients-make-appointments")}</p>
             <div className={styles.radioGroup}>
               <Controller
                 name="canMakeAppointments"
@@ -165,7 +167,7 @@ export const DirectoryServices = ({ onNext, onBack }: DirectoryServicesProps) =>
                   <>
                     <Radio
                       id="appointments-yes"
-                      label="Yes"
+                      label={t("yes")}
                       checked={field.value === true}
                       onChange={() => {
                         field.onChange(true);
@@ -173,7 +175,7 @@ export const DirectoryServices = ({ onNext, onBack }: DirectoryServicesProps) =>
                     />
                     <Radio
                       id="appointments-no"
-                      label="No"
+                      label={t("no")}
                       checked={field.value === false}
                       onChange={() => {
                         field.onChange(false);
@@ -189,9 +191,7 @@ export const DirectoryServices = ({ onNext, onBack }: DirectoryServicesProps) =>
           </div>
 
           <div className={styles.questionSection}>
-            <p className={styles.sectionText}>
-              Can patients request genetic tests through your services?
-            </p>
+            <p className={styles.sectionText}>{t("can-patients-request-tests")}</p>
             <div className={styles.radioGroup}>
               <Controller
                 name="canRequestTests"
@@ -200,7 +200,7 @@ export const DirectoryServices = ({ onNext, onBack }: DirectoryServicesProps) =>
                   <>
                     <Radio
                       id="tests-yes"
-                      label="Yes"
+                      label={t("yes")}
                       checked={field.value === true}
                       onChange={() => {
                         field.onChange(true);
@@ -208,7 +208,7 @@ export const DirectoryServices = ({ onNext, onBack }: DirectoryServicesProps) =>
                     />
                     <Radio
                       id="tests-no"
-                      label="No"
+                      label={t("no")}
                       checked={field.value === false}
                       onChange={() => {
                         field.onChange(false);
@@ -224,9 +224,7 @@ export const DirectoryServices = ({ onNext, onBack }: DirectoryServicesProps) =>
           </div>
 
           <div className={styles.questionSection}>
-            <p className={styles.sectionText}>
-              Do you offer remote medical services (e.g. telehealth)?
-            </p>
+            <p className={styles.sectionText}>{t("do-you-offer-telehealth")}</p>
             <div className={styles.radioGroup}>
               <Controller
                 name="offersTelehealth"
@@ -235,7 +233,7 @@ export const DirectoryServices = ({ onNext, onBack }: DirectoryServicesProps) =>
                   <>
                     <Radio
                       id="telehealth-yes"
-                      label="Yes"
+                      label={t("yes")}
                       checked={field.value === true}
                       onChange={() => {
                         field.onChange(true);
@@ -243,7 +241,7 @@ export const DirectoryServices = ({ onNext, onBack }: DirectoryServicesProps) =>
                     />
                     <Radio
                       id="telehealth-no"
-                      label="No"
+                      label={t("no")}
                       checked={field.value === false}
                       onChange={() => {
                         field.onChange(false);
@@ -259,9 +257,7 @@ export const DirectoryServices = ({ onNext, onBack }: DirectoryServicesProps) =>
           </div>
 
           <div className={styles.questionSection}>
-            <p className={styles.sectionText}>
-              Please indicate the genetic specialty services you offer
-            </p>
+            <p className={styles.sectionText}>{t("indicate-genetic-services")}</p>
             <Controller
               name="specialtyServices"
               control={control}
@@ -279,7 +275,7 @@ export const DirectoryServices = ({ onNext, onBack }: DirectoryServicesProps) =>
                           toggleSpecialty(specialty);
                         }}
                       >
-                        {specialty}
+                        {t(specialty)}
                       </button>
                     );
                   })}
@@ -292,7 +288,7 @@ export const DirectoryServices = ({ onNext, onBack }: DirectoryServicesProps) =>
           </div>
 
           <div className={styles.questionSection}>
-            <p className={styles.sectionText}>Language(s) used for patient care:</p>
+            <p className={styles.sectionText}>{t("language-for-patient-care")}:</p>
             <Controller
               name="careLanguages"
               control={control}
@@ -310,7 +306,7 @@ export const DirectoryServices = ({ onNext, onBack }: DirectoryServicesProps) =>
                           toggleLanguage(language);
                         }}
                       >
-                        {language}
+                        {t(language)}
                       </button>
                     );
                   })}
@@ -323,10 +319,7 @@ export const DirectoryServices = ({ onNext, onBack }: DirectoryServicesProps) =>
           </div>
 
           <div className={styles.questionSection}>
-            <p className={styles.sectionText}>
-              Based on your state health institutions and policies, are you authorized to provide
-              care in the languages mentioned above?
-            </p>
+            <p className={styles.sectionText}>{t("authorized-in-languages-question")}</p>
             <div className={styles.radioGroup}>
               <Controller
                 name="authorizedForLanguages"
@@ -335,7 +328,7 @@ export const DirectoryServices = ({ onNext, onBack }: DirectoryServicesProps) =>
                   <>
                     <Radio
                       id="authorized-yes"
-                      label="Yes"
+                      label={t("yes")}
                       checked={field.value === true}
                       onChange={() => {
                         field.onChange(true);
@@ -343,7 +336,7 @@ export const DirectoryServices = ({ onNext, onBack }: DirectoryServicesProps) =>
                     />
                     <Radio
                       id="authorized-no"
-                      label="No"
+                      label={t("no")}
                       checked={field.value === false}
                       onChange={() => {
                         field.onChange(false);
@@ -351,7 +344,7 @@ export const DirectoryServices = ({ onNext, onBack }: DirectoryServicesProps) =>
                     />
                     <Radio
                       id="authorized-unsure"
-                      label="I'm not sure"
+                      label={t("im-not-sure")}
                       checked={field.value === "unsure"}
                       onChange={() => {
                         field.onChange("unsure");
@@ -370,10 +363,10 @@ export const DirectoryServices = ({ onNext, onBack }: DirectoryServicesProps) =>
         <div className={styles.buttonContainer}>
           <button type="button" className={styles.backButton} onClick={onBack}>
             <Image src="/icons/ic_caretleft.svg" alt="Back Icon" width={24} height={24} />
-            Back
+            {t("back")}
           </button>
 
-          <Button type="submit" label="Continue" />
+          <Button type="submit" label={t("continue")} />
         </div>
       </form>
     </div>

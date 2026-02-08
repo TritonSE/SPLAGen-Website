@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useContext, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import styles from "./page.module.css";
 
@@ -13,6 +14,7 @@ import { UserContext } from "@/contexts/userContext";
 import { useRedirectToLoginIfNotSignedIn } from "@/hooks/useRedirection";
 
 const Announcements: React.FC = () => {
+  const { t } = useTranslation();
   useRedirectToLoginIfNotSignedIn();
 
   const [page, setPage] = useState(1);
@@ -35,12 +37,12 @@ const Announcements: React.FC = () => {
         setAnnouncements(response.data.announcements);
         setNumPages(Math.ceil(response.data.count / ANNOUNCEMENTS_PAGE_SIZE));
       } else {
-        setErrorMessage(`Failed to fetch announcements: ${response.error}`);
+        setErrorMessage(`${t("failed-to-fetch-announcements")}: ${response.error}`);
       }
     } catch (error) {
-      setErrorMessage(`Failed to fetch announcements: ${String(error)}`);
+      setErrorMessage(`${t("failed-to-fetch-announcements")}: ${String(error)}`);
     }
-  }, [firebaseUser, search, sort, page]);
+  }, [firebaseUser, search, sort, page, t]);
 
   useEffect(() => {
     void loadAnnouncements();
@@ -49,14 +51,14 @@ const Announcements: React.FC = () => {
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <h1 className={styles.title}>Announcements</h1>
+        <h1 className={styles.title}>{t("announcements")}</h1>
       </div>
       <div className={styles.searchForm}>
         {/* Wrap the search input and 'Sort By' dropdown */}
         <div className={styles.searchAllSortContainer}>
           <input
             type="text"
-            placeholder="Search Announcements"
+            placeholder={t("search-announcements")}
             className={styles.searchInput}
             value={search}
             onChange={(e) => {
@@ -74,9 +76,9 @@ const Announcements: React.FC = () => {
                   }}
                   value={sort}
                 >
-                  <option value="">Sort By</option>
-                  <option value="newest">Newest First</option>
-                  <option value="oldest">Oldest First</option>
+                  <option value="">{t("sort-by")}</option>
+                  <option value="newest">{t("newest-first")}</option>
+                  <option value="oldest">{t("oldest-first")}</option>
                 </select>
 
                 <div className={styles.sortIconWrapper}>
@@ -89,7 +91,7 @@ const Announcements: React.FC = () => {
 
         {isAdminOrSuperAdmin && (
           <Link href="/announcements/create" className={styles.newPostButton}>
-            Create Announcement
+            {t("create-announcement")}
             <Image src="/icons/plus.svg" alt="Plus icon" width={24} height={24} />
           </Link>
         )}
@@ -105,7 +107,7 @@ const Announcements: React.FC = () => {
             message={announcement.message}
           />
         ))}
-        {announcements && announcements.length === 0 && <p>No announcements found</p>}
+        {announcements && announcements.length === 0 && <p>{t("no-announcements-found")}</p>}
       </div>
 
       <Pagination currentPage={page} numPages={numPages} onPageChange={setPage} />

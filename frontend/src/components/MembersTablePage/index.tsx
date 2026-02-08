@@ -140,12 +140,12 @@ export const MembersTablePage = ({ adminsView }: { adminsView: boolean }) => {
       if (response.success) {
         setFilterOptions(response.data);
       } else {
-        setErrorMessage(`Failed to fetch filter options: ${response.error}`);
+        setErrorMessage(`${t("failed-to-fetch-filter-options")}: ${response.error}`);
       }
     } catch (error) {
-      setErrorMessage(`Failed to fetch filer options: ${String(error)}`);
+      setErrorMessage(`${t("failed-to-fetch-filter-options")}: ${String(error)}`);
     }
-  }, [adminsView, firebaseUser, search, directoryOnly, activeTab]);
+  }, [adminsView, firebaseUser, search, directoryOnly, activeTab, t]);
 
   const handleDownload = useCallback(async () => {
     if (!firebaseUser) return;
@@ -160,7 +160,7 @@ export const MembersTablePage = ({ adminsView }: { adminsView: boolean }) => {
         const userIds = selectedUsers.map((user) => user._id);
         const response = await exportUsers(token, userIds);
         if (!response.success) {
-          setErrorMessage(`Failed to export users: ${response.error}`);
+          setErrorMessage(`${t("failed-to-export-users")}: ${response.error}`);
         }
       } else {
         // Otherwise, export all users matching current filters
@@ -175,15 +175,15 @@ export const MembersTablePage = ({ adminsView }: { adminsView: boolean }) => {
           country: activeFilters.location,
         });
         if (!response.success) {
-          setErrorMessage(`Failed to export users: ${response.error}`);
+          setErrorMessage(`${t("failed-to-export-users")}: ${response.error}`);
         }
       }
     } catch (error) {
-      setErrorMessage(`Failed to export users: ${String(error)}`);
+      setErrorMessage(`${t("failed-to-export-users")}: ${String(error)}`);
     } finally {
       setIsDownloading(false);
     }
-  }, [firebaseUser, selectedUsers, search, adminsView, directoryOnly, activeTab, activeFilters]);
+  }, [firebaseUser, selectedUsers, search, adminsView, directoryOnly, activeTab, activeFilters, t]);
 
   const loadUsers = useCallback(async () => {
     if (!firebaseUser) return;
@@ -205,12 +205,12 @@ export const MembersTablePage = ({ adminsView }: { adminsView: boolean }) => {
         setUsers(response.data.users);
         setNumPages(Math.ceil(response.data.count / USERS_PAGE_SIZE));
       } else {
-        setErrorMessage(`Failed to fetch users: ${response.error}`);
+        setErrorMessage(`${t("failed-to-fetch-users")}: ${response.error}`);
       }
     } catch (error) {
-      setErrorMessage(`Failed to fetch users: ${String(error)}`);
+      setErrorMessage(`${t("failed-to-fetch-users")}: ${String(error)}`);
     }
-  }, [adminsView, firebaseUser, search, sort, page, directoryOnly, activeTab, activeFilters]);
+  }, [adminsView, firebaseUser, search, sort, page, directoryOnly, activeTab, activeFilters, t]);
 
   useEffect(() => {
     if (!users) return;
@@ -250,28 +250,31 @@ export const MembersTablePage = ({ adminsView }: { adminsView: boolean }) => {
     }
   }, [isFilterOpen, activeFilters]);
 
-  // Capitalize first letter for display
+  // Translate filter category names
   const formatFilterCategory = (category: string) => {
-    return category.charAt(0).toUpperCase() + category.slice(1);
+    return t(category);
   };
 
   // Convert backend filter values to human-readable labels
-  const formatFilterValue = useCallback((category: string, value: string): string => {
-    switch (category) {
-      case "title":
-        return professionalTitleOptions.find((opt) => opt.value === value)?.label ?? value;
-      case "membership":
-        return membershipDisplayMap[value] ?? value;
-      case "education":
-        return degreesToReadable[value as keyof typeof degreesToReadable];
-      case "services":
-        return serviceKeyToLabelMap[value as keyof typeof serviceKeyToLabelMap] ?? value;
-      case "location":
-        return getCountryLabelFromCode(value) ?? value;
-      default:
-        return value;
-    }
-  }, []);
+  const formatFilterValue = useCallback(
+    (category: string, value: string): string => {
+      switch (category) {
+        case "title":
+          return t(professionalTitleOptions.find((opt) => opt.value === value)?.label ?? value);
+        case "membership":
+          return t(membershipDisplayMap[value] ?? value);
+        case "education":
+          return t(degreesToReadable[value as keyof typeof degreesToReadable]);
+        case "services":
+          return serviceKeyToLabelMap[value as keyof typeof serviceKeyToLabelMap] ?? value;
+        case "location":
+          return getCountryLabelFromCode(value) ?? value;
+        default:
+          return value;
+      }
+    },
+    [t],
+  );
 
   const handleFilterChange = useCallback((category: string, value: string) => {
     setEditingFilters((prev) => {
@@ -327,16 +330,14 @@ export const MembersTablePage = ({ adminsView }: { adminsView: boolean }) => {
           setSidebarUserIdx(index);
         }}
       >
-        {content ?? "None"}
+        {content ?? t("none")}
       </div>
     );
   };
 
-  const entityName = adminsView ? "Admins" : "Members";
-
   return (
     <div className={styles.root}>
-      <h1 className={styles.title}>Manage {entityName}</h1>
+      <h1 className={styles.title}>{adminsView ? t("manage-admins") : t("manage-members")}</h1>
       {/* Controls */}
       <div className={styles.controls}>
         {adminsView ? null : (
@@ -347,7 +348,7 @@ export const MembersTablePage = ({ adminsView }: { adminsView: boolean }) => {
               }}
               className={`${styles.directoryToggleButton} ${directoryOnly ? "" : styles.directoryToggleButtonActive}`}
             >
-              All Members
+              {t("all-members")}
             </button>
             <button
               onClick={() => {
@@ -355,7 +356,7 @@ export const MembersTablePage = ({ adminsView }: { adminsView: boolean }) => {
               }}
               className={`${styles.directoryToggleButton} ${directoryOnly ? styles.directoryToggleButtonActive : ""}`}
             >
-              Directory
+              {t("directory")}
             </button>
           </div>
         )}
@@ -364,7 +365,7 @@ export const MembersTablePage = ({ adminsView }: { adminsView: boolean }) => {
           <Image src="/icons/search.svg" alt="Search icon" width={27} height={16} />
           <input
             type="text"
-            placeholder={`Search ${entityName}`}
+            placeholder={adminsView ? t("search-admins") : t("search-members")}
             value={search}
             onChange={(e) => {
               setSearch(e.target.value);
@@ -380,7 +381,7 @@ export const MembersTablePage = ({ adminsView }: { adminsView: boolean }) => {
               }}
               className={styles["action-button"]}
             >
-              Deny
+              {t("deny")}
               <Image
                 src="/icons/ExitButton.svg"
                 alt="Collapse"
@@ -395,7 +396,7 @@ export const MembersTablePage = ({ adminsView }: { adminsView: boolean }) => {
               }}
               className={styles["dark-action-button"]}
             >
-              Approve
+              {t("approve")}
               <Image
                 src="/white_check.svg"
                 alt="Checkmark"
@@ -413,7 +414,7 @@ export const MembersTablePage = ({ adminsView }: { adminsView: boolean }) => {
               }}
               className={styles["action-button"]}
             >
-              Filter
+              {t("filter")}
               <Image
                 src="/icons/filter.svg"
                 alt="Filter icon"
@@ -432,7 +433,7 @@ export const MembersTablePage = ({ adminsView }: { adminsView: boolean }) => {
               }}
               className={styles["red-action-button"]}
             >
-              Remove {selectedUsers.length > 0 ? `(${String(selectedUsers.length)})` : "All"}
+              {t("remove")} {selectedUsers.length > 0 ? `(${String(selectedUsers.length)})` : ""}
               <Image
                 src="/icons/ExitButton.svg"
                 alt="Collapse"
@@ -448,7 +449,7 @@ export const MembersTablePage = ({ adminsView }: { adminsView: boolean }) => {
                 setIsInviteModalOpen(true);
               }}
             >
-              Invite Admin
+              {t("invite-admin")}
               <Image
                 src="/icons/plus.svg"
                 alt="Plus icon"
@@ -464,8 +465,10 @@ export const MembersTablePage = ({ adminsView }: { adminsView: boolean }) => {
           disabled={isDownloading}
         >
           {isDownloading
-            ? "Downloading..."
-            : `Download ${selectedUsers.length > 0 ? `(${String(selectedUsers.length)})` : "All"}`}
+            ? t("downloading")
+            : selectedUsers.length > 0
+              ? `${t("download")} (${String(selectedUsers.length)})`
+              : t("download-all")}
           {!isDownloading && (
             <Image
               src="/icons/download.svg"
@@ -480,9 +483,11 @@ export const MembersTablePage = ({ adminsView }: { adminsView: boolean }) => {
 
       {directoryOnly && (
         <Tabs
-          tabs={["Approved", "Pending"]}
-          activeTab={activeTab}
-          onActiveTabChange={setActiveTab}
+          tabs={["approved", "pending"]}
+          activeTab={activeTab.toLowerCase()}
+          onActiveTabChange={(tab) => {
+            setActiveTab(tab === "approved" ? "Approved" : "Pending");
+          }}
         />
       )}
 
@@ -524,40 +529,42 @@ export const MembersTablePage = ({ adminsView }: { adminsView: boolean }) => {
               <ProfilePicture user={sidebarUser} size="large" />
               <div className="flex flex-col gap-1">
                 <p className="font-bold text-2xl">{formatUserFullName(sidebarUser)}</p>
-                <p className="text-base">{membershipDisplayMap[sidebarUser.account.membership]}</p>
+                <p className="text-base">
+                  {t(membershipDisplayMap[sidebarUser.account.membership])}
+                </p>
                 <p className={styles.fieldLabel}>
-                  {sidebarUser?.role
-                    ? sidebarUser.role[0].toUpperCase() + sidebarUser.role.substring(1)
-                    : t("none")}
+                  {sidebarUser?.role ? t(sidebarUser.role) : t("none")}
                 </p>
               </div>
             </div>
             <Tabs
-              tabs={["Information", "Directory Responses"]}
-              activeTab={sidebarTab}
-              onActiveTabChange={setSidebarTab}
+              tabs={["information", "directory-responses"]}
+              activeTab={sidebarTab.toLowerCase().replace(/ /g, "-")}
+              onActiveTabChange={(tab) => {
+                setSidebarTab(tab === "information" ? "Information" : "Directory Responses");
+              }}
             />
 
             {sidebarTab === "Information" ? (
               <div className="flex flex-col gap-6">
                 {/* Basic Info */}
                 <div className="flex flex-col gap-3">
-                  <h3 className="font-semibold text-lg">Basic Information</h3>
+                  <h3 className="font-semibold text-lg">{t("basic-information")}</h3>
                   <div className="flex flex-col gap-3">
                     <div className="flex flex-col">
-                      <span className={styles.fieldLabel}>First Name</span>
+                      <span className={styles.fieldLabel}>{t("first-name")}</span>
                       <span>{sidebarUser.personal.firstName ?? t("none")}</span>
                     </div>
                     <div className="flex flex-col">
-                      <span className={styles.fieldLabel}>Last Name</span>
+                      <span className={styles.fieldLabel}>{t("last-name")}</span>
                       <span>{sidebarUser.personal.lastName ?? t("none")}</span>
                     </div>
                     <div className="flex flex-col">
-                      <span className={styles.fieldLabel}>Email</span>
+                      <span className={styles.fieldLabel}>{t("email")}</span>
                       <span>{sidebarUser.personal.email ?? t("none")}</span>
                     </div>
                     <div className="flex flex-col">
-                      <span className={styles.fieldLabel}>Phone</span>
+                      <span className={styles.fieldLabel}>{t("phone")}</span>
                       <span>{sidebarUser.personal.phone ?? t("none")}</span>
                     </div>
                   </div>
@@ -565,31 +572,38 @@ export const MembersTablePage = ({ adminsView }: { adminsView: boolean }) => {
 
                 {/* Professional Info */}
                 <div className="flex flex-col gap-3">
-                  <h3 className="font-semibold text-lg">Professional Information</h3>
+                  <h3 className="font-semibold text-lg">{t("professional-information")}</h3>
                   <div className="flex flex-col gap-3">
                     <div className="flex flex-col">
-                      <span className={styles.fieldLabel}>Title</span>
+                      <span className={styles.fieldLabel}>{t("title")}</span>
                       <span>
-                        {professionalTitleOptions.find(
+                        {t(
+                          professionalTitleOptions.find(
+                            (option) => option.value === sidebarUser.professional?.title,
+                          )?.label ?? "other",
+                        )}{" "}
+                        {!professionalTitleOptions.find(
                           (option) => option.value === sidebarUser.professional?.title,
-                        )?.label ?? `Other (${String(sidebarUser.professional?.title)})`}
+                        ) && sidebarUser.professional?.title
+                          ? `(${String(sidebarUser.professional?.title)})`
+                          : ""}
                       </span>
                     </div>
                     <div className="flex flex-col">
-                      <span className={styles.fieldLabel}>Country</span>
+                      <span className={styles.fieldLabel}>{t("country")}</span>
                       <span>{sidebarUser.professional?.country ?? t("none")}</span>
                     </div>
                     <div className="flex flex-col">
-                      <span className={styles.fieldLabel}>Language</span>
+                      <span className={styles.fieldLabel}>{t("language")}</span>
                       <PreferredLanguages language={sidebarUser.professional?.prefLanguage} />
                     </div>
                     <div className="flex flex-col">
-                      <span className={styles.fieldLabel}>In Directory</span>
+                      <span className={styles.fieldLabel}>{t("in-directory")}</span>
                       <span>
                         {sidebarUser.account.inDirectory === true
                           ? t("yes")
                           : sidebarUser.account.inDirectory === "pending"
-                            ? "Pending"
+                            ? t("pending")
                             : t("no")}
                       </span>
                     </div>
@@ -599,35 +613,35 @@ export const MembersTablePage = ({ adminsView }: { adminsView: boolean }) => {
                 {/* Student Info */}
                 {sidebarUser.account.membership === "student" && (
                   <div className="flex flex-col gap-3">
-                    <h3 className="font-semibold text-lg">Student Information</h3>
+                    <h3 className="font-semibold text-lg">{t("student-information")}</h3>
                     <div className="flex flex-col gap-3">
                       <div className="flex flex-col">
-                        <span className={styles.fieldLabel}>School Country</span>
+                        <span className={styles.fieldLabel}>{t("school-country")}</span>
                         <span>
                           {getCountryLabelFromCode(sidebarUser.education?.schoolCountry) ??
                             t("none")}
                         </span>
                       </div>
                       <div className="flex flex-col">
-                        <span className={styles.fieldLabel}>School Name</span>
+                        <span className={styles.fieldLabel}>{t("school-name")}</span>
                         <span>{sidebarUser.education?.institution ?? t("none")}</span>
                       </div>
                       <div className="flex flex-col">
-                        <span className={styles.fieldLabel}>University Email</span>
+                        <span className={styles.fieldLabel}>{t("university-email")}</span>
                         <span>{sidebarUser.education?.email ?? t("none")}</span>
                       </div>
                       <div className="flex flex-col">
-                        <span className={styles.fieldLabel}>Degree</span>
+                        <span className={styles.fieldLabel}>{t("degree")}</span>
                         <span>
-                          {degreesToReadable[sidebarUser.education?.degree ?? ""] ?? "Other"}
+                          {t(degreesToReadable[sidebarUser.education?.degree ?? ""] || "other")}
                         </span>
                       </div>
                       <div className="flex flex-col">
-                        <span className={styles.fieldLabel}>Program</span>
+                        <span className={styles.fieldLabel}>{t("program")}</span>
                         <span>{sidebarUser.education?.program ?? t("none")}</span>
                       </div>
                       <div className="flex flex-col">
-                        <span className={styles.fieldLabel}>Graduation Date</span>
+                        <span className={styles.fieldLabel}>{t("graduation-date")}</span>
                         <span>{sidebarUser.education?.gradDate ?? t("none")}</span>
                       </div>
                     </div>
@@ -637,28 +651,33 @@ export const MembersTablePage = ({ adminsView }: { adminsView: boolean }) => {
                 {/* Associate Info */}
                 {sidebarUser.account.membership === "associate" && (
                   <div className="flex flex-col gap-3">
-                    <h3 className="font-semibold text-lg">Associate Information</h3>
+                    <h3 className="font-semibold text-lg">{t("associate-information")}</h3>
                     <div className="flex flex-col gap-3">
                       <div className="flex flex-col">
-                        <span className={styles.fieldLabel}>Job Title</span>
+                        <span className={styles.fieldLabel}>{t("job-title")}</span>
                         <span>{sidebarUser.associate?.title ?? t("none")}</span>
                       </div>
                       <div className="flex flex-col">
-                        <span className={styles.fieldLabel}>Specializations</span>
+                        <span className={styles.fieldLabel}>{t("specializations")}</span>
                         <span>
                           {sidebarUser.associate?.specialization
-                            ?.map((s) => SPECIALIZATIONS.find((spec) => spec.toLowerCase() === s))
+                            ?.map((s) => {
+                              const key = SPECIALIZATIONS.find((spec) => spec.toLowerCase() === s);
+                              return key ? t(key) : null;
+                            })
                             .filter(Boolean)
                             .join(", ") ?? t("none")}
                         </span>
                       </div>
                       <div className="flex flex-col">
-                        <span className={styles.fieldLabel}>Organization Representative</span>
-                        <span>{sidebarUser.associate?.organization ? "Yes" : "No"}</span>
+                        <span className={styles.fieldLabel}>
+                          {t("organization-representative")}
+                        </span>
+                        <span>{sidebarUser.associate?.organization ? t("yes") : t("no")}</span>
                       </div>
                       {sidebarUser.associate?.organization && (
                         <div className="flex flex-col">
-                          <span className={styles.fieldLabel}>Organization</span>
+                          <span className={styles.fieldLabel}>{t("organization")}</span>
                           <span>{sidebarUser.associate.organization}</span>
                         </div>
                       )}
@@ -672,31 +691,33 @@ export const MembersTablePage = ({ adminsView }: { adminsView: boolean }) => {
                   <>
                     {/* Personal Info */}
                     <div className="flex flex-col gap-3">
-                      <h3 className="font-semibold text-lg">Personal Information</h3>
+                      <h3 className="font-semibold text-lg">{t("personal-information")}</h3>
                       <div className="flex flex-col gap-3">
                         <div className="flex flex-col">
-                          <span className={styles.fieldLabel}>Degree/Certification</span>
+                          <span className={styles.fieldLabel}>{t("degree-certification")}</span>
                           <span>
-                            {educationTypeOptions.find(
-                              (option) => option.value === sidebarUser.education?.degree,
-                            )?.label ?? t("none")}
+                            {t(
+                              educationTypeOptions.find(
+                                (option) => option.value === sidebarUser.education?.degree,
+                              )?.label ?? "none",
+                            )}
                           </span>
                         </div>
                         <div className="flex flex-col">
-                          <span className={styles.fieldLabel}>Institution</span>
+                          <span className={styles.fieldLabel}>{t("institution")}</span>
                           <span>{sidebarUser.education?.institution ?? t("none")}</span>
                         </div>
                         <div className="flex flex-col">
-                          <span className={styles.fieldLabel}>Work Clinic</span>
+                          <span className={styles.fieldLabel}>{t("work-clinic")}</span>
                           <span>{sidebarUser.clinic?.name ?? t("none")}</span>
                         </div>
                         <div className="flex flex-col">
-                          <span className={styles.fieldLabel}>Clinic Website</span>
+                          <span className={styles.fieldLabel}>{t("clinic-website")}</span>
                           <span>{sidebarUser.clinic?.url ?? t("none")}</span>
                         </div>
                         {sidebarUser.clinic?.location && (
                           <div className="flex flex-col">
-                            <span className={styles.fieldLabel}>Clinic Address</span>
+                            <span className={styles.fieldLabel}>{t("clinic-address")}</span>
                             <div className="text-sm">
                               {sidebarUser.clinic.location.address && (
                                 <p>{sidebarUser.clinic.location.address}</p>
@@ -719,18 +740,18 @@ export const MembersTablePage = ({ adminsView }: { adminsView: boolean }) => {
 
                     {/* Display Info */}
                     <div className="flex flex-col gap-3">
-                      <h3 className="font-semibold text-lg">Display Information</h3>
+                      <h3 className="font-semibold text-lg">{t("display-information")}</h3>
                       <div className="flex flex-col gap-3">
                         <div className="flex flex-col">
-                          <span className={styles.fieldLabel}>Work Email</span>
+                          <span className={styles.fieldLabel}>{t("work-email")}</span>
                           <span>{sidebarUser.display?.workEmail ?? t("none")}</span>
                         </div>
                         <div className="flex flex-col">
-                          <span className={styles.fieldLabel}>Work Phone</span>
+                          <span className={styles.fieldLabel}>{t("work-phone")}</span>
                           <span>{sidebarUser.display?.workPhone ?? t("none")}</span>
                         </div>
                         <div className="flex flex-col">
-                          <span className={styles.fieldLabel}>Genetic Services</span>
+                          <span className={styles.fieldLabel}>{t("genetic-services")}</span>
                           {(sidebarUser.display?.services?.length ?? 0) > 0 ? (
                             <div className="text-sm">
                               {sidebarUser.display?.services?.map((service) => (
@@ -742,11 +763,11 @@ export const MembersTablePage = ({ adminsView }: { adminsView: boolean }) => {
                           )}
                         </div>
                         <div className="flex flex-col">
-                          <span className={styles.fieldLabel}>Languages</span>
+                          <span className={styles.fieldLabel}>{t("languages")}</span>
                           <PreferredLanguages languages={sidebarUser.display?.languages} />
                         </div>
                         <div className="flex flex-col">
-                          <span className={styles.fieldLabel}>License Number</span>
+                          <span className={styles.fieldLabel}>{t("license-number")}</span>
                           <span>
                             {sidebarUser.display?.license?.[0]
                               ? sidebarUser.display?.license?.[0]
@@ -754,27 +775,27 @@ export const MembersTablePage = ({ adminsView }: { adminsView: boolean }) => {
                           </span>
                         </div>
                         <div className="flex flex-col">
-                          <span className={styles.fieldLabel}>Remote Services</span>
+                          <span className={styles.fieldLabel}>{t("remote-services")}</span>
                           <span>{sidebarUser.display?.options?.remote ? t("yes") : t("no")}</span>
                         </div>
                         <div className="flex flex-col">
-                          <span className={styles.fieldLabel}>Authorized Care</span>
+                          <span className={styles.fieldLabel}>{t("authorized-care")}</span>
                           <span>
                             {sidebarUser.display?.options?.authorizedCare === "unsure"
-                              ? "Unsure"
+                              ? t("unsure")
                               : sidebarUser.display?.options?.authorizedCare === true
                                 ? t("yes")
                                 : t("no")}
                           </span>
                         </div>
                         <div className="flex flex-col">
-                          <span className={styles.fieldLabel}>Open to Requests</span>
+                          <span className={styles.fieldLabel}>{t("open-to-requests")}</span>
                           <span>
                             {sidebarUser.display?.options?.openToRequests ? t("yes") : t("no")}
                           </span>
                         </div>
                         <div className="flex flex-col">
-                          <span className={styles.fieldLabel}>Open to Appointments</span>
+                          <span className={styles.fieldLabel}>{t("open-to-appointments")}</span>
                           <span>
                             {sidebarUser.display?.options?.openToAppointments ? t("yes") : t("no")}
                           </span>
@@ -786,8 +807,8 @@ export const MembersTablePage = ({ adminsView }: { adminsView: boolean }) => {
                   <div className="flex flex-col gap-2 items-center justify-center py-8">
                     <p className="text-gray-600 text-center">
                       {sidebarUser.account.inDirectory === "pending"
-                        ? "This user's directory application is pending"
-                        : "This user is not in the SPLAGen Directory."}
+                        ? t("this-user-directory-pending")
+                        : t("this-user-not-in-directory")}
                     </p>
                   </div>
                 )}
@@ -803,7 +824,7 @@ export const MembersTablePage = ({ adminsView }: { adminsView: boolean }) => {
                   }}
                   className={styles["action-button"]}
                 >
-                  Deny
+                  {t("deny")}
                   <Image
                     src="/icons/ExitButton.svg"
                     alt="Collapse"
@@ -818,7 +839,7 @@ export const MembersTablePage = ({ adminsView }: { adminsView: boolean }) => {
                   }}
                   className={styles["dark-action-button"]}
                 >
-                  Approve
+                  {t("approve")}
                   <Image
                     src="/white_check.svg"
                     alt="Checkmark"
@@ -832,7 +853,7 @@ export const MembersTablePage = ({ adminsView }: { adminsView: boolean }) => {
           </div>
         ) : (
           <>
-            <h3 className={styles.filterTitle}>Filter By</h3>
+            <h3 className={styles.filterTitle}>{t("filter-by")}</h3>
             {Object.entries(filterOptions).map(([category, options]) => (
               <div key={category} className={styles["filter-category"]}>
                 <h4>{formatFilterCategory(category)}</h4>
@@ -851,8 +872,8 @@ export const MembersTablePage = ({ adminsView }: { adminsView: boolean }) => {
               </div>
             ))}
             <div className={styles["filter-actions"]}>
-              <Button variant="secondary" onClick={resetFilters} label="Reset" />
-              <Button onClick={applyFilters} label="Apply Filters" />
+              <Button variant="secondary" onClick={resetFilters} label={t("reset")} />
+              <Button onClick={applyFilters} label={t("apply-filters")} />
             </div>
           </>
         )}
@@ -872,7 +893,7 @@ export const MembersTablePage = ({ adminsView }: { adminsView: boolean }) => {
           columns={[
             {
               id: "Name",
-              header: () => renderHeader("name", "Name"),
+              header: () => renderHeader("name", t("name")),
               cell: (cell) => {
                 const user = cell.row.original;
                 return renderClickableCell(cell.row.index, formatUserFullName(user));
@@ -880,44 +901,45 @@ export const MembersTablePage = ({ adminsView }: { adminsView: boolean }) => {
             },
             {
               id: "Title",
-              header: () => renderHeader("title", "Title"),
+              header: () => renderHeader("title", t("title")),
               cell: (cell) => {
                 const user = cell.row.original;
+                const titleOption = professionalTitleOptions.find(
+                  (option) => option.value === user.professional?.title,
+                );
                 return renderClickableCell(
                   cell.row.index,
-                  professionalTitleOptions.find(
-                    (option) => option.value === user.professional?.title,
-                  )?.label,
+                  titleOption ? t(titleOption.label) : undefined,
                 );
               },
             },
             {
               id: "Membership",
-              header: () => renderHeader("membership", "Membership"),
+              header: () => renderHeader("membership", t("membership")),
               cell: (cell) => {
                 const user = cell.row.original;
                 return renderClickableCell(
                   cell.row.index,
-                  membershipDisplayMap[user.account.membership],
+                  t(membershipDisplayMap[user.account.membership]),
                 );
               },
             },
             {
               id: "Location",
-              header: () => renderHeader("location", "Location"),
+              header: () => renderHeader("location", t("location")),
               cell: (cell) => {
                 const user = cell.row.original;
                 return renderClickableCell(cell.row.index, user.clinic?.location?.country);
               },
             },
             {
-              header: "Languages",
+              header: t("languages"),
               cell: (cell) => {
                 const user = cell.row.original;
                 return renderClickableCell(
                   cell.row.index,
                   user.display?.languages?.length === 0 ? (
-                    "None"
+                    t("none")
                   ) : (
                     <div className={styles.chipsRow}>
                       {user.display?.languages
@@ -942,13 +964,13 @@ export const MembersTablePage = ({ adminsView }: { adminsView: boolean }) => {
               },
             },
             {
-              header: "Services",
+              header: t("services"),
               cell: (cell) => {
                 const user = cell.row.original;
                 return renderClickableCell(
                   cell.row.index,
                   user.display?.services?.length === 0 ? (
-                    "None"
+                    t("none")
                   ) : (
                     <div className={styles.chipsRow}>
                       {user.display?.services
@@ -974,7 +996,7 @@ export const MembersTablePage = ({ adminsView }: { adminsView: boolean }) => {
             },
             {
               id: "Date Joined",
-              header: () => renderHeader("createdAt", "Date Joined"),
+              header: () => renderHeader("createdAt", t("date-joined")),
               cell: (cell) => {
                 const user = cell.row.original;
                 return renderClickableCell(
@@ -988,7 +1010,7 @@ export const MembersTablePage = ({ adminsView }: { adminsView: boolean }) => {
         />
       )}
 
-      {users && users.length === 0 && <p>No users found</p>}
+      {users && users.length === 0 && <p>{t("no-users-found")}</p>}
 
       <Pagination currentPage={page} numPages={numPages} onPageChange={setPage} />
       {errorMessage && <div className="text-red-500">{errorMessage}</div>}

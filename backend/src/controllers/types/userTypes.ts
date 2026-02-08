@@ -29,25 +29,7 @@ export type CreateUserRequestBody = {
 
   associate?: {
     title?: string;
-    specialization?: [
-      {
-        type: string;
-        enum: [
-          "rare disease advocacy",
-          "research",
-          "public health",
-          "bioethics",
-          "law",
-          "biology",
-          "medical writer",
-          "medical science liason",
-          "laboratory scientist",
-          "professor",
-          "bioinformatics",
-          "biotech sales and marketing",
-        ];
-      },
-    ];
+    specialization?: string[];
     organization?: string;
   };
 };

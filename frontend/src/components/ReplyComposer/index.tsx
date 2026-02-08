@@ -1,6 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 import { z } from "zod";
 
 import { Button } from "..";
@@ -22,6 +23,7 @@ type ReplyComposerProps = {
   reloadReplies: () => unknown;
 };
 export const ReplyComposer = ({ postId, reply, onExit, reloadReplies }: ReplyComposerProps) => {
+  const { t } = useTranslation();
   const { firebaseUser } = useContext(UserContext);
   const {
     register,
@@ -58,7 +60,7 @@ export const ReplyComposer = ({ postId, reply, onExit, reloadReplies }: ReplyCom
             onExit();
           } else {
             setErrorMessage(
-              `Failed to update reply: ${result.success ? JSON.stringify(result.data) : result.error}`,
+              `${t("failed-to-update-reply")}: ${result.success ? JSON.stringify(result.data) : result.error}`,
             );
           }
         } else {
@@ -70,17 +72,19 @@ export const ReplyComposer = ({ postId, reply, onExit, reloadReplies }: ReplyCom
             onExit();
           } else {
             setErrorMessage(
-              `Failed to create reply: ${result.success ? JSON.stringify(result.data) : result.error}`,
+              `${t("failed-to-create-reply")}: ${result.success ? JSON.stringify(result.data) : result.error}`,
             );
           }
         }
       } catch (error) {
-        setErrorMessage(`Failed to ${reply ? "update" : "create"} reply: ${String(error)}`);
+        setErrorMessage(
+          `${t(reply ? "failed-to-update-reply" : "failed-to-create-reply")}: ${String(error)}`,
+        );
       } finally {
         setLoading(false);
       }
     },
-    [reset, firebaseUser, onExit, postId, reloadReplies, reply],
+    [reset, firebaseUser, onExit, postId, reloadReplies, reply, t],
   );
 
   const handleFormSubmit = useCallback(
@@ -97,21 +101,21 @@ export const ReplyComposer = ({ postId, reply, onExit, reloadReplies }: ReplyCom
         id="reply-message"
         className={styles.textAreaField}
         {...register("message")}
-        placeholder="Reply..."
+        placeholder={t("reply-placeholder")}
       />
       <p className={styles.errorMessage}>{errors.message?.message ?? "\u00A0"}</p>
       <div className={styles.buttonsRow}>
         <Button
           className={styles.button}
           type="button"
-          label="Cancel"
+          label={t("cancel")}
           variant="secondary"
           onClick={onExit}
         />
         <Button
           className={styles.button}
           type="submit"
-          label={loading ? "Loading..." : reply ? "Save" : "Reply"}
+          label={loading ? t("loading") : reply ? t("save") : t("reply")}
           disabled={loading}
         />
       </div>

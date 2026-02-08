@@ -136,19 +136,19 @@ export const EditDirectoryDisplayModal = ({ isOpen, onClose, populationInfo }: M
         const firebaseToken = await firebaseUser.getIdToken();
         const response = await editDirectoryDisplayInfoRequest(formattedData, firebaseToken);
         if (response.success) {
-          setSuccessMessage("Display information updated");
+          setSuccessMessage(t("display-information-updated"));
           await reloadUser();
           onClose();
         } else {
-          setErrorMessage(`Error updating info: ${response.error}`);
+          setErrorMessage(`${t("error-updating-info")}: ${response.error}`);
         }
       } catch (err) {
-        setErrorMessage(`Error updating info: ${String(err)}`);
+        setErrorMessage(`${t("error-updating-info")}: ${String(err)}`);
       } finally {
         setLoading(false);
       }
     },
-    [onClose, firebaseUser, reloadUser],
+    [onClose, firebaseUser, reloadUser, t],
   );
 
   // Populates form inputs when modal is opened
@@ -236,7 +236,7 @@ export const EditDirectoryDisplayModal = ({ isOpen, onClose, populationInfo }: M
                         watchedServiceKeys || [],
                         key,
                         ["other"], // fallback is a non-empty tuple here
-                        "one-service-required-default-other",
+                        "one-service-required",
                       );
                     }}
                     className="mx-1 my-1"
@@ -279,10 +279,7 @@ export const EditDirectoryDisplayModal = ({ isOpen, onClose, populationInfo }: M
 
             {/* Authorized to provide care */}
             <div className={`${styles.infoField} mb-3`}>
-              <span>
-                Based on your state health institutions and policies, are you authorized to provide
-                care in the languages mentioned above?
-              </span>
+              <span>{t("authorized-in-languages-question")}</span>
 
               <Controller
                 name="authorizedForLanguages"
@@ -291,7 +288,7 @@ export const EditDirectoryDisplayModal = ({ isOpen, onClose, populationInfo }: M
                   <div className="flex gap-2">
                     <Radio
                       id="authorizedForLanguagesYes"
-                      label="Yes"
+                      label={t("yes")}
                       checked={field.value === true}
                       onChange={() => {
                         field.onChange(true);
@@ -299,7 +296,7 @@ export const EditDirectoryDisplayModal = ({ isOpen, onClose, populationInfo }: M
                     />
                     <Radio
                       id="authorizedForLanguagesNo"
-                      label="No"
+                      label={t("no")}
                       checked={field.value === false}
                       onChange={() => {
                         field.onChange(false);
@@ -307,7 +304,7 @@ export const EditDirectoryDisplayModal = ({ isOpen, onClose, populationInfo }: M
                     />
                     <Radio
                       id="authorized-unsure"
-                      label="I'm not sure"
+                      label={t("im-not-sure")}
                       checked={field.value === "unsure"}
                       onChange={() => {
                         field.onChange("unsure");
@@ -333,7 +330,7 @@ export const EditDirectoryDisplayModal = ({ isOpen, onClose, populationInfo }: M
 
             {/* Remote Services */}
             <div className={`${styles.infoField} mb-3`}>
-              <span>Do you offer remote medical services (e.g. telehealth)?</span>
+              <span>{t("do-you-offer-telehealth")}</span>
 
               <Controller
                 name="remoteOption"
@@ -343,7 +340,7 @@ export const EditDirectoryDisplayModal = ({ isOpen, onClose, populationInfo }: M
                     <Radio
                       id="remoteYes"
                       name="RemoteServices"
-                      label="Yes"
+                      label={t("yes")}
                       checked={field.value}
                       onChange={() => {
                         field.onChange(true);
@@ -352,7 +349,7 @@ export const EditDirectoryDisplayModal = ({ isOpen, onClose, populationInfo }: M
                     <Radio
                       id="remoteNo"
                       name="RemoteServices"
-                      label="No"
+                      label={t("no")}
                       checked={!field.value}
                       onChange={() => {
                         field.onChange(false);
@@ -365,7 +362,7 @@ export const EditDirectoryDisplayModal = ({ isOpen, onClose, populationInfo }: M
 
             {/* Genetic Tests*/}
             <div className={`${styles.infoField} mb-2`}>
-              <span>Can patients request genetic tests through your services?</span>
+              <span>{t("can-patients-request-tests")}</span>
               <Controller
                 name="requestOption"
                 control={control}
@@ -374,7 +371,7 @@ export const EditDirectoryDisplayModal = ({ isOpen, onClose, populationInfo }: M
                     <Radio
                       id="geneticYes"
                       name="geneticTests"
-                      label="Yes"
+                      label={t("yes")}
                       checked={field.value}
                       onChange={() => {
                         field.onChange(true);
@@ -383,7 +380,7 @@ export const EditDirectoryDisplayModal = ({ isOpen, onClose, populationInfo }: M
                     <Radio
                       id="geneticNo"
                       name="geneticTests"
-                      label="No"
+                      label={t("no")}
                       checked={!field.value}
                       onChange={() => {
                         field.onChange(false);
@@ -396,7 +393,7 @@ export const EditDirectoryDisplayModal = ({ isOpen, onClose, populationInfo }: M
 
             {/* Appointmenets*/}
             <div className={`${styles.infoField} mb-2`}>
-              <span>Can patients make appointments for your services?</span>
+              <span>{t("can-patients-make-appointments")}</span>
               <Controller
                 name="canMakeAppointments"
                 control={control}
@@ -404,7 +401,7 @@ export const EditDirectoryDisplayModal = ({ isOpen, onClose, populationInfo }: M
                   <div className="flex gap-2">
                     <Radio
                       id="appointments-yes"
-                      label="Yes"
+                      label={t("yes")}
                       checked={field.value}
                       onChange={() => {
                         field.onChange(true);
@@ -412,7 +409,7 @@ export const EditDirectoryDisplayModal = ({ isOpen, onClose, populationInfo }: M
                     />
                     <Radio
                       id="appointments-no"
-                      label="No"
+                      label={t("no")}
                       checked={!field.value}
                       onChange={() => {
                         field.onChange(false);

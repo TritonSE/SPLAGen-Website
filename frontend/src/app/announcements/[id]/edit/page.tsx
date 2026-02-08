@@ -2,6 +2,7 @@
 
 import { useParams } from "next/navigation";
 import { useCallback, useContext, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import { Announcement, getIndividualAnnouncement } from "@/api/announcement";
 import { AnnouncementForm } from "@/components/AnnouncementForm";
@@ -9,6 +10,7 @@ import { UserContext } from "@/contexts/userContext";
 import { useRedirectToLoginIfNotSignedIn } from "@/hooks/useRedirection";
 
 const EditAnnouncementPage = () => {
+  const { t } = useTranslation();
   useRedirectToLoginIfNotSignedIn();
   const params = useParams();
 
@@ -25,12 +27,12 @@ const EditAnnouncementPage = () => {
       if (response.success) {
         setAnnouncement(response.data);
       } else {
-        setErrorMessage(`Failed to retrieve announcement: ${response.error}`);
+        setErrorMessage(`${t("failed-to-retrieve-announcement")}: ${response.error}`);
       }
     } catch (error) {
-      setErrorMessage(`Failed to retrieve announcement: ${String(error)}`);
+      setErrorMessage(`${t("failed-to-retrieve-announcement")}: ${String(error)}`);
     }
-  }, [firebaseUser, params]);
+  }, [firebaseUser, params, t]);
 
   useEffect(() => {
     void loadAnnouncement();

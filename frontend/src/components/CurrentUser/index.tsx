@@ -28,11 +28,9 @@ export const CurrentUser = () => {
             {user?.personal.firstName ?? t("none")} {user?.personal.lastName ?? t("none")}
           </p>
           <p className={styles.userTitle}>
-            {membershipDisplayMap[user.account.membership] ?? t("none")}
+            {t(membershipDisplayMap[user.account.membership]) ?? t("none")}
           </p>
-          <p className={styles.userRole}>
-            {user?.role ? user.role[0].toUpperCase() + user.role.substring(1) : t("none")}
-          </p>
+          <p className={styles.userRole}>{user?.role ? t(user.role) : t("none")}</p>
         </div>
         {showDropdown ? <ChevronUp /> : <ChevronDown />}
       </div>
@@ -46,7 +44,7 @@ export const CurrentUser = () => {
                 setShowDropdown(false);
               }}
             >
-              Profile
+              {t("profile")}
             </button>
           </Link>
           <button
@@ -56,7 +54,7 @@ export const CurrentUser = () => {
               setShowDropdown(false);
             }}
           >
-            Logout
+            {t("log-out")}
           </button>
         </div>
       )}
