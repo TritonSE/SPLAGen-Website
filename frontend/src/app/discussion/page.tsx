@@ -13,6 +13,7 @@ import { PostCard } from "@/components/PostCard";
 import { Tabs } from "@/components/Tabs";
 import { UserContext } from "@/contexts/userContext";
 import { useRedirectToLoginIfNotSignedIn } from "@/hooks/useRedirection";
+import "@/app/globals.css";
 
 const TABS = ["all-discussions", "my-discussions"] as const;
 type Tab = (typeof TABS)[number];

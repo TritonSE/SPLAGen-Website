@@ -12,6 +12,7 @@ import styles from "./login.module.css";
 import { getWhoAmI, loginUserWithEmailPassword } from "@/api/users";
 import { Checkmark } from "@/components";
 import { useRedirectToHomeIfSignedIn } from "@/hooks/useRedirection";
+import "@/app/globals.css";
 
 // Define the schema for form validation using Zod
 const schema = z.object({

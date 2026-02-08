@@ -16,6 +16,7 @@ import { UserContext } from "@/contexts/userContext";
 import { useRedirectToLoginIfNotSignedIn } from "@/hooks/useRedirection";
 import { onboardingState } from "@/state/stateTypes";
 import updateOnboardingForm from "@/state/updateOnboardingForm";
+import "@/app/globals.css";
 
 export default function EditMembershipPage() {
   useRedirectToLoginIfNotSignedIn();

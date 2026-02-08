@@ -8,6 +8,7 @@ import { Announcement, getIndividualAnnouncement } from "@/api/announcement";
 import { AnnouncementForm } from "@/components/AnnouncementForm";
 import { UserContext } from "@/contexts/userContext";
 import { useRedirectToLoginIfNotSignedIn } from "@/hooks/useRedirection";
+import "@/app/globals.css";
 
 const EditAnnouncementPage = () => {
   const { t } = useTranslation();

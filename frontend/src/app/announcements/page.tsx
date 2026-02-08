@@ -12,6 +12,7 @@ import { PostCard } from "@/components";
 import { Pagination } from "@/components/Pagination";
 import { UserContext } from "@/contexts/userContext";
 import { useRedirectToLoginIfNotSignedIn } from "@/hooks/useRedirection";
+import "@/app/globals.css";
 
 const Announcements: React.FC = () => {
   const { t } = useTranslation();

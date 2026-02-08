@@ -9,6 +9,7 @@ import type { APIResult } from "@/api/requests";
 
 import { getPublicDirectory } from "@/api/directory";
 import env from "@/util/validateEnv";
+import "@/app/globals.css";
 
 type GeoLocation = { lat: number; lng: number };
 type CounselorMarker = { location: GeoLocation; counselor: Counselor };

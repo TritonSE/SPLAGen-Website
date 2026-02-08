@@ -7,6 +7,7 @@ import { useTranslation } from "react-i18next";
 import { resetUserPassword } from "@/api/users";
 import styles from "@/app/login/login.module.css";
 import { useRedirectToHomeIfSignedIn } from "@/hooks/useRedirection";
+import "@/app/globals.css";
 
 const ForgotLogin = () => {
   const [email, setEmail] = useState("");

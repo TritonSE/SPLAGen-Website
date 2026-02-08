@@ -18,6 +18,7 @@ import {
 import { UserContext } from "@/contexts/userContext";
 import { onboardingState } from "@/state/stateTypes";
 import updateOnboardingForm from "@/state/updateOnboardingForm";
+import "@/app/globals.css";
 
 export default function OnboardingForm() {
   const [step, setStep] = useState(0);

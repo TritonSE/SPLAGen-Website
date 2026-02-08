@@ -30,6 +30,7 @@ import { educationTypeOptions } from "@/components/modals/displayInfoConstants";
 import { SPECIALIZATIONS } from "@/constants/specializations";
 import { UserContext } from "@/contexts/userContext";
 import { useRedirectToLoginIfNotSignedIn } from "@/hooks/useRedirection";
+import "@/app/globals.css";
 
 const TABS = ["Profile", "Directory"] as const;
 type Tab = (typeof TABS)[number];

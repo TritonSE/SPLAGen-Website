@@ -11,6 +11,7 @@ import { UserContext } from "@/contexts/userContext";
 import { useRedirectToLoginIfNotSignedIn } from "@/hooks/useRedirection";
 import { directoryState } from "@/state/stateTypes";
 import updateDirectoryForm from "@/state/updateDirectoryForm";
+import "@/app/globals.css";
 
 export default function DirectoryForm() {
   useRedirectToLoginIfNotSignedIn();

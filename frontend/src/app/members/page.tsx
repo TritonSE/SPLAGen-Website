@@ -5,6 +5,7 @@ import {
   useRedirectToHomeIfNotAdminOrSuperAdmin,
   useRedirectToLoginIfNotSignedIn,
 } from "@/hooks/useRedirection";
+import "@/app/globals.css";
 
 export default function Members() {
   useRedirectToLoginIfNotSignedIn();

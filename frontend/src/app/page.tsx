@@ -13,6 +13,7 @@ import { MemberCountCard } from "@/components/MemberCountCard";
 import { ResourceCard } from "@/components/ResourceCard";
 import { UserContext } from "@/contexts/userContext";
 import { useRedirectToLoginIfNotSignedIn } from "@/hooks/useRedirection";
+import "@/app/globals.css";
 
 export default function Dashboard() {
   const { t } = useTranslation();

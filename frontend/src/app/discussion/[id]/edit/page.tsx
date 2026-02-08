@@ -8,6 +8,7 @@ import { Discussion, getIndividualPost } from "@/api/discussion";
 import { DiscussionForm } from "@/components/DiscussionForm";
 import { UserContext } from "@/contexts/userContext";
 import { useRedirectToLoginIfNotSignedIn } from "@/hooks/useRedirection";
+import "@/app/globals.css";
 
 const EditPostPage = () => {
   const { t } = useTranslation();

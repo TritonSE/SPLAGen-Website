@@ -18,6 +18,7 @@ import { PostPageView } from "@/components/PostPageView";
 import { SuccessMessage } from "@/components/SuccessMessage";
 import { UserContext } from "@/contexts/userContext";
 import { useRedirectToLoginIfNotSignedIn } from "@/hooks/useRedirection";
+import "@/app/globals.css";
 
 const DiscussionPostDetailPage = () => {
   const { t } = useTranslation();
