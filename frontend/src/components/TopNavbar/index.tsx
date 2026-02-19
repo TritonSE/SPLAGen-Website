@@ -1,7 +1,7 @@
+import styles from "./styles.module.css";
+
 import { CurrentUser } from "@/components/CurrentUser";
 import { LanguageSwitcher } from "@/components/languageSwitcher";
-
-import styles from "./styles.module.css";
 
 type TopNavbarProps = {
   languageVisible: boolean;

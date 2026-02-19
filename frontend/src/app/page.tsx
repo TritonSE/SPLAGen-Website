@@ -117,21 +117,25 @@ export default function Dashboard() {
         <div className="flex flex-row gap-12 overflow-x-auto">
           <ResourceCard
             iconSrc="/icons/education.svg"
+            iconWidth={100}
             label={t("education")}
             href="https://drive.google.com/drive/folders/1yv2D8KsLlUgcRScUS86G_DOOzUiXM3ln?usp=drive_link"
           />
           <ResourceCard
             iconSrc="/icons/public_policy.svg"
+            iconWidth={70}
             label={t("public-policy")}
             href="https://drive.google.com/drive/folders/1Xxd0MRpT-RBxMVUakFr9ykWz6qzitLnX?usp=drive_link"
           />
           <ResourceCard
             iconSrc="/icons/research.svg"
+            iconWidth={99}
             label={t("research")}
             href="https://drive.google.com/drive/folders/1LJ4UUgTKIUS6Bj8bip0hj2rQBaetzWsb"
           />
           <ResourceCard
             iconSrc="/icons/members.svg"
+            iconWidth={77}
             label={t("members")}
             href="https://drive.google.com/drive/folders/1D_0kRA4leoOnFMjdvlF5YMdt1x6KGxjU?usp=drive_link"
           />
@@ -140,6 +144,21 @@ export default function Dashboard() {
 
       <div className="flex flex-col gap-4">
         <h2 className={styles.subtitle}>{t("youtube-videos")}</h2>
+        <span>
+          <Trans
+            i18nKey="visit-youtube-channel"
+            components={{
+              a: (
+                <a
+                  className="underline text-blue-60"
+                  href="https://www.youtube.com/@SPLAGen"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                />
+              ),
+            }}
+          />
+        </span>
         <div className="flex flex-row gap-12 overflow-x-auto">
           {youtubeVideos?.map((video) => (
             <div key={video.id}>
@@ -158,19 +177,6 @@ export default function Dashboard() {
             </div>
           ))}
         </div>
-        <Trans
-          i18nKey="visit-youtube-channel"
-          components={{
-            a: (
-              <a
-                className="underline text-blue-60"
-                href="https://www.youtube.com/@SPLAGen"
-                target="_blank"
-                rel="noopener noreferrer"
-              />
-            ),
-          }}
-        />
       </div>
 
       <div className="flex flex-col gap-4">

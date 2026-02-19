@@ -687,10 +687,16 @@ export const MembersTablePage = ({ adminsView }: { adminsView: boolean }) => {
               </div>
             ) : (
               <div className="flex flex-col gap-6">
-                {sidebarUser.account.inDirectory === true ? (
+                {sidebarUser.account.inDirectory === true ||
+                sidebarUser.account.inDirectory === "pending" ? (
                   <>
                     {/* Personal Info */}
                     <div className="flex flex-col gap-3">
+                      <p className="text-gray-600 text-center">
+                        {sidebarUser.account.inDirectory === "pending"
+                          ? t("this-user-directory-pending")
+                          : null}
+                      </p>
                       <h3 className="font-semibold text-lg">{t("personal-information")}</h3>
                       <div className="flex flex-col gap-3">
                         <div className="flex flex-col">
@@ -805,11 +811,7 @@ export const MembersTablePage = ({ adminsView }: { adminsView: boolean }) => {
                   </>
                 ) : (
                   <div className="flex flex-col gap-2 items-center justify-center py-8">
-                    <p className="text-gray-600 text-center">
-                      {sidebarUser.account.inDirectory === "pending"
-                        ? t("this-user-directory-pending")
-                        : t("this-user-not-in-directory")}
-                    </p>
+                    <p className="text-gray-600 text-center">{t("this-user-not-in-directory")}</p>
                   </div>
                 )}
               </div>

@@ -12,7 +12,7 @@ import env from "@/util/validateEnv";
 import "@/app/globals.css";
 
 type GeoLocation = { lat: number; lng: number };
-type CounselorMarker = { location: GeoLocation; counselor: Counselor };
+type CounselorMarker = { location: GeoLocation; counselors: Counselor[] };
 
 type GeocodeApiResponse = {
   results: { geometry?: { location: GeoLocation } }[];
@@ -107,12 +107,31 @@ export default function DirectoryMapPage() {
 
     try {
       const all = await Promise.all(
-        result.data.map(async (c) => ({
-          location: await geocodeAddress(c.address),
-          counselor: c,
-        })),
+        result.data.map(
+          async (c) =>
+            [
+              // Stringify to JSON - ugly hack to make equal locations compare equal
+              JSON.stringify(await geocodeAddress(c.address)),
+              c,
+            ] as const,
+        ),
       );
-      setMarkers(all);
+      // lat then long
+      const allDeduplicated: Map<string, Counselor[]> = new Map<string, Counselor[]>();
+      for (const [location, counselor] of all) {
+        const counselors = allDeduplicated.get(location) ?? [];
+        counselors.push(counselor);
+        allDeduplicated.set(location, counselors);
+      }
+      setMarkers(
+        allDeduplicated
+          .entries()
+          .map(([location, counselors]) => ({
+            location: JSON.parse(location) as GeoLocation,
+            counselors,
+          }))
+          .toArray(),
+      );
     } catch (e) {
       setError(`Geocoding failed: ${(e as Error).message}`);
     }
@@ -218,7 +237,7 @@ export default function DirectoryMapPage() {
           <Marker
             key={i}
             position={m.location}
-            title={m.counselor.name}
+            title={`${String(m.counselors.length)} counselors`}
             onClick={() => {
               setSelected(m);
             }}
@@ -234,39 +253,43 @@ export default function DirectoryMapPage() {
             options={{ pixelOffset: new google.maps.Size(0, -30), disableAutoPan: false }}
           >
             <>
-              {/* Header row: name + title - LARGER TEXT */}
-              <div className="flex items-start justify-between space-x-2">
-                <span className="text-lg font-semibold">
-                  {selected.counselor.name}
-                  <span className="text-gray-500 font-normal text-base">
-                    {" "}
-                    ({formatTitle(selected.counselor.title)})
-                  </span>
-                </span>
-              </div>
+              {selected.counselors.map((counselor, i) => (
+                <div key={i}>
+                  {/* Header row: name + title - LARGER TEXT */}
+                  <div className="flex items-start justify-between space-x-2">
+                    <span className="text-lg font-semibold">
+                      {counselor.name}
+                      <span className="text-gray-500 font-normal text-base">
+                        {" "}
+                        ({formatTitle(counselor.title)})
+                      </span>
+                    </span>
+                  </div>
 
-              {/* Details */}
-              <div className="mt-2 space-y-1 text-sm">
-                <p>📍 {selected.counselor.address}</p>
-                <p>🏢 {selected.counselor.organization}</p>
-                {selected.counselor.profileUrl && (
-                  <p>
-                    🔗{" "}
-                    <a
-                      href={selected.counselor.profileUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="underline text-blue-600 break-all"
-                    >
-                      {selected.counselor.profileUrl}
-                    </a>
-                  </p>
-                )}
-                <p>🌐 {selected.counselor.email}</p>
-                <p>☎️ {selected.counselor.phone ?? "—"}</p>
-                <p>📚 {formatTranslatedList(selected.counselor.specialties)}</p>
-                <p>🗣 {formatTranslatedList(selected.counselor.languages)}</p>
-              </div>
+                  {/* Details */}
+                  <div className="mt-2 space-y-1 text-sm">
+                    <p>📍 {counselor.address}</p>
+                    <p>🏢 {counselor.organization}</p>
+                    {counselor.profileUrl && (
+                      <p>
+                        🔗{" "}
+                        <a
+                          href={counselor.profileUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="underline text-blue-600 break-all"
+                        >
+                          {counselor.profileUrl}
+                        </a>
+                      </p>
+                    )}
+                    <p>🌐 {counselor.email}</p>
+                    <p>☎️ {counselor.phone ?? "—"}</p>
+                    <p>📚 {formatTranslatedList(counselor.specialties)}</p>
+                    <p>🗣 {formatTranslatedList(counselor.languages)}</p>
+                  </div>
+                </div>
+              ))}
             </>
           </InfoWindow>
         )}
@@ -274,40 +297,44 @@ export default function DirectoryMapPage() {
 
       {/* Right Sidebar */}
       <aside className={SIDEBAR_STYLE}>
-        {markers.map(({ counselor, location }, i) => (
-          <div
-            key={i}
-            className="mb-4 cursor-pointer space-y-1 hover:bg-gray-50 p-2 rounded"
-            onClick={() => {
-              setSelected({ counselor, location });
-              google.maps.event.trigger(window, "resize");
-            }}
-          >
-            <h3 className="font-medium">
-              {counselor.name} ({formatTitle(counselor.title)})
-            </h3>
-            <p className="text-sm">📍 {counselor.address}</p>
-            <p className="text-sm">🏢 {counselor.organization}</p>
-            {counselor.profileUrl && (
-              <p className="text-sm">
-                🔗{" "}
-                <a
-                  href={counselor.profileUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="underline text-blue-600 break-all"
-                >
-                  {counselor.profileUrl}
-                </a>
-              </p>
-            )}
-            <p className="text-sm">🌐 {counselor.email}</p>
-            <p className="text-sm">☎️ {counselor.phone ?? "—"}</p>
-            <p className="text-sm">📚 {formatTranslatedList(counselor.specialties)}</p>
-            <p className="text-sm">🗣 {formatTranslatedList(counselor.languages)}</p>
-            <hr className="my-2" />
-          </div>
-        ))}
+        {markers
+          .map(({ counselors, location }, i) =>
+            counselors.map((counselor, j) => (
+              <div
+                key={`${String(i)} ${String(j)}`}
+                className="mb-4 cursor-pointer space-y-1 hover:bg-gray-50 p-2 rounded"
+                onClick={() => {
+                  setSelected({ counselors, location });
+                  google.maps.event.trigger(window, "resize");
+                }}
+              >
+                <h3 className="font-medium">
+                  {counselor.name} ({formatTitle(counselor.title)})
+                </h3>
+                <p className="text-sm">📍 {counselor.address}</p>
+                <p className="text-sm">🏢 {counselor.organization}</p>
+                {counselor.profileUrl && (
+                  <p className="text-sm">
+                    🔗{" "}
+                    <a
+                      href={counselor.profileUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="underline text-blue-600 break-all"
+                    >
+                      {counselor.profileUrl}
+                    </a>
+                  </p>
+                )}
+                <p className="text-sm">🌐 {counselor.email}</p>
+                <p className="text-sm">☎️ {counselor.phone ?? "—"}</p>
+                <p className="text-sm">📚 {formatTranslatedList(counselor.specialties)}</p>
+                <p className="text-sm">🗣 {formatTranslatedList(counselor.languages)}</p>
+                <hr className="my-2" />
+              </div>
+            )),
+          )
+          .flat()}
       </aside>
     </div>
   );
