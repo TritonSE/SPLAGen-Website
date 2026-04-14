@@ -17,7 +17,7 @@ const announcementSchema = z.object({
   title: z.string().min(1).max(50),
   message: z.string().min(1).max(500),
   recipientType: z.enum(["everyone", "language", "specific", ""]),
-  language: z.enum(["english", "spanish", "portuguese", "other", ""]),
+  language: z.enum(["english", "spanish", "portuguese", ""]),
   recipients: z.string().optional(),
 });
 type NewAnnouncementData = z.infer<typeof announcementSchema>;
@@ -40,7 +40,7 @@ export const AnnouncementForm = ({ announcement }: { announcement?: Announcement
     if (announcement) {
       const firstRecipient = announcement.recipients[0];
       let recipientType: "everyone" | "language" | "specific" = "specific";
-      let language: "english" | "spanish" | "portuguese" | "other" | "" = "";
+      let language: "english" | "spanish" | "portuguese" | "" = "";
       let recipients = "";
 
       if (firstRecipient === "everyone") {
@@ -50,8 +50,7 @@ export const AnnouncementForm = ({ announcement }: { announcement?: Announcement
         language = firstRecipient.substring("language:".length) as
           | "english"
           | "spanish"
-          | "portuguese"
-          | "other";
+          | "portuguese";
       } else {
         recipientType = "specific";
         recipients = announcement.recipients.join(",");
@@ -217,16 +216,6 @@ export const AnnouncementForm = ({ announcement }: { announcement?: Announcement
                     className={styles.radioInput}
                   />
                   <span>{t("portuguese")}</span>
-                </label>
-
-                <label className={styles.radioLabel}>
-                  <input
-                    type="radio"
-                    value="other"
-                    {...register("language")}
-                    className={styles.radioInput}
-                  />
-                  <span>{t("other")}</span>
                 </label>
               </div>
             )}

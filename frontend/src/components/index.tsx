@@ -14,6 +14,8 @@ export {
   ApproveDirectoryRequestPopup,
   ConfirmInviteAdminPopup,
   RemoveAdminPopup,
+  DeleteUserPopup,
+  RemoveFromDirectoryPopup,
 } from "./modals/ManageFlowPopup";
 export { I18nClientReady } from "./I18nClientReady";
 export { ExpandableSection } from "./expandable";

@@ -289,6 +289,7 @@ const DirectorySection = ({
       return (
         <div className={styles.directoryColumn}>
           <p className={styles.directoryTitle}>{t("not-in-directory-yet")}</p>
+          <p>{t("directory-question")}</p>
           <Link href="/directoryForm">
             <Button label={t("join-directory")} />
           </Link>
@@ -335,26 +336,13 @@ const DirectorySection = ({
                       ?.label ?? "other",
                   ),
                 },
-                { label: t("work-clinic-short"), value: user?.clinic?.name },
-                { label: t("clinic-website-short"), value: user?.clinic?.url },
+                {
+                  label: t("license-number-short"),
+                  value: user?.display?.license?.[0] ? user?.display?.license?.[0] : t("none"),
+                },
               ]}
               rightColumnFields={[
                 { label: t("education-institution"), value: user?.education?.institution },
-                {
-                  label: t("clinic-address-short"),
-                  value:
-                    user?.clinic?.location &&
-                    formatAddress(
-                      user.clinic.location.address,
-                      user.clinic.location.suite,
-                      user.clinic.location.city,
-                      user.clinic.location.state,
-                      // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-                      getCountryLabelFromCode(user.clinic.location.country) ||
-                        user.clinic.location.country,
-                      user.clinic.location.zipPostCode,
-                    ),
-                },
               ]}
             />
 
@@ -377,10 +365,6 @@ const DirectorySection = ({
                   ),
                 },
                 {
-                  label: t("license-number-short"),
-                  value: user?.display?.license?.[0] ? user?.display?.license?.[0] : t("none"),
-                },
-                {
                   label: t("offer-remote-services-question"),
                   value: user?.display?.options?.remote ? t("yes") : t("no"),
                 },
@@ -393,6 +377,8 @@ const DirectorySection = ({
                         ? t("yes")
                         : t("no"),
                 },
+                { label: t("work-clinic-short"), value: user?.clinic?.name },
+                { label: t("clinic-website-short"), value: user?.clinic?.url },
               ]}
               rightColumnFields={[
                 {
@@ -411,6 +397,21 @@ const DirectorySection = ({
                 {
                   label: t("patient-make-appointments"),
                   value: user?.display?.options?.openToAppointments ? t("yes") : t("no"),
+                },
+                {
+                  label: t("clinic-address-short"),
+                  value:
+                    user?.clinic?.location &&
+                    formatAddress(
+                      user.clinic.location.address,
+                      user.clinic.location.suite,
+                      user.clinic.location.city,
+                      user.clinic.location.state,
+                      // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+                      getCountryLabelFromCode(user.clinic.location.country) ||
+                        user.clinic.location.country,
+                      user.clinic.location.zipPostCode,
+                    ),
                 },
               ]}
             />

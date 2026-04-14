@@ -19,12 +19,8 @@ export const createUser = [
   body("professional.title").optional().isString().withMessage("Title must be a string"),
   body("professional.prefLanguage")
     .optional()
-    .isIn(["english", "spanish", "portuguese", "other"])
+    .isIn(["english", "spanish", "portuguese"])
     .withMessage("Invalid preferred language"),
-  body("professional.otherPrefLanguage")
-    .optional()
-    .isString()
-    .withMessage("Other preferred language must be a string"),
   body("professional.country").optional().isString().withMessage("Country must be a string"),
 
   body("education").optional().notEmpty().withMessage("Education information is required"),
@@ -47,12 +43,7 @@ export const createUser = [
 ];
 
 export const deleteUser = [
-  param("firebaseId").notEmpty().withMessage("Valid user ID is required"),
-  validateRequest,
-];
-
-export const getUser = [
-  param("firebaseId").notEmpty().withMessage("Valid user ID is required"),
+  param("id").notEmpty().withMessage("Valid user ID is required"),
   validateRequest,
 ];
 
@@ -67,9 +58,8 @@ export const editPersonalInformation = [
 export const editProfessionalInformation = [
   body("newTitle").isString().withMessage("Title must be a string"),
   body("newPrefLanguage")
-    .isIn(["english", "spanish", "portuguese", "other"])
+    .isIn(["english", "spanish", "portuguese"])
     .withMessage("Invalid preferred language"),
-  body("newOtherPrefLanguage").isString().withMessage("Other preferred language must be a string"),
   body("newCountry").optional().isString().withMessage("Country must be a string"),
   validateRequest,
 ];
@@ -77,14 +67,8 @@ export const editProfessionalInformation = [
 export const editDirectoryPersonalInformation = [
   body("newDegree").isString().withMessage("Degree must be a string"),
   body("newEducationInstitution").isString().withMessage("Education institution is required"),
-  body("newClinicName").isString().withMessage("Clinic name is required"),
-  body("newClinicWebsiteUrl").isString().withMessage("Website must be a string"),
-  body("newClinicAddress").isString().withMessage("Address is required"),
-  body("newClinicCountry").isString().withMessage("Country is required"),
-  body("newClinicApartmentSuite").optional().isString(),
-  body("newClinicCity").optional().isString(),
-  body("newClinicState").optional().isString(),
-  body("newClinicZipPostCode").optional().isString(),
+  body("newLicense").isArray().withMessage("License must be an array"),
+  body("newLicense.*").isString().withMessage("Each license entry must be a string"),
   validateRequest,
 ];
 
@@ -113,15 +97,21 @@ export const editDirectoryDisplayInfo = [
     .withMessage("Invalid service entry"),
   body("newLanguages").isArray({ min: 1 }).withMessage("Languages must be a non-empty array"),
   body("newLanguages.*")
-    .isIn(["english", "spanish", "portuguese", "other"])
+    .isIn(["english", "spanish", "portuguese"])
     .withMessage("Invalid language entry"),
-  body("newLicense").isArray().withMessage("License must be an array"),
-  body("newLicense.*").isString().withMessage("Each license entry must be a string"),
   body("newRemoteOption").isBoolean().withMessage("Remote option must be a boolean"),
   body("newAppointmentsOption").isBoolean().withMessage("Appointments option must be a boolean"),
   body("newAuthorizedOption")
     .notEmpty()
     .withMessage("Authorized option must be a boolean or string"),
+  body("newClinicName").isString().withMessage("Clinic name is required"),
+  body("newClinicWebsiteUrl").isString().withMessage("Website must be a string"),
+  body("newClinicAddress").isString().withMessage("Address is required"),
+  body("newClinicCountry").isString().withMessage("Country is required"),
+  body("newClinicApartmentSuite").optional().isString(),
+  body("newClinicCity").optional().isString(),
+  body("newClinicState").optional().isString(),
+  body("newClinicZipPostCode").optional().isString(),
   validateRequest,
 ];
 

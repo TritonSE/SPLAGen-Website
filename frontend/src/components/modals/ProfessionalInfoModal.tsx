@@ -25,7 +25,7 @@ type professionalInfoProps = {
 };
 const CountryOptions = countryList().getData();
 
-const languages = ["english", "spanish", "portuguese", "other"];
+const languages = ["english", "spanish", "portuguese"];
 
 // Lazy load CountrySelector component to avoid hydration error
 const CountrySelector = dynamic(() => import("@/components").then((mod) => mod.CountrySelector), {
@@ -49,7 +49,7 @@ export const professionalInfoSchema = (t: (key: string) => string) =>
     professionalTitle: z.string().min(1, t("professional-title-required")),
     professionalTitleOther: z.string(),
     country: countrySchema(t).optional(),
-    language: z.enum(["english", "spanish", "portuguese", "other"], {
+    language: z.enum(["english", "spanish", "portuguese"], {
       errorMap: () => ({ message: t("one-language-required") }),
     }),
     splagenDirectory: z.boolean(),
@@ -113,7 +113,6 @@ export const ProfessionalInfoModal = ({
               ? data.professionalTitleOther
               : data.professionalTitle,
           newPrefLanguage: data.language,
-          newOtherPrefLanguage: "",
           newCountry: data.country?.label ?? "",
         };
 

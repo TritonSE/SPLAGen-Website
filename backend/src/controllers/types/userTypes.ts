@@ -13,8 +13,7 @@ export type CreateUserRequestBody = {
 
   professional?: {
     title?: string;
-    prefLanguage?: "english" | "spanish" | "portuguese" | "other";
-    otherPrefLanguage?: string;
+    prefLanguage?: "english" | "spanish" | "portuguese";
     country?: string;
   };
 
@@ -43,22 +42,14 @@ export type EditUserPersonalInformationRequestBody = {
 
 export type EditUserProfessionalInformationRequestBody = {
   newTitle: string;
-  newPrefLanguage: "english" | "spanish" | "portuguese" | "other";
-  newOtherPrefLanguage: string;
+  newPrefLanguage: "english" | "spanish" | "portuguese";
   newCountry: string;
 };
 
 export type EditDirectoryPersonalInformationRequestBody = {
   newDegree: string;
   newEducationInstitution: string;
-  newClinicName?: string;
-  newClinicAddress?: string;
-  newClinicCountry?: string;
-  newClinicApartmentSuite?: string;
-  newClinicCity?: string;
-  newClinicState?: string;
-  newClinicZipPostCode?: string;
-  newClinicWebsiteUrl?: string;
+  newLicense: string[];
 };
 
 export type EditDirectoryDisplayInformationRequestBody = {
@@ -81,12 +72,19 @@ export type EditDirectoryDisplayInformationRequestBody = {
     | "metabolic"
     | "other"
   )[];
-  newLanguages: ("english" | "spanish" | "portuguese" | "other")[];
-  newLicense: string[];
+  newLanguages: ("english" | "spanish" | "portuguese")[];
   newRemoteOption: boolean;
   newRequestOption: boolean;
   newAppointmentsOption: boolean;
   newAuthorizedOption: string | boolean;
+  newClinicName?: string;
+  newClinicAddress?: string;
+  newClinicCountry?: string;
+  newClinicApartmentSuite?: string;
+  newClinicCity?: string;
+  newClinicState?: string;
+  newClinicZipPostCode?: string;
+  newClinicWebsiteUrl?: string;
 };
 
 export type EditProfilePictureRequestBody = {

@@ -64,7 +64,6 @@ export const Basics = ({ onNext, onBack }: BasicsProps) => {
     { value: "ES", label: t("spanish") },
     { value: "EN", label: t("english") },
     { value: "PT", label: t("portuguese") },
-    { value: "OTH", label: t("other") },
   ];
 
   return (

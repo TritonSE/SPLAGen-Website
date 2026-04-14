@@ -27,6 +27,13 @@ router.post(
   DirectoryController.denyDirectoryEntry,
 );
 router.post("/leave", requireSignedIn, DirectoryController.leaveDirectory);
+router.post(
+  "/remove",
+  requireSignedIn,
+  requireAdminOrSuperAdmin,
+  DirectoryValidator.removeUserFromDirectory,
+  DirectoryController.removeUserFromDirectory,
+);
 router.get("/public", DirectoryController.getPublicDirectory);
 
 export default router;

@@ -1,6 +1,6 @@
 import { InferSchemaType, Schema, model } from "mongoose";
 
-export const VALID_LANGUAGES = ["english", "spanish", "portuguese", "other"];
+export const VALID_LANGUAGES = ["english", "spanish", "portuguese"];
 
 export const validateRecipients = (value: string[]) => {
   if (!Array.isArray(value)) return false;

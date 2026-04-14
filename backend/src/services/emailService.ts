@@ -5,6 +5,7 @@ import Mail from "nodemailer/lib/mailer";
 import env from "../util/validateEnv";
 
 import {
+  ACCOUNT_DELETION_EMAIL,
   ADMIN_INVITE_EMAIL,
   ADMIN_REMOVAL_EMAIL,
   ANNOUNCEMENT_MESSAGE,
@@ -13,6 +14,7 @@ import {
   AUTHOR_NAME,
   DIRECTORY_APPROVAL_EMAIL,
   DIRECTORY_DENIAL_EMAIL,
+  DIRECTORY_REMOVAL_EMAIL,
   DISCUSSION_TITLE,
   DISCUSSION_URL,
   NEW_ANNOUNCEMENT_EMAIL,
@@ -23,8 +25,58 @@ import {
   REPLIER_NAME,
   REPLY_MESSAGE,
   SIGN_OFF_HTML,
+  getTemplate,
 } from "./emailHtml";
 config();
+
+const EMAIL_SUBJECTS = {
+  directoryApproval: {
+    english: "Welcome to the SPLAGen Directory!",
+    spanish: "¡Bienvenido/a al Directorio de SPLAGen!",
+    portuguese: "Bem-vindo/a ao Diretório da SPLAGen!",
+  },
+  directoryDenial: {
+    english: "Update on your SPLAGen Directory Application!",
+    spanish: "Actualización sobre su solicitud al Directorio de SPLAGen",
+    portuguese: "Atualização sobre sua candidatura ao Diretório da SPLAGen",
+  },
+  adminInvitation: {
+    english: "Invitation to be a SPLAGen Admin",
+    spanish: "Invitación para ser administrador/a de SPLAGen",
+    portuguese: "Convite para ser administrador/a da SPLAGen",
+  },
+  adminRemoval: {
+    english: "Removal as SPLAGen Admin",
+    spanish: "Eliminación como administrador/a de SPLAGen",
+    portuguese: "Remoção como administrador/a da SPLAGen",
+  },
+  accountDeletion: {
+    english: "SPLAGen Membership Portal Account Deletion",
+    spanish: "Eliminación de cuenta en el Portal de Membresía de SPLAGen",
+    portuguese: "Exclusão de conta no Portal de Membros da SPLAGen",
+  },
+  directoryRemoval: {
+    english: "Removal from SPLAGen Directory",
+    spanish: "Eliminación del Directorio de SPLAGen",
+    portuguese: "Remoção do Diretório da SPLAGen",
+  },
+  newAnnouncement: {
+    english: "SPLAGen Membership Portal - New Announcement",
+    spanish: "Portal de Membresía de SPLAGen - Nuevo anuncio",
+    portuguese: "Portal de Membros da SPLAGen - Novo anúncio",
+  },
+  newDiscussionReply: {
+    english: "SPLAGen Membership Portal - New Reply to a Discussion",
+    spanish: "Portal de Membresía de SPLAGen - Nueva respuesta a una discusión",
+    portuguese: "Portal de Membros da SPLAGen - Nova resposta a uma discussão",
+  },
+};
+
+const LOGO_ATTACHMENT = {
+  filename: "splagen_logo.png",
+  path: `${__dirname}/../../public/splagen_logo.png`,
+  cid: "splagen_logo.png",
+};
 
 const sendEmail = async (options: Mail.Options) => {
   const transporter = nodemailer.createTransport({
@@ -48,84 +100,123 @@ const sendEmail = async (options: Mail.Options) => {
   }
 };
 
-const sendDirectoryApprovalEmail = async (to: string, name: string) => {
-  const emailSubject = "Welcome to the SPLAGen Directory!";
-  const emailHTML = DIRECTORY_APPROVAL_EMAIL.replace(RECIPIENT_TEXT, name) + SIGN_OFF_HTML;
+const sendDirectoryApprovalEmail = async (to: string, name: string, lang?: string | null) => {
+  const emailSubject = getTemplate(EMAIL_SUBJECTS.directoryApproval, lang);
+  const emailHTML =
+    getTemplate(DIRECTORY_APPROVAL_EMAIL, lang).replaceAll(RECIPIENT_TEXT, name) +
+    getTemplate(SIGN_OFF_HTML, lang);
 
   await sendEmail({
     to,
     cc: env.EMAIL_CC,
     subject: emailSubject,
     html: emailHTML,
-    attachments: [
-      {
-        filename: "splagen_logo.png",
-        path: `${__dirname}/../../public/splagen_logo.png`,
-        cid: "splagen_logo.png",
-      },
-    ],
+    attachments: [LOGO_ATTACHMENT],
   });
 };
 
-const sendDirectoryDenialEmail = async (to: string, name: string, reason: string) => {
-  const emailSubject = "Update on your SPLAGen Directory Application!";
+const sendDirectoryDenialEmail = async (
+  to: string,
+  name: string,
+  reason: string,
+  lang?: string | null,
+) => {
+  const emailSubject = getTemplate(EMAIL_SUBJECTS.directoryDenial, lang);
   const emailHTML =
-    DIRECTORY_DENIAL_EMAIL.replace(RECIPIENT_TEXT, name).replace(REASON_TEXT, reason) +
-    SIGN_OFF_HTML;
+    getTemplate(DIRECTORY_DENIAL_EMAIL, lang)
+      .replaceAll(RECIPIENT_TEXT, name)
+      .replaceAll(REASON_TEXT, reason) + getTemplate(SIGN_OFF_HTML, lang);
 
   await sendEmail({
     to,
     cc: env.EMAIL_CC,
     subject: emailSubject,
     html: emailHTML,
-    attachments: [
-      {
-        filename: "splagen_logo.png",
-        path: `${__dirname}/../../public/splagen_logo.png`,
-        cid: "splagen_logo.png",
-      },
-    ],
+    attachments: [LOGO_ATTACHMENT],
   });
 };
 
-const sendAdminInvitationEmail = async (to: string, name: string, portalLink: string) => {
-  const emailSubject = "Invitation to be a SPLAGen Admin";
+const sendAdminInvitationEmail = async (
+  to: string,
+  name: string,
+  portalLink: string,
+  lang?: string | null,
+) => {
+  const emailSubject = getTemplate(EMAIL_SUBJECTS.adminInvitation, lang);
   const emailHTML =
-    ADMIN_INVITE_EMAIL.replace(RECIPIENT_TEXT, name).replace(PORTAL_LINK, portalLink) +
-    SIGN_OFF_HTML;
+    getTemplate(ADMIN_INVITE_EMAIL, lang)
+      .replaceAll(RECIPIENT_TEXT, name)
+      .replaceAll(PORTAL_LINK, portalLink) + getTemplate(SIGN_OFF_HTML, lang);
 
   await sendEmail({
     to,
     cc: env.EMAIL_CC,
     subject: emailSubject,
     html: emailHTML,
-    attachments: [
-      {
-        filename: "splagen_logo.png",
-        path: `${__dirname}/../../public/splagen_logo.png`,
-        cid: "splagen_logo.png",
-      },
-    ],
+    attachments: [LOGO_ATTACHMENT],
   });
 };
 
-const sendAdminRemovalEmail = async (to: string, name: string, reason: string) => {
-  const emailSubject = "Removal as SPLAGen Admin";
+const sendAdminRemovalEmail = async (
+  to: string,
+  name: string,
+  reason: string,
+  lang?: string | null,
+) => {
+  const emailSubject = getTemplate(EMAIL_SUBJECTS.adminRemoval, lang);
   const emailHTML =
-    ADMIN_REMOVAL_EMAIL.replace(RECIPIENT_TEXT, name).replace(REASON_TEXT, reason) + SIGN_OFF_HTML;
+    getTemplate(ADMIN_REMOVAL_EMAIL, lang)
+      .replaceAll(RECIPIENT_TEXT, name)
+      .replaceAll(REASON_TEXT, reason) + getTemplate(SIGN_OFF_HTML, lang);
 
   await sendEmail({
     to,
     cc: env.EMAIL_CC,
     subject: emailSubject,
     html: emailHTML,
-    attachments: [
-      {
-        filename: "splagen_logo.png",
-        path: `${__dirname}/../../public/splagen_logo.png`,
-        cid: "splagen_logo.png",
-      },
-    ],
+    attachments: [LOGO_ATTACHMENT],
+  });
+};
+
+const sendUserDeletionEmail = async (
+  to: string,
+  name: string,
+  reason: string,
+  lang?: string | null,
+) => {
+  const emailSubject = getTemplate(EMAIL_SUBJECTS.accountDeletion, lang);
+  const emailHTML =
+    getTemplate(ACCOUNT_DELETION_EMAIL, lang)
+      .replaceAll(RECIPIENT_TEXT, name)
+      .replaceAll(REASON_TEXT, reason) + getTemplate(SIGN_OFF_HTML, lang);
+
+  await sendEmail({
+    to,
+    cc: env.EMAIL_CC,
+    subject: emailSubject,
+    html: emailHTML,
+    attachments: [LOGO_ATTACHMENT],
+  });
+};
+
+const sendDirectoryRemovalEmail = async (
+  to: string,
+  name: string,
+  reason: string,
+  lang?: string | null,
+) => {
+  const emailSubject = getTemplate(EMAIL_SUBJECTS.directoryRemoval, lang);
+  const emailHTML =
+    getTemplate(DIRECTORY_REMOVAL_EMAIL, lang)
+      .replaceAll(RECIPIENT_TEXT, name)
+      .replaceAll(REASON_TEXT, reason) + getTemplate(SIGN_OFF_HTML, lang);
+
+  await sendEmail({
+    to,
+    cc: env.EMAIL_CC,
+    subject: emailSubject,
+    html: emailHTML,
+    attachments: [LOGO_ATTACHMENT],
   });
 };
 
@@ -136,27 +227,23 @@ const sendAnnouncementEmail = async (
   announcementTitle: string,
   announcementMessage: string,
   announcementUrl: string,
+  lang?: string | null,
 ) => {
-  const emailSubject = "SPLAGen Membership Portal - New Announcement";
+  const emailSubject = getTemplate(EMAIL_SUBJECTS.newAnnouncement, lang);
 
   const emailHTML =
-    NEW_ANNOUNCEMENT_EMAIL.replace(RECIPIENT_TEXT, recipientName)
-      .replace(AUTHOR_NAME, authorName)
-      .replace(ANNOUNCEMENT_TITLE, announcementTitle)
-      .replace(ANNOUNCEMENT_MESSAGE, announcementMessage)
-      .replace(ANNOUNCEMENT_URL, announcementUrl) + SIGN_OFF_HTML;
+    getTemplate(NEW_ANNOUNCEMENT_EMAIL, lang)
+      .replaceAll(RECIPIENT_TEXT, recipientName)
+      .replaceAll(AUTHOR_NAME, authorName)
+      .replaceAll(ANNOUNCEMENT_TITLE, announcementTitle)
+      .replaceAll(ANNOUNCEMENT_MESSAGE, announcementMessage)
+      .replaceAll(ANNOUNCEMENT_URL, announcementUrl) + getTemplate(SIGN_OFF_HTML, lang);
 
   await sendEmail({
     to,
     subject: emailSubject,
     html: emailHTML,
-    attachments: [
-      {
-        filename: "splagen_logo.png",
-        path: `${__dirname}/../../public/splagen_logo.png`,
-        cid: "splagen_logo.png",
-      },
-    ],
+    attachments: [LOGO_ATTACHMENT],
   });
 };
 
@@ -167,28 +254,23 @@ const sendDiscussionReplyEmail = async (
   discussionTitle: string,
   replyMessage: string,
   discussionUrl: string,
+  lang?: string | null,
 ) => {
-  const emailSubject = "SPLAGen Membership Portal - New Reply to a Discussion";
+  const emailSubject = getTemplate(EMAIL_SUBJECTS.newDiscussionReply, lang);
 
   const emailHTML =
-    NEW_DISCUSSION_REPLY_EMAIL.replace(RECIPIENT_TEXT, recipientName)
-      .replace(REPLIER_NAME, replierName)
-      .replace(DISCUSSION_TITLE, discussionTitle)
-      .replace(REPLY_MESSAGE, replyMessage)
-      .replace(DISCUSSION_URL, discussionUrl)
-      .replace(DISCUSSION_URL, discussionUrl) + SIGN_OFF_HTML;
+    getTemplate(NEW_DISCUSSION_REPLY_EMAIL, lang)
+      .replaceAll(RECIPIENT_TEXT, recipientName)
+      .replaceAll(REPLIER_NAME, replierName)
+      .replaceAll(DISCUSSION_TITLE, discussionTitle)
+      .replaceAll(REPLY_MESSAGE, replyMessage)
+      .replaceAll(DISCUSSION_URL, discussionUrl) + getTemplate(SIGN_OFF_HTML, lang);
 
   await sendEmail({
     to,
     subject: emailSubject,
     html: emailHTML,
-    attachments: [
-      {
-        filename: "splagen_logo.png",
-        path: `${__dirname}/../../public/splagen_logo.png`,
-        cid: "splagen_logo.png",
-      },
-    ],
+    attachments: [LOGO_ATTACHMENT],
   });
 };
 
@@ -199,4 +281,6 @@ export {
   sendAdminRemovalEmail,
   sendAnnouncementEmail,
   sendDiscussionReplyEmail,
+  sendUserDeletionEmail,
+  sendDirectoryRemovalEmail,
 };

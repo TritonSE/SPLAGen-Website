@@ -23,8 +23,10 @@ import { degreesToReadable } from "@/app/profile/page";
 import {
   ApproveDirectoryRequestPopup,
   Button,
+  DeleteUserPopup,
   DenyDirectoryRequestPopup,
   RemoveAdminPopup,
+  RemoveFromDirectoryPopup,
 } from "@/components";
 import { Chip } from "@/components/Chip";
 import { getCountryLabelFromCode } from "@/components/CountrySelector";
@@ -103,11 +105,13 @@ export const MembersTablePage = ({ adminsView }: { adminsView: boolean }) => {
   const [approvingMembers, setApprovingMembers] = useState<User[]>([]);
   const [denyingMembers, setDenyingMembers] = useState<User[]>([]);
   const [removingAdmins, setRemovingAdmins] = useState<User[]>([]);
+  const [deletingUser, setDeletingUser] = useState<User | null>(null);
+  const [removingFromDirectoryUser, setRemovingFromDirectoryUser] = useState<User | null>(null);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [isDownloading, setIsDownloading] = useState(false);
 
-  const { firebaseUser } = useContext(UserContext);
+  const { firebaseUser, isAdminOrSuperAdmin } = useContext(UserContext);
 
   const selectedUsers = useMemo(
     () => users?.filter((user) => rowSelection[user._id]) ?? [],
@@ -714,33 +718,13 @@ export const MembersTablePage = ({ adminsView }: { adminsView: boolean }) => {
                           <span>{sidebarUser.education?.institution ?? t("none")}</span>
                         </div>
                         <div className="flex flex-col">
-                          <span className={styles.fieldLabel}>{t("work-clinic")}</span>
-                          <span>{sidebarUser.clinic?.name ?? t("none")}</span>
+                          <span className={styles.fieldLabel}>{t("license-number")}</span>
+                          <span>
+                            {sidebarUser.display?.license?.[0]
+                              ? sidebarUser.display?.license?.[0]
+                              : t("none")}
+                          </span>
                         </div>
-                        <div className="flex flex-col">
-                          <span className={styles.fieldLabel}>{t("clinic-website")}</span>
-                          <span>{sidebarUser.clinic?.url ?? t("none")}</span>
-                        </div>
-                        {sidebarUser.clinic?.location && (
-                          <div className="flex flex-col">
-                            <span className={styles.fieldLabel}>{t("clinic-address")}</span>
-                            <div className="text-sm">
-                              {sidebarUser.clinic.location.address && (
-                                <p>{sidebarUser.clinic.location.address}</p>
-                              )}
-                              {sidebarUser.clinic.location.suite && (
-                                <p>{sidebarUser.clinic.location.suite}</p>
-                              )}
-                              <p>
-                                {sidebarUser.clinic.location.city},{" "}
-                                {sidebarUser.clinic.location.state},{" "}
-                                {getCountryLabelFromCode(sidebarUser.clinic.location.country) ??
-                                  sidebarUser.clinic.location.country}
-                              </p>
-                              <p>{sidebarUser.clinic.location.zipPostCode}</p>
-                            </div>
-                          </div>
-                        )}
                       </div>
                     </div>
 
@@ -773,14 +757,6 @@ export const MembersTablePage = ({ adminsView }: { adminsView: boolean }) => {
                           <PreferredLanguages languages={sidebarUser.display?.languages} />
                         </div>
                         <div className="flex flex-col">
-                          <span className={styles.fieldLabel}>{t("license-number")}</span>
-                          <span>
-                            {sidebarUser.display?.license?.[0]
-                              ? sidebarUser.display?.license?.[0]
-                              : t("none")}
-                          </span>
-                        </div>
-                        <div className="flex flex-col">
                           <span className={styles.fieldLabel}>{t("remote-services")}</span>
                           <span>{sidebarUser.display?.options?.remote ? t("yes") : t("no")}</span>
                         </div>
@@ -806,6 +782,35 @@ export const MembersTablePage = ({ adminsView }: { adminsView: boolean }) => {
                             {sidebarUser.display?.options?.openToAppointments ? t("yes") : t("no")}
                           </span>
                         </div>
+
+                        <div className="flex flex-col">
+                          <span className={styles.fieldLabel}>{t("work-clinic")}</span>
+                          <span>{sidebarUser.clinic?.name ?? t("none")}</span>
+                        </div>
+                        <div className="flex flex-col">
+                          <span className={styles.fieldLabel}>{t("clinic-website")}</span>
+                          <span>{sidebarUser.clinic?.url ?? t("none")}</span>
+                        </div>
+                        {sidebarUser.clinic?.location && (
+                          <div className="flex flex-col">
+                            <span className={styles.fieldLabel}>{t("clinic-address")}</span>
+                            <div className="text-sm">
+                              {sidebarUser.clinic.location.address && (
+                                <p>{sidebarUser.clinic.location.address}</p>
+                              )}
+                              {sidebarUser.clinic.location.suite && (
+                                <p>{sidebarUser.clinic.location.suite}</p>
+                              )}
+                              <p>
+                                {sidebarUser.clinic.location.city},{" "}
+                                {sidebarUser.clinic.location.state},{" "}
+                                {getCountryLabelFromCode(sidebarUser.clinic.location.country) ??
+                                  sidebarUser.clinic.location.country}
+                              </p>
+                              <p>{sidebarUser.clinic.location.zipPostCode}</p>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </>
@@ -849,6 +854,30 @@ export const MembersTablePage = ({ adminsView }: { adminsView: boolean }) => {
                     height={12}
                     className={styles["small-icon"]}
                   />
+                </button>
+              </div>
+            )}
+
+            {/* Admin actions: Remove from Directory / Delete User */}
+            {isAdminOrSuperAdmin && (
+              <div className="flex flex-row gap-6 mt-4 ml-auto mr-auto">
+                {sidebarUser.account.inDirectory === true && (
+                  <button
+                    onClick={() => {
+                      setRemovingFromDirectoryUser(sidebarUser);
+                    }}
+                    className={styles["action-button"]}
+                  >
+                    {t("admin-remove-from-directory")}
+                  </button>
+                )}
+                <button
+                  onClick={() => {
+                    setDeletingUser(sidebarUser);
+                  }}
+                  className={styles["red-action-button"]}
+                >
+                  {t("delete-user")}
                 </button>
               </div>
             )}
@@ -1058,6 +1087,29 @@ export const MembersTablePage = ({ adminsView }: { adminsView: boolean }) => {
         onInviteAdmin={() => {
           setIsInviteModalOpen(false);
           void loadUsers();
+        }}
+      />
+      <DeleteUserPopup
+        isOpen={deletingUser !== null}
+        user={deletingUser}
+        onDelete={() => {
+          setDeletingUser(null);
+          setSidebarUserIdx(-1);
+          void loadUsers();
+        }}
+        onCancel={() => {
+          setDeletingUser(null);
+        }}
+      />
+      <RemoveFromDirectoryPopup
+        isOpen={removingFromDirectoryUser !== null}
+        user={removingFromDirectoryUser}
+        onRemove={() => {
+          setRemovingFromDirectoryUser(null);
+          void loadUsers();
+        }}
+        onCancel={() => {
+          setRemovingFromDirectoryUser(null);
         }}
       />
     </div>

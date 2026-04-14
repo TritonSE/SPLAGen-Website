@@ -44,7 +44,7 @@ const professionalTitleMap: Record<string, string> = {
 };
 
 // Available languages and specializations for filtering - using translation keys
-const AVAILABLE_LANGUAGES = ["english", "spanish", "portuguese", "other"];
+const AVAILABLE_LANGUAGES = ["english", "spanish", "portuguese"];
 
 // Service keys matching backend enum values
 const AVAILABLE_SPECIALIZATIONS = [

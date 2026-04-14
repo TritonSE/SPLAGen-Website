@@ -31,20 +31,13 @@ router.post(
 );
 router.post("/", UserValidator.createUser, UserController.createUser);
 router.delete(
-  "/:firebaseId",
+  "/:id",
   requireSignedIn,
   requireAdminOrSuperAdmin,
   UserValidator.deleteUser,
   UserController.deleteUser,
 );
 router.get("/", requireSignedIn, requireAdminOrSuperAdmin, UserController.getUsers);
-router.get(
-  "/:firebaseId",
-  requireSignedIn,
-  requireAdminOrSuperAdmin,
-  UserValidator.getUser,
-  UserController.getUser,
-);
 
 // Personal information routes
 router.put(

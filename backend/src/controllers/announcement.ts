@@ -59,16 +59,15 @@ export const createAnnouncement = async (
               { "professional.prefLanguage": "english" },
               { "professional.prefLanguage": { $exists: false } },
               { "professional.prefLanguage": null },
-              { "professional.prefLanguage": "other" },
             ],
           },
-          "personal.email personal.firstName",
+          "personal.email personal.firstName professional.prefLanguage",
         );
         emailRecipients = languageUsers;
       } else {
         const languageUsers = await UserModel.find(
           { "professional.prefLanguage": targetLanguage },
-          "personal.email personal.firstName",
+          "personal.email personal.firstName professional.prefLanguage",
         );
         emailRecipients = languageUsers;
       }
@@ -76,7 +75,7 @@ export const createAnnouncement = async (
       // Get specific users by email
       const specificUsers = await UserModel.find(
         { "personal.email": { $in: recipients } },
-        "personal.email personal.firstName",
+        "personal.email personal.firstName professional.prefLanguage",
       );
       emailRecipients = specificUsers;
     }
@@ -92,6 +91,7 @@ export const createAnnouncement = async (
               title,
               message,
               announcementUrl,
+              recipient.professional?.prefLanguage,
             ).catch((error: unknown) => {
               console.error(`Failed to send email to ${recipient.personal?.email ?? ""}:`, error);
             })
@@ -170,10 +170,7 @@ export const getMultipleAnnouncements = async (
     if (![UserRole.ADMIN, UserRole.SUPERADMIN].includes(userRole as UserRole)) {
       // Get user's preferred language
       const user = await UserModel.findById(userId, "professional.prefLanguage");
-      const userLanguage =
-        user?.professional?.prefLanguage && user.professional.prefLanguage !== "other"
-          ? user.professional.prefLanguage
-          : "english";
+      const userLanguage = user?.professional?.prefLanguage ?? "english";
 
       // Filter announcements by user's email, "everyone", or their preferred language
       filters.push({
@@ -230,10 +227,7 @@ export const getIndividualAnnouncementDetails = async (
     if (![UserRole.ADMIN, UserRole.SUPERADMIN].includes(userRole as UserRole)) {
       // Get user's preferred language
       const user = await UserModel.findById(userId, "professional.prefLanguage");
-      const userLanguage =
-        user?.professional?.prefLanguage && user.professional.prefLanguage !== "other"
-          ? user.professional.prefLanguage
-          : "english";
+      const userLanguage = user?.professional?.prefLanguage ?? "english";
 
       const isAuthorized =
         announcement.recipients.includes("everyone") ||

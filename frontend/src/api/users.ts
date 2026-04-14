@@ -1,6 +1,6 @@
 import { getAuth, sendPasswordResetEmail, signInWithEmailAndPassword } from "firebase/auth";
 
-import { APIResult, get, handleAPIError, post, put } from "./requests";
+import { APIResult, get, handleAPIError, httpDelete, post, put } from "./requests";
 
 import type { UserCredential } from "firebase/auth";
 
@@ -36,8 +36,7 @@ export type CreateUserRequestBody = {
   };
   professional?: {
     title?: string;
-    prefLanguage?: "english" | "spanish" | "portuguese" | "other";
-    otherPrefLanguage?: string;
+    prefLanguage?: "english" | "spanish" | "portuguese";
     country?: string;
   };
   education?: {
@@ -74,8 +73,7 @@ export type User = {
   };
   professional?: {
     title?: string;
-    prefLanguage?: "english" | "spanish" | "portuguese" | "other";
-    otherPrefLanguage?: string;
+    prefLanguage?: "english" | "spanish" | "portuguese";
     country?: string;
   };
   education?: {
@@ -137,7 +135,7 @@ export type User = {
       | "metabolic"
       | "other"
     )[];
-    languages?: ("english" | "spanish" | "portuguese" | "other")[];
+    languages?: ("english" | "spanish" | "portuguese")[];
     license?: string[];
     options?: {
       openToAppointments?: boolean;
@@ -171,15 +169,13 @@ export type EditBasicInfo = {
 
 export type ProfessionalInfo = {
   title: string;
-  prefLanguage: "english" | "spanish" | "portuguese" | "other";
-  otherPrefLanguage: string;
+  prefLanguage: "english" | "spanish" | "portuguese";
   country: string;
 };
 
 export type EditProfessionalInfo = {
   newTitle: string;
-  newPrefLanguage: "english" | "spanish" | "portuguese" | "other";
-  newOtherPrefLanguage: string;
+  newPrefLanguage: "english" | "spanish" | "portuguese";
   newCountry: string;
 };
 
@@ -203,17 +199,11 @@ export type EditDirectoryDisplayInformationRequestBody = {
     | "metabolic"
     | "other"
   )[];
-  newLanguages: ("english" | "spanish" | "portuguese" | "other")[];
-  newLicense: string[];
+  newLanguages: ("english" | "spanish" | "portuguese")[];
   newRemoteOption: boolean;
   newRequestOption: boolean;
   newAppointmentsOption: boolean;
   newAuthorizedOption: string | boolean;
-};
-
-export type EditDirectoryPersonalInformationRequestBody = {
-  newDegree: string;
-  newEducationInstitution: string;
   newClinicName?: string;
   newClinicAddress?: string;
   newClinicCountry?: string;
@@ -222,6 +212,12 @@ export type EditDirectoryPersonalInformationRequestBody = {
   newClinicState?: string;
   newClinicZipPostCode?: string;
   newClinicWebsiteUrl?: string;
+};
+
+export type EditDirectoryPersonalInformationRequestBody = {
+  newDegree: string;
+  newEducationInstitution: string;
+  newLicense: string[];
 };
 
 export const createAuthHeader = (firebaseToken: string) => ({
@@ -515,14 +511,27 @@ export async function editMembership(
   }
 }
 
-export const getUser = async (
-  firebaseUid: string,
+export const deleteUser = async (
+  userId: string,
+  reason: string,
   firebaseToken: string,
-): Promise<APIResult<User>> => {
+): Promise<APIResult<null>> => {
   try {
-    const response = await get(`/api/users/${firebaseUid}`, createAuthHeader(firebaseToken));
-    const data = (await response.json()) as User;
-    return { success: true, data };
+    await httpDelete(`/api/users/${userId}`, createAuthHeader(firebaseToken), { reason });
+    return { success: true, data: null };
+  } catch (error) {
+    return handleAPIError(error);
+  }
+};
+
+export const removeUserFromDirectory = async (
+  userId: string,
+  reason: string,
+  firebaseToken: string,
+): Promise<APIResult<null>> => {
+  try {
+    await post(`/api/directory/remove`, { userId, reason }, createAuthHeader(firebaseToken));
+    return { success: true, data: null };
   } catch (error) {
     return handleAPIError(error);
   }

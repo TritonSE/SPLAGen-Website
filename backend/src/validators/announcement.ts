@@ -10,7 +10,7 @@ export const createOrEditAnnouncement = [
   body("recipients")
     .custom(validateRecipients)
     .withMessage(
-      "Recipients must be 'everyone', 'language:<language>' (where language is english, spanish, portuguese, or other), or valid email addresses.",
+      "Recipients must be 'everyone', 'language:<language>' (where language is english, spanish, or portuguese), or valid email addresses.",
     ),
   validateRequest,
 ];

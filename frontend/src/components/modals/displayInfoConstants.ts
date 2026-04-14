@@ -15,7 +15,7 @@ export type ValidService =
   | "pharmacogenomics"
   | "metabolic";
 
-export const languages = ["english", "spanish", "portuguese", "other"] as const;
+export const languages = ["english", "spanish", "portuguese"] as const;
 
 export const serviceLabelToKeyMap: Record<string, ValidService> = {
   "Pediatric Genetics": "pediatrics",

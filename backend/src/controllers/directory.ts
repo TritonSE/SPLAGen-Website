@@ -2,7 +2,11 @@ import { NextFunction, Request, Response } from "express";
 
 import { AuthenticatedRequest } from "../middleware/auth";
 import UserModel, { User, UserMembership } from "../models/user";
-import { sendDirectoryApprovalEmail, sendDirectoryDenialEmail } from "../services/emailService";
+import {
+  sendDirectoryApprovalEmail,
+  sendDirectoryDenialEmail,
+  sendDirectoryRemovalEmail,
+} from "../services/emailService";
 
 type JoinDirectoryRequestBody = {
   education: {
@@ -47,6 +51,11 @@ type ApproveDirectoryRequestBody = {
 
 type DenyDirectoryRequestBody = {
   userIds: string[];
+  reason: string;
+};
+
+type RemoveUserFromDirectoryRequestBody = {
+  userId: string;
   reason: string;
 };
 
@@ -164,7 +173,7 @@ export const approveDirectoryEntry = async (
 
         const { firstName, email } = user.personal;
 
-        await sendDirectoryApprovalEmail(email, firstName);
+        await sendDirectoryApprovalEmail(email, firstName, user.professional?.prefLanguage);
       }),
     );
 
@@ -206,7 +215,7 @@ export const denyDirectoryEntry = async (
 
         const { firstName, email } = user.personal;
 
-        await sendDirectoryDenialEmail(email, firstName, reason);
+        await sendDirectoryDenialEmail(email, firstName, reason, user.professional?.prefLanguage);
       }),
     );
 
@@ -218,6 +227,37 @@ export const denyDirectoryEntry = async (
     res.status(200).json({ message: "Directory entry denied and email sent" });
   } catch (error) {
     next(error);
+  }
+};
+
+export const removeUserFromDirectory = async (
+  req: AuthenticatedRequest<unknown, unknown, RemoveUserFromDirectoryRequestBody>,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { userId, reason } = req.body;
+    const user = await UserModel.findById(userId);
+    if (!user?.personal || !user?.account) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    user.account.inDirectory = false;
+    await user.save();
+
+    await sendDirectoryRemovalEmail(
+      user.personal.email,
+      user.personal.firstName,
+      reason,
+      user.professional?.prefLanguage,
+    );
+
+    res.status(200).json({ message: "User removed from directory successfully" });
+    return;
+  } catch (error) {
+    console.error("Error removing user from directory:", error);
+    next(error);
+    return;
   }
 };
 

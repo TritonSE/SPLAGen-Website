@@ -63,7 +63,7 @@ export const specialtyOptionsToFrontend = Object.entries(specialtyOptionsToBacke
   {},
 );
 
-const languageOptions = ["English", "Spanish", "Portuguese", "Other"];
+const languageOptions = ["English", "Spanish", "Portuguese"];
 
 const formSchema = z.object({
   canMakeAppointments: z.boolean({ required_error: "Required" }),

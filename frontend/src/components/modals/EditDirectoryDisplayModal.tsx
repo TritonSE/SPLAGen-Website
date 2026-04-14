@@ -2,6 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Radio } from "@tritonse/tse-constellation";
+import dynamic from "next/dynamic";
 import React, { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
@@ -19,6 +20,7 @@ import {
 
 import { User, editDirectoryDisplayInfoRequest } from "@/api/users";
 import { PhoneInput, PillButton } from "@/components";
+import { getCountryOptions } from "@/components/CountrySelector";
 import { SuccessMessage } from "@/components/SuccessMessage";
 import { UserContext } from "@/contexts/userContext";
 
@@ -28,6 +30,18 @@ type ModalProps = {
   populationInfo: User | null;
 };
 
+// Lazy load CountrySelector component to avoid hydration error
+const CountrySelector = dynamic(() => import("@/components").then((mod) => mod.CountrySelector), {
+  ssr: false,
+});
+
+// Define validation schema using Zod
+const countrySchema = (t: (key: string) => string) =>
+  z.object({
+    value: z.string().min(1, t("invalid-country-selection")),
+    label: z.string().min(1),
+  });
+
 export const DisplayInfoSchema = (t: (key: string) => string) =>
   z.object({
     workEmail: z.string().min(1, t("email-required")).email(t("invalid-email")),
@@ -36,11 +50,23 @@ export const DisplayInfoSchema = (t: (key: string) => string) =>
     }),
     services: z.array(z.string()).nonempty(t("one-service-required")),
     languages: z.array(z.string()).nonempty(t("one-language-required")),
-    license: z.string(),
     remoteOption: z.boolean(),
     requestOption: z.boolean(),
     canMakeAppointments: z.boolean(),
     authorizedForLanguages: z.union([z.boolean(), z.literal("unsure")]),
+    clinic: z.string().optional(),
+    website: z.string().url(t("invalid-website-url")).optional(),
+    country: countrySchema(t).refine((val) => val !== null, {
+      message: t("required-country-selection"),
+    }),
+    addressLine: z.string().min(3, t("address-3-characters")).optional(),
+    apartment: z.string().optional(),
+    city: z.string().min(2, t("city-2-characters")).optional(),
+    state: z.string().min(2, t("state-2-characters")).optional(),
+    postcode: z
+      .string()
+      .min(3, t("postcode-3-characters"))
+      .max(10, t("postcode-10-max-characters")),
   });
 
 type DisplayInfoModalType = z.infer<ReturnType<typeof DisplayInfoSchema>>;
@@ -63,7 +89,6 @@ export const EditDirectoryDisplayModal = ({ isOpen, onClose, populationInfo }: M
       workPhone: populationInfo?.display?.workPhone,
       services: populationInfo?.display?.services,
       languages: populationInfo?.display?.languages,
-      license: populationInfo?.display?.license?.[0] ?? "",
       remoteOption: populationInfo?.display?.options?.remote,
       requestOption: populationInfo?.display?.options?.openToRequests,
     },
@@ -125,12 +150,19 @@ export const EditDirectoryDisplayModal = ({ isOpen, onClose, populationInfo }: M
           newWorkEmail: data.workEmail,
           newWorkPhone: data.workPhone,
           newServices: data.services as ValidService[],
-          newLanguages: data.languages as ("english" | "spanish" | "portuguese" | "other")[],
-          newLicense: [data.license],
+          newLanguages: data.languages as ("english" | "spanish" | "portuguese")[],
           newRemoteOption: data.remoteOption,
           newRequestOption: data.requestOption,
           newAppointmentsOption: data.canMakeAppointments,
           newAuthorizedOption: data.authorizedForLanguages,
+          newClinicName: data.clinic,
+          newClinicWebsiteUrl: data.website,
+          newClinicAddress: data.addressLine,
+          newClinicApartmentSuite: data.apartment,
+          newClinicCity: data.city,
+          newClinicState: data.state,
+          newClinicZipPostCode: data.postcode,
+          newClinicCountry: data.country.value,
         };
 
         const firebaseToken = await firebaseUser.getIdToken();
@@ -159,11 +191,20 @@ export const EditDirectoryDisplayModal = ({ isOpen, onClose, populationInfo }: M
         workPhone: populationInfo.display?.workPhone,
         services: populationInfo.display?.services,
         languages: populationInfo.display?.languages,
-        license: populationInfo.display?.license?.[0] ?? "",
         remoteOption: populationInfo.display?.options?.remote,
         requestOption: populationInfo.display?.options?.openToRequests,
         canMakeAppointments: populationInfo.display?.options?.openToAppointments,
         authorizedForLanguages: populationInfo.display?.options?.authorizedCare,
+        clinic: populationInfo.clinic?.name,
+        website: populationInfo.clinic?.url,
+        country: getCountryOptions().find(
+          (option) => option.value === populationInfo.clinic?.location?.country,
+        ),
+        addressLine: populationInfo.clinic?.location?.address,
+        apartment: populationInfo.clinic?.location?.suite,
+        city: populationInfo.clinic?.location?.city,
+        state: populationInfo.clinic?.location?.state,
+        postcode: populationInfo.clinic?.location?.zipPostCode,
       });
     }
   }, [isOpen, populationInfo, reset]);
@@ -315,19 +356,6 @@ export const EditDirectoryDisplayModal = ({ isOpen, onClose, populationInfo }: M
               />
             </div>
 
-            {/* License Number */}
-            <div className={styles.infoField}>
-              <label htmlFor="license">{t("license-number")}</label>
-              <input
-                className={styles.infoFieldBox}
-                type="text"
-                id="license"
-                placeholder={"12345678"}
-                {...register("license")}
-              />
-              <p className={styles.errorMessage}>{errors.license?.message ?? "\u00A0"}</p>
-            </div>
-
             {/* Remote Services */}
             <div className={`${styles.infoField} mb-3`}>
               <span>{t("do-you-offer-telehealth")}</span>
@@ -418,6 +446,113 @@ export const EditDirectoryDisplayModal = ({ isOpen, onClose, populationInfo }: M
                   </div>
                 )}
               />
+            </div>
+
+            <div className={`${styles.infoField} mb-3`}>
+              <label htmlFor="clinic">
+                {t("name-of-work-clinic-label")}
+                <span className="red">*</span>
+              </label>
+              <input
+                className={styles.infoFieldBox}
+                id="clinic"
+                {...register("clinic")}
+                placeholder={t("enter-name-of-clinic")}
+              />
+              <p className="error-message">{errors.clinic?.message ?? "\u00A0"}</p>
+            </div>
+
+            <div className={`${styles.infoField} mb-3`}>
+              <label htmlFor="website">{t("clinic-website-link")}</label>
+              <input
+                className={styles.infoFieldBox}
+                id="website"
+                {...register("website")}
+                placeholder={t("clinic-website-link-placeholder")}
+              />
+              <p className="error-message">{errors.website?.message ?? "\u00A0"}</p>
+            </div>
+
+            <div className="directoryInfo-address">
+              <div className="dir-info-form-group">
+                <label>{t("clinic-address")}</label>
+                <Controller
+                  control={control}
+                  name="country"
+                  render={({ field }) => (
+                    <CountrySelector
+                      value={field.value}
+                      onChange={field.onChange}
+                      placeholder={t("country-ellipsis")}
+                    />
+                  )}
+                />
+              </div>
+
+              <div className="dir-info-form-group">
+                <input
+                  className={styles.infoFieldBox}
+                  id="addressLine"
+                  {...register("addressLine")}
+                  placeholder={t("address-line")}
+                />
+              </div>
+
+              <div className="dir-info-form-group">
+                <input
+                  className={styles.infoFieldBox}
+                  id="apartment"
+                  {...register("apartment")}
+                  placeholder={t("apartment-suite-etc")}
+                />
+              </div>
+
+              <div className="city-state-postcode">
+                <div className="dir-info-form-group">
+                  <input
+                    className={styles.infoFieldBox}
+                    id="city"
+                    {...register("city")}
+                    placeholder={t("city")}
+                  />
+                </div>
+                <div className="dir-info-form-group">
+                  <input
+                    className={styles.infoFieldBox}
+                    id="state"
+                    {...register("state")}
+                    placeholder={t("state")}
+                  />
+                </div>
+                <div className="dir-info-form-group">
+                  <input
+                    className={styles.infoFieldBox}
+                    id="postcode"
+                    {...register("postcode")}
+                    placeholder={t("postcode")}
+                  />
+                </div>
+              </div>
+            </div>
+            {/* Only Display 1 error message at a time for address  */}
+            <div className="error-message">
+              {errors.country?.message ||
+              errors.addressLine?.message ||
+              errors.apartment?.message ||
+              errors.city?.message ||
+              errors.state?.message ||
+              errors.postcode?.message ? (
+                <p>
+                  {errors.country?.message ??
+                    errors.addressLine?.message ??
+                    errors.apartment?.message ??
+                    errors.city?.message ??
+                    errors.state?.message ??
+                    errors.postcode?.message}
+                </p>
+              ) : (
+                "\u00A0"
+              )}
             </div>
 
             {errorMessage && <div className="text-red-500">{errorMessage}</div>}

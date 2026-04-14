@@ -137,13 +137,15 @@ export async function patch(
  *
  * @param url The URL to request
  * @param headers The headers of the request (optional)
+ * @param body The body of the request, or undefined if there is none (optional)
  * @returns The Response object returned by `fetch()`
  */
 export async function httpDelete(
   url: string,
   headers: Record<string, string> = {},
+  body?: unknown,
 ): Promise<Response> {
-  const response = await fetchRequest("DELETE", API_BASE_URL + url, undefined, headers);
+  const response = await fetchRequest("DELETE", API_BASE_URL + url, body, headers);
   await assertOk(response);
   return response;
 }

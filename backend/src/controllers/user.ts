@@ -5,8 +5,8 @@ import { NextFunction, Request, Response } from "express";
 
 import { AuthenticatedRequest } from "../middleware/auth";
 import UserModel from "../models/user";
+import { sendUserDeletionEmail } from "../services/emailService";
 import { firebaseAdminAuth } from "../util/firebase";
-import { deleteUserFromFirebase, deleteUserFromMongoDB, getUserFromMongoDB } from "../util/user";
 import { buildUserQuery } from "../util/userQuery";
 
 import {
@@ -72,16 +72,26 @@ export const getWhoAmI = async (req: AuthenticatedRequest, res: Response, next: 
 };
 
 export const deleteUser = async (
-  req: AuthenticatedRequest<{ firebaseId: string }>,
+  req: AuthenticatedRequest<{ id: string }, unknown, { reason: string }>,
   res: Response,
   next: NextFunction,
 ) => {
   try {
-    const { firebaseId } = req.params;
+    const { reason } = req.body;
+    const { id } = req.params;
 
     // Delete user from Firebase and MongoDB
-    await deleteUserFromFirebase(firebaseId);
-    await deleteUserFromMongoDB(firebaseId);
+    const user = await UserModel.findById(id);
+    if (!user?.personal) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const { email, firstName } = user.personal;
+
+    await firebaseAdminAuth.deleteUser(user.firebaseId);
+    await user.deleteOne();
+
+    await sendUserDeletionEmail(email, firstName, reason, user.professional?.prefLanguage);
 
     res.status(200).json({ message: "User deleted successfully" });
     return;
@@ -208,29 +218,6 @@ export const getUsers = async (req: AuthenticatedRequest, res: Response, next: N
   }
 };
 
-export const getUser = async (
-  req: AuthenticatedRequest<{ firebaseId: string }>,
-  res: Response,
-  next: NextFunction,
-) => {
-  try {
-    const { firebaseId } = req.params;
-    const user = await getUserFromMongoDB(firebaseId);
-
-    if (!user) {
-      res.status(404).json({ error: "User not found" });
-      return;
-    }
-
-    res.status(200).json(user);
-    return;
-  } catch (error) {
-    console.error("Error getting user:", error);
-    next(error);
-    return;
-  }
-};
-
 export const editPersonalInformation = async (
   req: AuthenticatedRequest<unknown, unknown, EditUserPersonalInformationRequestBody>,
   res: Response,
@@ -274,14 +261,13 @@ export const editProfessionalInformation = async (
 ) => {
   try {
     const { firebaseUid } = req;
-    const { newTitle, newPrefLanguage, newOtherPrefLanguage, newCountry } = req.body;
+    const { newTitle, newPrefLanguage, newCountry } = req.body;
 
     const updatedUser = await UserModel.findOneAndUpdate(
       { firebaseId: firebaseUid },
       {
         "professional.title": newTitle,
         "professional.prefLanguage": newPrefLanguage,
-        "professional.otherPrefLanguage": newOtherPrefLanguage,
         "professional.country": newCountry,
       },
       { new: true, runValidators: true },
@@ -311,32 +297,14 @@ export const editDirectoryPersonalInformation = async (
 ) => {
   try {
     const { firebaseUid } = req;
-    const {
-      newDegree,
-      newEducationInstitution,
-      newClinicName,
-      newClinicWebsiteUrl,
-      newClinicAddress,
-      newClinicCountry,
-      newClinicApartmentSuite,
-      newClinicCity,
-      newClinicState,
-      newClinicZipPostCode,
-    } = req.body;
+    const { newDegree, newEducationInstitution, newLicense } = req.body;
 
     const updatedUser = await UserModel.findOneAndUpdate(
       { firebaseId: firebaseUid },
       {
         "education.degree": newDegree,
         "education.institution": newEducationInstitution,
-        "clinic.name": newClinicName,
-        "clinic.url": newClinicWebsiteUrl,
-        "clinic.location.address": newClinicAddress,
-        "clinic.location.country": newClinicCountry,
-        "clinic.location.suite": newClinicApartmentSuite,
-        "clinic.location.city": newClinicCity,
-        "clinic.location.state": newClinicState,
-        "clinic.location.zipPostCode": newClinicZipPostCode,
+        "display.license": newLicense,
       },
       { new: true, runValidators: true },
     );
@@ -370,11 +338,18 @@ export const editDirectoryDisplayInfo = async (
       newWorkPhone,
       newServices,
       newLanguages,
-      newLicense,
       newRemoteOption,
       newRequestOption,
       newAuthorizedOption,
       newAppointmentsOption,
+      newClinicName,
+      newClinicWebsiteUrl,
+      newClinicAddress,
+      newClinicCountry,
+      newClinicApartmentSuite,
+      newClinicCity,
+      newClinicState,
+      newClinicZipPostCode,
     } = req.body;
 
     const updatedUser = await UserModel.findOneAndUpdate(
@@ -384,11 +359,18 @@ export const editDirectoryDisplayInfo = async (
         "display.workPhone": newWorkPhone,
         "display.services": newServices,
         "display.languages": newLanguages,
-        "display.license": newLicense,
         "display.options.remote": newRemoteOption,
         "display.options.openToRequests": newRequestOption,
         "display.options.authorizedCare": newAuthorizedOption,
         "display.options.openToAppointments": newAppointmentsOption,
+        "clinic.name": newClinicName,
+        "clinic.url": newClinicWebsiteUrl,
+        "clinic.location.address": newClinicAddress,
+        "clinic.location.country": newClinicCountry,
+        "clinic.location.suite": newClinicApartmentSuite,
+        "clinic.location.city": newClinicCity,
+        "clinic.location.state": newClinicState,
+        "clinic.location.zipPostCode": newClinicZipPostCode,
       },
       { new: true, runValidators: true },
     );
@@ -668,7 +650,6 @@ export const exportUsers = async (
       english: "English",
       spanish: "Spanish",
       portuguese: "Portuguese",
-      other: "Other",
     };
 
     const degreeMap: Record<string, string> = {
@@ -739,13 +720,10 @@ export const exportUsers = async (
       "Professional Title": user.professional?.title
         ? professionalTitleMap[user.professional.title] || user.professional.title
         : "",
-      // Preferred Language (coalesced with other, using display map)
-      "Preferred Language":
-        user.professional?.prefLanguage === "other"
-          ? (user.professional?.otherPrefLanguage ?? "Other")
-          : user.professional?.prefLanguage
-            ? languageMap[user.professional.prefLanguage] || user.professional.prefLanguage
-            : "",
+      // Preferred Language (using display map)
+      "Preferred Language": user.professional?.prefLanguage
+        ? languageMap[user.professional.prefLanguage] || user.professional.prefLanguage
+        : "",
       // Country
       Country: user.professional?.country ?? "",
       // Degree (coalesced with other, using display map)

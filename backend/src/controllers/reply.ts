@@ -68,6 +68,7 @@ export const createReply = async (
             discussion.title,
             message,
             discussionUrl,
+            subscriber.professional?.prefLanguage,
           ).catch((error: unknown) => {
             console.error(
               `Failed to send reply notification email to ${subscriber.personal?.email ?? ""}:`,

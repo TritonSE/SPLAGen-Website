@@ -52,7 +52,12 @@ export const inviteAdmin: RequestHandler = async (req, res, next) => {
     await user.save();
 
     const deploymentUrl = getDeploymentUrl(req);
-    await sendAdminInvitationEmail(user.personal.email, user.personal.firstName, deploymentUrl);
+    await sendAdminInvitationEmail(
+      user.personal.email,
+      user.personal.firstName,
+      deploymentUrl,
+      user.professional?.prefLanguage,
+    );
 
     res.status(200).json({
       message: "User invited successfully",
@@ -85,7 +90,12 @@ export const removeAdmins = async (
         user.role = UserRole.MEMBER;
         await user.save();
 
-        await sendAdminRemovalEmail(user.personal.email, user.personal.firstName, reason);
+        await sendAdminRemovalEmail(
+          user.personal.email,
+          user.personal.firstName,
+          reason,
+          user.professional?.prefLanguage,
+        );
       }),
     );
 

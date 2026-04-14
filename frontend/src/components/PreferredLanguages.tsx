@@ -1,8 +1,8 @@
 import { useTranslation } from "react-i18next";
 
 type PreferredLanguagesProps = {
-  language?: "english" | "spanish" | "portuguese" | "other";
-  languages?: ("english" | "spanish" | "portuguese" | "other")[];
+  language?: "english" | "spanish" | "portuguese";
+  languages?: ("english" | "spanish" | "portuguese")[];
 };
 
 export const PreferredLanguages = ({ language, languages }: PreferredLanguagesProps) => {

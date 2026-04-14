@@ -65,3 +65,9 @@ export const denyDirectoryEntry = [
   body("reason").isString().notEmpty().trim().withMessage("Reason is required"),
   validateRequest,
 ];
+
+export const removeUserFromDirectory = [
+  body("userId").isString().isMongoId().withMessage("User ID must be a valid MongoDB ID"),
+  body("reason").isString().notEmpty().trim().withMessage("Reason is required"),
+  validateRequest,
+];
