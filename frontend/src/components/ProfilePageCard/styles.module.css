@@ -29,6 +29,7 @@
 
 .profileDetails {
   display: flex;
+  flex-direction: row;
   gap: 8px;
 }
 
@@ -43,4 +44,10 @@
 
 .infoLabel {
   color: var(--color-grey4);
+}
+
+@media (max-width: 768px) {
+  .profileDetails {
+    flex-direction: column;
+  }
 }

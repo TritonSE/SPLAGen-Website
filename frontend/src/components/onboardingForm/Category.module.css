@@ -55,6 +55,7 @@
 
 .buttonContainer {
   display: flex;
+  flex-direction: row;
   width: 100%;
   justify-content: space-between;
   align-items: center;
@@ -71,4 +72,11 @@
   border: none;
   cursor: pointer;
   display: flex;
+}
+
+@media (max-width: 768px) {
+  .buttonContainer {
+    flex-direction: column;
+    gap: 10px;
+  }
 }

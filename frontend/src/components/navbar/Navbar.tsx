@@ -10,6 +10,8 @@ import styles from "./Navbar.module.css";
 import { VerticalStepper } from "./VerticalStepper";
 
 import logo from "@/../public/images/Logo_SPLAGen1.png";
+import { CurrentUser } from "@/components/CurrentUser";
+import { LanguageSwitcher } from "@/components/languageSwitcher";
 import { UserContext } from "@/contexts/userContext";
 
 // Props for each navigation card on sidebar
@@ -76,12 +78,22 @@ const superAdminItems: CardProps[] = [...adminItems, AdminsProps];
 const onboardingStepLabels = ["account-setup", "personal-info", "membership"];
 const directoryStepLabels = [...onboardingStepLabels, "directory"];
 
-export const Navbar: React.FC = () => {
+type NavbarProps = {
+  isMobileOpen?: boolean;
+  onClose?: () => void;
+};
+
+export const Navbar: React.FC<NavbarProps> = ({ isMobileOpen = false, onClose }) => {
   const [navState, setNavState] = useState<NavStateType>(NavStateType.member);
   const { user, onboardingStep } = useContext(UserContext);
   const { t } = useTranslation();
 
   const pathname = `/${usePathname().split("/")[1]}`;
+
+  // Close mobile drawer when the route changes
+  useEffect(() => {
+    onClose?.();
+  }, [pathname]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Determine Navigation based on route and or user role
   useEffect(() => {
@@ -137,7 +149,12 @@ export const Navbar: React.FC = () => {
   }, [navState, onboardingStep]);
 
   return navState === NavStateType.hidden ? null : (
-    <section className={styles.SideNavbar}>
+    <section className={`${styles.SideNavbar} ${isMobileOpen ? styles.mobileOpen : ""}`}>
+      {/* Close button — only visible on mobile via CSS */}
+      <button className={styles.closeButton} onClick={onClose} aria-label="Close menu">
+        ✕
+      </button>
+
       <Link href="/" className={styles.decoration}>
         <Image src={logo} alt="SPLAGen logo" aria-hidden="true" id={styles.logo} />
         <strong>SPLAGen</strong>
@@ -158,6 +175,12 @@ export const Navbar: React.FC = () => {
           {t("overview")}
         </span>
         {renderNavItems()}
+      </div>
+
+      {/* Language + user controls pinned to the bottom of the sidebar */}
+      <div className={styles.bottomControls}>
+        <LanguageSwitcher />
+        <CurrentUser />
       </div>
     </section>
   );

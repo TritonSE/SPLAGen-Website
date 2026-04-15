@@ -18,9 +18,11 @@ type GeocodeApiResponse = {
   results: { geometry?: { location: GeoLocation } }[];
 };
 
-const MAP_CONTAINER = { width: "55vw", height: "100vh" } as const;
-const SIDEBAR_STYLE = "w-[30vw] h-screen overflow-y-auto p-4 border-l";
-const LEFT_SIDEBAR_STYLE = "w-[15vw] h-screen overflow-y-auto p-4 border-r bg-gray-50";
+const MAP_CONTAINER = { width: "100%", height: "100%" } as const;
+const SIDEBAR_STYLE =
+  "w-full md:w-[30vw] h-[30vh] md:h-full overflow-y-auto p-4 border-t md:border-t-0 md:border-l";
+const LEFT_SIDEBAR_STYLE =
+  "w-full md:w-[15vw] md:min-w-[160px] h-[25vh] md:h-full overflow-y-auto p-4 border-b md:border-b-0 md:border-r bg-gray-50";
 const CENTER: GeoLocation = { lat: 23, lng: -90 }; // Gulf of Mexico
 const ZOOM = 3;
 
@@ -162,7 +164,7 @@ export default function DirectoryMapPage() {
     );
 
   return (
-    <div className="flex">
+    <div className="flex flex-col md:flex-row h-screen overflow-hidden">
       {/* Left Sidebar - Search and Filters */}
       <aside className={LEFT_SIDEBAR_STYLE}>
         <h2 className="font-bold text-lg mb-4">{t("search-and-filters")}</h2>
@@ -225,75 +227,77 @@ export default function DirectoryMapPage() {
       </aside>
 
       {/* Map */}
-      <GoogleMap
-        mapContainerStyle={MAP_CONTAINER}
-        center={CENTER}
-        zoom={ZOOM}
-        onClick={() => {
-          setSelected(null);
-        }}
-      >
-        {markers.map((m, i) => (
-          <Marker
-            key={i}
-            position={m.location}
-            title={`${String(m.counselors.length)} counselors`}
-            onClick={() => {
-              setSelected(m);
-            }}
-          />
-        ))}
+      <div className="flex-1 h-[45vh] md:h-full min-h-0">
+        <GoogleMap
+          mapContainerStyle={MAP_CONTAINER}
+          center={CENTER}
+          zoom={ZOOM}
+          onClick={() => {
+            setSelected(null);
+          }}
+        >
+          {markers.map((m, i) => (
+            <Marker
+              key={i}
+              position={m.location}
+              title={`${String(m.counselors.length)} counselors`}
+              onClick={() => {
+                setSelected(m);
+              }}
+            />
+          ))}
 
-        {selected && (
-          <InfoWindow
-            position={selected.location}
-            onCloseClick={() => {
-              setSelected(null);
-            }}
-            options={{ pixelOffset: new google.maps.Size(0, -30), disableAutoPan: false }}
-          >
-            <>
-              {selected.counselors.map((counselor, i) => (
-                <div key={i}>
-                  {/* Header row: name + title - LARGER TEXT */}
-                  <div className="flex items-start justify-between space-x-2">
-                    <span className="text-lg font-semibold">
-                      {counselor.name}
-                      <span className="text-gray-500 font-normal text-base">
-                        {" "}
-                        ({formatTitle(counselor.title)})
+          {selected && (
+            <InfoWindow
+              position={selected.location}
+              onCloseClick={() => {
+                setSelected(null);
+              }}
+              options={{ pixelOffset: new google.maps.Size(0, -30), disableAutoPan: false }}
+            >
+              <>
+                {selected.counselors.map((counselor, i) => (
+                  <div key={i}>
+                    {/* Header row: name + title - LARGER TEXT */}
+                    <div className="flex items-start justify-between space-x-2">
+                      <span className="text-lg font-semibold">
+                        {counselor.name}
+                        <span className="text-gray-500 font-normal text-base">
+                          {" "}
+                          ({formatTitle(counselor.title)})
+                        </span>
                       </span>
-                    </span>
-                  </div>
+                    </div>
 
-                  {/* Details */}
-                  <div className="mt-2 space-y-1 text-sm">
-                    <p>📍 {counselor.address}</p>
-                    <p>🏢 {counselor.organization}</p>
-                    {counselor.profileUrl && (
-                      <p>
-                        🔗{" "}
-                        <a
-                          href={counselor.profileUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="underline text-blue-600 break-all"
-                        >
-                          {counselor.profileUrl}
-                        </a>
-                      </p>
-                    )}
-                    <p>🌐 {counselor.email}</p>
-                    <p>☎️ {counselor.phone ?? "—"}</p>
-                    <p>📚 {formatTranslatedList(counselor.specialties)}</p>
-                    <p>🗣 {formatTranslatedList(counselor.languages)}</p>
+                    {/* Details */}
+                    <div className="mt-2 space-y-1 text-sm">
+                      <p>📍 {counselor.address}</p>
+                      <p>🏢 {counselor.organization}</p>
+                      {counselor.profileUrl && (
+                        <p>
+                          🔗{" "}
+                          <a
+                            href={counselor.profileUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="underline text-blue-600 break-all"
+                          >
+                            {counselor.profileUrl}
+                          </a>
+                        </p>
+                      )}
+                      <p>🌐 {counselor.email}</p>
+                      <p>☎️ {counselor.phone ?? "—"}</p>
+                      <p>📚 {formatTranslatedList(counselor.specialties)}</p>
+                      <p>🗣 {formatTranslatedList(counselor.languages)}</p>
+                    </div>
                   </div>
-                </div>
-              ))}
-            </>
-          </InfoWindow>
-        )}
-      </GoogleMap>
+                ))}
+              </>
+            </InfoWindow>
+          )}
+        </GoogleMap>
+      </div>
 
       {/* Right Sidebar */}
       <aside className={SIDEBAR_STYLE}>

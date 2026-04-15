@@ -35,6 +35,7 @@
   --color-grey6: #484848;
 
   --nav-width: clamp(185px, 26vw, 250px);
+  --mobile-header-height: 60px;
 }
 
 body {
@@ -43,11 +44,15 @@ body {
   height: 100%;
 }
 
+/* Mobile header — hidden on desktop, shown via media query */
+.mobile-header {
+  display: none;
+}
+
 .layout-container {
   display: flex;
   height: 100vh;
   overflow-x: hidden;
-  min-width: 30rem;
 }
 
 .viewPort {
@@ -190,5 +195,75 @@ main {
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+/* ── Mobile layout (≤768px) ─────────────────────────────────────── */
+@media (max-width: 768px) {
+  .layout-container {
+    flex-direction: column;
+  }
+
+  .mobile-header {
+    display: flex;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--mobile-header-height);
+    background-color: var(--color-primary2);
+    color: white;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1rem;
+    z-index: 900;
+    gap: 0.75rem;
+  }
+
+  .hamburger-button {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    padding: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .hamburger-button span {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background-color: white;
+    border-radius: 2px;
+  }
+
+  .mobile-logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: white;
+    text-decoration: none;
+    font-size: 1.1rem;
+    flex-grow: 1;
+  }
+
+  .mobile-logo strong {
+    font-size: 1.1rem;
+  }
+
+  .mobile-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+  }
+
+  main {
+    margin: 0.75rem;
+    margin-top: calc(var(--mobile-header-height) + 0.5rem);
+    height: calc(100vh - var(--mobile-header-height) - 1.25rem);
   }
 }

@@ -48,3 +48,9 @@
   gap: 1rem;
   align-items: center;
 }
+
+@media (max-width: 768px) {
+  .modalOverlay {
+    padding-left: 0;
+  }
+}

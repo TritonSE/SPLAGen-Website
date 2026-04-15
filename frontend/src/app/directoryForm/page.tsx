@@ -97,7 +97,7 @@ export default function DirectoryForm() {
 
   return (
     <div className="w-full h-full flex flex-col gap-2 items-center pt-10">
-      <div className="flex flex-row items-center gap-8 whitespace-nowrap">
+      <div className="flex flex-col md:flex-row items-center gap-8 whitespace-wrap md:whitespace-nowrap">
         <Link href="/">
           <Button variant="secondary" label={t("skip-for-now")} />
         </Link>
