@@ -14,6 +14,7 @@ import styles from "./Basics.module.css";
 import type { CountryOption, ProfessionalTitleOption } from "@/components";
 
 import { Button, Checkmark, ExpandableSection } from "@/components";
+import { onboardingState } from "@/state/stateTypes";
 import updateOnboardingForm from "@/state/updateOnboardingForm";
 
 const CountrySelector = dynamic(() => import("@/components").then((mod) => mod.CountrySelector), {
@@ -55,7 +56,7 @@ type FormData = {
 };
 
 type BasicsProps = {
-  onNext: (data: FormData) => void;
+  onNext: (data: onboardingState["data"]) => void;
   onBack: () => void;
 };
 
@@ -82,10 +83,16 @@ export const Basics = ({ onNext, onBack }: BasicsProps) => {
 
   const onSubmit = useCallback(
     (data: FormData) => {
-      actions.updateOnboardingForm(data);
-      onNext(data);
+      actions.updateOnboardingForm({
+        ...state.onboardingForm,
+        ...data,
+      });
+      onNext({
+        ...state.onboardingForm,
+        ...data,
+      });
     },
-    [actions, onNext],
+    [actions, onNext, state.onboardingForm],
   );
 
   const handleFormSubmit = useCallback(
