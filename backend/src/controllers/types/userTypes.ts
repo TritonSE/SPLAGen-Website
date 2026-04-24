@@ -1,7 +1,12 @@
 export type CreateUserRequestBody = {
   password: string;
   account: {
-    membership: "student" | "geneticCounselor" | "healthcareProvider" | "associate";
+    membership:
+      | "student"
+      | "geneticCounselor"
+      | "otherGeneticsProfessional"
+      | "healthcareProfessional"
+      | "associate";
   };
 
   personal: {

@@ -35,6 +35,8 @@ export const Category: React.FC<CategoryProps> = ({ onBack, onReset, onStatusCha
     switch (membershipType) {
       case "Student":
         return t("category-membership-student");
+      case "Other Genetics Professional":
+        return t("category-membership-other-genetics-professional");
       case "Healthcare Professional":
         return t("category-membership-healthcare");
       case "Genetic Counselor":
@@ -53,7 +55,8 @@ export const Category: React.FC<CategoryProps> = ({ onBack, onReset, onStatusCha
       // Normalize membership to expected type
       const membership = {
         Student: "student",
-        "Healthcare Professional": "healthcareProvider",
+        "Healthcare Professional": "healthcareProfessional",
+        "Other Genetics Professional": "otherGeneticsProfessional",
         "Genetic Counselor": "geneticCounselor",
         "Associate Member": "associate",
       }[state.onboardingForm.membership] as MembershipType;

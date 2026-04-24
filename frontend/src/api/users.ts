@@ -6,12 +6,18 @@ import type { UserCredential } from "firebase/auth";
 
 import { initFirebase } from "@/firebase/firebase";
 
-export type MembershipType = "student" | "geneticCounselor" | "healthcareProvider" | "associate";
+export type MembershipType =
+  | "student"
+  | "geneticCounselor"
+  | "otherGeneticsProfessional"
+  | "healthcareProfessional"
+  | "associate";
 
 export const membershipDisplayMap: Record<string, string> = {
   student: "student-membership",
   geneticCounselor: "genetic-counselor-membership",
-  healthcareProvider: "healthcare-provider-membership",
+  healthcareProfessional: "healthcare-professional-membership",
+  otherGeneticsProfessional: "other-genetics-professional-membership",
   associate: "associate-membership",
 };
 

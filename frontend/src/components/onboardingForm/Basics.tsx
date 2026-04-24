@@ -1,18 +1,19 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useStateMachine } from "little-state-machine";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import { useCallback, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
+import { z } from "zod";
 
 import styles from "./Basics.module.css";
 
 import type { CountryOption, ProfessionalTitleOption } from "@/components";
 
 import { Button, Checkmark, ExpandableSection } from "@/components";
-import { onboardingState } from "@/state/stateTypes";
 import updateOnboardingForm from "@/state/updateOnboardingForm";
 
 const CountrySelector = dynamic(() => import("@/components").then((mod) => mod.CountrySelector), {
@@ -26,8 +27,35 @@ const ProfessionalTitleSelector = dynamic(
   },
 );
 
+const formSchema = (t: (key: string) => string) =>
+  z.object({
+    professionalTitle: z.object({
+      value: z.string().min(1, t("professional-title-required")),
+      label: z.string(),
+    }),
+    professionalTitleOther: z.string().optional(),
+    country: z.object({
+      value: z.string().min(1, t("country-required")),
+      label: z.string(),
+    }),
+    language: z.string().min(1, t("preferred-language-required")),
+  });
+
+type FormData = {
+  professionalTitle: {
+    value: string;
+    label: string;
+  };
+  professionalTitleOther?: string;
+  country: {
+    value: string;
+    label: string;
+  };
+  language: string;
+};
+
 type BasicsProps = {
-  onNext: (data: onboardingState["data"]) => void;
+  onNext: (data: FormData) => void;
   onBack: () => void;
 };
 
@@ -40,12 +68,20 @@ export const Basics = ({ onNext, onBack }: BasicsProps) => {
   const [selectedProfessionalTitle, setSelectedProfessionalTitle] =
     useState<ProfessionalTitleOption | null>(null);
 
-  const { register, handleSubmit, control } = useForm<onboardingState["data"]>({
+  const {
+    register,
+    handleSubmit,
+    control,
+    formState: { errors, isValid },
+  } = useForm<FormData>({
+    resolver: zodResolver(formSchema(t)),
     defaultValues: state.onboardingForm,
+    mode: "onChange",
   });
+  console.log(errors, isValid);
 
   const onSubmit = useCallback(
-    (data: onboardingState["data"]) => {
+    (data: FormData) => {
       actions.updateOnboardingForm(data);
       onNext(data);
     },
@@ -90,6 +126,9 @@ export const Basics = ({ onNext, onBack }: BasicsProps) => {
               />
             )}
           />
+          <p className={styles.errorText}>
+            {errors.professionalTitle ? errors.professionalTitle.message : "\u00A0"}
+          </p>
         </div>
 
         {selectedProfessionalTitle?.value === "other" && (
@@ -107,6 +146,9 @@ export const Basics = ({ onNext, onBack }: BasicsProps) => {
                 />
               )}
             />
+            <p className={styles.errorText}>
+              {errors.professionalTitleOther ? errors.professionalTitleOther.message : "\u00A0"}
+            </p>
           </div>
         )}
 
@@ -130,6 +172,7 @@ export const Basics = ({ onNext, onBack }: BasicsProps) => {
               />
             )}
           />
+          <p className={styles.errorText}>{errors.country ? errors.country.message : "\u00A0"}</p>
         </div>
 
         <div>
@@ -158,6 +201,7 @@ export const Basics = ({ onNext, onBack }: BasicsProps) => {
               </div>
             )}
           />
+          <p className={styles.errorText}>{errors.language ? errors.language.message : "\u00A0"}</p>
         </div>
 
         <div className={styles.membershipSection}>
@@ -170,22 +214,28 @@ export const Basics = ({ onNext, onBack }: BasicsProps) => {
             content={t("membership-genetic-counselor-desc")}
           />
 
-          <h4 className={styles.membershipLabel}>{t("membership-healthcare-provider")}</h4>
+          <h4 className={styles.membershipLabel}>{t("membership-other-genetics-professional")}</h4>
           <ExpandableSection
-            title={t("membership-healthcare-provider-title")}
-            content={t("membership-healthcare-provider-desc")}
+            title={t("membership-other-genetics-professional-title")}
+            content={t("membership-other-genetics-professional-desc")}
           />
 
-          <h4 className={styles.membershipLabel}>{t("membership-associate")}</h4>
+          <h4 className={styles.membershipLabel}>{t("membership-healthcare-professional")}</h4>
           <ExpandableSection
-            title={t("membership-associate-title")}
-            content={t("membership-associate-desc")}
+            title={t("membership-healthcare-professional-title")}
+            content={t("membership-healthcare-professional-desc")}
           />
 
           <h4 className={styles.membershipLabel}>{t("membership-student")}</h4>
           <ExpandableSection
             title={t("membership-student-title")}
             content={t("membership-student-desc")}
+          />
+
+          <h4 className={styles.membershipLabel}>{t("membership-associate")}</h4>
+          <ExpandableSection
+            title={t("membership-associate-title")}
+            content={t("membership-associate-desc")}
           />
         </div>
 
@@ -195,7 +245,7 @@ export const Basics = ({ onNext, onBack }: BasicsProps) => {
             {t("back")}
           </button>
 
-          <Button type="submit" label={t("continue")} />
+          <Button type="submit" disabled={!isValid} label={t("continue")} />
         </div>
       </form>
     </div>

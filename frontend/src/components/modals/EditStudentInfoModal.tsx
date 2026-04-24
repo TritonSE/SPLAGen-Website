@@ -29,7 +29,10 @@ const schema = (t: (key: string) => string) =>
       label: z.string(),
     }),
     schoolName: z.string().min(1, t("school-name-required")),
-    universityEmail: z.string().email(t("invalid-email-format")),
+    universityEmail: z
+      .string()
+      .email(t("invalid-email-format"))
+      .endsWith(".edu", t("edu-email-required")),
     degree: z.enum(["masters", "diploma", "fellowship", "md", "phd", "other"], {
       errorMap: () => ({ message: t("please-select-degree") }),
     }),

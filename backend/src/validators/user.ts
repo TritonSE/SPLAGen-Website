@@ -5,7 +5,13 @@ import { validateRequest } from "./validateRequestHelper";
 export const createUser = [
   body("account").notEmpty().withMessage("Account information is required"),
   body("account.membership")
-    .isIn(["student", "geneticCounselor", "healthcareProvider", "associate"])
+    .isIn([
+      "student",
+      "geneticCounselor",
+      "otherGeneticsProfessional",
+      "healthcareProfessional",
+      "associate",
+    ])
     .withMessage("Invalid membership type"),
 
   body("personal").notEmpty().withMessage("Personal information is required"),
@@ -122,7 +128,13 @@ export const editProfilePicture = [
 
 export const editMembership = [
   body("newMembership")
-    .isIn(["student", "geneticCounselor", "healthcareProvider", "associate"])
+    .isIn([
+      "student",
+      "geneticCounselor",
+      "otherGeneticsProfessional",
+      "healthcareProfessional",
+      "associate",
+    ])
     .withMessage("Invalid membership type"),
   validateRequest,
 ];

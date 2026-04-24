@@ -1,5 +1,6 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Radio } from "@tritonse/tse-constellation";
 import { useStateMachine } from "little-state-machine";
 import dynamic from "next/dynamic";
@@ -7,21 +8,50 @@ import Image from "next/image";
 import { useCallback, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
+import { z } from "zod";
 
 import styles from "./Student.module.css";
 
 import type { CountryOption } from "@/components";
 
 import { Button } from "@/components";
-import { onboardingState } from "@/state/stateTypes";
 import updateOnboardingForm from "@/state/updateOnboardingForm";
 
 const CountrySelector = dynamic(() => import("@/components").then((mod) => mod.CountrySelector), {
   ssr: false,
 });
 
+const formSchema = (t: (key: string) => string) =>
+  z.object({
+    schoolCountry: z.object({
+      value: z.string().min(1, t("school-country-required")),
+      label: z.string(),
+    }),
+    schoolName: z.string().min(1, t("school-name-required")),
+    universityEmail: z
+      .string()
+      .email(t("invalid-email-format"))
+      .min(1, t("university-email-required"))
+      .endsWith(".edu", t("edu-email-required")),
+    degree: z.string().min(1, t("degree-required")),
+    programName: z.string().min(1, t("program-name-required")),
+    graduationDate: z.string().min(1, t("graduation-date-required")),
+  });
+
+type FormData = {
+  schoolCountry: {
+    value: string;
+    label: string;
+  };
+  schoolName: string;
+  universityEmail: string;
+  degree: string;
+  programName: string;
+  graduationDate: string;
+};
+
 type StudentProps = {
-  onNext: (data: onboardingState["data"]) => void;
+  onNext: (data: FormData) => void;
   onBack: () => void;
 };
 
@@ -30,14 +60,23 @@ export const Student = ({ onNext, onBack }: StudentProps) => {
   const { state, actions } = useStateMachine({ actions: { updateOnboardingForm } });
   const [selectedCountry, setSelectedCountry] = useState<CountryOption | null>(null);
 
-  const { register, handleSubmit, control, watch, setValue, reset } = useForm({
+  const {
+    register,
+    handleSubmit,
+    control,
+    watch,
+    setValue,
+    reset,
+    formState: { isValid, errors },
+  } = useForm({
+    resolver: zodResolver(formSchema(t)),
     defaultValues: state.onboardingForm,
+    mode: "onChange",
   });
 
   const onSubmit = useCallback(
-    (data: onboardingState["data"]) => {
+    (data: FormData) => {
       actions.updateOnboardingForm(data);
-      // FORM VALIDATION FOR THE STUDENT EMAIL DO NOT CHECK FOR EDU NOT ALL STUDENT USERS WILL HAVE EDU
       onNext(data);
     },
     [actions, onNext],
@@ -103,6 +142,9 @@ export const Student = ({ onNext, onBack }: StudentProps) => {
               />
             )}
           />
+          <p className={styles.errorText}>
+            {errors.schoolCountry ? errors.schoolCountry.message : "\u00A0"}
+          </p>
         </div>
 
         <div>
@@ -112,6 +154,9 @@ export const Student = ({ onNext, onBack }: StudentProps) => {
             className={styles.input}
             placeholder={t("school-name-placeholder")}
           />
+          <p className={styles.errorText}>
+            {errors.schoolName ? errors.schoolName.message : "\u00A0"}
+          </p>
         </div>
 
         <div>
@@ -122,6 +167,9 @@ export const Student = ({ onNext, onBack }: StudentProps) => {
             placeholder={t("university-email-placeholder")}
             type="email"
           />
+          <p className={styles.errorText}>
+            {errors.universityEmail ? errors.universityEmail.message : "\u00A0"}
+          </p>
         </div>
 
         <div>
@@ -152,6 +200,7 @@ export const Student = ({ onNext, onBack }: StudentProps) => {
               }}
             />
           </div>
+          <p className={styles.errorText}>{errors.degree ? errors.degree.message : "\u00A0"}</p>
         </div>
 
         <div>
@@ -161,6 +210,9 @@ export const Student = ({ onNext, onBack }: StudentProps) => {
             className={styles.input}
             placeholder={t("program-name-placeholder")}
           />
+          <p className={styles.errorText}>
+            {errors.programName ? errors.programName.message : "\u00A0"}
+          </p>
         </div>
 
         <div>
@@ -170,6 +222,9 @@ export const Student = ({ onNext, onBack }: StudentProps) => {
             className={styles.input}
             placeholder={t("graduation-date-placeholder")}
           />
+          <p className={styles.errorText}>
+            {errors.graduationDate ? errors.graduationDate.message : "\u00A0"}
+          </p>
         </div>
 
         <div className={styles.buttonContainer}>
@@ -177,7 +232,7 @@ export const Student = ({ onNext, onBack }: StudentProps) => {
             <Image src="/icons/ic_caretleft.svg" alt="Back Icon" width={24} height={24} />
             {t("back")}
           </button>
-          <Button type="submit" label={t("continue")} />
+          <Button type="submit" disabled={!isValid} label={t("continue")} />
         </div>
       </form>
     </div>

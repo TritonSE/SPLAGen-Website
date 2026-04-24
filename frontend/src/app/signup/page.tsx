@@ -92,6 +92,7 @@ export default function OnboardingForm() {
         // Professional & healthcare members can be added to the directory
         if (
           state.onboardingForm?.membership === "Genetic Counselor" ||
+          state.onboardingForm?.membership === "Other Genetics Professional" ||
           state.onboardingForm?.membership === "Healthcare Professional"
         ) {
           setStep(4);

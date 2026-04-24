@@ -160,11 +160,14 @@ export const approveDirectoryEntry = async (
         }
 
         if (
-          ![UserMembership.GENETIC_COUNSELOR, UserMembership.HEALTHCARE_PROVIDER].includes(
-            user.account.membership as UserMembership,
-          )
+          ![
+            UserMembership.GENETIC_COUNSELOR,
+            UserMembership.HEALTHCARE_PROFESSIONAL,
+            UserMembership.OTHER_GENETICS_PROFESSIONAL,
+          ].includes(user.account.membership as UserMembership)
         ) {
-          errorMap[userId] = "User is not a genetic counselor or healthcare provider";
+          errorMap[userId] =
+            "User is not a genetic counselor, healthcare professional, or other genetics professional";
           return;
         }
 
@@ -282,7 +285,11 @@ export const getPublicDirectory = async (req: Request, res: Response) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const filters: any[] = [
       { "account.inDirectory": true },
-      { "account.membership": { $in: ["geneticCounselor", "healthcareProvider"] } },
+      {
+        "account.membership": {
+          $in: ["geneticCounselor", "otherGeneticsProfessional", "healthcareProfessional"],
+        },
+      },
     ];
 
     // Search by name

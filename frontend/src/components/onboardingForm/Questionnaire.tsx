@@ -7,7 +7,7 @@ import { useTranslation } from "react-i18next";
 
 import styles from "./Questionnaire.module.css";
 
-import { Button, ExpandableSection } from "@/components";
+import { Button } from "@/components";
 import { onboardingState } from "@/state/stateTypes";
 import updateOnboardingForm from "@/state/updateOnboardingForm";
 
@@ -62,48 +62,34 @@ export const Questionnaire: React.FC<QuestionnaireProps> = ({
   }, [answers]);
 
   const handleContinue = useCallback(() => {
-    let updatedData;
+    let membershipCategory;
 
     if (answers.field1 === "yes") {
-      updatedData = {
-        ...state.onboardingForm,
-        membership: "Genetic Counselor",
-      };
-      actions.updateOnboardingForm(updatedData);
-      onNext(updatedData);
-    } else if (
-      answers.field1 === "no" &&
-      answers.field2 === "yes" &&
-      answers.field3 !== undefined &&
-      answers.field3 !== null
-    ) {
-      updatedData = {
-        ...state.onboardingForm,
-        membership: "Healthcare Professional",
-      };
-      actions.updateOnboardingForm(updatedData);
-      onNext(updatedData);
-    } else if (answers.field3 === "yes") {
-      updatedData = {
-        ...state.onboardingForm,
-        membership: "Healthcare Professional",
-      };
-      actions.updateOnboardingForm(updatedData);
-      onNext(updatedData);
-    } else if (answers.field4 === "Student") {
-      updatedData = {
-        ...state.onboardingForm,
-        membership: "Student",
-      };
-      actions.updateOnboardingForm(updatedData);
+      membershipCategory = "Genetic Counselor";
+    } else if (answers.field2 === "yes") {
+      if (answers.field3 === "yes") {
+        membershipCategory = "Other Genetics Professional";
+      } else {
+        membershipCategory = "Healthcare Professional";
+      }
+    } else {
+      if (answers.field4 === "yes") {
+        membershipCategory = "Student";
+      } else {
+        membershipCategory = "Associate Member";
+      }
+    }
+    const updatedData = {
+      ...state.onboardingForm,
+      membership: membershipCategory,
+    };
+    actions.updateOnboardingForm(updatedData);
+    if (membershipCategory === "Student") {
       onStudentFlow();
-    } else if (answers.field4 === "Associate Member") {
-      updatedData = {
-        ...state.onboardingForm,
-        membership: "Associate Member",
-      };
-      actions.updateOnboardingForm(updatedData);
+    } else if (membershipCategory === "Associate Member") {
       onAssociateFlow();
+    } else {
+      onNext(updatedData);
     }
   }, [answers, actions, state.onboardingForm, onNext, onStudentFlow, onAssociateFlow]);
 
@@ -187,37 +173,23 @@ export const Questionnaire: React.FC<QuestionnaireProps> = ({
         {answers.field2 === "no" && (
           <div>
             <p className={styles.subtitle}>{t("questionnaire-q4")}</p>
-
-            <div className={styles.radioGroup}>
+            <div className={styles.buttonGroup}>
               <Radio
                 id="radio-7"
-                label={t("membership-student")}
-                checked={answers.field4 === "Student"}
+                label={t("yes")}
+                checked={answers.field4 === "yes"}
                 onChange={() => {
-                  handleSelection("field4", "Student");
+                  handleSelection("field4", "yes");
                 }}
               />
-              <div className={styles.expandableIndent}>
-                <ExpandableSection
-                  title={t("membership-student-title")}
-                  content={t("membership-student-desc")}
-                />
-              </div>
-
               <Radio
                 id="radio-8"
-                label={t("membership-associate")}
-                checked={answers.field4 === "Associate Member"}
+                label={t("no")}
+                checked={answers.field4 === "no"}
                 onChange={() => {
-                  handleSelection("field4", "Associate Member");
+                  handleSelection("field4", "no");
                 }}
               />
-              <div className={styles.expandableIndent}>
-                <ExpandableSection
-                  title={t("membership-associate-title")}
-                  content={t("membership-associate-desc")}
-                />
-              </div>
             </div>
           </div>
         )}

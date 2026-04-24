@@ -58,6 +58,7 @@ export default function EditMembershipPage() {
       if (status === "success") {
         if (
           (state.onboardingForm?.membership === "Genetic Counselor" ||
+            state.onboardingForm?.membership === "Other Genetics Professional" ||
             state.onboardingForm?.membership === "Healthcare Professional") &&
           !user?.account.inDirectory
         ) {

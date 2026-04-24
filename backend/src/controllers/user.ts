@@ -438,7 +438,9 @@ export const editMembership = async (
     // If new membership is student or associate (not eligible for directory),
     // and user was in directory or pending, remove them from directory
     const isNewMembershipEligibleForDirectory =
-      newMembership === "geneticCounselor" || newMembership === "healthcareProvider";
+      newMembership === "geneticCounselor" ||
+      newMembership === "otherGeneticsProfessional" ||
+      newMembership === "healthcareProfessional";
     const wasInDirectoryOrPending =
       user.account?.inDirectory === true || user.account?.inDirectory === "pending";
 
@@ -635,7 +637,8 @@ export const exportUsers = async (
     const membershipDisplayMap: Record<string, string> = {
       student: "Student",
       geneticCounselor: "Genetic Counselor",
-      healthcareProvider: "Healthcare Provider",
+      otherGeneticsProfessional: "Other Genetics Professional",
+      healthcareProfessional: "Healthcare Professional",
       associate: "Associate",
     };
 

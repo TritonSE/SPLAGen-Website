@@ -9,7 +9,8 @@ export enum UserRole {
 export enum UserMembership {
   STUDENT = "student",
   GENETIC_COUNSELOR = "geneticCounselor",
-  HEALTHCARE_PROVIDER = "healthcareProvider",
+  OTHER_GENETICS_PROFESSIONAL = "otherGeneticsProfessional",
+  HEALTHCARE_PROFESSIONAL = "healthcareProfessional",
   ASSOCIATE = "associate",
 }
 
@@ -33,7 +34,13 @@ const userSchema = new Schema(
       // can they have multiple memberships?
       membership: {
         type: String,
-        enum: ["student", "geneticCounselor", "healthcareProvider", "associate"],
+        enum: [
+          "student",
+          "geneticCounselor",
+          "otherGeneticsProfessional",
+          "healthcareProfessional",
+          "associate",
+        ],
         required: true,
       },
     },

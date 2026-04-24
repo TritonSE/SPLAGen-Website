@@ -20,7 +20,8 @@ import { UserContext } from "@/contexts/userContext";
 // Map display membership to API membership type
 const membershipMap: Record<string, MembershipType> = {
   Student: "student",
-  "Healthcare Professional": "healthcareProvider",
+  "Healthcare Professional": "healthcareProfessional",
+  "Other Genetics Professional": "otherGeneticsProfessional",
   "Genetic Counselor": "geneticCounselor",
   "Associate Member": "associate",
 };
