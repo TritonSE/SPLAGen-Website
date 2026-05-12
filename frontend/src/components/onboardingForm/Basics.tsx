@@ -35,10 +35,12 @@ const formSchema = (t: (key: string) => string) =>
       label: z.string(),
     }),
     professionalTitleOther: z.string().optional(),
-    country: z.object({
-      value: z.string().min(1, t("country-required")),
-      label: z.string(),
-    }),
+    country: z
+      .object({
+        value: z.string(),
+        label: z.string(),
+      })
+      .optional(),
     language: z.string().min(1, t("preferred-language-required")),
   });
 
@@ -48,7 +50,7 @@ type FormData = {
     label: string;
   };
   professionalTitleOther?: string;
-  country: {
+  country?: {
     value: string;
     label: string;
   };
@@ -167,7 +169,7 @@ export const Basics = ({ onNext, onBack }: BasicsProps) => {
           <Controller
             name="country"
             control={control}
-            defaultValue={state.onboardingForm?.country || ""}
+            defaultValue={state.onboardingForm?.country || undefined}
             render={({ field }) => (
               <CountrySelector
                 value={selectedCountry ?? state.onboardingForm?.country}

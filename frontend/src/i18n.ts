@@ -9,6 +9,8 @@ import pt from "./translations/pt.json";
 const detectionOptions = {
   order: ["path", "cookie", "localStorage", "navigator"],
   lookupFromPathIndex: 1, // For directory map: /directoryMap/{en,es,pt}
+  // Also write to cookie so dropdown changes stay in sync with the middleware-set cookie
+  caches: ["localStorage", "cookie"],
 };
 
 // eslint-disable-next-line import/no-named-as-default-member
