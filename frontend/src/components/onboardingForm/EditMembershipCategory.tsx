@@ -2,18 +2,12 @@
 
 import { useStateMachine } from "little-state-machine";
 import Image from "next/image";
-import { useCallback, useContext, useMemo, useState } from "react";
+import { useContext, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 
 import styles from "./Category.module.css";
 
-import {
-  MembershipType,
-  editMembership,
-  membershipDisplayMap,
-  updateAssociateInfo,
-  updateStudentInfo,
-} from "@/api/users";
+import { MembershipType, membershipDisplayMap } from "@/api/users";
 import { Button } from "@/components/Button";
 import { UserContext } from "@/contexts/userContext";
 
@@ -27,111 +21,18 @@ const membershipMap: Record<string, MembershipType> = {
 };
 
 type EditMembershipCategoryProps = {
-  onNext: () => void;
-  onBack: () => void;
   onStatusChange: (status: "idle" | "submitting" | "success" | "error") => void;
 };
 
 export const EditMembershipCategory: React.FC<EditMembershipCategoryProps> = ({
-  onNext,
-  onBack,
   onStatusChange,
 }) => {
   const { t } = useTranslation();
   const { state } = useStateMachine();
-  const { firebaseUser, reloadUser } = useContext(UserContext);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { reloadUser } = useContext(UserContext);
 
   const membershipType = state.onboardingForm.membership;
-
-  const membershipKey = useMemo(() => {
-    return membershipMap[membershipType];
-  }, [membershipType]);
-
-  const updateMembership = useCallback(async () => {
-    if (!firebaseUser) return;
-
-    try {
-      setIsSubmitting(true);
-      setError(null);
-      onStatusChange("submitting");
-
-      const membership = membershipMap[state.onboardingForm.membership];
-      const token = await firebaseUser.getIdToken();
-
-      // Update membership first
-      const response = await editMembership(membership, token);
-
-      if (!response.success) {
-        setError(response.error || t("failed-to-update-membership"));
-        onStatusChange("error");
-        return;
-      }
-
-      // If membership is student, also update student information
-      if (membership === "student") {
-        // Normalize degree
-        const degreeMap: Record<
-          string,
-          "other" | "masters" | "diploma" | "fellowship" | "md" | "phd"
-        > = {
-          ms: "masters",
-          phd: "phd",
-          md: "md",
-        };
-
-        const normalizedDegree =
-          degreeMap[state.onboardingForm.degree?.toLowerCase() || ""] || "other";
-
-        const studentInfoResponse = await updateStudentInfo(token, {
-          schoolCountry: state.onboardingForm.schoolCountry?.value || "",
-          schoolName: state.onboardingForm.schoolName,
-          universityEmail: state.onboardingForm.universityEmail,
-          degree: normalizedDegree,
-          programName: state.onboardingForm.programName,
-          gradDate: state.onboardingForm.graduationDate,
-        });
-
-        if (!studentInfoResponse.success) {
-          setError(studentInfoResponse.error || t("failed-to-update-student-information"));
-          onStatusChange("error");
-          return;
-        }
-      }
-
-      // If membership is associate, also update associate information
-      if (membership === "associate") {
-        // Normalize specializations
-        const specialization = (state.onboardingForm.specializations || []).map((s) =>
-          s.toLowerCase(),
-        );
-
-        const associateInfoResponse = await updateAssociateInfo(token, {
-          jobTitle: state.onboardingForm.jobTitle,
-          specialization,
-          isOrganizationRepresentative: state.onboardingForm.isOrganizationRepresentative,
-          organizationName: state.onboardingForm.organizationName || "",
-        });
-
-        if (!associateInfoResponse.success) {
-          setError(associateInfoResponse.error || t("failed-to-update-associate-information"));
-          onStatusChange("error");
-          return;
-        }
-      }
-
-      await reloadUser();
-      onStatusChange("success");
-      onNext();
-    } catch (err) {
-      console.error("Error updating membership:", err);
-      setError("Failed to update membership");
-      onStatusChange("error");
-    } finally {
-      setIsSubmitting(false);
-    }
-  }, [firebaseUser, state.onboardingForm, onNext, onStatusChange, reloadUser, t]);
+  const membershipKey = useMemo(() => membershipMap[membershipType], [membershipType]);
 
   return (
     <div className={styles.darkContainer}>
@@ -148,30 +49,15 @@ export const EditMembershipCategory: React.FC<EditMembershipCategoryProps> = ({
           })}
         </p>
 
-        {error && (
-          <>
-            <p className="text-red-600 text-center my-2">{error}</p>
-            <div className="flex justify-center mt-4">
-              <button
-                onClick={onBack}
-                className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100"
-              >
-                {t("back")}
-              </button>
-            </div>
-          </>
-        )}
-
         <div className={styles.buttonContainer}>
-          <button type="button" onClick={onBack} className={styles.backButton}>
-            <Image src="/icons/ic_caretleft.svg" alt="Back Icon" width={24} height={24} />
-            {t("back")}
-          </button>
-
           <Button
-            onClick={() => void updateMembership()}
-            label={isSubmitting ? t("updating") : t("confirm-and-update")}
-            disabled={isSubmitting}
+            onClick={() => {
+              // The membership + sub-flow data was already PATCHed in earlier steps;
+              // reload the user so downstream pages see the fresh data.
+              reloadUser();
+              onStatusChange("success");
+            }}
+            label={t("continue")}
           />
         </div>
       </div>

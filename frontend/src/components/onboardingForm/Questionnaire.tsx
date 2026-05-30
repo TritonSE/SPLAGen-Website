@@ -1,32 +1,42 @@
 "use client";
 import { Radio } from "@tritonse/tse-constellation";
 import { useStateMachine } from "little-state-machine";
-import Image from "next/image";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useContext, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import styles from "./Questionnaire.module.css";
 
+import { MembershipType, editMembership } from "@/api/users";
 import { Button } from "@/components";
+import { UserContext } from "@/contexts/userContext";
 import { onboardingState } from "@/state/stateTypes";
 import updateOnboardingForm from "@/state/updateOnboardingForm";
 
+const DISPLAY_TO_DB_MEMBERSHIP: Record<string, MembershipType> = {
+  "Genetic Counselor": "geneticCounselor",
+  "Other Genetics Professional": "otherGeneticsProfessional",
+  "Healthcare Professional": "healthcareProfessional",
+  Student: "student",
+  "Associate Member": "associate",
+};
+
 type QuestionnaireProps = {
   onNext: (data: onboardingState["data"]) => void;
-  onBack: () => void;
   onStudentFlow: () => void;
   onAssociateFlow: () => void;
 };
 
 export const Questionnaire: React.FC<QuestionnaireProps> = ({
   onNext,
-  onBack,
   onStudentFlow,
   onAssociateFlow,
 }) => {
   const { t } = useTranslation();
   const { state, actions } = useStateMachine({ actions: { updateOnboardingForm } });
+  const { firebaseUser, reloadUser } = useContext(UserContext);
   const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSelection = useCallback(
     (question: string, answer: string) => {
@@ -61,8 +71,8 @@ export const Questionnaire: React.FC<QuestionnaireProps> = ({
     return condition1 || condition2 || condition3;
   }, [answers]);
 
-  const handleContinue = useCallback(() => {
-    let membershipCategory;
+  const handleContinue = useCallback(async () => {
+    let membershipCategory: string;
 
     if (answers.field1 === "yes") {
       membershipCategory = "Genetic Counselor";
@@ -79,11 +89,36 @@ export const Questionnaire: React.FC<QuestionnaireProps> = ({
         membershipCategory = "Associate Member";
       }
     }
+
     const updatedData = {
       ...state.onboardingForm,
       membership: membershipCategory,
     };
     actions.updateOnboardingForm(updatedData);
+
+    // PATCH the user's membership on the backend before navigating
+    if (!firebaseUser) {
+      setSubmitError(t("registration-failed"));
+      return;
+    }
+    setSubmitError(null);
+    setIsSubmitting(true);
+
+    try {
+      const token = await firebaseUser.getIdToken();
+      const result = await editMembership(DISPLAY_TO_DB_MEMBERSHIP[membershipCategory], token);
+      if (!result.success) {
+        setSubmitError(result.error || t("registration-failed"));
+        return;
+      }
+      reloadUser();
+    } catch {
+      setSubmitError(t("registration-failed"));
+      return;
+    } finally {
+      setIsSubmitting(false);
+    }
+
     if (membershipCategory === "Student") {
       onStudentFlow();
     } else if (membershipCategory === "Associate Member") {
@@ -91,7 +126,17 @@ export const Questionnaire: React.FC<QuestionnaireProps> = ({
     } else {
       onNext(updatedData);
     }
-  }, [answers, actions, state.onboardingForm, onNext, onStudentFlow, onAssociateFlow]);
+  }, [
+    answers,
+    actions,
+    state.onboardingForm,
+    firebaseUser,
+    reloadUser,
+    onNext,
+    onStudentFlow,
+    onAssociateFlow,
+    t,
+  ]);
 
   const renderQuestions = () => {
     return (
@@ -206,16 +251,14 @@ export const Questionnaire: React.FC<QuestionnaireProps> = ({
 
         {renderQuestions()}
 
+        {submitError && <p style={{ color: "red" }}>{submitError}</p>}
+
         <div className={styles.buttonContainer}>
-          <button type="button" onClick={onBack} className={styles.backButton}>
-            <Image src="/icons/ic_caretleft.svg" alt="Back Icon" width={24} height={24} />
-            {t("back")}
-          </button>
           <Button
             type="button"
-            onClick={handleContinue}
-            label={t("continue")}
-            disabled={!isContinueEnabled}
+            onClick={() => void handleContinue()}
+            label={isSubmitting ? t("loading") : t("continue")}
+            disabled={!isContinueEnabled || isSubmitting}
           />
         </div>
       </form>

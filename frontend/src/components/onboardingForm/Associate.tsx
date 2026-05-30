@@ -2,37 +2,67 @@
 
 import { Radio } from "@tritonse/tse-constellation";
 import { useStateMachine } from "little-state-machine";
-import Image from "next/image";
-import { useCallback, useMemo } from "react";
+import { useCallback, useContext, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 
 import styles from "./Associate.module.css";
 
+import { updateAssociateInfo } from "@/api/users";
 import { Button } from "@/components";
 import { SPECIALIZATIONS } from "@/constants/specializations";
+import { UserContext } from "@/contexts/userContext";
 import { onboardingState } from "@/state/stateTypes";
 import updateOnboardingForm from "@/state/updateOnboardingForm";
 
 type AssociateProps = {
   onNext: (data: onboardingState["data"]) => void;
-  onBack: () => void;
 };
 
-export const Associate = ({ onNext, onBack }: AssociateProps) => {
+export const Associate = ({ onNext }: AssociateProps) => {
   const { t } = useTranslation();
   const { state, actions } = useStateMachine({ actions: { updateOnboardingForm } });
+  const { firebaseUser } = useContext(UserContext);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [isSubmittingApi, setIsSubmittingApi] = useState(false);
 
-  const { register, handleSubmit, control, watch, setValue, reset } = useForm({
+  const { register, handleSubmit, control, watch, setValue } = useForm({
     defaultValues: state.onboardingForm,
   });
 
   const onSubmit = useCallback(
-    (data: onboardingState["data"]) => {
+    async (data: onboardingState["data"]) => {
       actions.updateOnboardingForm(data);
+
+      if (!firebaseUser) {
+        setSubmitError(t("registration-failed"));
+        return;
+      }
+      setSubmitError(null);
+      setIsSubmittingApi(true);
+
+      try {
+        const token = await firebaseUser.getIdToken();
+        const result = await updateAssociateInfo(token, {
+          jobTitle: data.jobTitle || "",
+          specialization: data.specializations || [],
+          isOrganizationRepresentative: data.isOrganizationRepresentative || "",
+          organizationName: data.organizationName || "",
+        });
+        if (!result.success) {
+          setSubmitError(result.error || t("registration-failed"));
+          return;
+        }
+      } catch {
+        setSubmitError(t("registration-failed"));
+        return;
+      } finally {
+        setIsSubmittingApi(false);
+      }
+
       onNext(data);
     },
-    [actions, onNext],
+    [actions, onNext, firebaseUser, t],
   );
 
   const handleFormSubmit = useCallback(
@@ -69,22 +99,6 @@ export const Associate = ({ onNext, onBack }: AssociateProps) => {
     },
     [setValue],
   );
-
-  const handleBack = useCallback(() => {
-    const clearedData = {
-      ...state.onboardingForm,
-      jobTitle: "",
-      specializations: [],
-      isOrganizationRepresentative: "",
-      organizationName: "",
-    };
-
-    actions.updateOnboardingForm(clearedData);
-
-    reset(clearedData);
-
-    onBack();
-  }, [state.onboardingForm, actions, reset, onBack]);
 
   return (
     <div className={styles.container}>
@@ -161,12 +175,14 @@ export const Associate = ({ onNext, onBack }: AssociateProps) => {
           />
         </div>
 
+        {submitError && <p style={{ color: "red" }}>{submitError}</p>}
+
         <div className={styles.buttonContainer}>
-          <button type="button" onClick={handleBack} className={styles.backButton}>
-            <Image src="/icons/ic_caretleft.svg" alt="Back Icon" width={24} height={24} />
-            {t("back")}
-          </button>
-          <Button type="submit" label={t("continue")} />
+          <Button
+            type="submit"
+            disabled={isSubmittingApi}
+            label={isSubmittingApi ? t("loading") : t("continue")}
+          />
         </div>
       </form>
     </div>

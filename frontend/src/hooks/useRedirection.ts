@@ -7,6 +7,7 @@ import { UserContext } from "@/contexts/userContext";
 
 export const LOGIN_URL = "/login";
 export const HOME_URL = "/";
+export const SIGNUP_URL = "/signup";
 
 /**
  * An interface for the user's current authentication credentials
@@ -57,12 +58,17 @@ export const useRedirectToHomeIfSignedIn = () => {
 };
 
 /**
- * A hook that redirects the user to the login page if they are not signed in
+ * A hook that redirects the user to the login page if they are not signed in,
+ * or to the signup page if they have an incomplete (pending) onboarding.
  */
 export const useRedirectToLoginIfNotSignedIn = () => {
   useRedirection({
     checkShouldRedirect: ({ firebaseUser, user }) => firebaseUser === null || user === null,
     redirectURL: LOGIN_URL,
+  });
+  useRedirection({
+    checkShouldRedirect: ({ user }) => user?.account?.membership === "pending",
+    redirectURL: SIGNUP_URL,
   });
 };
 

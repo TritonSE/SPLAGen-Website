@@ -2,6 +2,7 @@ export type CreateUserRequestBody = {
   password: string;
   account: {
     membership:
+      | "pending"
       | "student"
       | "geneticCounselor"
       | "otherGeneticsProfessional"

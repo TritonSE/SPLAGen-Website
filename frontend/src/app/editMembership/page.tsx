@@ -94,51 +94,16 @@ export default function EditMembershipPage() {
       {step === 0 && (
         <Questionnaire
           onNext={handleNext}
-          onBack={() => {
-            router.push("/profile");
-          }}
           onStudentFlow={handleStudentFlow}
           onAssociateFlow={handleAssociateFlow}
         />
       )}
 
-      {step === 0.1 && (
-        <Student
-          onNext={continueFromIntermediateStep}
-          onBack={() => {
-            setStep(0);
-          }}
-        />
-      )}
+      {step === 0.1 && <Student onNext={continueFromIntermediateStep} />}
 
-      {step === 0.2 && (
-        <Associate
-          onNext={continueFromIntermediateStep}
-          onBack={() => {
-            setStep(0);
-          }}
-        />
-      )}
+      {step === 0.2 && <Associate onNext={continueFromIntermediateStep} />}
 
-      {step === 1 && (
-        <EditMembershipCategory
-          onNext={() => {
-            setStep(2);
-          }}
-          onBack={() => {
-            // Go back to questionnaire or intermediate step
-            const membership = state.onboardingForm.membership;
-            if (membership === "Student") {
-              setStep(0.1);
-            } else if (membership === "Associate Member") {
-              setStep(0.2);
-            } else {
-              setStep(0);
-            }
-          }}
-          onStatusChange={handleUpdateStatusChange}
-        />
-      )}
+      {step === 1 && <EditMembershipCategory onStatusChange={handleUpdateStatusChange} />}
 
       {step === 2 && (
         <ContinueToDirectory

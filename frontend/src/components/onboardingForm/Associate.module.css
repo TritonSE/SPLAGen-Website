@@ -1,24 +1,21 @@
 .container {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
   width: 75%;
-  max-height: 80vh; /* Limit height to 80% of viewport height */
+  max-width: 750px;
+  margin: 2rem auto;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   border-radius: 10px;
   background: var(--color-surface);
   padding: 20px;
-  overflow-y: auto; /* Enable vertical scrolling */
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE and Edge */
-  max-width: 750px;
 }
 
-.container::-webkit-scrollbar {
-  display: none;
+@media (max-width: 768px) {
+  .container {
+    width: 100%;
+    margin: 0;
+    padding: 16px;
+  }
 }
 
 .form {

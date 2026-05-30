@@ -6,6 +6,7 @@ export const createUser = [
   body("account").notEmpty().withMessage("Account information is required"),
   body("account.membership")
     .isIn([
+      "pending",
       "student",
       "geneticCounselor",
       "otherGeneticsProfessional",

@@ -7,6 +7,7 @@ export enum UserRole {
 }
 
 export enum UserMembership {
+  PENDING = "pending",
   STUDENT = "student",
   GENETIC_COUNSELOR = "geneticCounselor",
   OTHER_GENETICS_PROFESSIONAL = "otherGeneticsProfessional",
@@ -35,6 +36,7 @@ const userSchema = new Schema(
       membership: {
         type: String,
         enum: [
+          "pending",
           "student",
           "geneticCounselor",
           "otherGeneticsProfessional",

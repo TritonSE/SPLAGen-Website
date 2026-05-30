@@ -16,18 +16,39 @@ type CountrySelectorProps = {
   placeholder?: string;
 };
 
-export const getCountryOptions = () => {
+// Cache localized country lists so we don't rebuild them on every render
+const optionsCache = new Map<string, CountryOption[]>();
+
+export const getCountryOptions = (locale = "en"): CountryOption[] => {
+  const cached = optionsCache.get(locale);
+  if (cached) return cached;
+
   const data = (countryList() as { getData: () => CountryOption[] }).getData();
-  return data.map((country) => ({
-    value: country.value,
-    label: country.label,
-  }));
+
+  let displayNames: Intl.DisplayNames | null = null;
+  try {
+    displayNames = new Intl.DisplayNames([locale], { type: "region" });
+  } catch {
+    displayNames = null;
+  }
+
+  const localized = data
+    .map((country) => ({
+      value: country.value,
+      label: displayNames?.of(country.value) ?? country.label,
+    }))
+    .sort((a, b) => a.label.localeCompare(b.label, locale));
+
+  optionsCache.set(locale, localized);
+  return localized;
 };
 
-export const getCountryLabelFromCode = (code: string | undefined): string | undefined => {
+export const getCountryLabelFromCode = (
+  code: string | undefined,
+  locale = "en",
+): string | undefined => {
   if (!code) return undefined;
-  const options = getCountryOptions();
-  return options.find((option) => option.value === code)?.label;
+  return getCountryOptions(locale).find((option) => option.value === code)?.label;
 };
 
 export const CountrySelector: React.FC<CountrySelectorProps> = ({
@@ -35,11 +56,11 @@ export const CountrySelector: React.FC<CountrySelectorProps> = ({
   onChange,
   placeholder,
 }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   // Ensure safe data fetching
   const options = useMemo(() => {
     try {
-      return getCountryOptions();
+      return getCountryOptions(i18n.language);
     } catch (err: unknown) {
       console.error(
         "Error fetching country list:",
@@ -47,7 +68,14 @@ export const CountrySelector: React.FC<CountrySelectorProps> = ({
       );
       return [];
     }
-  }, []);
+  }, [i18n.language]);
+
+  // Re-map the selected value's label into the current locale so the
+  // displayed country name updates when the user changes languages.
+  const localizedValue = useMemo(() => {
+    if (!value) return null;
+    return options.find((opt) => opt.value === value.value) ?? value;
+  }, [value, options]);
 
   const changeHandler = useCallback(
     (selectedOption: SingleValue<CountryOption>) => {
@@ -61,7 +89,7 @@ export const CountrySelector: React.FC<CountrySelectorProps> = ({
       <Select
         instanceId="country-selector"
         options={options}
-        value={value}
+        value={localizedValue}
         onChange={changeHandler}
         placeholder={placeholder ?? t("select-a-country")}
       />

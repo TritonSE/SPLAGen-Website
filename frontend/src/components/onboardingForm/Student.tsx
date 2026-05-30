@@ -4,8 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Radio } from "@tritonse/tse-constellation";
 import { useStateMachine } from "little-state-machine";
 import dynamic from "next/dynamic";
-import Image from "next/image";
-import { useCallback, useState } from "react";
+import { useCallback, useContext, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
@@ -14,7 +13,9 @@ import styles from "./Student.module.css";
 
 import type { CountryOption } from "@/components";
 
+import { updateStudentInfo } from "@/api/users";
 import { Button } from "@/components";
+import { UserContext } from "@/contexts/userContext";
 import updateOnboardingForm from "@/state/updateOnboardingForm";
 
 const CountrySelector = dynamic(() => import("@/components").then((mod) => mod.CountrySelector), {
@@ -52,13 +53,15 @@ type FormData = {
 
 type StudentProps = {
   onNext: (data: FormData) => void;
-  onBack: () => void;
 };
 
-export const Student = ({ onNext, onBack }: StudentProps) => {
+export const Student = ({ onNext }: StudentProps) => {
   const { t } = useTranslation();
   const { state, actions } = useStateMachine({ actions: { updateOnboardingForm } });
+  const { firebaseUser } = useContext(UserContext);
   const [selectedCountry, setSelectedCountry] = useState<CountryOption | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [isSubmittingApi, setIsSubmittingApi] = useState(false);
 
   const {
     register,
@@ -66,7 +69,6 @@ export const Student = ({ onNext, onBack }: StudentProps) => {
     control,
     watch,
     setValue,
-    reset,
     formState: { isValid, errors },
   } = useForm({
     resolver: zodResolver(formSchema(t)),
@@ -75,11 +77,40 @@ export const Student = ({ onNext, onBack }: StudentProps) => {
   });
 
   const onSubmit = useCallback(
-    (data: FormData) => {
+    async (data: FormData) => {
       actions.updateOnboardingForm(data);
+
+      if (!firebaseUser) {
+        setSubmitError(t("registration-failed"));
+        return;
+      }
+      setSubmitError(null);
+      setIsSubmittingApi(true);
+
+      try {
+        const token = await firebaseUser.getIdToken();
+        const result = await updateStudentInfo(token, {
+          schoolCountry: data.schoolCountry.value,
+          schoolName: data.schoolName,
+          universityEmail: data.universityEmail,
+          degree: data.degree,
+          programName: data.programName,
+          gradDate: data.graduationDate,
+        });
+        if (!result.success) {
+          setSubmitError(result.error || t("registration-failed"));
+          return;
+        }
+      } catch {
+        setSubmitError(t("registration-failed"));
+        return;
+      } finally {
+        setIsSubmittingApi(false);
+      }
+
       onNext(data);
     },
-    [actions, onNext],
+    [actions, onNext, firebaseUser, t],
   );
 
   const handleFormSubmit = useCallback(
@@ -98,26 +129,6 @@ export const Student = ({ onNext, onBack }: StudentProps) => {
     },
     [setValue],
   );
-
-  const handleBack = useCallback(() => {
-    const clearedData = {
-      ...state.onboardingForm,
-      schoolCountry: { value: "", label: "" },
-      schoolName: "",
-      universityEmail: "",
-      degree: "",
-      programName: "",
-      graduationDate: "",
-    };
-
-    actions.updateOnboardingForm(clearedData);
-
-    reset(clearedData);
-
-    setSelectedCountry(null);
-
-    onBack();
-  }, [state.onboardingForm, actions, reset, onBack]);
 
   return (
     <div className={styles.container}>
@@ -227,12 +238,14 @@ export const Student = ({ onNext, onBack }: StudentProps) => {
           </p>
         </div>
 
+        {submitError && <p className={styles.errorText}>{submitError}</p>}
+
         <div className={styles.buttonContainer}>
-          <button type="button" onClick={handleBack} className={styles.backButton}>
-            <Image src="/icons/ic_caretleft.svg" alt="Back Icon" width={24} height={24} />
-            {t("back")}
-          </button>
-          <Button type="submit" disabled={!isValid} label={t("continue")} />
+          <Button
+            type="submit"
+            disabled={!isValid || isSubmittingApi}
+            label={isSubmittingApi ? t("loading") : t("continue")}
+          />
         </div>
       </form>
     </div>

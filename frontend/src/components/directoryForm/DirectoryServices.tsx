@@ -65,16 +65,17 @@ export const specialtyOptionsToFrontend = Object.entries(specialtyOptionsToBacke
 
 const languageOptions = ["English", "Spanish", "Portuguese"];
 
-const formSchema = z.object({
-  canMakeAppointments: z.boolean({ required_error: "Required" }),
-  canRequestTests: z.boolean({ required_error: "Required" }),
-  offersTelehealth: z.boolean({ required_error: "Required" }),
-  specialtyServices: z.array(z.string()).min(1, "Please select at least one specialty service"),
-  careLanguages: z.array(z.string()).min(1, "Required"),
-  authorizedForLanguages: z.union([z.boolean(), z.literal("unsure")]),
-});
+const formSchema = (t: (key: string) => string) =>
+  z.object({
+    canMakeAppointments: z.boolean({ required_error: t("required") }),
+    canRequestTests: z.boolean({ required_error: t("required") }),
+    offersTelehealth: z.boolean({ required_error: t("required") }),
+    specialtyServices: z.array(z.string()).min(1, t("select-at-least-one-specialty")),
+    careLanguages: z.array(z.string()).min(1, t("required")),
+    authorizedForLanguages: z.union([z.boolean(), z.literal("unsure")]),
+  });
 
-type FormSchema = z.infer<typeof formSchema>;
+type FormSchema = z.infer<ReturnType<typeof formSchema>>;
 
 type DirectoryServicesProps = {
   onNext: (data: directoryState["data"]) => void;
@@ -93,7 +94,7 @@ export const DirectoryServices = ({ onNext, onBack }: DirectoryServicesProps) =>
     formState: { errors },
   } = useForm<FormSchema>({
     defaultValues: state.directoryForm as FormSchema,
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(formSchema(t)),
   });
 
   const rawSpecialtyServices = watch("specialtyServices");
@@ -113,7 +114,7 @@ export const DirectoryServices = ({ onNext, onBack }: DirectoryServicesProps) =>
         currentSpecialties.splice(index, 1);
       }
 
-      setValue("specialtyServices", currentSpecialties);
+      setValue("specialtyServices", currentSpecialties, { shouldValidate: true });
     },
     [setValue, watchSpecialtyServices],
   );
@@ -129,7 +130,7 @@ export const DirectoryServices = ({ onNext, onBack }: DirectoryServicesProps) =>
         currentLanguages.splice(index, 1);
       }
 
-      setValue("careLanguages", currentLanguages);
+      setValue("careLanguages", currentLanguages, { shouldValidate: true });
     },
     [setValue, watchCareLanguages],
   );

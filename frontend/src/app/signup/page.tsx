@@ -26,10 +26,19 @@ export default function OnboardingForm() {
     "idle" | "submitting" | "success" | "error"
   >("idle");
   const { state, actions } = useStateMachine({ actions: { updateOnboardingForm } });
-  const { setOnboardingStep } = useContext(UserContext);
+  const { setOnboardingStep, user, loadingUser } = useContext(UserContext);
   const router = useRouter();
   const { t } = useTranslation();
   const [successMessage, setSuccessMessage] = useState("");
+
+  // If the user is already signed in with a pending membership, they previously
+  // submitted Basics — resume them at the questionnaire instead of restarting.
+  useEffect(() => {
+    if (loadingUser) return;
+    if (user?.account?.membership === "pending" && step === 0) {
+      setStep(2);
+    }
+  }, [loadingUser, user, step]);
 
   const handleNext = useCallback(
     (data: onboardingState["data"]) => {
@@ -43,20 +52,6 @@ export default function OnboardingForm() {
   const handleBack = useCallback(() => {
     setStep((prev) => Math.max(0, prev - 1));
   }, [setStep]);
-
-  const handleReset = useCallback(() => {
-    actions.updateOnboardingForm({
-      firstName: "",
-      lastName: "",
-      email: "",
-      password: "",
-      professionalTitle: { value: "", label: "" },
-      professionalTitleOther: "",
-      country: { value: "", label: "" },
-      language: "",
-    });
-    setStep(0);
-  }, [actions, setStep]);
 
   // Update the onboarding Progress stepper
   useEffect(() => {
@@ -125,52 +120,27 @@ export default function OnboardingForm() {
       {renderRegistrationMessage()}
 
       {step === 0 && <SignUp onNext={handleNext} />}
-      {step === 1 && <Basics onBack={handleBack} onNext={handleNext} />}
+      {step === 1 && (
+        <Basics
+          onBack={handleBack}
+          onNext={handleNext}
+          onStatusChange={handleRegistrationStatusChange}
+        />
+      )}
 
       {step === 2 && (
         <Questionnaire
           onNext={handleNext}
-          onBack={handleBack}
           onStudentFlow={handleStudentFlow}
           onAssociateFlow={handleAssociateFlow}
         />
       )}
 
-      {step === 2.1 && (
-        <Student
-          onNext={continueFromIntermediateStep}
-          onBack={() => {
-            setStep(2);
-          }}
-        />
-      )}
+      {step === 2.1 && <Student onNext={continueFromIntermediateStep} />}
 
-      {step === 2.2 && (
-        <Associate
-          onNext={continueFromIntermediateStep}
-          onBack={() => {
-            setStep(2);
-          }}
-        />
-      )}
+      {step === 2.2 && <Associate onNext={continueFromIntermediateStep} />}
 
-      {step === 3 && (
-        <Category
-          onBack={() => {
-            // If we're coming from an intermediate step, go back to Step2
-            const membership = state.onboardingForm.membership;
-            if (membership === "Student") {
-              setStep(2.1);
-            } else if (membership === "Associate Member") {
-              setStep(2.2);
-            } else {
-              setStep(2);
-            }
-          }}
-          onReset={handleReset}
-          onStatusChange={handleRegistrationStatusChange}
-        />
-      )}
+      {step === 3 && <Category onStatusChange={handleRegistrationStatusChange} />}
 
       {step === 4 && (
         <ContinueToDirectory

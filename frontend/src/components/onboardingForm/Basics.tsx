@@ -13,7 +13,9 @@ import styles from "./Basics.module.css";
 
 import type { CountryOption, ProfessionalTitleOption } from "@/components";
 
+import { CreateUserRequestBody, loginUserWithEmailPassword, signUpUser } from "@/api/users";
 import { Button, Checkmark, ExpandableSection } from "@/components";
+import { LANGUAGES } from "@/components/languageSwitcher";
 import { onboardingState } from "@/state/stateTypes";
 import updateOnboardingForm from "@/state/updateOnboardingForm";
 
@@ -60,9 +62,10 @@ type FormData = {
 type BasicsProps = {
   onNext: (data: onboardingState["data"]) => void;
   onBack: () => void;
+  onStatusChange: (status: "idle" | "submitting" | "success" | "error") => void;
 };
 
-export const Basics = ({ onNext, onBack }: BasicsProps) => {
+export const Basics = ({ onNext, onBack, onStatusChange }: BasicsProps) => {
   const { t } = useTranslation();
   const { state, actions } = useStateMachine({ actions: { updateOnboardingForm } });
 
@@ -71,30 +74,72 @@ export const Basics = ({ onNext, onBack }: BasicsProps) => {
   const [selectedProfessionalTitle, setSelectedProfessionalTitle] =
     useState<ProfessionalTitleOption | null>(null);
 
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
   const {
     register,
     handleSubmit,
     control,
-    formState: { errors, isValid },
+    formState: { errors, isValid, isSubmitting },
   } = useForm<FormData>({
     resolver: zodResolver(formSchema(t)),
     defaultValues: state.onboardingForm,
     mode: "onChange",
   });
-  console.log(errors, isValid);
 
   const onSubmit = useCallback(
-    (data: FormData) => {
-      actions.updateOnboardingForm({
-        ...state.onboardingForm,
-        ...data,
-      });
-      onNext({
-        ...state.onboardingForm,
-        ...data,
-      });
+    async (data: FormData) => {
+      const combined = { ...state.onboardingForm, ...data };
+      actions.updateOnboardingForm(combined);
+
+      // Create the user account up-front with membership "pending".
+      // The membership questionnaire and sub-flows will PATCH this later.
+      setSubmitError(null);
+      onStatusChange("submitting");
+
+      const professionalTitleToUse =
+        combined.professionalTitle?.value === "other"
+          ? combined.professionalTitleOther
+          : combined.professionalTitle?.value;
+
+      const normalizedLanguage = LANGUAGES.find(
+        (lang) => lang.code === (combined.language || "").toLowerCase(),
+      )?.dbValue;
+
+      const userData: CreateUserRequestBody = {
+        password: combined.password,
+        account: { membership: "pending" },
+        personal: {
+          firstName: combined.firstName,
+          lastName: combined.lastName,
+          email: combined.email,
+          phone: combined.phone,
+        },
+        professional: {
+          title: professionalTitleToUse,
+          country: combined.country?.value,
+          prefLanguage: normalizedLanguage,
+        },
+      };
+
+      const signUpResult = await signUpUser(userData);
+      if (!signUpResult.success) {
+        setSubmitError(signUpResult.error || t("registration-failed"));
+        onStatusChange("error");
+        return;
+      }
+
+      const loginResult = await loginUserWithEmailPassword(combined.email, combined.password);
+      if (!loginResult.success) {
+        setSubmitError(loginResult.error || t("registration-failed"));
+        onStatusChange("error");
+        return;
+      }
+
+      onStatusChange("idle");
+      onNext(combined);
     },
-    [actions, onNext, state.onboardingForm],
+    [actions, onNext, onStatusChange, state.onboardingForm, t],
   );
 
   const handleFormSubmit = useCallback(
@@ -248,13 +293,19 @@ export const Basics = ({ onNext, onBack }: BasicsProps) => {
           />
         </div>
 
+        {submitError && <p className={styles.errorText}>{submitError}</p>}
+
         <div className={styles.buttonContainer}>
           <button type="button" onClick={onBack} className={styles.backButton}>
             <Image src="/icons/ic_caretleft.svg" alt="Back Icon" width={24} height={24} />
             {t("back")}
           </button>
 
-          <Button type="submit" disabled={!isValid} label={t("continue")} />
+          <Button
+            type="submit"
+            disabled={!isValid || isSubmitting}
+            label={isSubmitting ? t("loading") : t("continue")}
+          />
         </div>
       </form>
     </div>

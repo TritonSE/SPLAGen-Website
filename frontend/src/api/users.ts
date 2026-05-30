@@ -7,6 +7,7 @@ import type { UserCredential } from "firebase/auth";
 import { initFirebase } from "@/firebase/firebase";
 
 export type MembershipType =
+  | "pending"
   | "student"
   | "geneticCounselor"
   | "otherGeneticsProfessional"

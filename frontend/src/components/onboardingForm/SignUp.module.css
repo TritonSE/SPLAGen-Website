@@ -1,24 +1,23 @@
 .signup {
   width: 100%;
-  height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
 }
 
 .signupContainer {
   width: 75%;
   max-width: 750px;
+  margin: 2rem auto;
   padding: 20px;
-  overflow-y: scroll;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  max-height: 80vh;
 }
 
-.signupContainer::-webkit-scrollbar {
-  display: none;
+@media (max-width: 768px) {
+  .signupContainer {
+    width: 100%;
+    margin: 0;
+    padding: 16px;
+  }
 }
 
 .signupTitle {
