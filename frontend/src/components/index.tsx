@@ -22,3 +22,4 @@ export { ExpandableSection } from "./expandable";
 export { ProfessionalTitleSelector, type ProfessionalTitleOption } from "./TitleSelector";
 export { PostCard } from "./PostCard";
 export { PhoneInput } from "./PhoneInput";
+export { LoadingIndicator } from "./LoadingIndicator";

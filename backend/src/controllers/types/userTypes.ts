@@ -67,7 +67,7 @@ export type EditDirectoryDisplayInformationRequestBody = {
     | "neurogenetics"
     | "rareDiseases"
     | "cancer"
-    | "biochemical"
+    | "biochemicalMetabolic"
     | "prenatal"
     | "adult"
     | "psychiatric"
@@ -75,7 +75,6 @@ export type EditDirectoryDisplayInformationRequestBody = {
     | "ophthalmic"
     | "research"
     | "pharmacogenomics"
-    | "metabolic"
     | "other"
   )[];
   newLanguages: ("english" | "spanish" | "portuguese")[];

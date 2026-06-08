@@ -8,6 +8,7 @@ import { useTranslation } from "react-i18next";
 import styles from "./landingPage.module.css";
 
 import { DISCUSSION_PAGE_SIZE, Discussion, getPosts } from "@/api/discussion";
+import { LoadingIndicator } from "@/components";
 import { Pagination } from "@/components/Pagination";
 import { PostCard } from "@/components/PostCard";
 import { Tabs } from "@/components/Tabs";
@@ -28,6 +29,7 @@ export default function LandingPage() {
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState("");
   const [posts, setPosts] = useState<Discussion[]>();
+  const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<Tab>("all-discussions");
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -36,6 +38,7 @@ export default function LandingPage() {
   const loadPosts = useCallback(async () => {
     if (!firebaseUser) return;
 
+    setIsLoading(true);
     setErrorMessage("");
     try {
       const token = await firebaseUser.getIdToken();
@@ -54,6 +57,8 @@ export default function LandingPage() {
       }
     } catch (error) {
       setErrorMessage(`${t("failed-to-fetch-discussion-posts")}: ${String(error)}`);
+    } finally {
+      setIsLoading(false);
     }
   }, [firebaseUser, search, sort, activeTab, page, t]);
 
@@ -111,18 +116,20 @@ export default function LandingPage() {
       <Tabs tabs={TABS} activeTab={activeTab} onActiveTabChange={setActiveTab} />
 
       <div className={styles.scrollContainer}>
-        {posts?.map((post) => (
-          <PostCard
-            key={post._id}
-            href={`/discussion/${post._id}`}
-            author={post.userId}
-            createdAt={post.createdAt}
-            title={post.title}
-            message={post.message}
-          />
-        ))}
+        {isLoading && <LoadingIndicator />}
+        {!isLoading &&
+          posts?.map((post) => (
+            <PostCard
+              key={post._id}
+              href={`/discussion/${post._id}`}
+              author={post.userId}
+              createdAt={post.createdAt}
+              title={post.title}
+              message={post.message}
+            />
+          ))}
 
-        {posts && posts.length === 0 && <div>{t("no-posts-found")}</div>}
+        {!isLoading && posts && posts.length === 0 && <div>{t("no-posts-found")}</div>}
       </div>
 
       <Pagination currentPage={page} numPages={numPages} onPageChange={setPage} />

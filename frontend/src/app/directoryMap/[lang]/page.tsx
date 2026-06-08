@@ -8,6 +8,7 @@ import type { Counselor } from "@/api/directory";
 import type { APIResult } from "@/api/requests";
 
 import { getPublicDirectory } from "@/api/directory";
+import { LoadingIndicator } from "@/components";
 import env from "@/util/validateEnv";
 import "@/app/globals.css";
 
@@ -55,7 +56,7 @@ const AVAILABLE_SPECIALIZATIONS = [
   "neurogenetics",
   "rareDiseases",
   "cancer",
-  "biochemical",
+  "biochemicalMetabolic",
   "prenatal",
   "adult",
   "psychiatric",
@@ -63,7 +64,6 @@ const AVAILABLE_SPECIALIZATIONS = [
   "ophthalmic",
   "research",
   "pharmacogenomics",
-  "metabolic",
   "other",
 ];
 
@@ -77,6 +77,7 @@ export default function DirectoryMapPage() {
   const [markers, setMarkers] = useState<CounselorMarker[]>([]);
   const [selected, setSelected] = useState<CounselorMarker | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isLoadingDirectory, setIsLoadingDirectory] = useState(true);
 
   // Filter states
   const [searchQuery, setSearchQuery] = useState("");
@@ -96,6 +97,7 @@ export default function DirectoryMapPage() {
   };
 
   const loadDirectory = useCallback(async () => {
+    setIsLoadingDirectory(true);
     const result: APIResult<Counselor[]> = await getPublicDirectory(
       searchQuery || undefined,
       selectedLanguages.length > 0 ? selectedLanguages : undefined,
@@ -104,6 +106,7 @@ export default function DirectoryMapPage() {
 
     if (!result.success) {
       setError(result.error);
+      setIsLoadingDirectory(false);
       return;
     }
 
@@ -136,6 +139,8 @@ export default function DirectoryMapPage() {
       );
     } catch (e) {
       setError(`Geocoding failed: ${(e as Error).message}`);
+    } finally {
+      setIsLoadingDirectory(false);
     }
   }, [searchQuery, selectedLanguages, selectedSpecializations]);
 
@@ -222,7 +227,7 @@ export default function DirectoryMapPage() {
         </div>
 
         <p className="text-base text-gray-500 mt-4">
-          {t("providers-found", { count: markers.length })}
+          {isLoadingDirectory ? t("loading") : t("providers-found", { count: markers.length })}
         </p>
       </aside>
 
@@ -301,44 +306,46 @@ export default function DirectoryMapPage() {
 
       {/* Right Sidebar */}
       <aside className={SIDEBAR_STYLE}>
-        {markers
-          .map(({ counselors, location }, i) =>
-            counselors.map((counselor, j) => (
-              <div
-                key={`${String(i)} ${String(j)}`}
-                className="mb-4 cursor-pointer space-y-1 hover:bg-gray-50 p-2 rounded"
-                onClick={() => {
-                  setSelected({ counselors, location });
-                  google.maps.event.trigger(window, "resize");
-                }}
-              >
-                <h3 className="font-medium">
-                  {counselor.name} ({formatTitle(counselor.title)})
-                </h3>
-                <p className="text-sm">📍 {counselor.address}</p>
-                <p className="text-sm">🏢 {counselor.organization}</p>
-                {counselor.profileUrl && (
-                  <p className="text-sm">
-                    🔗{" "}
-                    <a
-                      href={counselor.profileUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="underline text-blue-600 break-all"
-                    >
-                      {counselor.profileUrl}
-                    </a>
-                  </p>
-                )}
-                <p className="text-sm">🌐 {counselor.email}</p>
-                <p className="text-sm">☎️ {counselor.phone ?? "—"}</p>
-                <p className="text-sm">📚 {formatTranslatedList(counselor.specialties)}</p>
-                <p className="text-sm">🗣 {formatTranslatedList(counselor.languages)}</p>
-                <hr className="my-2" />
-              </div>
-            )),
-          )
-          .flat()}
+        {isLoadingDirectory && <LoadingIndicator />}
+        {!isLoadingDirectory &&
+          markers
+            .map(({ counselors, location }, i) =>
+              counselors.map((counselor, j) => (
+                <div
+                  key={`${String(i)} ${String(j)}`}
+                  className="mb-4 cursor-pointer space-y-1 hover:bg-gray-50 p-2 rounded"
+                  onClick={() => {
+                    setSelected({ counselors, location });
+                    google.maps.event.trigger(window, "resize");
+                  }}
+                >
+                  <h3 className="font-medium">
+                    {counselor.name} ({formatTitle(counselor.title)})
+                  </h3>
+                  <p className="text-sm">📍 {counselor.address}</p>
+                  <p className="text-sm">🏢 {counselor.organization}</p>
+                  {counselor.profileUrl && (
+                    <p className="text-sm">
+                      🔗{" "}
+                      <a
+                        href={counselor.profileUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="underline text-blue-600 break-all"
+                      >
+                        {counselor.profileUrl}
+                      </a>
+                    </p>
+                  )}
+                  <p className="text-sm">🌐 {counselor.email}</p>
+                  <p className="text-sm">☎️ {counselor.phone ?? "—"}</p>
+                  <p className="text-sm">📚 {formatTranslatedList(counselor.specialties)}</p>
+                  <p className="text-sm">🗣 {formatTranslatedList(counselor.languages)}</p>
+                  <hr className="my-2" />
+                </div>
+              )),
+            )
+            .flat()}
       </aside>
     </div>
   );

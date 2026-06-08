@@ -22,7 +22,7 @@ const specialtyOptions = [
   "Neurogenetics",
   "Rare Diseases",
   "Cancer Genetics",
-  "Biochemical Genetics",
+  "Biochemical or Metabolic Genetics",
   "Prenatal Genetics",
   "Adult Genetics",
   "Psychiatric Genetics",
@@ -30,7 +30,6 @@ const specialtyOptions = [
   "Ophthalmic Genetics",
   "Research",
   "Pharmacogenomics",
-  "Metabolic Genetics",
   "Other",
 ] as const;
 export type SpecialtyOption = (typeof specialtyOptions)[number];
@@ -41,7 +40,7 @@ export const specialtyOptionsToBackend: Record<SpecialtyOption, string> = {
   Neurogenetics: "neurogenetics",
   "Rare Diseases": "rareDiseases",
   "Cancer Genetics": "cancer",
-  "Biochemical Genetics": "biochemical",
+  "Biochemical or Metabolic Genetics": "biochemicalMetabolic",
   "Prenatal Genetics": "prenatal",
   "Adult Genetics": "adult",
   "Psychiatric Genetics": "psychiatric",
@@ -49,7 +48,6 @@ export const specialtyOptionsToBackend: Record<SpecialtyOption, string> = {
   "Ophthalmic Genetics": "ophthalmic",
   Research: "research",
   Pharmacogenomics: "pharmacogenomics",
-  "Metabolic Genetics": "metabolic",
   Other: "other",
 };
 

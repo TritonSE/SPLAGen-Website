@@ -8,7 +8,7 @@ import { useTranslation } from "react-i18next";
 import styles from "./page.module.css";
 
 import { ANNOUNCEMENTS_PAGE_SIZE, Announcement, getAnnouncements } from "@/api/announcement";
-import { PostCard } from "@/components";
+import { LoadingIndicator, PostCard } from "@/components";
 import { Pagination } from "@/components/Pagination";
 import { UserContext } from "@/contexts/userContext";
 import { useRedirectToLoginIfNotSignedIn } from "@/hooks/useRedirection";
@@ -23,6 +23,7 @@ const Announcements: React.FC = () => {
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState("");
   const [announcements, setAnnouncements] = useState<Announcement[]>();
+  const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
 
   const { firebaseUser, isAdminOrSuperAdmin } = useContext(UserContext);
@@ -30,6 +31,7 @@ const Announcements: React.FC = () => {
   const loadAnnouncements = useCallback(async () => {
     if (!firebaseUser) return;
 
+    setIsLoading(true);
     try {
       setErrorMessage("");
       const token = await firebaseUser.getIdToken();
@@ -42,6 +44,8 @@ const Announcements: React.FC = () => {
       }
     } catch (error) {
       setErrorMessage(`${t("failed-to-fetch-announcements")}: ${String(error)}`);
+    } finally {
+      setIsLoading(false);
     }
   }, [firebaseUser, search, sort, page, t]);
 
@@ -98,17 +102,21 @@ const Announcements: React.FC = () => {
         )}
       </div>
       <div className={styles.scrollContainer}>
-        {announcements?.map((announcement) => (
-          <PostCard
-            key={announcement._id}
-            href={`/announcements/${announcement._id}`}
-            author={announcement.userId}
-            createdAt={announcement.createdAt}
-            title={announcement.title}
-            message={announcement.message}
-          />
-        ))}
-        {announcements && announcements.length === 0 && <p>{t("no-announcements-found")}</p>}
+        {isLoading && <LoadingIndicator />}
+        {!isLoading &&
+          announcements?.map((announcement) => (
+            <PostCard
+              key={announcement._id}
+              href={`/announcements/${announcement._id}`}
+              author={announcement.userId}
+              createdAt={announcement.createdAt}
+              title={announcement.title}
+              message={announcement.message}
+            />
+          ))}
+        {!isLoading && announcements && announcements.length === 0 && (
+          <p>{t("no-announcements-found")}</p>
+        )}
       </div>
 
       <Pagination currentPage={page} numPages={numPages} onPageChange={setPage} />

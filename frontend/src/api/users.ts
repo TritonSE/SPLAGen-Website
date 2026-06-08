@@ -131,7 +131,7 @@ export type User = {
       | "neurogenetics"
       | "rareDiseases"
       | "cancer"
-      | "biochemical"
+      | "biochemicalMetabolic"
       | "prenatal"
       | "adult"
       | "psychiatric"
@@ -139,7 +139,6 @@ export type User = {
       | "ophthalmic"
       | "research"
       | "pharmacogenomics"
-      | "metabolic"
       | "other"
     )[];
     languages?: ("english" | "spanish" | "portuguese")[];
@@ -195,7 +194,7 @@ export type EditDirectoryDisplayInformationRequestBody = {
     | "neurogenetics"
     | "rareDiseases"
     | "cancer"
-    | "biochemical"
+    | "biochemicalMetabolic"
     | "prenatal"
     | "adult"
     | "psychiatric"
@@ -203,7 +202,6 @@ export type EditDirectoryDisplayInformationRequestBody = {
     | "ophthalmic"
     | "research"
     | "pharmacogenomics"
-    | "metabolic"
     | "other"
   )[];
   newLanguages: ("english" | "spanish" | "portuguese")[];

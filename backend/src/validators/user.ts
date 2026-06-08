@@ -90,7 +90,7 @@ export const editDirectoryDisplayInfo = [
       "neurogenetics",
       "rareDiseases",
       "cancer",
-      "biochemical",
+      "biochemicalMetabolic",
       "prenatal",
       "adult",
       "psychiatric",
@@ -98,7 +98,6 @@ export const editDirectoryDisplayInfo = [
       "ophthalmic",
       "research",
       "pharmacogenomics",
-      "metabolic",
       "other",
     ])
     .withMessage("Invalid service entry"),

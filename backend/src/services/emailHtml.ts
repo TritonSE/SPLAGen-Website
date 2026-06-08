@@ -26,6 +26,12 @@ const REPLY_MESSAGE = "[ReplyMessage]";
 
 const DISCUSSION_URL = "[DiscussionUrl]";
 
+const NEW_USER_NAME = "[NewUserName]";
+
+const NEW_USER_EMAIL = "[NewUserEmail]";
+
+const MEMBERSHIP_NAME = "[MembershipName]";
+
 const SIGN_OFF_HTML: LocalizedTemplate = {
   english: `
 <p style="margin-bottom: 20px;"> <strong> This is an automated email. Please do not reply to this email. For any inquiries contact us at <a href="mailto:info@splagen.org" style="color: blue;">info@splagen.org</a> </strong> </p>
@@ -395,6 +401,135 @@ const NEW_DISCUSSION_REPLY_EMAIL: LocalizedTemplate = {
 `,
 };
 
+const NEW_ACCOUNT_ADMIN_EMAIL: LocalizedTemplate = {
+  english: `
+<p style="margin-bottom: 20px;">Dear [Recipient],</p>
+
+<p style="margin-bottom: 20px;">A new user has signed up for the SPLAGen Membership Portal:</p>
+
+<div style="margin: 30px 0; padding: 20px; background-color: #f5f5f5; border-left: 4px solid #1e40af;">
+  <p style="margin: 0 0 8px 0;"><strong>Name:</strong> [NewUserName]</p>
+  <p style="margin: 0;"><strong>Email:</strong> [NewUserEmail]</p>
+</div>
+
+<p style="margin-bottom: 20px;">You can review members in the portal here: <a href="[PortalLink]/members" style="color: blue;">[PortalLink]/members</a></p>
+`,
+
+  spanish: `
+<p style="margin-bottom: 20px;">Estimado/a [Recipient],</p>
+
+<p style="margin-bottom: 20px;">Un nuevo usuario se ha registrado en el Portal de Membresía de SPLAGen:</p>
+
+<div style="margin: 30px 0; padding: 20px; background-color: #f5f5f5; border-left: 4px solid #1e40af;">
+  <p style="margin: 0 0 8px 0;"><strong>Nombre:</strong> [NewUserName]</p>
+  <p style="margin: 0;"><strong>Correo electrónico:</strong> [NewUserEmail]</p>
+</div>
+
+<p style="margin-bottom: 20px;">Puede revisar a los miembros en el portal aquí: <a href="[PortalLink]/members" style="color: blue;">[PortalLink]/members</a></p>
+`,
+
+  portuguese: `
+<p style="margin-bottom: 20px;">Prezado/a [Recipient],</p>
+
+<p style="margin-bottom: 20px;">Um novo usuário se cadastrou no Portal de Membros da SPLAGen:</p>
+
+<div style="margin: 30px 0; padding: 20px; background-color: #f5f5f5; border-left: 4px solid #1e40af;">
+  <p style="margin: 0 0 8px 0;"><strong>Nome:</strong> [NewUserName]</p>
+  <p style="margin: 0;"><strong>E-mail:</strong> [NewUserEmail]</p>
+</div>
+
+<p style="margin-bottom: 20px;">Você pode revisar os membros no portal aqui: <a href="[PortalLink]/members" style="color: blue;">[PortalLink]/members</a></p>
+`,
+};
+
+const MEMBERSHIP_CHANGED_ADMIN_EMAIL: LocalizedTemplate = {
+  english: `
+<p style="margin-bottom: 20px;">Dear [Recipient],</p>
+
+<p style="margin-bottom: 20px;">A member has updated their membership category in the SPLAGen Membership Portal:</p>
+
+<div style="margin: 30px 0; padding: 20px; background-color: #f5f5f5; border-left: 4px solid #1e40af;">
+  <p style="margin: 0 0 8px 0;"><strong>Name:</strong> [NewUserName]</p>
+  <p style="margin: 0 0 8px 0;"><strong>Email:</strong> [NewUserEmail]</p>
+  <p style="margin: 0;"><strong>New membership category:</strong> [MembershipName]</p>
+</div>
+
+<p style="margin-bottom: 20px;">You can review members in the portal here: <a href="[PortalLink]/members" style="color: blue;">[PortalLink]/members</a></p>
+`,
+
+  spanish: `
+<p style="margin-bottom: 20px;">Estimado/a [Recipient],</p>
+
+<p style="margin-bottom: 20px;">Un miembro ha actualizado su categoría de membresía en el Portal de Membresía de SPLAGen:</p>
+
+<div style="margin: 30px 0; padding: 20px; background-color: #f5f5f5; border-left: 4px solid #1e40af;">
+  <p style="margin: 0 0 8px 0;"><strong>Nombre:</strong> [NewUserName]</p>
+  <p style="margin: 0 0 8px 0;"><strong>Correo electrónico:</strong> [NewUserEmail]</p>
+  <p style="margin: 0;"><strong>Nueva categoría de membresía:</strong> [MembershipName]</p>
+</div>
+
+<p style="margin-bottom: 20px;">Puede revisar a los miembros en el portal aquí: <a href="[PortalLink]/members" style="color: blue;">[PortalLink]/members</a></p>
+`,
+
+  portuguese: `
+<p style="margin-bottom: 20px;">Prezado/a [Recipient],</p>
+
+<p style="margin-bottom: 20px;">Um membro atualizou sua categoria de associação no Portal de Membros da SPLAGen:</p>
+
+<div style="margin: 30px 0; padding: 20px; background-color: #f5f5f5; border-left: 4px solid #1e40af;">
+  <p style="margin: 0 0 8px 0;"><strong>Nome:</strong> [NewUserName]</p>
+  <p style="margin: 0 0 8px 0;"><strong>E-mail:</strong> [NewUserEmail]</p>
+  <p style="margin: 0;"><strong>Nova categoria de associação:</strong> [MembershipName]</p>
+</div>
+
+<p style="margin-bottom: 20px;">Você pode revisar os membros no portal aqui: <a href="[PortalLink]/members" style="color: blue;">[PortalLink]/members</a></p>
+`,
+};
+
+const DIRECTORY_REQUEST_ADMIN_EMAIL: LocalizedTemplate = {
+  english: `
+<p style="margin-bottom: 20px;">Dear [Recipient],</p>
+
+<p style="margin-bottom: 20px;">A member has requested to be added to the SPLAGen Directory:</p>
+
+<div style="margin: 30px 0; padding: 20px; background-color: #f5f5f5; border-left: 4px solid #1e40af;">
+  <p style="margin: 0 0 8px 0;"><strong>Name:</strong> [NewUserName]</p>
+  <p style="margin: 0 0 8px 0;"><strong>Email:</strong> [NewUserEmail]</p>
+  <p style="margin: 0;"><strong>Membership category:</strong> [MembershipName]</p>
+</div>
+
+<p style="margin-bottom: 20px;">Review the request and approve or deny it in the portal: <a href="[PortalLink]/members" style="color: blue;">[PortalLink]/members</a></p>
+`,
+
+  spanish: `
+<p style="margin-bottom: 20px;">Estimado/a [Recipient],</p>
+
+<p style="margin-bottom: 20px;">Un miembro ha solicitado ser añadido al Directorio de SPLAGen:</p>
+
+<div style="margin: 30px 0; padding: 20px; background-color: #f5f5f5; border-left: 4px solid #1e40af;">
+  <p style="margin: 0 0 8px 0;"><strong>Nombre:</strong> [NewUserName]</p>
+  <p style="margin: 0 0 8px 0;"><strong>Correo electrónico:</strong> [NewUserEmail]</p>
+  <p style="margin: 0;"><strong>Categoría de membresía:</strong> [MembershipName]</p>
+</div>
+
+<p style="margin-bottom: 20px;">Revise la solicitud y apruébela o deniéguela en el portal: <a href="[PortalLink]/members" style="color: blue;">[PortalLink]/members</a></p>
+`,
+
+  portuguese: `
+<p style="margin-bottom: 20px;">Prezado/a [Recipient],</p>
+
+<p style="margin-bottom: 20px;">Um membro solicitou ser adicionado ao Diretório da SPLAGen:</p>
+
+<div style="margin: 30px 0; padding: 20px; background-color: #f5f5f5; border-left: 4px solid #1e40af;">
+  <p style="margin: 0 0 8px 0;"><strong>Nome:</strong> [NewUserName]</p>
+  <p style="margin: 0 0 8px 0;"><strong>E-mail:</strong> [NewUserEmail]</p>
+  <p style="margin: 0;"><strong>Categoria de associação:</strong> [MembershipName]</p>
+</div>
+
+<p style="margin-bottom: 20px;">Revise a solicitação e aprove ou recuse no portal: <a href="[PortalLink]/members" style="color: blue;">[PortalLink]/members</a></p>
+`,
+};
+
 export {
   ADMIN_INVITE_EMAIL,
   ADMIN_REMOVAL_EMAIL,
@@ -416,4 +551,10 @@ export {
   DISCUSSION_URL,
   DIRECTORY_REMOVAL_EMAIL,
   ACCOUNT_DELETION_EMAIL,
+  NEW_ACCOUNT_ADMIN_EMAIL,
+  MEMBERSHIP_CHANGED_ADMIN_EMAIL,
+  DIRECTORY_REQUEST_ADMIN_EMAIL,
+  NEW_USER_NAME,
+  NEW_USER_EMAIL,
+  MEMBERSHIP_NAME,
 };

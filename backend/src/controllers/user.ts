@@ -5,9 +5,14 @@ import { NextFunction, Request, Response } from "express";
 
 import { AuthenticatedRequest } from "../middleware/auth";
 import UserModel from "../models/user";
-import { sendUserDeletionEmail } from "../services/emailService";
+import {
+  notifyAdminsOfMembershipChange,
+  notifyAdminsOfNewAccount,
+  sendUserDeletionEmail,
+} from "../services/emailService";
 import { firebaseAdminAuth } from "../util/firebase";
 import { buildUserQuery } from "../util/userQuery";
+import { getDeploymentUrl } from "../utils/urlHelper";
 
 import {
   CreateUserRequestBody,
@@ -43,6 +48,13 @@ export const createUser = async (
       education,
       associate,
     });
+
+    // Fire-and-forget: notify admins of the new signup in their preferred language.
+    notifyAdminsOfNewAccount(
+      `${personal.firstName} ${personal.lastName}`,
+      personal.email,
+      getDeploymentUrl(req),
+    );
 
     res.status(201).json(newUser);
     return;
@@ -459,6 +471,24 @@ export const editMembership = async (
       updateFields,
       { new: true, runValidators: true },
     );
+
+    // Fire-and-forget: notify admins that this user's membership category changed.
+    // Skip if (a) the value didn't actually change, or (b) the previous value was
+    // "pending" — that transition is the user completing signup, which already
+    // triggered a separate "new account" notification.
+    const previousMembership = user.account?.membership;
+    if (
+      updatedUser?.personal &&
+      previousMembership !== newMembership &&
+      previousMembership !== "pending"
+    ) {
+      notifyAdminsOfMembershipChange(
+        `${updatedUser.personal.firstName} ${updatedUser.personal.lastName}`,
+        updatedUser.personal.email,
+        newMembership,
+        getDeploymentUrl(req),
+      );
+    }
 
     res.status(200).json({
       message: "Membership updated",

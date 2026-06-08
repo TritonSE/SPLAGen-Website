@@ -3,10 +3,12 @@ import { NextFunction, Request, Response } from "express";
 import { AuthenticatedRequest } from "../middleware/auth";
 import UserModel, { User, UserMembership } from "../models/user";
 import {
+  notifyAdminsOfDirectoryRequest,
   sendDirectoryApprovalEmail,
   sendDirectoryDenialEmail,
   sendDirectoryRemovalEmail,
 } from "../services/emailService";
+import { getDeploymentUrl } from "../utils/urlHelper";
 
 type JoinDirectoryRequestBody = {
   education: {
@@ -103,6 +105,16 @@ export const joinDirectory = async (
     if (!updatedUser) {
       res.status(404).json({ error: "User not found" });
       return;
+    }
+
+    // Fire-and-forget: notify admins that this member has requested directory inclusion.
+    if (updatedUser.personal) {
+      notifyAdminsOfDirectoryRequest(
+        `${updatedUser.personal.firstName} ${updatedUser.personal.lastName}`,
+        updatedUser.personal.email,
+        updatedUser.account?.membership ?? "",
+        getDeploymentUrl(req),
+      );
     }
 
     res.status(200).json({ message: "Request received", user: updatedUser });

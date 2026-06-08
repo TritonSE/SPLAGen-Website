@@ -5,15 +5,14 @@ export type ValidService =
   | "neurogenetics"
   | "rareDiseases"
   | "cancer"
-  | "biochemical"
+  | "biochemicalMetabolic"
   | "prenatal"
   | "adult"
   | "psychiatric"
   | "reproductive"
   | "ophthalmic"
   | "research"
-  | "pharmacogenomics"
-  | "metabolic";
+  | "pharmacogenomics";
 
 export const languages = ["english", "spanish", "portuguese"] as const;
 
@@ -23,7 +22,7 @@ export const serviceLabelToKeyMap: Record<string, ValidService> = {
   Neurogenetics: "neurogenetics",
   "Rare Diseases": "rareDiseases",
   "Cancer Genetics": "cancer",
-  "Biochemical Genetics": "biochemical",
+  "Biochemical or Metabolic Genetics": "biochemicalMetabolic",
   "Prenatal Genetics": "prenatal",
   "Adult Genetics": "adult",
   "Psychiatric Genetics": "psychiatric",
@@ -31,7 +30,6 @@ export const serviceLabelToKeyMap: Record<string, ValidService> = {
   "Ophthalmic Genetics": "ophthalmic",
   Research: "research",
   Pharmacogenomics: "pharmacogenomics",
-  "Metabolic Genetics": "metabolic",
   Other: "other",
 };
 

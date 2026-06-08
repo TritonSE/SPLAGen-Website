@@ -25,6 +25,7 @@ import {
   Button,
   DeleteUserPopup,
   DenyDirectoryRequestPopup,
+  LoadingIndicator,
   RemoveAdminPopup,
   RemoveFromDirectoryPopup,
 } from "@/components";
@@ -56,7 +57,7 @@ const serviceColors = {
   neurogenetics: "#DBECDB",
   rareDiseases: "#FFE2EF",
   cancer: "#FDECCA",
-  biochemical: "#FADECA",
+  biochemicalMetabolic: "#FADECA",
   prenatal: "#edbbc1",
   adult: "#b2dbd3",
   psychiatric: "#e3baaa",
@@ -64,7 +65,6 @@ const serviceColors = {
   ophthalmic: "##cc85c7",
   research: "#77a38d",
   pharmacogenomics: "#c6d979",
-  metabolic: "##6a9174",
   other: "#FFFFFF",
 };
 
@@ -101,6 +101,7 @@ export const MembersTablePage = ({ adminsView }: { adminsView: boolean }) => {
     "Information",
   );
   const [users, setUsers] = useState<User[]>();
+  const [isLoadingUsers, setIsLoadingUsers] = useState(true);
   const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({});
   const [approvingMembers, setApprovingMembers] = useState<User[]>([]);
   const [denyingMembers, setDenyingMembers] = useState<User[]>([]);
@@ -192,6 +193,7 @@ export const MembersTablePage = ({ adminsView }: { adminsView: boolean }) => {
   const loadUsers = useCallback(async () => {
     if (!firebaseUser) return;
 
+    setIsLoadingUsers(true);
     setErrorMessage("");
     try {
       const token = await firebaseUser.getIdToken();
@@ -213,6 +215,8 @@ export const MembersTablePage = ({ adminsView }: { adminsView: boolean }) => {
       }
     } catch (error) {
       setErrorMessage(`${t("failed-to-fetch-users")}: ${String(error)}`);
+    } finally {
+      setIsLoadingUsers(false);
     }
   }, [adminsView, firebaseUser, search, sort, page, directoryOnly, activeTab, activeFilters, t]);
 
@@ -910,7 +914,9 @@ export const MembersTablePage = ({ adminsView }: { adminsView: boolean }) => {
         )}
       </div>
 
-      {users && (
+      {isLoadingUsers && <LoadingIndicator />}
+
+      {!isLoadingUsers && users && (
         <Table
           className={styles.membersTable}
           enableRowSelection
@@ -1041,7 +1047,7 @@ export const MembersTablePage = ({ adminsView }: { adminsView: boolean }) => {
         />
       )}
 
-      {users && users.length === 0 && <p>{t("no-users-found")}</p>}
+      {!isLoadingUsers && users && users.length === 0 && <p>{t("no-users-found")}</p>}
 
       <Pagination currentPage={page} numPages={numPages} onPageChange={setPage} />
       {errorMessage && <div className="text-red-500">{errorMessage}</div>}
