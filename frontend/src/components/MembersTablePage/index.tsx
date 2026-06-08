@@ -535,7 +535,7 @@ export const MembersTablePage = ({ adminsView }: { adminsView: boolean }) => {
             </div>
             <div className="flex flex-row gap-8 items-center">
               <ProfilePicture user={sidebarUser} size="large" />
-              <div className="flex flex-col gap-1">
+              <div className="flex flex-col gap-1 max-w-[200px]">
                 <p className="font-bold text-2xl">{formatUserFullName(sidebarUser)}</p>
                 <p className="text-base">
                   {t(membershipDisplayMap[sidebarUser.account.membership])}
