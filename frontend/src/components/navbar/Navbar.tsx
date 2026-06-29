@@ -75,7 +75,7 @@ const adminItems: CardProps[] = [...memberItems, MembersProps];
 
 const superAdminItems: CardProps[] = [...adminItems, AdminsProps];
 
-const onboardingStepLabels = ["account-setup", "personal-info", "membership"];
+const onboardingStepLabels = ["account-setup", "membership-rules", "personal-info", "membership"];
 const directoryStepLabels = [...onboardingStepLabels, "directory"];
 
 type NavbarProps = {
@@ -141,7 +141,7 @@ export const Navbar: React.FC<NavbarProps> = ({ isMobileOpen = false, onClose })
           <VerticalStepper steps={onboardingStepLabels} activeStep={onboardingStep} /> // Set Active Step here
         );
       case NavStateType.directory:
-        return <VerticalStepper steps={directoryStepLabels} activeStep={3} />;
+        return <VerticalStepper steps={directoryStepLabels} activeStep={4} />;
       case NavStateType.blank:
       case NavStateType.hidden:
         return null;

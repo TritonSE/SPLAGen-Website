@@ -1,4 +1,7 @@
 {
+  "rules-path": "/membership-rules-pt.md",
+  "rules-failed": "Falha ao carregar as regras",
+  "i-accept-rules": "Aceito estas regras",
   "welcome": "Bem-vindo",
   "overview": "Visão Geral",
   "dashboard": "Painel de Controle",
@@ -7,6 +10,7 @@
   "members": "Membros",
   "admins": "Administradores",
   "account-setup": "Configuração de Conta",
+  "membership-rules": "Regras da Associação",
   "personal-info": "Informações Pessoais",
   "membership": "Associação",
   "directory": "Diretório",

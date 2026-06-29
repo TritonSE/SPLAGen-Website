@@ -61,17 +61,3 @@
   margin-left: 10px;
   font-weight: 500;
 }
-
-@media (max-width: 550px) {
-  .doneText {
-    display: none;
-  }
-
-  .currentText {
-    display: none;
-  }
-
-  .stepText {
-    display: none;
-  }
-}

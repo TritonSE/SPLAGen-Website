@@ -1,10 +1,12 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Radio } from "@tritonse/tse-constellation";
 import { useStateMachine } from "little-state-machine";
 import { useCallback, useContext, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
+import { z } from "zod";
 
 import styles from "./Associate.module.css";
 
@@ -12,11 +14,20 @@ import { updateAssociateInfo } from "@/api/users";
 import { Button } from "@/components";
 import { SPECIALIZATIONS } from "@/constants/specializations";
 import { UserContext } from "@/contexts/userContext";
-import { onboardingState } from "@/state/stateTypes";
 import updateOnboardingForm from "@/state/updateOnboardingForm";
 
+const formSchema = (t: (key: string) => string) =>
+  z.object({
+    jobTitle: z.string().min(1, t("job-title-required")),
+    specializations: z.array(z.string()).min(1, t("select-at-least-one-specialization-required")),
+    isOrganizationRepresentative: z.string().min(1, t("please-select-option")),
+    organizationName: z.string().optional(),
+  });
+
+type FormData = z.infer<ReturnType<typeof formSchema>>;
+
 type AssociateProps = {
-  onNext: (data: onboardingState["data"]) => void;
+  onNext: (data: FormData) => void;
 };
 
 export const Associate = ({ onNext }: AssociateProps) => {
@@ -26,12 +37,21 @@ export const Associate = ({ onNext }: AssociateProps) => {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [isSubmittingApi, setIsSubmittingApi] = useState(false);
 
-  const { register, handleSubmit, control, watch, setValue } = useForm({
+  const {
+    register,
+    handleSubmit,
+    control,
+    watch,
+    setValue,
+    formState: { isValid, errors },
+  } = useForm({
+    resolver: zodResolver(formSchema(t)),
     defaultValues: state.onboardingForm,
+    mode: "onChange",
   });
 
   const onSubmit = useCallback(
-    async (data: onboardingState["data"]) => {
+    async (data: FormData) => {
       actions.updateOnboardingForm(data);
 
       if (!firebaseUser) {
@@ -47,7 +67,7 @@ export const Associate = ({ onNext }: AssociateProps) => {
           jobTitle: data.jobTitle || "",
           specialization: data.specializations || [],
           isOrganizationRepresentative: data.isOrganizationRepresentative || "",
-          organizationName: data.organizationName || "",
+          organizationName: data.organizationName ?? "",
         });
         if (!result.success) {
           setSubmitError(result.error || t("registration-failed"));
@@ -88,14 +108,14 @@ export const Associate = ({ onNext }: AssociateProps) => {
         currentSpecializations.splice(index, 1);
       }
 
-      setValue("specializations", currentSpecializations);
+      setValue("specializations", currentSpecializations, { shouldValidate: true });
     },
     [setValue, watchSpecializations],
   );
 
   const handleRepresentativeSelection = useCallback(
     (value: string) => {
-      setValue("isOrganizationRepresentative", value);
+      setValue("isOrganizationRepresentative", value, { shouldValidate: true });
     },
     [setValue],
   );
@@ -114,6 +134,7 @@ export const Associate = ({ onNext }: AssociateProps) => {
             className={styles.input}
             placeholder={t("associate-job-title-placeholder")}
           />
+          <p className={styles.errorText}>{errors.jobTitle ? errors.jobTitle.message : "\u00A0"}</p>
         </div>
 
         <div>
@@ -142,6 +163,9 @@ export const Associate = ({ onNext }: AssociateProps) => {
               </div>
             )}
           />
+          <p className={styles.errorText}>
+            {errors.specializations ? errors.specializations.message : "\u00A0"}
+          </p>
         </div>
 
         <div>
@@ -164,6 +188,11 @@ export const Associate = ({ onNext }: AssociateProps) => {
               }}
             />
           </div>
+          <p className={styles.errorText}>
+            {errors.isOrganizationRepresentative
+              ? errors.isOrganizationRepresentative.message
+              : "\u00A0"}
+          </p>
         </div>
 
         <div>
@@ -173,6 +202,9 @@ export const Associate = ({ onNext }: AssociateProps) => {
             className={styles.input}
             placeholder={t("organization-name-placeholder")}
           />
+          <p className={styles.errorText}>
+            {errors.organizationName ? errors.organizationName.message : "\u00A0"}
+          </p>
         </div>
 
         {submitError && <p style={{ color: "red" }}>{submitError}</p>}
@@ -180,7 +212,7 @@ export const Associate = ({ onNext }: AssociateProps) => {
         <div className={styles.buttonContainer}>
           <Button
             type="submit"
-            disabled={isSubmittingApi}
+            disabled={!isValid || isSubmittingApi}
             label={isSubmittingApi ? t("loading") : t("continue")}
           />
         </div>

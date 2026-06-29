@@ -24,9 +24,8 @@ export const RootLayoutComponent = ({
     [pathname],
   );
   const isDirectoryMap = useMemo(() => pathname.startsWith("/directoryMap"), [pathname]);
-  // Hide mobile header on full-screen pages (onboarding flow handles its own layout,
-  // directoryMap has no sidebar at all)
-  const showMobileHeader = !isOnboardingFlow && !isDirectoryMap;
+  // Hide mobile header on directoryMap page since it has no sidebar
+  const showMobileHeader = !isDirectoryMap;
 
   return (
     <html lang="en">

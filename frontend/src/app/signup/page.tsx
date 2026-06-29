@@ -15,6 +15,7 @@ import {
   SignUp,
   Student,
 } from "@/components/onboardingForm";
+import { MembershipRules } from "@/components/onboardingForm/MembershipRules";
 import { UserContext } from "@/contexts/userContext";
 import { onboardingState } from "@/state/stateTypes";
 import updateOnboardingForm from "@/state/updateOnboardingForm";
@@ -36,7 +37,7 @@ export default function OnboardingForm() {
   useEffect(() => {
     if (loadingUser) return;
     if (user?.account?.membership === "pending" && step === 0) {
-      setStep(2);
+      setStep(3);
     }
   }, [loadingUser, user, step]);
 
@@ -61,20 +62,22 @@ export default function OnboardingForm() {
       setOnboardingStep(1);
     } else if (step === 2) {
       setOnboardingStep(2);
+    } else if (step === 3) {
+      setOnboardingStep(3);
     }
   }, [step, setOnboardingStep]);
 
   // Special flow handlers for Student and Associate Member paths
   const handleStudentFlow = useCallback(() => {
-    setStep(2.1); // Use decimal to represent the student sub-step
+    setStep(3.1); // Use decimal to represent the student sub-step
   }, [setStep]);
 
   const handleAssociateFlow = useCallback(() => {
-    setStep(2.2);
+    setStep(3.2);
   }, [setStep]);
 
   const continueFromIntermediateStep = useCallback(() => {
-    setStep(3); // Go to Step3A after either intermediate step
+    setStep(4); // Go to Step4A after either intermediate step
   }, [setStep]);
 
   // Handle registration status changes
@@ -90,7 +93,7 @@ export default function OnboardingForm() {
           state.onboardingForm?.membership === "Other Genetics Professional" ||
           state.onboardingForm?.membership === "Healthcare Professional"
         ) {
-          setStep(4);
+          setStep(5);
         } else {
           setSuccessMessage(t("registration-submitted"));
           router.push("/");
@@ -120,7 +123,8 @@ export default function OnboardingForm() {
       {renderRegistrationMessage()}
 
       {step === 0 && <SignUp onNext={handleNext} />}
-      {step === 1 && (
+      {step === 1 && <MembershipRules onBack={handleBack} onNext={handleNext} />}
+      {step === 2 && (
         <Basics
           onBack={handleBack}
           onNext={handleNext}
@@ -128,7 +132,7 @@ export default function OnboardingForm() {
         />
       )}
 
-      {step === 2 && (
+      {step === 3 && (
         <Questionnaire
           onNext={handleNext}
           onStudentFlow={handleStudentFlow}
@@ -136,13 +140,13 @@ export default function OnboardingForm() {
         />
       )}
 
-      {step === 2.1 && <Student onNext={continueFromIntermediateStep} />}
+      {step === 3.1 && <Student onNext={continueFromIntermediateStep} />}
 
-      {step === 2.2 && <Associate onNext={continueFromIntermediateStep} />}
+      {step === 3.2 && <Associate onNext={continueFromIntermediateStep} />}
 
-      {step === 3 && <Category onStatusChange={handleRegistrationStatusChange} />}
+      {step === 4 && <Category onStatusChange={handleRegistrationStatusChange} />}
 
-      {step === 4 && (
+      {step === 5 && (
         <ContinueToDirectory
           onNo={() => {
             router.push("/");

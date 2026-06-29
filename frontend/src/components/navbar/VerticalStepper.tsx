@@ -1,11 +1,11 @@
 import { Step } from "./Step";
 import styles from "./VerticalStepper.module.css";
 
-export type OnboardingStep = 0 | 1 | 2;
+export type OnboardingStep = 0 | 1 | 2 | 3;
 
 type VerticalStepperProps = {
   steps: string[];
-  activeStep: OnboardingStep | 3;
+  activeStep: OnboardingStep | 4;
 };
 
 export const VerticalStepper: React.FC<VerticalStepperProps> = ({ steps, activeStep }) => {
