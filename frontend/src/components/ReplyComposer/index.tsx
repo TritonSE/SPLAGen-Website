@@ -12,7 +12,7 @@ import { Reply, createReply, updateReply } from "@/api/reply";
 import { UserContext } from "@/contexts/userContext";
 
 const replySchema = z.object({
-  message: z.string().min(1).max(500),
+  message: z.string().min(1).max(4000),
 });
 type ReplyFormData = z.infer<typeof replySchema>;
 

@@ -14,8 +14,8 @@ import { UserContext } from "@/contexts/userContext";
 
 // Schema
 const postSchema = z.object({
-  title: z.string().min(1).max(50),
-  message: z.string().min(1).max(500),
+  title: z.string().min(1).max(400),
+  message: z.string().min(1).max(4000),
 });
 type PostFormData = z.infer<typeof postSchema>;
 
