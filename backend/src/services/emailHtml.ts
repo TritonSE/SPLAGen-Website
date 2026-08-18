@@ -88,7 +88,7 @@ const DIRECTORY_APPROVAL_EMAIL: LocalizedTemplate = {
 
 <p style="margin-bottom: 20px;"> We are delighted to inform you that you have been added to the Latin American Professional Society for Genetic Counseling (SPLAGen) directory. </p>
 
-<p style="margin-bottom: 20px;"> You can view the information posted in our directory here: <a href="https://www.splagen.org/en/en/directory">https://www.splagen.org/en/en/directory</a> </p>
+<p style="margin-bottom: 20px;"> You can view the information posted in our directory here: <a href="https://www.splagen.org/en/directorio">https://www.splagen.org/en/directorio</a> </p>
 
 <p style="margin-bottom: 20px;"> Your information for the directory can always be edited by going to the membership portal and clicking your profile picture in the top right corner. </p>
 
@@ -102,7 +102,7 @@ const DIRECTORY_APPROVAL_EMAIL: LocalizedTemplate = {
 
 <p style="margin-bottom: 20px;"> Nos complace informarle que ha sido añadido/a al directorio de la Sociedad Profesional Latinoamericana de Asesoramiento Genético (SPLAGen). </p>
 
-<p style="margin-bottom: 20px;"> Puede ver la información publicada en nuestro directorio aquí: <a href="https://www.splagen.org/en/es/directory">https://www.splagen.org/en/es/directory</a> </p>
+<p style="margin-bottom: 20px;"> Puede ver la información publicada en nuestro directorio aquí: <a href="https://www.splagen.org/es/directorio">https://www.splagen.org/es/directorio</a> </p>
 
 <p style="margin-bottom: 20px;"> Su información en el directorio siempre puede editarse accediendo al portal de membresía y haciendo clic en su foto de perfil en la esquina superior derecha. </p>
 
@@ -116,7 +116,7 @@ const DIRECTORY_APPROVAL_EMAIL: LocalizedTemplate = {
 
 <p style="margin-bottom: 20px;"> Temos o prazer de informar que você foi adicionado/a ao diretório da Sociedade Profissional Latino-americana de Aconselhamento Genético (SPLAGen). </p>
 
-<p style="margin-bottom: 20px;"> Você pode visualizar as informações publicadas em nosso diretório aqui: <a href="https://www.splagen.org/en/pt/directory">https://www.splagen.org/en/pt/directory</a> </p>
+<p style="margin-bottom: 20px;"> Você pode visualizar as informações publicadas em nosso diretório aqui: <a href="https://www.splagen.org/pt/directorio">https://www.splagen.org/pt/directorio</a> </p>
 
 <p style="margin-bottom: 20px;"> Suas informações no diretório sempre podem ser editadas acessando o portal de membros e clicando na sua foto de perfil no canto superior direito. </p>
 
