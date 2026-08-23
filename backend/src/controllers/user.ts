@@ -65,6 +65,37 @@ export const createUser = async (
   }
 };
 
+/**
+ * Checks whether an account already exists for the given email address, using
+ * the Firebase Admin SDK. Used by the signup form to warn the user before
+ * they fill out the whole form, rather than failing at the very end.
+ */
+export const checkEmailExists = async (
+  req: Request<unknown, unknown, unknown, { email: string }>,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { email } = req.query;
+
+    try {
+      await firebaseAdminAuth.getUserByEmail(email);
+      res.status(200).json({ exists: true });
+      return;
+    } catch (error) {
+      if ((error as { code?: string }).code === "auth/user-not-found") {
+        res.status(200).json({ exists: false });
+        return;
+      }
+      throw error;
+    }
+  } catch (error) {
+    console.error("Error checking if email exists:", error);
+    next(error);
+    return;
+  }
+};
+
 export const getWhoAmI = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
     const { firebaseUid } = req;
@@ -512,6 +543,18 @@ type UpdateStudentInfoRequestBody = {
   gradDate: string;
 };
 
+// The onboarding/edit forms show "MS" for the masters option (to match how
+// it's commonly abbreviated), but the database enum spells it out as
+// "masters". Other degree options (PhD, MD) already match once lowercased.
+const DEGREE_TO_DB_VALUE: Record<string, string> = {
+  ms: "masters",
+};
+
+const normalizeDegree = (degree: string): string => {
+  const lowercased = degree.toLowerCase();
+  return DEGREE_TO_DB_VALUE[lowercased] ?? lowercased;
+};
+
 export const updateStudentInfo = async (
   req: AuthenticatedRequest<unknown, unknown, UpdateStudentInfoRequestBody>,
   res: Response,
@@ -540,7 +583,7 @@ export const updateStudentInfo = async (
         "education.schoolCountry": schoolCountry,
         "education.institution": schoolName,
         "education.email": universityEmail,
-        "education.degree": degree.toLowerCase(),
+        "education.degree": normalizeDegree(degree),
         "education.program": programName,
         "education.gradDate": gradDate,
       },

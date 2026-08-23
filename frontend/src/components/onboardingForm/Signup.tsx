@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useStateMachine } from "little-state-machine";
 import Link from "next/link";
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { isValidPhoneNumber } from "react-phone-number-input";
@@ -11,9 +11,14 @@ import { z } from "zod";
 
 import style from "./SignUp.module.css";
 
+import { checkEmailExists } from "@/api/users";
 import { Button, PhoneInput } from "@/components";
 import { onboardingState } from "@/state/stateTypes";
 import updateOnboardingForm from "@/state/updateOnboardingForm";
+
+// How long to wait after the user stops typing their email before checking
+// whether an account with it already exists.
+const EMAIL_CHECK_DEBOUNCE_MS = 500;
 
 type SignUpProps = {
   onNext: (data: onboardingState["data"]) => void;
@@ -60,12 +65,53 @@ export const SignUp = ({ onNext }: SignUpProps) => {
     control,
     register,
     handleSubmit,
+    watch,
     formState: { errors, isValid },
   } = useForm<BasicFormData>({
     resolver: zodResolver(formSchema(t)),
     defaultValues: state.onboardingForm,
     mode: "onChange",
   });
+
+  // Tracks whether the currently-entered email address is already associated
+  // with an existing account, so we can warn the user before they fill out
+  // the rest of the signup flow.
+  const [emailCheckStatus, setEmailCheckStatus] = useState<
+    "idle" | "checking" | "available" | "exists" | "error"
+  >("idle");
+  const emailBeingChecked = useRef<string | null>(null);
+
+  const watchedEmail = watch("email");
+  const isEmailFormatValid = !errors.email && Boolean(watchedEmail);
+
+  useEffect(() => {
+    if (!isEmailFormatValid) {
+      setEmailCheckStatus("idle");
+      return;
+    }
+
+    setEmailCheckStatus("checking");
+    const email = watchedEmail;
+
+    const timeoutId = setTimeout(() => {
+      emailBeingChecked.current = email;
+      void checkEmailExists(email).then((result) => {
+        // Ignore stale responses for an email the user has since changed.
+        if (emailBeingChecked.current !== email) {
+          return;
+        }
+        if (!result.success) {
+          setEmailCheckStatus("error");
+          return;
+        }
+        setEmailCheckStatus(result.data.exists ? "exists" : "available");
+      });
+    }, EMAIL_CHECK_DEBOUNCE_MS);
+
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [watchedEmail, isEmailFormatValid]);
 
   const onSubmit = useCallback(
     (data: BasicFormData) => {
@@ -84,9 +130,14 @@ export const SignUp = ({ onNext }: SignUpProps) => {
   const handleFormSubmit = useCallback(
     (e: React.FormEvent) => {
       e.preventDefault();
+      // Don't let the user continue with an email that's already taken, or
+      // while we're still waiting to find out.
+      if (emailCheckStatus === "exists" || emailCheckStatus === "checking") {
+        return;
+      }
       void handleSubmit(onSubmit)();
     },
-    [handleSubmit, onSubmit],
+    [emailCheckStatus, handleSubmit, onSubmit],
   );
 
   return (
@@ -140,7 +191,13 @@ export const SignUp = ({ onNext }: SignUpProps) => {
               placeholder={t("enter-email")}
               autoComplete="email"
             />
-            <p className={style.errorText}>{errors.email ? errors.email.message : "\u00A0"}</p>
+            <p className={style.errorText}>
+              {errors.email
+                ? errors.email.message
+                : emailCheckStatus === "exists"
+                  ? t("email-already-exists")
+                  : ""}
+            </p>
           </div>
 
           <div className={style.inputGroup}>
@@ -186,7 +243,13 @@ export const SignUp = ({ onNext }: SignUpProps) => {
           </span>
 
           <div className={style.buttonContainer}>
-            <Button type="submit" disabled={!isValid} label={t("continue")} />
+            <Button
+              type="submit"
+              disabled={
+                !isValid || emailCheckStatus === "exists" || emailCheckStatus === "checking"
+              }
+              label={t("continue")}
+            />
           </div>
         </form>
       </div>

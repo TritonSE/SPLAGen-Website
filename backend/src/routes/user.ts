@@ -15,6 +15,7 @@ const router = express.Router();
  * GET /api/users/:id - Get specific user from directory
  */
 
+router.get("/email-exists", UserValidator.checkEmailExists, UserController.checkEmailExists);
 router.get("/whoami", requireSignedIn, UserController.getWhoAmI);
 router.get(
   "/filterOptions",

@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Radio } from "@tritonse/tse-constellation";
 import { useStateMachine } from "little-state-machine";
 import dynamic from "next/dynamic";
+import Image from "next/image";
 import { useCallback, useContext, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
@@ -53,9 +54,15 @@ type FormData = {
 
 type StudentProps = {
   onNext: (data: FormData) => void;
+  // "edit" (default) PATCHes student info onto the current, already-existing
+  // account right away. "create" just stores it locally, since the account
+  // doesn't exist yet (used by the signup flow).
+  mode?: "edit" | "create";
+  // If provided, shows a back button that calls this instead of submitting.
+  onBack?: () => void;
 };
 
-export const Student = ({ onNext }: StudentProps) => {
+export const Student = ({ onNext, mode = "edit", onBack }: StudentProps) => {
   const { t } = useTranslation();
   const { state, actions } = useStateMachine({ actions: { updateOnboardingForm } });
   const { firebaseUser } = useContext(UserContext);
@@ -80,37 +87,39 @@ export const Student = ({ onNext }: StudentProps) => {
     async (data: FormData) => {
       actions.updateOnboardingForm(data);
 
-      if (!firebaseUser) {
-        setSubmitError(t("registration-failed"));
-        return;
-      }
-      setSubmitError(null);
-      setIsSubmittingApi(true);
-
-      try {
-        const token = await firebaseUser.getIdToken();
-        const result = await updateStudentInfo(token, {
-          schoolCountry: data.schoolCountry.value,
-          schoolName: data.schoolName,
-          universityEmail: data.universityEmail,
-          degree: data.degree,
-          programName: data.programName,
-          gradDate: data.graduationDate,
-        });
-        if (!result.success) {
-          setSubmitError(result.error || t("registration-failed"));
+      if (mode === "edit") {
+        if (!firebaseUser) {
+          setSubmitError(t("registration-failed"));
           return;
         }
-      } catch {
-        setSubmitError(t("registration-failed"));
-        return;
-      } finally {
-        setIsSubmittingApi(false);
+        setSubmitError(null);
+        setIsSubmittingApi(true);
+
+        try {
+          const token = await firebaseUser.getIdToken();
+          const result = await updateStudentInfo(token, {
+            schoolCountry: data.schoolCountry.value,
+            schoolName: data.schoolName,
+            universityEmail: data.universityEmail,
+            degree: data.degree,
+            programName: data.programName,
+            gradDate: data.graduationDate,
+          });
+          if (!result.success) {
+            setSubmitError(result.error || t("registration-failed"));
+            return;
+          }
+        } catch {
+          setSubmitError(t("registration-failed"));
+          return;
+        } finally {
+          setIsSubmittingApi(false);
+        }
       }
 
       onNext(data);
     },
-    [actions, onNext, firebaseUser, t],
+    [actions, onNext, firebaseUser, mode, t],
   );
 
   const handleFormSubmit = useCallback(
@@ -241,6 +250,13 @@ export const Student = ({ onNext }: StudentProps) => {
         {submitError && <p className={styles.errorText}>{submitError}</p>}
 
         <div className={styles.buttonContainer}>
+          {onBack && (
+            <button type="button" onClick={onBack} className={styles.backButton}>
+              <Image src="/icons/ic_caretleft.svg" alt="Back Icon" width={24} height={24} />
+              {t("back")}
+            </button>
+          )}
+
           <Button
             type="submit"
             disabled={!isValid || isSubmittingApi}

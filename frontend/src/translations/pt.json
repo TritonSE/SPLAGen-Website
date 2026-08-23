@@ -571,5 +571,9 @@
   "ophthalmic": "Genética Oftálmica",
   "pharmacogenomics": "Farmacogenômica",
   "membership-update-message": "Sua categoria de associação será atualizada para um {{membership}}.",
+  "choose-membership-category": "Escolher Categoria de Associação",
+  "membership-choose-message": "Sua categoria de associação será definida como {{membership}}.",
+  "unsaved-changes-warning": "Você ainda não terminou de criar sua conta. Se sair agora, seu progresso será perdido. Tem certeza de que deseja sair?",
+  "email-already-exists": "Já existe uma conta com este e-mail.",
   "confirm-and-update": "Confirmar e Atualizar"
 }

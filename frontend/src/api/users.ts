@@ -22,6 +22,16 @@ export const membershipDisplayMap: Record<string, string> = {
   associate: "associate-membership",
 };
 
+// Maps the human-readable membership category names used in the onboarding
+// state machine to the values expected by the backend/database.
+export const DISPLAY_TO_DB_MEMBERSHIP: Record<string, MembershipType> = {
+  "Genetic Counselor": "geneticCounselor",
+  "Other Genetics Professional": "otherGeneticsProfessional",
+  "Healthcare Professional": "healthcareProfessional",
+  Student: "student",
+  "Associate Member": "associate",
+};
+
 export const professionalTitleOptions = [
   { value: "medical_geneticist", label: "medical-geneticist" },
   { value: "genetic_counselor", label: "genetic-counselor-title" },
@@ -254,6 +264,23 @@ export const signUpUser = async (userData: CreateUserRequestBody): Promise<APIRe
   try {
     const response = await post("/api/users", userData);
     const data = (await response.json()) as User;
+    return { success: true, data };
+  } catch (error) {
+    return handleAPIError(error);
+  }
+};
+
+/**
+ * Checks whether an account already exists for the given email address.
+ * Used on the signup form to warn the user before they fill out the rest of
+ * the form.
+ * @param email The email address to check
+ * @returns API result with a boolean indicating whether the email is taken
+ */
+export const checkEmailExists = async (email: string): Promise<APIResult<{ exists: boolean }>> => {
+  try {
+    const response = await get(`/api/users/email-exists?email=${encodeURIComponent(email)}`);
+    const data = (await response.json()) as { exists: boolean };
     return { success: true, data };
   } catch (error) {
     return handleAPIError(error);

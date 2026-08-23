@@ -53,6 +53,13 @@
   display: inline;
 }
 
+.errorText {
+  font-size: 0.875rem;
+  color: var(--color-error);
+  text-align: center;
+  margin: 0;
+}
+
 .buttonContainer {
   display: flex;
   flex-direction: row;

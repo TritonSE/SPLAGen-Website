@@ -10,10 +10,16 @@ import styles from "./Category.module.css";
 import { Button } from "@/components/Button";
 
 type CategoryProps = {
-  onStatusChange: (status: "idle" | "submitting" | "success" | "error") => void;
+  // Called when the user clicks "Continue" to actually create their account.
+  onContinue: () => void | Promise<void>;
+  isSubmitting?: boolean;
+  error?: string | null;
+  // If provided, shows a back button that returns to the appropriate
+  // previous step (e.g. the Student/Associate sub-form) instead of continuing.
+  onBack?: () => void;
 };
 
-export const Category: React.FC<CategoryProps> = ({ onStatusChange }) => {
+export const Category: React.FC<CategoryProps> = ({ onContinue, isSubmitting, error, onBack }) => {
   const { state } = useStateMachine();
   const { t } = useTranslation();
 
@@ -48,12 +54,27 @@ export const Category: React.FC<CategoryProps> = ({ onStatusChange }) => {
           <span className={styles.membershipCategory}>{membershipText}</span>.
         </p>
 
+        {error && <p className={styles.errorText}>{error}</p>}
+
         <div className={styles.buttonContainer}>
+          {onBack && (
+            <button
+              type="button"
+              onClick={onBack}
+              className={styles.backButton}
+              disabled={isSubmitting}
+            >
+              <Image src="/icons/ic_caretleft.svg" alt="Back Icon" width={24} height={24} />
+              {t("back")}
+            </button>
+          )}
+
           <Button
             onClick={() => {
-              onStatusChange("success");
+              void onContinue();
             }}
-            label={t("continue")}
+            disabled={isSubmitting}
+            label={isSubmitting ? t("loading") : t("continue")}
           />
         </div>
       </div>

@@ -29,7 +29,11 @@ export const EditMembershipCategory: React.FC<EditMembershipCategoryProps> = ({
 }) => {
   const { t } = useTranslation();
   const { state } = useStateMachine();
-  const { reloadUser } = useContext(UserContext);
+  const { reloadUser, user } = useContext(UserContext);
+
+  // If the user's membership was still "pending" when they landed on this flow,
+  // this is their first time choosing a category rather than editing one.
+  const isInitialSelection = user?.account?.membership === "pending";
 
   const membershipType = state.onboardingForm.membership;
   const membershipKey = useMemo(() => membershipMap[membershipType], [membershipType]);
@@ -37,14 +41,16 @@ export const EditMembershipCategory: React.FC<EditMembershipCategoryProps> = ({
   return (
     <div className={styles.darkContainer}>
       <div className={styles.container}>
-        <h2 className={styles.welcome}>{t("update-membership-category")}</h2>
+        <h2 className={styles.welcome}>
+          {t(isInitialSelection ? "choose-membership-category" : "update-membership-category")}
+        </h2>
 
         <div className={styles.iconContainer}>
           <Image src="/icons/ic_success.svg" alt="Checkbox icon" width={81} height={81} />
         </div>
 
         <p className={styles.text}>
-          {t("membership-update-message", {
+          {t(isInitialSelection ? "membership-choose-message" : "membership-update-message", {
             membership: t(membershipDisplayMap[membershipKey]),
           })}
         </p>

@@ -1,4 +1,4 @@
-import { body, param } from "express-validator";
+import { body, param, query } from "express-validator";
 
 import { validateRequest } from "./validateRequestHelper";
 
@@ -51,6 +51,11 @@ export const createUser = [
 
 export const deleteUser = [
   param("id").notEmpty().withMessage("Valid user ID is required"),
+  validateRequest,
+];
+
+export const checkEmailExists = [
+  query("email").isEmail().withMessage("Valid email is required"),
   validateRequest,
 ];
 

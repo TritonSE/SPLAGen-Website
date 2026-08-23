@@ -8,6 +8,7 @@ import { UserContext } from "@/contexts/userContext";
 export const LOGIN_URL = "/login";
 export const HOME_URL = "/";
 export const SIGNUP_URL = "/signup";
+export const EDIT_MEMBERSHIP_URL = "/editMembership";
 
 /**
  * An interface for the user's current authentication credentials
@@ -59,16 +60,23 @@ export const useRedirectToHomeIfSignedIn = () => {
 
 /**
  * A hook that redirects the user to the login page if they are not signed in,
- * or to the signup page if they have an incomplete (pending) onboarding.
+ * or to the edit membership page if they have an account without a chosen
+ * membership category yet (a "pending" membership left over from before
+ * signup required choosing a category up-front).
+ *
+ * Pass `skipPendingRedirect: true` on pages (like the edit membership page
+ * itself) that are meant to handle pending-membership users directly, to
+ * avoid an unnecessary redirect loop.
  */
-export const useRedirectToLoginIfNotSignedIn = () => {
+export const useRedirectToLoginIfNotSignedIn = (options?: { skipPendingRedirect?: boolean }) => {
   useRedirection({
     checkShouldRedirect: ({ firebaseUser, user }) => firebaseUser === null || user === null,
     redirectURL: LOGIN_URL,
   });
   useRedirection({
-    checkShouldRedirect: ({ user }) => user?.account?.membership === "pending",
-    redirectURL: SIGNUP_URL,
+    checkShouldRedirect: ({ user }) =>
+      !options?.skipPendingRedirect && user?.account?.membership === "pending",
+    redirectURL: EDIT_MEMBERSHIP_URL,
   });
 };
 

@@ -19,7 +19,9 @@ import updateOnboardingForm from "@/state/updateOnboardingForm";
 import "@/app/globals.css";
 
 export default function EditMembershipPage() {
-  useRedirectToLoginIfNotSignedIn();
+  // Skip the pending-membership redirect here, since this page is where
+  // pending-membership users are sent to choose their initial category.
+  useRedirectToLoginIfNotSignedIn({ skipPendingRedirect: true });
 
   const router = useRouter();
   const { state, actions } = useStateMachine({ actions: { updateOnboardingForm } });

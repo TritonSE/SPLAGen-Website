@@ -564,5 +564,9 @@
   "ophthalmic": "Ophthalmic Genetics",
   "pharmacogenomics": "Pharmacogenomics",
   "membership-update-message": "Your membership category will be updated to a {{membership}}.",
+  "choose-membership-category": "Choose Membership Category",
+  "membership-choose-message": "Your membership category will be set to a {{membership}}.",
+  "unsaved-changes-warning": "You haven't finished creating your account yet. If you leave now, your progress will be lost. Are you sure you want to leave?",
+  "email-already-exists": "An account with this email already exists.",
   "confirm-and-update": "Confirm and Update"
 }

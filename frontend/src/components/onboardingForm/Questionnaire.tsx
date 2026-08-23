@@ -1,35 +1,37 @@
 "use client";
 import { Radio } from "@tritonse/tse-constellation";
 import { useStateMachine } from "little-state-machine";
+import Image from "next/image";
 import { useCallback, useContext, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import styles from "./Questionnaire.module.css";
 
-import { MembershipType, editMembership } from "@/api/users";
+import { DISPLAY_TO_DB_MEMBERSHIP, editMembership } from "@/api/users";
 import { Button } from "@/components";
 import { UserContext } from "@/contexts/userContext";
 import { onboardingState } from "@/state/stateTypes";
 import updateOnboardingForm from "@/state/updateOnboardingForm";
 
-const DISPLAY_TO_DB_MEMBERSHIP: Record<string, MembershipType> = {
-  "Genetic Counselor": "geneticCounselor",
-  "Other Genetics Professional": "otherGeneticsProfessional",
-  "Healthcare Professional": "healthcareProfessional",
-  Student: "student",
-  "Associate Member": "associate",
-};
-
 type QuestionnaireProps = {
   onNext: (data: onboardingState["data"]) => void;
   onStudentFlow: () => void;
   onAssociateFlow: () => void;
+  // "edit" (default) PATCHes the membership onto the current, already-existing
+  // account right away (used by the edit membership flow). "create" just stores
+  // the chosen category locally, since the account doesn't exist yet (used by
+  // the signup flow, which creates the account only after a category is chosen).
+  mode?: "edit" | "create";
+  // If provided, shows a back button that calls this instead of continuing.
+  onBack?: () => void;
 };
 
 export const Questionnaire: React.FC<QuestionnaireProps> = ({
   onNext,
   onStudentFlow,
   onAssociateFlow,
+  mode = "edit",
+  onBack,
 }) => {
   const { t } = useTranslation();
   const { state, actions } = useStateMachine({ actions: { updateOnboardingForm } });
@@ -96,27 +98,29 @@ export const Questionnaire: React.FC<QuestionnaireProps> = ({
     };
     actions.updateOnboardingForm(updatedData);
 
-    // PATCH the user's membership on the backend before navigating
-    if (!firebaseUser) {
-      setSubmitError(t("registration-failed"));
-      return;
-    }
-    setSubmitError(null);
-    setIsSubmitting(true);
-
-    try {
-      const token = await firebaseUser.getIdToken();
-      const result = await editMembership(DISPLAY_TO_DB_MEMBERSHIP[membershipCategory], token);
-      if (!result.success) {
-        setSubmitError(result.error || t("registration-failed"));
+    if (mode === "edit") {
+      // PATCH the user's membership on the backend before navigating
+      if (!firebaseUser) {
+        setSubmitError(t("registration-failed"));
         return;
       }
-      reloadUser();
-    } catch {
-      setSubmitError(t("registration-failed"));
-      return;
-    } finally {
-      setIsSubmitting(false);
+      setSubmitError(null);
+      setIsSubmitting(true);
+
+      try {
+        const token = await firebaseUser.getIdToken();
+        const result = await editMembership(DISPLAY_TO_DB_MEMBERSHIP[membershipCategory], token);
+        if (!result.success) {
+          setSubmitError(result.error || t("registration-failed"));
+          return;
+        }
+        reloadUser();
+      } catch {
+        setSubmitError(t("registration-failed"));
+        return;
+      } finally {
+        setIsSubmitting(false);
+      }
     }
 
     if (membershipCategory === "Student") {
@@ -135,6 +139,7 @@ export const Questionnaire: React.FC<QuestionnaireProps> = ({
     onNext,
     onStudentFlow,
     onAssociateFlow,
+    mode,
     t,
   ]);
 
@@ -254,6 +259,13 @@ export const Questionnaire: React.FC<QuestionnaireProps> = ({
         {submitError && <p style={{ color: "red" }}>{submitError}</p>}
 
         <div className={styles.buttonContainer}>
+          {onBack && (
+            <button type="button" onClick={onBack} className={styles.backButton}>
+              <Image src="/icons/ic_caretleft.svg" alt="Back Icon" width={24} height={24} />
+              {t("back")}
+            </button>
+          )}
+
           <Button
             type="button"
             onClick={() => void handleContinue()}
