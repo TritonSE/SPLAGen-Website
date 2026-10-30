@@ -9,6 +9,7 @@ import type { APIResult } from "@/api/requests";
 
 import { getPublicDirectory } from "@/api/directory";
 import { LoadingIndicator } from "@/components";
+import { Tabs } from "@/components/Tabs";
 import env from "@/util/validateEnv";
 import "@/app/globals.css";
 
@@ -21,21 +22,26 @@ type GeocodeApiResponse = {
 
 const MAP_CONTAINER = { width: "100%", height: "100%" } as const;
 const SIDEBAR_STYLE =
-  "w-full md:w-[30vw] h-[30vh] md:h-full overflow-y-auto p-4 border-t md:border-t-0 md:border-l";
+  "w-full md:w-[30vw] h-[30vh] md:h-full flex flex-col min-h-0 border-t md:border-t-0 md:border-l";
 const LEFT_SIDEBAR_STYLE =
   "w-full md:w-[15vw] md:min-w-[160px] h-[25vh] md:h-full overflow-y-auto p-4 border-b md:border-b-0 md:border-r bg-gray-50";
 const CENTER: GeoLocation = { lat: 23, lng: -90 }; // Gulf of Mexico
 const ZOOM = 3;
 
-const geocodeAddress = async (address: string): Promise<GeoLocation> => {
+const geocodeAddress = async (address: string): Promise<GeoLocation | null> => {
+  if (!address.trim()) return null;
   const res = await fetch(
     `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
       address,
     )}&key=${env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`,
   );
 
+  if (!res.ok) return null;
   const data = (await res.json()) as GeocodeApiResponse;
-  return data.results?.[0]?.geometry?.location ?? { lat: 0, lng: 0 };
+  const location = data.results?.[0]?.geometry?.location;
+  return location && Number.isFinite(location.lat) && Number.isFinite(location.lng)
+    ? location
+    : null;
 };
 
 // Professional title display map - now using translation keys
@@ -75,6 +81,8 @@ export default function DirectoryMapPage() {
   });
 
   const [markers, setMarkers] = useState<CounselorMarker[]>([]);
+  const [unlocated, setUnlocated] = useState<Counselor[]>([]);
+  const [showUnlocatedOnly, setShowUnlocatedOnly] = useState(false);
   const [selected, setSelected] = useState<CounselorMarker | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoadingDirectory, setIsLoadingDirectory] = useState(true);
@@ -98,6 +106,8 @@ export default function DirectoryMapPage() {
 
   const loadDirectory = useCallback(async () => {
     setIsLoadingDirectory(true);
+    setSelected(null);
+    setError(null);
     const result: APIResult<Counselor[]> = await getPublicDirectory(
       searchQuery || undefined,
       selectedLanguages.length > 0 ? selectedLanguages : undefined,
@@ -113,21 +123,23 @@ export default function DirectoryMapPage() {
     try {
       const all = await Promise.all(
         result.data.map(
-          async (c) =>
-            [
-              // Stringify to JSON - ugly hack to make equal locations compare equal
-              JSON.stringify(await geocodeAddress(c.address)),
-              c,
-            ] as const,
+          async (c) => [await geocodeAddress(c.address).catch(() => null), c] as const,
         ),
       );
       // lat then long
       const allDeduplicated: Map<string, Counselor[]> = new Map<string, Counselor[]>();
+      const missingLocations: Counselor[] = [];
       for (const [location, counselor] of all) {
-        const counselors = allDeduplicated.get(location) ?? [];
+        if (!location) {
+          missingLocations.push(counselor);
+          continue;
+        }
+        const key = JSON.stringify(location);
+        const counselors = allDeduplicated.get(key) ?? [];
         counselors.push(counselor);
-        allDeduplicated.set(location, counselors);
+        allDeduplicated.set(key, counselors);
       }
+      setUnlocated(missingLocations);
       setMarkers(
         allDeduplicated
           .entries()
@@ -227,7 +239,13 @@ export default function DirectoryMapPage() {
         </div>
 
         <p className="text-base text-gray-500 mt-4">
-          {isLoadingDirectory ? t("loading") : t("providers-found", { count: markers.length })}
+          {isLoadingDirectory
+            ? t("loading")
+            : t("providers-found", {
+                count:
+                  markers.reduce((total, marker) => total + marker.counselors.length, 0) +
+                  unlocated.length,
+              })}
         </p>
       </aside>
 
@@ -306,46 +324,72 @@ export default function DirectoryMapPage() {
 
       {/* Right Sidebar */}
       <aside className={SIDEBAR_STYLE}>
-        {isLoadingDirectory && <LoadingIndicator />}
-        {!isLoadingDirectory &&
-          markers
-            .map(({ counselors, location }, i) =>
-              counselors.map((counselor, j) => (
-                <div
-                  key={`${String(i)} ${String(j)}`}
-                  className="mb-4 cursor-pointer space-y-1 hover:bg-gray-50 p-2 rounded"
-                  onClick={() => {
-                    setSelected({ counselors, location });
-                    google.maps.event.trigger(window, "resize");
-                  }}
-                >
-                  <h3 className="font-medium">
-                    {counselor.name} ({formatTitle(counselor.title)})
-                  </h3>
-                  <p className="text-sm">📍 {counselor.address}</p>
-                  <p className="text-sm">🏢 {counselor.organization}</p>
-                  {counselor.profileUrl && (
-                    <p className="text-sm">
-                      🔗{" "}
-                      <a
-                        href={counselor.profileUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="underline text-blue-600 break-all"
-                      >
-                        {counselor.profileUrl}
-                      </a>
-                    </p>
-                  )}
-                  <p className="text-sm">🌐 {counselor.email}</p>
-                  <p className="text-sm">☎️ {counselor.phone ?? "—"}</p>
-                  <p className="text-sm">📚 {formatTranslatedList(counselor.specialties)}</p>
-                  <p className="text-sm">🗣 {formatTranslatedList(counselor.languages)}</p>
-                  <hr className="my-2" />
-                </div>
-              )),
-            )
-            .flat()}
+        <div className="shrink-0 px-4 pt-4">
+          <Tabs
+            tabs={["all-counselors", "location-not-found"] as const}
+            activeTab={showUnlocatedOnly ? "location-not-found" : "all-counselors"}
+            onActiveTabChange={(tab) => {
+              setShowUnlocatedOnly(tab === "location-not-found");
+            }}
+            labels={{
+              "location-not-found": `${t("location-not-found")} (${isLoadingDirectory ? "…" : String(unlocated.length)})`,
+            }}
+          />
+        </div>
+        <div
+          key={String(showUnlocatedOnly)}
+          className="flex-1 min-h-0 overflow-y-auto p-4"
+          aria-busy={isLoadingDirectory}
+        >
+          {isLoadingDirectory && <LoadingIndicator />}
+          {!isLoadingDirectory && showUnlocatedOnly && unlocated.length === 0 && (
+            <p className="text-sm text-gray-500">{t("no-unlocated-counselors")}</p>
+          )}
+          {!isLoadingDirectory &&
+            [
+              ...(showUnlocatedOnly ? [] : markers),
+              ...(unlocated.length ? [{ counselors: unlocated, location: null }] : []),
+            ].map(({ counselors, location }, i) => (
+              <section key={i} aria-label={location ? undefined : t("location-not-found")}>
+                {!location && <h2 className="font-bold text-lg mb-4">{t("location-not-found")}</h2>}
+                {counselors.map((counselor, j) => (
+                  <div
+                    key={`${String(i)} ${String(j)}`}
+                    className={`mb-4 space-y-1 p-2 rounded ${location ? "cursor-pointer hover:bg-gray-50" : ""}`}
+                    onClick={() => {
+                      if (!location) return;
+                      setSelected({ counselors, location });
+                      google.maps.event.trigger(window, "resize");
+                    }}
+                  >
+                    <h3 className="font-medium">
+                      {counselor.name} ({formatTitle(counselor.title)})
+                    </h3>
+                    <p className="text-sm">📍 {counselor.address}</p>
+                    <p className="text-sm">🏢 {counselor.organization}</p>
+                    {counselor.profileUrl && (
+                      <p className="text-sm">
+                        🔗{" "}
+                        <a
+                          href={counselor.profileUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="underline text-blue-600 break-all"
+                        >
+                          {counselor.profileUrl}
+                        </a>
+                      </p>
+                    )}
+                    <p className="text-sm">🌐 {counselor.email}</p>
+                    <p className="text-sm">☎️ {counselor.phone ?? "—"}</p>
+                    <p className="text-sm">📚 {formatTranslatedList(counselor.specialties)}</p>
+                    <p className="text-sm">🗣 {formatTranslatedList(counselor.languages)}</p>
+                    <hr className="my-2" />
+                  </div>
+                ))}
+              </section>
+            ))}
+        </div>
       </aside>
     </div>
   );

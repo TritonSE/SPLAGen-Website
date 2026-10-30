@@ -79,7 +79,7 @@ const ForgotLogin = () => {
 
           {/* Submit button is dynamically enabled/disabled based on form state */}
           <button
-            className={`longButton ${!isValid || loading ? "disabledButton" : ""}`}
+            className={`longButton authButton ${!isValid || loading ? "disabledButton" : ""}`}
             disabled={!isValid || loading}
             type="submit"
           >

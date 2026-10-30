@@ -8,7 +8,7 @@
   align-items: stretch;
   cursor: pointer;
   background-color: var(--color-surface);
-  max-height: 100%;
+  max-height: 250px;
   margin-bottom: 1rem;
 }
 
@@ -49,28 +49,40 @@
   display: flex;
   flex-direction: column;
   flex: 8;
+  min-width: 0;
+  min-height: 0;
 }
 
 .postcard-title {
+  flex-shrink: 0;
   font-size: 1.125rem;
   font-weight: bold;
   line-height: 1.5;
   color: var(--color-primary2);
   letter-spacing: 0.02rem;
+  overflow: hidden;
+  white-space: nowrap;
   text-overflow: ellipsis;
 }
 
 .postcard-audience {
+  flex-shrink: 0;
   font-size: 0.875rem;
   line-height: 1.4;
   color: black;
 }
 
 .postcard-message {
+  flex-shrink: 0;
   font-size: 0.75rem;
   line-height: 1.6;
   color: #6c6c6c;
   white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 9;
 }
 
 .postcard-divider {
@@ -86,6 +98,11 @@
     flex-direction: column;
     padding: 1rem;
     overflow-wrap: break-word;
+  }
+
+  .postcard-left {
+    flex-shrink: 0;
+    max-width: 100%;
   }
 
   .postcard-divider {

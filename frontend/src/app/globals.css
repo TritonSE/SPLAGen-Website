@@ -98,6 +98,10 @@ main {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
+.authButton:hover:not(:disabled):not(:active) {
+  background-color: var(--color-primary2);
+}
+
 .longButton:active {
   background-color: var(--color-active);
 }

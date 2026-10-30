@@ -158,7 +158,7 @@ const Login: React.FC = () => {
 
           {/* Submit button is dynamically enabled/disabled based on form state */}
           <button
-            className={`longButton ${!isValid ? "disabledButton" : ""}`}
+            className={`longButton authButton ${!isValid ? "disabledButton" : ""}`}
             disabled={!isValid || isSubmitting}
             type="submit"
           >

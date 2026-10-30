@@ -5,10 +5,16 @@ import styles from "./styles.module.css";
 type TabsProps<T extends string> = {
   tabs: readonly T[];
   activeTab: T;
+  labels?: Partial<Record<T, string>>;
   onActiveTabChange: (newTab: T) => unknown;
 };
 
-export const Tabs = <T extends string>({ tabs, activeTab, onActiveTabChange }: TabsProps<T>) => {
+export const Tabs = <T extends string>({
+  tabs,
+  activeTab,
+  onActiveTabChange,
+  labels,
+}: TabsProps<T>) => {
   const { t } = useTranslation();
 
   return (
@@ -21,7 +27,7 @@ export const Tabs = <T extends string>({ tabs, activeTab, onActiveTabChange }: T
             onActiveTabChange(tab);
           }}
         >
-          {t(tab)}
+          {labels?.[tab] ?? t(tab)}
         </div>
       ))}
     </div>

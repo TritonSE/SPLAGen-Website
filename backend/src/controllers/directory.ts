@@ -279,7 +279,17 @@ export const removeUserFromDirectory = async (
 const formatUserForDirectory = (user: User) => ({
   name: `${user.personal?.firstName ?? ""} ${user.personal?.lastName ?? ""}`,
   title: user.professional?.title ?? "Genetic Counselor",
-  address: `${user.clinic?.location?.address ?? ""} ${user.clinic?.location?.suite ?? ""}`.trim(),
+  address: [
+    user.clinic?.location?.address,
+    user.clinic?.location?.suite,
+    user.clinic?.location?.city,
+    user.clinic?.location?.state,
+    user.clinic?.location?.zipPostCode,
+    user.clinic?.location?.country,
+  ]
+    .map((part) => part?.trim())
+    .filter(Boolean)
+    .join(", "),
   organization: user.clinic?.name ?? "",
   email: user.display?.workEmail ?? user.personal?.email ?? "",
   phone: user.display?.workPhone ?? user.personal?.phone ?? "",
